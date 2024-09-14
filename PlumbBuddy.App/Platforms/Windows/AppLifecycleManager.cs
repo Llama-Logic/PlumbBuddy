@@ -28,9 +28,6 @@ class AppLifecycleManager :
     readonly AsyncManualResetEvent? startupTaskTrap;
     Microsoft.UI.Xaml.Window? xamlWindow;
 
-    public Task UiReleaseSignal =>
-        startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
-
     public bool PreventCasualClosing
     {
         get => preventCasualClosing;
@@ -41,6 +38,9 @@ class AppLifecycleManager :
                 SaveWindowPlacement();
         }
     }
+
+    public Task UiReleaseSignal =>
+        startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
 
     public void Dispose()
     {
