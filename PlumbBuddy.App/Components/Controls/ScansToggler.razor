@@ -1,0 +1,41 @@
+<MudComboBox T="string" @bind-SelectedValues="@SelectedGameOptionScans" Label="In The Sims 4 game options..." AdornmentIcon="@MaterialDesignIcons.Normal.Cog" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Primary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+    <ChildContent>
+        @foreach (var scan in gameOptionsScanLabels)
+        {
+            <MudComboBoxItem T="string" Text="@scan" Value="@scan">@scan</MudComboBoxItem>
+        }
+    </ChildContent>
+</MudComboBox>
+<br />
+<MudComboBox T="string" @bind-SelectedValues="@SelectedFoundScans" Label="Inside your Mods Folder, I find..." AdornmentIcon="@MaterialDesignIcons.Normal.FolderWrench" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Secondary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+    <ChildContent>
+        @foreach (var scan in foundScanLabels)
+        {
+            <MudComboBoxItem T="string" Text="@scan" Value="@scan">@scan</MudComboBoxItem>
+        }
+    </ChildContent>
+</MudComboBox>
+<br />
+<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Mods Folder, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+    <ChildContent>
+        @foreach (var scan in notFoundScanLabels)
+        {
+            <MudComboBoxItem T="string" Text="@scan" Value="@scan">@scan</MudComboBoxItem>
+        }
+    </ChildContent>
+</MudComboBox>
+<br />
+<MudComboBox T="string" @bind-SelectedValues="@SelectedAnalysisScans" Label="Mod file analysis suggests that..." AdornmentIcon="@MaterialDesignIcons.Normal.SyncAlert" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+    <ChildContent>
+        @foreach (var scan in analysisScanLabels)
+        {
+            <MudComboBoxItem T="string" Text="@scan" Value="@scan">@scan</MudComboBoxItem>
+        }
+    </ChildContent>
+</MudComboBox>
+<br />
+<MudTextM3 Align="Align.Center">
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.Checkbox" OnClick="EnableAllOnClickHandler">Enable All</MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxBlank" Style="margin-left: 5px;" OnClick="DisableAllOnClickHandler">Disable All</MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxMultipleMarked" Style="margin-left: 5px;" OnClick="SetDefaultOnClickHandler">Set Default</MudButton>
+</MudTextM3>

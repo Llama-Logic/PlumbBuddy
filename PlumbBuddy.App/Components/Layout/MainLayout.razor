@@ -1,0 +1,105 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject IDialogService DialogService
+@inject IDispatcher Dispatcher
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IPlayer Player
+@inject ISmartSimObserver SmartSimObserver
+@inject ISnackbar Snackbar
+@inject ISuperSnacks SuperSnacks
+
+<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@(Player.ShowThemeManager ? themeManagerTheme.Theme : theme)" />
+@if (Player.ShowThemeManager)
+{
+    <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
+    <MudThemeManager Open="@themeManagerOpen" IsDarkMode="@isDarkMode" OpenChanged="OpenThemeManager" Theme="@themeManagerTheme" ThemeChanged="UpdateTheme" />
+}
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudScrollbar Color="info" HoverColor="primary" TrackColor="#27272f30" Width="12" />
+<MudSnackbarProvider />
+<MudTypographyProvider />
+
+<MudDrawer @bind-Open="@isMainMenuDrawerOpen" Anchor="Anchor.Left" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+    <MainMenu CloseDrawer="CloseDrawerHandler" />
+</MudDrawer>
+
+<MudAnimate Selector=".plumbbuddy-is-thinking" AnimationType="AnimationType.Fade" Value="1" ValueSecondary="0.5" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseOut" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
+
+<MudLayout>
+    <MudAppBar>
+        <MudTooltip Text="Main Menu">
+            <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+        </MudTooltip>
+        <MudImage Src="/img/PlumbBuddyLogo.svg" Elevation="2" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+        <MudSpacer />
+        <MudSpacer />
+        @if (Player.ShowThemeManager)
+        {
+            if (@manualLightDarkModeToggleEnabled)
+            {
+                <MudTooltip Text="Manually Toggle Light/Dark Mode">
+                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-right: 5px;" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Toggle Manual Control of Light/Dark Mode">
+                <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-right: 5px;" />
+            </MudTooltip>
+        }
+        <MudPaper Style="border-radius: 30px; padding: 0 5px;">
+            @if (ModsDirectoryCataloger.IsUpdatingCatalog)
+            {
+                <MudTooltip Text="I'm currently combing through the files in your Mods folder, don't mind me. 😏">
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Info" Class="plumbbuddy-is-thinking">
+                        <ChildContent>Cataloging Mods</ChildContent>
+                    </MudChip>
+                </MudTooltip>
+            }
+            @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
+            {
+                <MudTooltip Text="This is the number of packages I was able to catalog in your Mods folder.">
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
+                </MudTooltip>
+            }
+            @if (Player.Type is UserType.Creator && ModsDirectoryCataloger.ResourceCount > 0)
+            {
+                <MudTooltip Text="This is the number of resources in the packages I was able to catalog in your Mods folder.">
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" Value="@ModsDirectoryCataloger.ResourceCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
+                </MudTooltip>
+            }
+            @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.ScriptArchiveCount > 0)
+            {
+                <MudTooltip Text="This is the number of script archives I was able to catalog in your Mods folder.">
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" Value="@ModsDirectoryCataloger.ScriptArchiveCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Error : Color.Success)" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Open Mods Folder">
+                <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderWrench" Color="Color.Primary" OnClick="SmartSimObserver.OpenModsFolder" />
+            </MudTooltip>
+            @if (Player.CacheStatus is SmartSimCacheStatus.Clear)
+            {
+                <MudTooltip Text="Clear Cache">
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Disabled="true" />
+                </MudTooltip>
+            }
+            @if (Player.CacheStatus is SmartSimCacheStatus.Normal)
+            {
+                <MudTooltip Text="Clear Cache">
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" OnClick="SmartSimObserver.ClearCache" />
+                </MudTooltip>
+            }
+            @if (Player.CacheStatus is SmartSimCacheStatus.Stale)
+            {
+                <MudTooltip Text="Clear Cache">
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="Color.Primary" OnClick="SmartSimObserver.ClearCache" />
+                </MudTooltip>
+            }
+            <MudTooltip Text="Ask for Help">
+                <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
+            </MudTooltip>
+        </MudPaper>
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>

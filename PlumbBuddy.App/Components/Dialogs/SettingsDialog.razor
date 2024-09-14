@@ -1,0 +1,51 @@
+@inject IPlayer Player
+
+<style>
+    .mud-dialog {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+
+    .mud-dialog-title {
+        display: none !important;
+    }
+
+    .mud-tab-slider {
+        display: none !important;
+    }
+
+    .custom-active-tab {
+        background-color: var(--mud-palette-surface);
+        color: var(--mud-palette-primary) !important;
+    }
+
+        .custom-active-tab:hover {
+            color: var(--mud--palette-primary-text) !important;
+        }
+</style>
+
+<MudStack>
+    <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer="true" KeepPanelsAlive="true" PanelClass="pa-6">
+        <MudTabPanel Text="General" Icon="@MaterialDesignIcons.Normal.Cog">
+            <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@UserType.Casual">Casual Player</MudSelectItem>
+                <MudSelectItem Value="@UserType.Enthusiast">Enthusiast Player</MudSelectItem>
+                <MudSelectItem Value="@UserType.Creator">Mod Creator</MudSelectItem>
+            </MudSelect>
+        </MudTabPanel>
+        <MudTabPanel Text="Folders" Icon="@MaterialDesignIcons.Normal.Folder">
+            <br />
+            <br />
+            <FoldersSelector @ref="@foldersSelector" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
+        </MudTabPanel>
+        <MudTabPanel Text="Mod Health Scans" Icon="@MaterialDesignIcons.Normal.PuzzleHeart">
+            <div style="margin: 0 auto; width: 85%;">
+                <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" />
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+    <MudGrid Justify="Justify.FlexEnd" Style="padding: 8px;">
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OkOnClickHandlerAsync" Style="margin-left: 8px;">Ok</MudButton>
+    </MudGrid>
+</MudStack>

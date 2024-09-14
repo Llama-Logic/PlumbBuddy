@@ -1,0 +1,26 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <Authors>LlamaLogic</Authors>
+        <Company>LlamaLogic</Company>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IncludeSymbols>true</IncludeSymbols>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>CA1014;CA1043;CA1502;CA1506;CA1721;CA2252;IDE0032</NoWarn>
+        <Nullable>enable</Nullable>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <RepositoryUrl>https://github.com/Llama-Logic/LlamaLogic</RepositoryUrl>
+        <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+        <DefineConstants Condition="'$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0'">$(DefineConstants);IS_NET_7_0_OR_GREATER</DefineConstants>
+        <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);IS_NET_8_0_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\Common\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
+    </ItemGroup>
+
+</Project>

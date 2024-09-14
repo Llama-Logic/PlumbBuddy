@@ -1,0 +1,82 @@
+<MudCarousel @bind-SelectedIndex="@UserTypeSelectedIndex" style="border-radius: 5px; height: 600px;" AutoCycle="false" BulletsPosition="Position.Start" Class="user-type-carousel mud-width-full" ShowArrows="true" ShowBullets="true" TData="object">
+    <BulletTemplate Context="selected">
+        <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+            <span class="mud-icon-button-label">
+                <MudIcon Icon="@(selected ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Circle)" Color="@Color.Inherit" />
+            </span>
+        </div>
+    </BulletTemplate>
+    <PreviousButtonTemplate>
+        <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+            <span class="mud-icon-button-label">
+                <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@MaterialDesignIcons.Normal.ArrowLeftCircle" Color="@Color.Inherit" />
+            </span>
+        </div>
+    </PreviousButtonTemplate>
+    <NextButtonTemplate>
+        <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
+            <span class="mud-icon-button-label">
+                <MudIcon Class="mud-ripple mud-ripple-icon mud-icon-button-size-medium" Icon="@MaterialDesignIcons.Normal.ArrowRightCircle" Color="@Color.Inherit" />
+            </span>
+        </div>
+    </NextButtonTemplate>
+    <ChildContent>
+        <MudCarouselItem>
+            <MudPage Class="carousel-item-user-casual" Column="7" Row="5">
+                <video autoplay muted loop>
+                    <source src="/video/CarouselCasual.mp4" type="video/mp4" />
+                </video>
+                <MudSection Class="description-backdrop" Column="2" ColSpan="2" Row="2" RowSpan="3">
+                </MudSection>
+                <MudSection Class="description" Column="2" ColSpan="2" Row="2" RowSpan="3">
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Casual Player</MudTextM3>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Body">
+                        I got PlumbBuddy because I want to play The Sims 4 with mods, but without any hassles.
+                        Don't bother me with a bunch of technical mumbo-jumbo.
+                        Just keep an eye on my mods, let me know when there's a problem, and give me an easy-to-follow way to fix it.
+                    </MudTextM3>
+                </MudSection>
+            </MudPage>
+        </MudCarouselItem>
+        <MudCarouselItem>
+            <MudPage Class="carousel-item-user-enthusiast" Column="7" Row="6">
+                <video autoplay muted loop>
+                    <source src="/video/CarouselEnthusiast.mp4" type="video/mp4" />
+                </video>
+                <MudSection Class="description-backdrop" Column="2" ColSpan="5" Row="4" RowSpan="2">
+                </MudSection>
+                <MudSection Class="description" Column="2" ColSpan="5" Row="4" RowSpan="2">
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Enthusiast Player</MudTextM3>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Body">
+                        I've been using mods in The Sims 4 for some time and I got PlumbBuddy to help automate all the mod maintenance I need to do.
+                        I'm comfortable with the technical stuff, so don't hold back.
+                        I want to see all the options, learn what they do, and exercise full control over them.
+                        I may have unusual preferences regarding how I want PlumbBuddy to behave.
+                    </MudTextM3>
+                </MudSection>
+            </MudPage>
+        </MudCarouselItem>
+        <MudCarouselItem>
+            <MudPage Class="carousel-item-user-creator" Column="8" Row="6">
+                <video autoplay muted loop>
+                    <source src="/video/CarouselCreator.mp4" type="video/mp4" />
+                </video>
+                <MudSection Class="description-backdrop" Column="5" ColSpan="3" Row="2" RowSpan="3">
+                </MudSection>
+                <MudSection Class="description" Column="5" ColSpan="3" Row="2" RowSpan="3">
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Mod Creator</MudTextM3>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Body">
+                        Hey, PlumbBuddy!
+                        You should probably just default all your health scans off for me unless I turn them on for myself.
+                        You and I both know I don't actually have time to play the game. 😂
+                        Oh, and could you unlock your Creator Tools tab for me?
+                        I may need to update manifests in my packages.
+                    </MudTextM3>
+                </MudSection>
+            </MudPage>
+        </MudCarouselItem>
+    </ChildContent>
+</MudCarousel>

@@ -1,0 +1,124 @@
+@inject IElectronicArtsApp ElectronicArtsApp
+@inject IFolderPicker FolderPicker
+@inject ISteam Steam
+
+<MudGrid Spacing="12" Justify="Justify.Center">
+    <MudItem>
+        <MudStack Row="true" Spacing="6">
+            <MudBadge Icon="@MaterialDesignIcons.Outline.CheckboxMarkedCircle" Color="Color.Success" Overlap="true">
+                <img src="@(DeviceInfo.Current.Platform == DevicePlatform.macOS || DeviceInfo.Current.Platform == DevicePlatform.MacCatalyst ? "/img/macOSLogo.png" : "/img/WindowsLogo.svg")" width="56" height="56" />
+            </MudBadge>
+            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    Operating System
+                </MudTextM3>
+                @if (DeviceInfo.Current.Platform == DevicePlatform.macOS || DeviceInfo.Current.Platform == DevicePlatform.MacCatalyst)
+                {
+                    <MudTextM3 Typo="TypoM3.Body">
+                        Apple macOS
+                    </MudTextM3>
+                }
+                @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                {
+                    <MudTextM3 Typo="TypoM3.Body">
+                        Microsoft Windows
+                    </MudTextM3>
+                }
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    @CultureInfo.CurrentCulture.NativeName
+                </MudTextM3>
+                <br />
+                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" OnClick="UseDefaultUserDataFolderOnClickAsync">Reset Path</MudButton>
+            </MudStack>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row="true" Spacing="6">
+            <MudBadge Icon="@(isEAAppInstalled ? isTS4AvailableFromEA ? MaterialDesignIcons.Outline.CheckboxMarkedCircleAuto : MaterialDesignIcons.Outline.CheckboxMarkedCircle : MaterialDesignIcons.Outline.CheckboxBlankCircle)" Color="@(isTS4AvailableFromEA ? Color.Success : Color.Dark)" Overlap="true">
+                <img src="/img/EAAppLogo.png" width="56" height="56" />
+            </MudBadge>
+            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    Distribution Platform
+                </MudTextM3>
+                <MudTextM3 Typo="TypoM3.Body">
+                    The EA App
+                </MudTextM3>
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    The Sims 4 is
+                    @if (!isTS4AvailableFromEA)
+                    {
+                        <span>not</span>
+                    }
+                    installed.
+                </MudTextM3>
+                @if (isTS4AvailableFromEA)
+                {
+                    <br />
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" OnClick="UseEAAppVersionOnClickAsync">Select</MudLoadingButton>
+                }
+            </MudStack>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row="true" Spacing="6">
+            <MudBadge Icon="@(isSteamInstalled ? isTS4AvailableFromValve ? MaterialDesignIcons.Outline.CheckboxMarkedCircleAuto : MaterialDesignIcons.Outline.CheckboxMarkedCircle : MaterialDesignIcons.Outline.CheckboxBlankCircle)" Color="@(isTS4AvailableFromValve ? Color.Success : Color.Dark)" Overlap="true">
+                <img src="/img/SteamLogo.svg" width="56" height="56" />
+            </MudBadge>
+            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    Distribution Platform
+                </MudTextM3>
+                <MudTextM3 Typo="TypoM3.Body">
+                    Valve Steam
+                </MudTextM3>
+                <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
+                    The Sims 4 is
+                    @if (!isTS4AvailableFromValve)
+                    {
+                        <span>not</span>
+                    }
+                    installed.
+                </MudTextM3>
+                @if (isTS4AvailableFromValve)
+                {
+                    <br />
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" OnClick="UseSteamVersionOnClickAsync">Select</MudLoadingButton>
+                }
+            </MudStack>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+<br />
+<br />
+@if (IsOnboarding)
+{
+    <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+        But, ya know... 👉👈... I can make mistakes just like anyone else.
+    </MudTextM3>
+    <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+        You can change either of these if they're wrong.
+    </MudTextM3>
+    <br />
+    <br />
+}
+<MudForm @ref="@foldersForm" style="margin: 0 auto; width: 80%;">
+    <MudTextFieldExtended T="string" Label="User Data Folder" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate="true" Required="true" Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
+        <AdornmentStart>
+            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
+        </AdornmentStart>
+        <AdornmentEnd>
+            <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">Browse...</MudButton>
+        </AdornmentEnd>
+    </MudTextFieldExtended>
+    <br />
+    <MudTextFieldExtended T="string" Label="Installation Folder" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate="true" Required="true" Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
+        <AdornmentStart>
+            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
+        </AdornmentStart>
+        <AdornmentEnd>
+            <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">Browse...</MudButton>
+        </AdornmentEnd>
+    </MudTextFieldExtended>
+</MudForm>
+<br />
