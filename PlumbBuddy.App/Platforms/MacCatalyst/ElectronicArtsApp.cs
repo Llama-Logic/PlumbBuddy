@@ -10,7 +10,7 @@ class ElectronicArtsApp :
     {
         try
         {
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {

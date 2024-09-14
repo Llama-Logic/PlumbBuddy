@@ -1,7 +1,7 @@
 namespace PlumbBuddy.App.Platforms.MacCatalyst;
 
 class Steam :
-    Services.SteamBase
+    SteamBase
 {
     protected override DirectoryInfo? GetSteamDataDirectory()
     {

@@ -1,10 +1,19 @@
 ﻿using Foundation;
 
-namespace PlumbBuddy.App
+namespace PlumbBuddy.App.Platforms.MacCatalyst;
+
+[Register("AppDelegate")]
+public class AppDelegate :
+    MauiUIApplicationDelegate
 {
-    [Register("AppDelegate")]
-    public class AppDelegate : MauiUIApplicationDelegate
+    protected override MauiApp CreateMauiApp() =>
+        MauiProgram.CreateMauiApp(ConfigureMauiAppBuilder);
+
+    void ConfigureMauiAppBuilder(MauiAppBuilder builder)
     {
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+        builder.Services.AddSingleton<IAppLifecycleManager>(appLifecycleManager!);
+        builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
+        builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
+        builder.Services.AddSingleton<ISteam, Steam>();
     }
 }

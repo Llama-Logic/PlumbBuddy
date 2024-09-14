@@ -8,6 +8,11 @@ public interface IAppLifecycleManager
     bool PreventCasualClosing { get; set; }
 
     /// <summary>
+    /// Gets a task that is completed when it's time for the UI to initialize
+    /// </summary>
+    Task UiReleaseSignal { get; }
+
+    /// <summary>
     /// Called when the main window should be hidden
     /// </summary>
     void HideWindow();
@@ -16,11 +21,6 @@ public interface IAppLifecycleManager
     /// Called when the main window should be shown
     /// </summary>
     void ShowWindow();
-
-    /// <summary>
-    /// Called by the UI thread when DI is ready but the UI has not yet started, trap it if necessary until it's time to show the window
-    /// </summary>
-    void TrapUiThreadBeforeStartup();
 
     /// <summary>
     /// Called when the first launched instance of the app first shows its window

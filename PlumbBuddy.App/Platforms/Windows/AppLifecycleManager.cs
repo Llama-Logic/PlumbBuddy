@@ -28,6 +28,9 @@ class AppLifecycleManager :
     readonly AsyncManualResetEvent? startupTaskTrap;
     Microsoft.UI.Xaml.Window? xamlWindow;
 
+    public Task UiReleaseSignal =>
+        startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
+
     public bool PreventCasualClosing
     {
         get => preventCasualClosing;
@@ -123,9 +126,6 @@ class AppLifecycleManager :
             xamlWindow.Activate();
         }
     }
-
-    public void TrapUiThreadBeforeStartup() =>
-        startupTaskTrap?.Wait();
 
     public void WindowFirstShown(Window window)
     {
