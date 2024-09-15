@@ -54,9 +54,9 @@
     height: 100%;
 }
 
-.carousel-item-user-enthusiast .carousel-item-backdrop-static {
-    background-image: url(/img/CarouselCasual.png);
-}
+    .carousel-item-user-casual .carousel-item-backdrop-static {
+        background-image: url(/img/CarouselCasual.png);
+    }
 
     .carousel-item-user-casual .description-backdrop {
         background-color: var(--mud-palette-primary);
@@ -86,7 +86,7 @@
     height: 100%;
 }
 
-    .carousel-item-user-enthusiast .carousel-item-backdrop-static {
+    .carousel-item-user-creator .carousel-item-backdrop-static {
         background-image: url(/img/CarouselCreator.png);
     }
 
