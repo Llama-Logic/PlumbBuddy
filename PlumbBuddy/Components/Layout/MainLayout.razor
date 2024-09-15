@@ -47,6 +47,14 @@
             </MudTooltip>
         }
         <MudPaper Style="border-radius: 30px; padding: 0 5px;">
+            @if (ModsDirectoryCataloger.IsListeningForBreakInChanges)
+            {
+                <MudTooltip Text="Just waiting for activity in your Mods folder to die down and then I'll have a look. 😏">
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.EarHearing" Color="Color.Info" Class="plumbbuddy-is-thinking">
+                        <ChildContent>Listening to File System</ChildContent>
+                    </MudChip>
+                </MudTooltip>
+            }
             @if (ModsDirectoryCataloger.IsUpdatingCatalog)
             {
                 <MudTooltip Text="I'm currently combing through the files in your Mods folder, don't mind me. 😏">

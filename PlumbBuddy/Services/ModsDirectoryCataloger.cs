@@ -79,11 +79,12 @@ public class ModsDirectoryCataloger :
         return modManifest;
     }
 
+    static readonly PropertyChangedEventArgs isListeningForBreakInChangesPropertyChangedEventArgs = new(nameof(IsListeningForBreakInChanges));
     static readonly PropertyChangedEventArgs isUpdatingCatalogPropertyChangedEventArgs = new(nameof(IsUpdatingCatalog));
     static readonly PropertyChangedEventArgs packageCountPropertyChangedEventArgs = new(nameof(PackageCount));
     static readonly PropertyChangedEventArgs resourceCountPropertyChangedEventArgs = new(nameof(ResourceCount));
     static readonly PropertyChangedEventArgs scriptArchiveCountPropertyChangedEventArgs = new(nameof(ScriptArchiveCount));
-    static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
+    static readonly TimeSpan fiveSeconds = TimeSpan.FromSeconds(5);
 
     public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlayer player, ISuperSnacks superSnacks)
     {
@@ -97,9 +98,11 @@ public class ModsDirectoryCataloger :
         this.superSnacks = superSnacks;
         pathsProcessingQueue = new();
         saveChangesLock = new();
+        Task.Run(UpdateAggregatePropertiesAsync);
         Task.Run(ProcessPathsQueueAsync);
     }
 
+    bool isListeningForBreakInChanges;
     bool isUpdatingCatalog;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
@@ -112,6 +115,16 @@ public class ModsDirectoryCataloger :
     readonly ISuperSnacks superSnacks;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public bool IsListeningForBreakInChanges
+    {
+        get => isListeningForBreakInChanges;
+        private set
+        {
+            isListeningForBreakInChanges = value;
+            PropertyChanged?.Invoke(this, isListeningForBreakInChangesPropertyChangedEventArgs);
+        }
+    }
 
     public bool IsUpdatingCatalog
     {
@@ -163,17 +176,22 @@ public class ModsDirectoryCataloger :
         cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
+            IsListeningForBreakInChanges = true;
             var nomNom = new Queue<string>();
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
             {
                 try
                 {
-                    await Task.Delay(oneSecond).ConfigureAwait(false);
+                    await Task.Delay(fiveSeconds).ConfigureAwait(false);
                     if (!await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
                         break;
                     while (await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
-                        nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
+                    {
+                        var path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
+                        if (!nomNom.Contains(path))
+                            nomNom.Enqueue(path);
+                    }
                 }
                 catch (OperationCanceledException) // this was OutputAvailableAsync -- usually Mr. Cleary documents his throws 🙄
                 {
@@ -181,9 +199,10 @@ public class ModsDirectoryCataloger :
                     break;
                 }
             }
+            IsListeningForBreakInChanges = false;
+            IsUpdatingCatalog = true;
             while (nomNom.TryDequeue(out var path))
             {
-                IsUpdatingCatalog = true;
                 var modsDirectoryPath = Path.Combine(player.UserDataFolderPath, "Mods");
                 var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
                 var fullPath = Path.Combine(modsDirectoryPath, path);
@@ -231,15 +250,7 @@ public class ModsDirectoryCataloger :
                     }
                     if (player.CacheStatus is SmartSimCacheStatus.Normal && packagesRemoved > 0)
                         player.CacheStatus = SmartSimCacheStatus.Stale;
-                    PackageCount = await pbDbContext.ModFiles
-                        .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package)
-                        .ConfigureAwait(false);
-                    ResourceCount = await pbDbContext.ModFileResources
-                        .CountAsync(mfr => mfr.ModFile!.Path != null)
-                        .ConfigureAwait(false);
-                    ScriptArchiveCount = await pbDbContext.ModFiles
-                        .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)
-                        .ConfigureAwait(false);
+                    await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
                 }
                 else
                 {
@@ -263,15 +274,7 @@ public class ModsDirectoryCataloger :
                     }
                     if (player.CacheStatus is SmartSimCacheStatus.Normal && packagesRemoved > 0)
                         player.CacheStatus = SmartSimCacheStatus.Stale;
-                    PackageCount = await pbDbContext.ModFiles
-                        .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package)
-                        .ConfigureAwait(false);
-                    ResourceCount = await pbDbContext.ModFileResources
-                        .CountAsync(mfr => mfr.ModFile!.Path != null)
-                        .ConfigureAwait(false);
-                    ScriptArchiveCount = await pbDbContext.ModFiles
-                        .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)
-                        .ConfigureAwait(false);
+                    await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
                 }
             }
             IsUpdatingCatalog = false;
@@ -441,5 +444,25 @@ public class ModsDirectoryCataloger :
                     options.Icon = MaterialDesignIcons.Normal.PackageVariantRemove;
                 });
         }
+    }
+
+    async Task UpdateAggregatePropertiesAsync()
+    {
+        using var nestedScope = lifetimeScope.BeginLifetimeScope();
+        var pbDbContext = nestedScope.Resolve<PbDbContext>();
+        await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
+    }
+
+    async Task UpdateAggregatePropertiesAsync(PbDbContext pbDbContext)
+    {
+        PackageCount = await pbDbContext.ModFiles
+            .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package)
+            .ConfigureAwait(false);
+        ResourceCount = await pbDbContext.ModFileResources
+            .CountAsync(mfr => mfr.ModFile!.Path != null)
+            .ConfigureAwait(false);
+        ScriptArchiveCount = await pbDbContext.ModFiles
+            .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)
+            .ConfigureAwait(false);
     }
 }

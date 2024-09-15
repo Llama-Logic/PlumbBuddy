@@ -3,6 +3,8 @@ namespace PlumbBuddy.Services;
 public interface IModsDirectoryCataloger :
     INotifyPropertyChanged
 {
+    bool IsListeningForBreakInChanges { get; }
+
     bool IsUpdatingCatalog { get; }
 
     int PackageCount { get; }
