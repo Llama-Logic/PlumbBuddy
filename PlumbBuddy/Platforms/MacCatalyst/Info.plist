@@ -15,6 +15,6 @@
 	<key>CFBundleDisplayName</key>
 	<string>PlumbBuddy</string>
 	<key>CFBundleIconFile</key>
-	<string>appicon.icns</string>
+	<string>plumbbuddy_icon</string>
 </dict>
 </plist>

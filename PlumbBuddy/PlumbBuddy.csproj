@@ -118,6 +118,12 @@
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <None Update="Platforms/MacCatalyst/Resources/plumbbuddy_icon.icns">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
     <ItemGroup>
         <Compile Update="Localization\AppText.Designer.cs">
             <DependentUpon>AppText.resx</DependentUpon>
