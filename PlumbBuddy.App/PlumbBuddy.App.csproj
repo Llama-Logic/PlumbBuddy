@@ -133,4 +133,10 @@
         </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <None Update="Platforms/MacCatalyst/Resources/plumbbuddy_icon.icns">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

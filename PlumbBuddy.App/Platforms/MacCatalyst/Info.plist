@@ -32,11 +32,13 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array> -->
-    <key>XSAppIconAssets</key>
-    <string>Assets.xcassets/appicon.appiconset</string>
+    <!--<key>XSAppIconAssets</key>
+    <string>Assets.xcassets/appicon.appiconset</string>-->
     <key>CFBundleName</key>
     <string>PlumbBuddy</string>
     <key>CFBundleDisplayName</key>
     <string>PlumbBuddy</string>
+    <key>CFBundleIconFile</key>
+    <string>plumbbuddy_icon.icns</string>
 </dict>
 </plist>
