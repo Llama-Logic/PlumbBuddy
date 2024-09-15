@@ -3,8 +3,8 @@ namespace PlumbBuddy.App.Platforms.MacCatalyst;
 class ElectronicArtsApp :
     IElectronicArtsApp
 {
-    const string eaAppBundleId = "com.ea.EADesktop";
-    const string ts4AppBundleId = "com.ea.sims4";
+    const string eaAppBundleId = "com.ea.mac.eaapp";
+    const string ts4AppBundleId = "com.ea.mac.thesims4";
 
     async Task<string?> FindAppByBundleIdAsync(string bundleId)
     {
