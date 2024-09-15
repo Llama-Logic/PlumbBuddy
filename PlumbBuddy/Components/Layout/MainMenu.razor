@@ -33,8 +33,11 @@
                 <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="ToggleThemeManagerOnClickHandlerAsync">Toggle Theme Manager</MudNavLink>
             </MudNavGroup>
         }
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" IconColor="Color.Primary" OnClick="CloseWindowOnClickHandlerAsync">Close Window</MudNavLink>
-        <MudDivider Class="my-2" />
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="ShutdownPlumbBuddyOnClickHandlerAsync">Shutdown PlumbBuddy</MudNavLink>
+        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+        {
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" IconColor="Color.Primary" OnClick="CloseWindowOnClickHandlerAsync">Close Window</MudNavLink>
+            <MudDivider Class="my-2" />
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="ShutdownPlumbBuddyOnClickHandlerAsync">Shutdown PlumbBuddy</MudNavLink>
+        }
     </MudNavMenu>
 </MudPaper>
