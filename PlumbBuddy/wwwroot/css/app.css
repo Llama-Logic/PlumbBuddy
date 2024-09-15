@@ -17,91 +17,85 @@
     filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.5));
 }
 
+.user-type-carousel .carousel-item-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.user-type-carousel .carousel-item-backdrop-static {
+    top: 0;
+    left: 0;
+    background-position: center;
+    background-size: cover;
+}
+
+.user-type-carousel video {
+    top: 50%;
+    left: 50%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+}
+
+.user-type-carousel .description-backdrop {
+    border-radius: 20px;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.user-type-carousel .description {
+    padding: 20px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
+    z-index: 2;
+}
+
 .carousel-item-user-casual {
     height: 100%;
 }
 
-    .carousel-item-user-casual video {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: translate(-50%, -50%);
-        z-index: 0;
+    .carousel-item-user-enthusiast .static {
+        background-image: url(/img/CarouselCasual.png);
     }
 
     .carousel-item-user-casual .description-backdrop {
         background-color: var(--mud-palette-primary);
-        border-radius: 20px;
-        opacity: 0.5;
-        z-index: 1;
     }
 
     .carousel-item-user-casual .description {
         color: var(--mud-palette-primary-text);
-        padding: 20px;
-        text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
-        z-index: 2;
     }
 
 .carousel-item-user-enthusiast {
     height: 100%;
 }
 
-    .carousel-item-user-enthusiast video {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: translate(-50%, -50%);
-        z-index: 0;
+    .carousel-item-user-enthusiast .static {
+        background-image: url(/img/CarouselEnthusiast.png);
     }
 
     .carousel-item-user-enthusiast .description-backdrop {
         background-color: var(--mud-palette-secondary);
-        border-radius: 20px;
-        opacity: 0.4;
-        z-index: 1;
     }
 
     .carousel-item-user-enthusiast .description {
         color: var(--mud-palette-secondary-text);
-        padding: 20px;
-        text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
-        z-index: 2;
     }
 
 .carousel-item-user-creator {
     height: 100%;
 }
 
-    .carousel-item-user-creator video {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: translate(-50%, -50%);
-        z-index: 0;
+    .carousel-item-user-enthusiast .static {
+        background-image: url(/img/CarouselCreator.png);
     }
 
     .carousel-item-user-creator .description-backdrop {
         background-color: var(--mud-palette-tertiary);
-        border-radius: 20px;
-        opacity: 0.6;
-        z-index: 1;
     }
 
     .carousel-item-user-creator .description {
         color: var(--mud-palette-tertiary-text);
-        padding: 20px;
-        text-shadow: 1px 1px 5px rgba(0, 0, 0, 1);
-        z-index: 2;
     }
 
 .classified-paper {
