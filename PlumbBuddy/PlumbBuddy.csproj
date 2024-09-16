@@ -17,8 +17,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>0.1.1</ApplicationDisplayVersion>
+        <ApplicationVersion>0.1.1</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -44,6 +44,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <MtouchLink>none</MtouchLink>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetFramework>net8.0-maccatalyst</TargetFramework>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
@@ -51,6 +52,7 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::IsOSPlatform('osx'))">
         <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+        <UseInterpreter>true</UseInterpreter>
     </PropertyGroup>
 
     <ItemGroup>
