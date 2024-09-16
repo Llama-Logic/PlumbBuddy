@@ -7,7 +7,7 @@ class PlatformFunctions :
         StringComparison.Ordinal;
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
-        Process.Start("open", directoryInfo.FullName);
+        Process.Start("open", $"\"{directoryInfo.FullName}\"");
 
     public void ViewFile(FileInfo fileInfo) =>
         Process.Start("open", $"-R \"{fileInfo.FullName}\"");
