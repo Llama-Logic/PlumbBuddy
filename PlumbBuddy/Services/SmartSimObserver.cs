@@ -438,11 +438,11 @@ public partial class SmartSimObserver :
     {
         var oldRelativePath = GetRelativePathInUserDataFolder(e.OldFullPath);
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
-        if (ResampleGameOptionsIfTheyChanged(oldRelativePath) || ResampleGameOptionsIfTheyChanged(relativePath))
+        if (ResampleGameOptionsIfTheyChanged(oldRelativePath) | ResampleGameOptionsIfTheyChanged(relativePath))
             return;
-        if (CatalogIfModsDirectory(oldRelativePath) || CatalogIfModsDirectory(relativePath))
+        if (CatalogIfModsDirectory(oldRelativePath) | CatalogIfModsDirectory(relativePath))
             return;
-        if (CatalogIfInModsDirectory(oldRelativePath) || CatalogIfInModsDirectory(relativePath))
+        if (CatalogIfInModsDirectory(oldRelativePath) | CatalogIfInModsDirectory(relativePath))
             return;
     }
 

@@ -85,14 +85,16 @@ public class ModsDirectoryCataloger :
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
     static readonly TimeSpan fiveSeconds = TimeSpan.FromSeconds(5);
 
-    public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlayer player, ISuperSnacks superSnacks)
+    public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.lifetimeScope = lifetimeScope;
         this.logger = logger;
+        this.platformFunctions = platformFunctions;
         this.player = player;
         this.superSnacks = superSnacks;
         pathsProcessingQueue = new();
@@ -105,6 +107,7 @@ public class ModsDirectoryCataloger :
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
     readonly AsyncProducerConsumerQueue<string> pathsProcessingQueue;
+    readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     int resourceCount;
     readonly AsyncLock saveChangesLock;
@@ -219,35 +222,31 @@ public class ModsDirectoryCataloger :
                     }
                     broadcastBlock.Complete();
                     await actionBlock.Completion.ConfigureAwait(false);
-                    using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
-                    {
-                        await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
-                            .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
-                            .ConfigureAwait(false);
-                        await pbDbContext.FilesOfInterest
-                            .Where(foi => foi.Path.StartsWith(path) && !preservedFileOfInterestPaths.Contains(foi.Path))
-                            .ExecuteDeleteAsync()
-                            .ConfigureAwait(false);
-                    }
-                    await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
+                    using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                    await pbDbContext.ModFiles
+                        .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
+                        .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
+                        .ConfigureAwait(false);
+                    await pbDbContext.FilesOfInterest
+                        .Where(foi => foi.Path.StartsWith(path) && !preservedFileOfInterestPaths.Contains(foi.Path))
+                        .ExecuteDeleteAsync()
+                        .ConfigureAwait(false);
                 }
                 else
                 {
-                    using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
-                    {
-                        await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.Path.StartsWith(path))
-                            .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
-                            .ConfigureAwait(false);
-                        await pbDbContext.FilesOfInterest
-                            .Where(foi => foi.Path.StartsWith(path))
-                            .ExecuteDeleteAsync()
-                            .ConfigureAwait(false);
-                    }
-                    await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
+                    using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                    var modFilesRemoved = await pbDbContext.ModFiles
+                        .Where(md => md.Path != null && md.Path.StartsWith(path))
+                        .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
+                        .ConfigureAwait(false);
+                    modFilesRemoved.ToString();
+                    await pbDbContext.FilesOfInterest
+                        .Where(foi => foi.Path.StartsWith(path))
+                        .ExecuteDeleteAsync()
+                        .ConfigureAwait(false);
                 }
             }
+            await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
             State = ModDirectoryCatalogerState.AnalyzingTopography;
             var resourceWasRemovedOrReplaced = false;
             var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
@@ -256,6 +255,12 @@ public class ModsDirectoryCataloger :
                 var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
                 await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+                var pathCollation = platformFunctions.FileSystemStringComparison switch
+                {
+                    StringComparison.Ordinal => "BINARY",
+                    StringComparison.OrdinalIgnoreCase => "NOCASE",
+                    _ => throw new NotSupportedException($"Cannot translate {platformFunctions.FileSystemStringComparison} to SQLite collation")
+                };
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection
                 await pbDbContext.Database.ExecuteSqlRawAsync
                 (
@@ -264,17 +269,21 @@ public class ModsDirectoryCataloger :
                         ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
                     SELECT
                         {currentTopologySnapshot.Id},
-                        FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path{(DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst ? " COLLATE BINARY" : string.Empty)})
-                    FROM
-                        ModFileResources mfr
-                        JOIN ModFiles mf ON mf.Id = mfr.ModFileId
-                    WHERE
-                        mf.Path IS NOT NULL
-                        AND mf.FileType = 1
-                    GROUP BY
-                        mfr.KeyType,
-                        mfr.KeyGroup,
-                        mfr.KeyFullInstance
+                    	sq.Id
+                    FROM 
+                    	(
+                    		SELECT DISTINCT
+                    			mfr.KeyType,
+                    			mfr.KeyGroup,
+                    			mfr.KeyFullInstance,
+                    			FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
+                    		FROM
+                    			ModFileResources mfr
+                    			JOIN ModFiles mf ON mf.Id = mfr.ModFileId
+                    		WHERE
+                    			mf.Path IS NOT NULL
+                    			AND mf.FileType = 1
+                    	) sq
                     """
                 ).ConfigureAwait(false);
                 if (latestTopologySnapshot is not null)

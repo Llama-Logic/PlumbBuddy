@@ -107,7 +107,7 @@
             @if (Player.CacheStatus is SmartSimCacheStatus.Stale)
             {
                 <MudTooltip Text="Clear Cache">
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="Color.Primary" OnClick="SmartSimObserver.ClearCache" />
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="Color.Warning" OnClick="SmartSimObserver.ClearCache" />
                 </MudTooltip>
             }
             <MudTooltip Text="Ask for Help">
