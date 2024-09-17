@@ -20,18 +20,40 @@ partial class MainMenu
         AppLifecycleManager.HideWindow();
     }
 
-    public void Dispose() =>
+    public void Dispose()
+    {
+        ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
+    }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
+    }
+
+    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
+        {
+            if (!Dispatcher.IsDispatchRequired)
+                StateHasChanged();
+            else
+                Dispatcher.Dispatch(StateHasChanged);
+        }
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
+        if (e.PropertyName is nameof(IPlayer.CacheStatus))
+        {
+            if (!Dispatcher.IsDispatchRequired)
+                StateHasChanged();
+            else
+                Dispatcher.Dispatch(StateHasChanged);
+        }
+        else if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
             StateHasChanged();
     }
 
@@ -62,6 +84,12 @@ partial class MainMenu
                 Snackbar.Add("Marry me, you beautiful human. Dev Tools unlocked! 🔓", Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.Heart);
             }
         }
+    }
+
+    async Task OpenDownloadsFolderHandlerAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        SmartSimObserver.OpenDownloadsFolder();
     }
 
     async Task OpenModsFolderHandlerAsync()

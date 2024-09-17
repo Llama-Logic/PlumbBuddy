@@ -8,5 +8,6 @@ public interface ISmartSimObserver :
     bool IsScriptModsEnabledGameSettingOn { get; }
 
     void ClearCache();
+    void OpenDownloadsFolder();
     void OpenModsFolder();
 }

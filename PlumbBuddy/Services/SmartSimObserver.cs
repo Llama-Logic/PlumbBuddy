@@ -74,7 +74,19 @@ public partial class SmartSimObserver :
     {
         if (modsDirectoryRelativePathPattern.IsMatch(userDataDirectoryRelativePath))
         {
+            PutCatalogerToBedIfGameIsRunning();
             modsDirectoryCataloger.Catalog(userDataDirectoryRelativePath[5..]);
+            return true;
+        }
+        return false;
+    }
+
+    bool CatalogIfModsDirectory(string userDataDirectoryRelativePath)
+    {
+        if (userDataDirectoryRelativePath == "Mods")
+        {
+            PutCatalogerToBedIfGameIsRunning();
+            modsDirectoryCataloger.Catalog("");
             return true;
         }
         return false;
@@ -188,6 +200,7 @@ public partial class SmartSimObserver :
             userDataDirectoryWatcher.Error += UserDataDirectoryWatcherErrorHandler;
             userDataDirectoryWatcher.Renamed += UserDataDirectoryFileSystemEntryRenamedHandler;
             userDataDirectoryWatcher.EnableRaisingEvents = true;
+            PutCatalogerToBedIfGameIsRunning();
             modsDirectoryCataloger.Catalog(string.Empty);
         }
     }
@@ -240,16 +253,6 @@ public partial class SmartSimObserver :
         }
     }
 
-    bool CatalogIfModsDirectory(string userDataDirectoryRelativePath)
-    {
-        if (userDataDirectoryRelativePath == "Mods")
-        {
-            modsDirectoryCataloger.Catalog("");
-            return true;
-        }
-        return false;
-    }
-
     string GetRelativePathInUserDataFolder(string fullPath)
     {
         var trimmedLocalPathSegmentsMatch = trimmedLocalPathSegmentsPattern.Match(player.UserDataFolderPath);
@@ -291,11 +294,34 @@ public partial class SmartSimObserver :
         ConnectToInstallationDirectory();
     }
 
+    bool IsCacheLocked()
+    {
+        try
+        {
+            foreach (var fileInfo in cacheComponents.OfType<FileInfo>())
+            {
+                fileInfo.Refresh();
+                if (fileInfo.Exists)
+                {
+                    using var fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                }
+            }
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+    }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    public void OpenDownloadsFolder() =>
+        platformFunctions.ViewDirectory(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")));
 
     public void OpenModsFolder()
     {
@@ -328,13 +354,33 @@ public partial class SmartSimObserver :
         }
     }
 
+    void PutCatalogerToBedIfGameIsRunning()
+    {
+        if (modsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping && IsCacheLocked())
+            Task.Run(PutCatalogerToBedWhileGameIsRunningAsync);
+    }
+
+    async Task PutCatalogerToBedWhileGameIsRunningAsync()
+    {
+        if (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(player.InstallationFolderPath)).ConfigureAwait(false) is { } ts4Process)
+        {
+            modsDirectoryCataloger.GoToSleep();
+            await ts4Process.WaitForExitAsync().ConfigureAwait(false);
+            ts4Process.Dispose();
+            modsDirectoryCataloger.WakeUp();
+        }
+    }
+
     void ResampleCacheClarity()
     {
         foreach (var cacheComponent in cacheComponents)
             cacheComponent.Refresh();
         var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce.Exists);
         if (player.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
+        {
             player.CacheStatus = SmartSimCacheStatus.Normal;
+            PutCatalogerToBedIfGameIsRunning();
+        }
         else if (player.CacheStatus is not SmartSimCacheStatus.Clear && !anyCacheComponentsExistOnDisk)
             player.CacheStatus = SmartSimCacheStatus.Clear;
     }

@@ -12,4 +12,8 @@ public interface IModsDirectoryCataloger :
     int ScriptArchiveCount { get; }
 
     void Catalog(string path);
+
+    void GoToSleep();
+
+    void WakeUp();
 }

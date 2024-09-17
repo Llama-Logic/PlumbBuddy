@@ -97,12 +97,14 @@ public class ModsDirectoryCataloger :
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.superSnacks = superSnacks;
+        awakeManualResetEvent = new(true);
         pathsProcessingQueue = new();
         saveChangesLock = new();
         Task.Run(UpdateAggregatePropertiesAsync);
         Task.Run(ProcessPathsQueueAsync);
     }
 
+    readonly AsyncManualResetEvent awakeManualResetEvent;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
@@ -160,6 +162,9 @@ public class ModsDirectoryCataloger :
     public void Catalog(string path) =>
         pathsProcessingQueue.Enqueue(path);
 
+    public void GoToSleep() =>
+        awakeManualResetEvent.Reset();
+
     async Task ProcessPathsQueueAsync()
     {
         using var cts = new CancellationTokenSource();
@@ -167,6 +172,8 @@ public class ModsDirectoryCataloger :
         cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
+            State = ModDirectoryCatalogerState.Sleeping;
+            await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
             State = ModDirectoryCatalogerState.Debouncing;
             var nomNom = new Queue<string>();
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
@@ -175,6 +182,9 @@ public class ModsDirectoryCataloger :
                 try
                 {
                     await Task.Delay(fiveSeconds).ConfigureAwait(false);
+                    State = ModDirectoryCatalogerState.Sleeping;
+                    await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
+                    State = ModDirectoryCatalogerState.Debouncing;
                     if (!await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
                         break;
                     while (await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
@@ -493,4 +503,7 @@ public class ModsDirectoryCataloger :
             .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)
             .ConfigureAwait(false);
     }
+
+    public void WakeUp() =>
+        awakeManualResetEvent.Set();
 }

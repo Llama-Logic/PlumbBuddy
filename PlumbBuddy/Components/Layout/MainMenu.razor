@@ -1,6 +1,8 @@
 @implements IDisposable
 @inject IAppLifecycleManager AppLifecycleManager
 @inject IDialogService DialogService
+@inject IDispatcher Dispatcher
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
@@ -21,8 +23,9 @@
     <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">(Version @AppInfo.VersionString)</MudTextM3>
     <MudNavMenu Class="main-menu">
         <MudDivider Class="my-2" />
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderWrench" IconColor="Color.Primary" OnClick="OpenModsFolderHandlerAsync">Open Mods Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="Color.Primary" OnClick="ClearCacheHandlerAsync">Clear Cache</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="OpenDownloadsFolderHandlerAsync">Open Downloads Folder</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="OpenModsFolderHandlerAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="ClearCacheHandlerAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" IconColor="Color.Info">Ask for Help</MudNavLink>
         <MudDivider Class="my-2" />
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="SettingsOnClickHandlerAsync">Settings</MudNavLink>
@@ -35,7 +38,7 @@
         }
         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
         {
-            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" IconColor="Color.Primary" OnClick="CloseWindowOnClickHandlerAsync">Close Window</MudNavLink>
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" OnClick="CloseWindowOnClickHandlerAsync">Close Window</MudNavLink>
             <MudDivider Class="my-2" />
             <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="ShutdownPlumbBuddyOnClickHandlerAsync">Shutdown PlumbBuddy</MudNavLink>
         }

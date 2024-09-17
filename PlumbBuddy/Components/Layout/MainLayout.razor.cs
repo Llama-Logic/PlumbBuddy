@@ -95,6 +95,27 @@ public partial class MainLayout
         }
     }
 
+    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(Player.CacheStatus))
+        {
+            if (!Dispatcher.IsDispatchRequired)
+                StateHasChanged();
+            else
+                Dispatcher.Dispatch(StateHasChanged);
+        }
+        else if (e.PropertyName is nameof(Player.ShowThemeManager))
+        {
+            manualLightDarkModeToggleEnabled = false;
+            manualLightDarkModeToggle = null;
+            if (Application.Current is { } app)
+                SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
+            StateHasChanged();
+        }
+        else if (e.PropertyName is nameof(Player.Type))
+            StateHasChanged();
+    }
+
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
@@ -115,27 +136,6 @@ public partial class MainLayout
             Dispatcher.Dispatch(nomNom);
         else
             nomNom();
-    }
-
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(Player.CacheStatus))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
-        else if (e.PropertyName is nameof(Player.ShowThemeManager))
-        {
-            manualLightDarkModeToggleEnabled = false;
-            manualLightDarkModeToggle = null;
-            if (Application.Current is { } app)
-                SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
-            StateHasChanged();
-        }
-        else if (e.PropertyName is nameof(Player.Type))
-            StateHasChanged();
     }
 
     /// <inheritdoc/>
