@@ -83,8 +83,7 @@ public partial class MainLayout
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is (nameof(IModsDirectoryCataloger.IsListeningForBreakInChanges))
-            or (nameof(IModsDirectoryCataloger.IsUpdatingCatalog))
+        if (e.PropertyName is (nameof(IModsDirectoryCataloger.State))
             or (nameof(IModsDirectoryCataloger.PackageCount))
             or (nameof(IModsDirectoryCataloger.ResourceCount))
             or (nameof(IModsDirectoryCataloger.ScriptArchiveCount)))

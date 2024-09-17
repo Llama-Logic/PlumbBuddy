@@ -47,38 +47,46 @@
             </MudTooltip>
         }
         <MudPaper Style="border-radius: 30px; padding: 0 5px;">
-            @if (ModsDirectoryCataloger.IsListeningForBreakInChanges)
+            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.Debouncing)
             {
                 <MudTooltip Text="Just waiting for activity in your Mods folder to die down and then I'll have a look. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.EarHearing" Color="Color.Info" Class="plumbbuddy-is-thinking">
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.EarHearing" Color="Color.Tertiary" Class="plumbbuddy-is-thinking">
                         <ChildContent>Listening to File System</ChildContent>
                     </MudChip>
                 </MudTooltip>
             }
-            @if (ModsDirectoryCataloger.IsUpdatingCatalog)
+            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.Cataloging)
             {
                 <MudTooltip Text="I'm currently combing through the files in your Mods folder, don't mind me. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Info" Class="plumbbuddy-is-thinking">
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Primary" Class="plumbbuddy-is-thinking">
                         <ChildContent>Cataloging Mods</ChildContent>
+                    </MudChip>
+                </MudTooltip>
+            }
+            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.AnalyzingTopography)
+            {
+                <MudTooltip Text="I'm taking a closer look at your package load order to see if I need to warn you about anything. 😏">
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
+                        <ChildContent>Analyzing Topography</ChildContent>
                     </MudChip>
                 </MudTooltip>
             }
             @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
             {
                 <MudTooltip Text="This is the number of packages I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
                 </MudTooltip>
             }
             @if (Player.Type is UserType.Creator && ModsDirectoryCataloger.ResourceCount > 0)
             {
                 <MudTooltip Text="This is the number of resources in the packages I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" Value="@ModsDirectoryCataloger.ResourceCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" Value="@ModsDirectoryCataloger.ResourceCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Error : Color.Success)" />
                 </MudTooltip>
             }
             @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.ScriptArchiveCount > 0)
             {
                 <MudTooltip Text="This is the number of script archives I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" Value="@ModsDirectoryCataloger.ScriptArchiveCount" Color="@(ModsDirectoryCataloger.IsUpdatingCatalog ? Color.Info : SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Error : Color.Success)" />
+                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" Value="@ModsDirectoryCataloger.ScriptArchiveCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Error : Color.Success)" />
                 </MudTooltip>
             }
             <MudTooltip Text="Open Mods Folder">

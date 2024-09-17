@@ -79,11 +79,10 @@ public class ModsDirectoryCataloger :
         return modManifest;
     }
 
-    static readonly PropertyChangedEventArgs isListeningForBreakInChangesPropertyChangedEventArgs = new(nameof(IsListeningForBreakInChanges));
-    static readonly PropertyChangedEventArgs isUpdatingCatalogPropertyChangedEventArgs = new(nameof(IsUpdatingCatalog));
     static readonly PropertyChangedEventArgs packageCountPropertyChangedEventArgs = new(nameof(PackageCount));
     static readonly PropertyChangedEventArgs resourceCountPropertyChangedEventArgs = new(nameof(ResourceCount));
     static readonly PropertyChangedEventArgs scriptArchiveCountPropertyChangedEventArgs = new(nameof(ScriptArchiveCount));
+    static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
     static readonly TimeSpan fiveSeconds = TimeSpan.FromSeconds(5);
 
     public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlayer player, ISuperSnacks superSnacks)
@@ -102,8 +101,6 @@ public class ModsDirectoryCataloger :
         Task.Run(ProcessPathsQueueAsync);
     }
 
-    bool isListeningForBreakInChanges;
-    bool isUpdatingCatalog;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
@@ -112,29 +109,10 @@ public class ModsDirectoryCataloger :
     int resourceCount;
     readonly AsyncLock saveChangesLock;
     int scriptArchiveCount;
+    ModDirectoryCatalogerState state;
     readonly ISuperSnacks superSnacks;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    public bool IsListeningForBreakInChanges
-    {
-        get => isListeningForBreakInChanges;
-        private set
-        {
-            isListeningForBreakInChanges = value;
-            PropertyChanged?.Invoke(this, isListeningForBreakInChangesPropertyChangedEventArgs);
-        }
-    }
-
-    public bool IsUpdatingCatalog
-    {
-        get => isUpdatingCatalog;
-        private set
-        {
-            isUpdatingCatalog = value;
-            PropertyChanged?.Invoke(this, isUpdatingCatalogPropertyChangedEventArgs);
-        }
-    }
 
     public int PackageCount
     {
@@ -166,6 +144,16 @@ public class ModsDirectoryCataloger :
         }
     }
 
+    public ModDirectoryCatalogerState State
+    {
+        get => state;
+        private set
+        {
+            state = value;
+            PropertyChanged?.Invoke(this, statePropertyChangedEventArgs);
+        }
+    }
+
     public void Catalog(string path) =>
         pathsProcessingQueue.Enqueue(path);
 
@@ -176,7 +164,7 @@ public class ModsDirectoryCataloger :
         cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
-            IsListeningForBreakInChanges = true;
+            State = ModDirectoryCatalogerState.Debouncing;
             var nomNom = new Queue<string>();
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
@@ -199,8 +187,9 @@ public class ModsDirectoryCataloger :
                     break;
                 }
             }
-            IsListeningForBreakInChanges = false;
-            IsUpdatingCatalog = true;
+            State = ModDirectoryCatalogerState.Cataloging;
+            using var nestedScope = lifetimeScope.BeginLifetimeScope();
+            var pbDbContext = nestedScope.Resolve<PbDbContext>();
             while (nomNom.TryDequeue(out var path))
             {
                 var modsDirectoryPath = Path.Combine(player.UserDataFolderPath, "Mods");
@@ -230,17 +219,10 @@ public class ModsDirectoryCataloger :
                     }
                     broadcastBlock.Complete();
                     await actionBlock.Completion.ConfigureAwait(false);
-                    int packagesRemoved;
-                    using var nestedScope = lifetimeScope.BeginLifetimeScope();
-                    var pbDbContext = nestedScope.Resolve<PbDbContext>();
                     using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
                     {
-                        packagesRemoved = await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.FileType == ModsDirectoryFileType.Package && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
-                            .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
-                            .ConfigureAwait(false);
                         await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.FileType == ModsDirectoryFileType.ScriptArchive && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
+                            .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
                             .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
                             .ConfigureAwait(false);
                         await pbDbContext.FilesOfInterest
@@ -248,23 +230,14 @@ public class ModsDirectoryCataloger :
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
                     }
-                    if (player.CacheStatus is SmartSimCacheStatus.Normal && packagesRemoved > 0)
-                        player.CacheStatus = SmartSimCacheStatus.Stale;
                     await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
                 }
                 else
                 {
-                    int packagesRemoved;
-                    using var nestedScope = lifetimeScope.BeginLifetimeScope();
-                    var pbDbContext = nestedScope.Resolve<PbDbContext>();
                     using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
                     {
-                        packagesRemoved = await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.FileType == ModsDirectoryFileType.Package && md.Path.StartsWith(path))
-                            .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
-                            .ConfigureAwait(false);
                         await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.FileType == ModsDirectoryFileType.ScriptArchive && md.Path.StartsWith(path))
+                            .Where(md => md.Path != null && md.Path.StartsWith(path))
                             .ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null))
                             .ConfigureAwait(false);
                         await pbDbContext.FilesOfInterest
@@ -272,12 +245,58 @@ public class ModsDirectoryCataloger :
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
                     }
-                    if (player.CacheStatus is SmartSimCacheStatus.Normal && packagesRemoved > 0)
-                        player.CacheStatus = SmartSimCacheStatus.Stale;
                     await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
                 }
             }
-            IsUpdatingCatalog = false;
+            State = ModDirectoryCatalogerState.AnalyzingTopography;
+            var resourceWasRemovedOrReplaced = false;
+            var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
+            using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
+            {
+                var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
+                await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection
+                await pbDbContext.Database.ExecuteSqlRawAsync
+                (
+                    $"""
+                    INSERT INTO
+                        ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
+                    SELECT
+                        {currentTopologySnapshot.Id},
+                        FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path{(DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst ? " COLLATE BINARY" : string.Empty)})
+                    FROM
+                        ModFileResources mfr
+                        JOIN ModFiles mf ON mf.Id = mfr.ModFileId
+                    WHERE
+                        mf.Path IS NOT NULL
+                        AND mf.FileType = 1
+                    GROUP BY
+                        mfr.KeyType,
+                        mfr.KeyGroup,
+                        mfr.KeyFullInstance
+                    """
+                ).ConfigureAwait(false);
+                if (latestTopologySnapshot is not null)
+                {
+                    resourceWasRemovedOrReplaced = (await pbDbContext.Database.SqlQueryRaw<int>
+                    (
+                        $"""
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
+                            EXCEPT
+                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
+                        )
+                        """
+                    ).ToListAsync().ConfigureAwait(false))[0] > 0;
+                    await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
+                }
+#pragma warning restore EF1002 // Risk of vulnerability to SQL injection
+            }
+            if (resourceWasRemovedOrReplaced && player.CacheStatus is SmartSimCacheStatus.Normal)
+                player.CacheStatus = SmartSimCacheStatus.Stale;
+            State = ModDirectoryCatalogerState.Idle;
         }
     }
 

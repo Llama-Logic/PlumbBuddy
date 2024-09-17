@@ -398,11 +398,7 @@ public partial class SmartSimObserver :
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
         if (CatalogIfInModsDirectory(relativePath))
-        {
-            if (player.CacheStatus is SmartSimCacheStatus.Normal && e.FullPath.EndsWith(".package", StringComparison.OrdinalIgnoreCase))
-                player.CacheStatus = SmartSimCacheStatus.Stale;
             return;
-        }
     }
 
     void UserDataDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
@@ -435,11 +431,7 @@ public partial class SmartSimObserver :
         if (CatalogIfModsDirectory(relativePath))
             return;
         if (CatalogIfInModsDirectory(relativePath))
-        {
-            if (player.CacheStatus is SmartSimCacheStatus.Normal && e.FullPath.EndsWith(".package", StringComparison.OrdinalIgnoreCase))
-                player.CacheStatus = SmartSimCacheStatus.Stale;
             return;
-        }
     }
 
     void UserDataDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e)

@@ -42,4 +42,7 @@ public class ModFileResource
     /// </summary>
     [Required]
     public long KeyFullInstance { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<TopologySnapshot>? TopologySnapshots { get; set; }
 }
