@@ -44,13 +44,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
-        <MtouchLink>none</MtouchLink>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetFramework>net8.0-maccatalyst</TargetFramework>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::IsOSPlatform('osx'))">
+        <CodesignKey>Developer ID Application: Daniel Henry (UA3C4N249P)</CodesignKey>
+        <MtouchLink>none</MtouchLink>
         <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
         <UseInterpreter>true</UseInterpreter>
     </PropertyGroup>
