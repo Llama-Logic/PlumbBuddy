@@ -3,15 +3,15 @@
 @inject IPlayer Player
 
 <MudTabs Centered="true" MinimumTabWidth="200px">
-    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.PuzzleHeart" ToolTip="View issues PlumbBuddy thinks it has found with your mods.">
+    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.PuzzleHeart">
 
     </MudTabPanel>
-    @* <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink" ToolTip="This is a pretty exciting feature, but it's not quite ready for prime time. Stay tuned. 😉">
+    @* <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink">
         <PreJector />
     </MudTabPanel> *@
     @if (Player.Type is UserType.Creator)
     {
-        <MudTabPanel Text="Creator Tools" Icon="@MaterialDesignIcons.Normal.PackageVariant" ToolTip="If you make mods and you'd like to let PlumbBuddy know about its dependencies and intentional overrides, I'm glad to help!">
+        <MudTabPanel Text="Creator Tools" Icon="@MaterialDesignIcons.Normal.PackageVariant">
 
         </MudTabPanel>
     }

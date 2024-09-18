@@ -335,7 +335,7 @@ public class ModsDirectoryCataloger :
                     $"""
                     INSERT INTO
                         ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
-                    SELECT
+                    SELECT DISTINCT
                         {currentTopologySnapshot.Id},
                     	sq.Id
                     FROM 
@@ -347,7 +347,8 @@ public class ModsDirectoryCataloger :
                     			FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
                     		FROM
                     			ModFileResources mfr
-                    			JOIN ModFiles mf ON mf.Id = mfr.ModFileId
+                                JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
+                    			JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
                     		WHERE
                     			mf.Path IS NOT NULL
                     			AND mf.FileType = 1
@@ -406,10 +407,6 @@ public class ModsDirectoryCataloger :
                     modFileHash = modFile.ModFileHash;
                 if (modFile is null)
                 {
-                    if (fileType is ModsDirectoryFileType.Package
-                        && player.CacheStatus is SmartSimCacheStatus.Normal
-                        && await pbDbContext.ModFiles.AnyAsync(mf => mf.Path == path).ConfigureAwait(false))
-                        player.CacheStatus = SmartSimCacheStatus.Stale;
                     var hash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
                     modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstOrDefaultAsync(mfh => mfh.Sha256 == hash).ConfigureAwait(false);
                     if (modFileHash is null)
@@ -425,65 +422,67 @@ public class ModsDirectoryCataloger :
                         {
                             pbDbContext.Entry(modFileHash).State = EntityState.Detached;
                             modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hash).ConfigureAwait(false);
-                            modFile = modFileHash.ModFiles?.FirstOrDefault();
                         }
                     }
-                    else
-                        modFile = modFileHash.ModFiles?.FirstOrDefault();
+                    if (!modFileHash.ResourcesAndManifestCataloged)
+                    {
+                        if (fileType is ModsDirectoryFileType.Package)
+                        {
+                            using var dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
+                            var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
+                            modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
+                            foreach (var snippetTuningKey in keys.Where(key => key.Type is ResourceType.SnippetTuning).OrderBy(key => key.Group).ThenBy(key => key.FullInstance))
+                            {
+                                ModFileManifestModel modFileManifestModel;
+                                try
+                                {
+                                    modFileManifestModel = await dbpf.GetModFileManifestAsync(snippetTuningKey).ConfigureAwait(false);
+                                }
+                                catch (FileNotFoundException)
+                                {
+                                    logger.LogDebug("{PackagePath} :: {ResourceKey} snippet tuning marked as deleted", path, snippetTuningKey);
+                                    continue;
+                                }
+                                catch (XmlException)
+                                {
+                                    logger.LogDebug("{PackagePath} :: {ResourceKey} snippet tuning not a mod file manifest", path, snippetTuningKey);
+                                    continue;
+                                }
+                                modFileHash.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                using var archive = ZipFile.OpenRead(fileInfo.FullName);
+                                if (archive.Entries.FirstOrDefault(entry => entry.FullName.Equals("manifest.yml", StringComparison.OrdinalIgnoreCase)) is { } manifestEntry)
+                                {
+                                    using var manifestStream = manifestEntry.Open();
+                                    using var manifestReader = new StreamReader(manifestStream);
+                                    if (ModFileManifestModel.TryParse(manifestReader.ReadToEnd(), out var modFileManifestModel))
+                                        modFileHash.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogWarning(ex, "failed to check for manifest in {ScriptArchivePath}", path);
+                            }
+                        }
+                        modFileHash.ResourcesAndManifestCataloged = true;
+                    }
+                    modFile = modFileHash.ModFiles?.Where(mf => mf.Path?.Equals(path, platformFunctions.FileSystemStringComparison) ?? false).FirstOrDefault();
                 }
                 if (modFile is null)
                 {
                     modFile = new() { ModFileHash = modFileHash };
                     (modFileHash!.ModFiles ??= []).Add(modFile);
-                    if (fileType is ModsDirectoryFileType.Package)
-                    {
-                        using var dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
-                        var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
-                        modFile.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFile = modFile }).ToList();
-                        foreach (var snippetTuningKey in keys.Where(key => key.Type is ResourceType.SnippetTuning).OrderBy(key => key.Group).ThenBy(key => key.FullInstance))
-                        {
-                            ModFileManifestModel modFileManifestModel;
-                            try
-                            {
-                                modFileManifestModel = await dbpf.GetModFileManifestAsync(snippetTuningKey).ConfigureAwait(false);
-                            }
-                            catch (FileNotFoundException)
-                            {
-                                logger.LogDebug("{PackagePath} :: {ResourceKey} snippet tuning marked as deleted", path, snippetTuningKey);
-                                continue;
-                            }
-                            catch (XmlException)
-                            {
-                                logger.LogDebug("{PackagePath} :: {ResourceKey} snippet tuning not a mod file manifest", path, snippetTuningKey);
-                                continue;
-                            }
-                            modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            using var archive = ZipFile.OpenRead(fileInfo.FullName);
-                            if (archive.Entries.FirstOrDefault(entry => entry.FullName.Equals("manifest.yml", StringComparison.OrdinalIgnoreCase)) is { } manifestEntry)
-                            {
-                                using var manifestStream = manifestEntry.Open();
-                                using var manifestReader = new StreamReader(manifestStream);
-                                if (ModFileManifestModel.TryParse(manifestReader.ReadToEnd(), out var modFileManifestModel))
-                                    modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogWarning(ex, "failed to check for manifest in {ScriptArchivePath}", path);
-                        }
-                    }
                     await pbDbContext.AddAsync(modFile).ConfigureAwait(false);
                     if (fileType is ModsDirectoryFileType.Package)
                     {
                         ++PackageCount;
-                        ResourceCount += modFile.Resources?.Count ?? 0;
+                        ResourceCount += modFileHash.Resources?.Count ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
                     }
                     else
                         ++ScriptArchiveCount;
@@ -493,18 +492,18 @@ public class ModsDirectoryCataloger :
                     modFile.AbsenceNoticed = null;
                     if (fileType is ModsDirectoryFileType.Package)
                     {
-                        ++PackageCount;
-                        ResourceCount += modFile.Resources?.Count ?? 0;
+                        --PackageCount;
+                        ResourceCount -= modFileHash!.Resources?.Count ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
                     }
                     else
-                        ++ScriptArchiveCount;
+                        --ScriptArchiveCount;
                 }
                 modFile.Path = path;
                 modFile.Creation = creation;
                 modFile.LastWrite = lastWrite;
                 modFile.Size = size;
                 modFile.FileType = fileType;
-                if (modFile is not null && pbDbContext.Entry(modFile).State is EntityState.Added or EntityState.Modified)
+                if (pbDbContext.Entry(modFile).State is EntityState.Added or EntityState.Modified)
                 {
                     using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
                     await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -554,8 +553,9 @@ public class ModsDirectoryCataloger :
         PackageCount = await pbDbContext.ModFiles
             .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package)
             .ConfigureAwait(false);
-        ResourceCount = await pbDbContext.ModFileResources
-            .CountAsync(mfr => mfr.ModFile!.Path != null)
+        ResourceCount = await pbDbContext.ModFiles
+            .Where(mf => mf.Path != null)
+            .SumAsync(mf => mf.ModFileHash!.Resources!.Count)
             .ConfigureAwait(false);
         ScriptArchiveCount = await pbDbContext.ModFiles
             .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)

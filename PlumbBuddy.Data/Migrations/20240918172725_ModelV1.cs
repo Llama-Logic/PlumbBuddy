@@ -39,19 +39,6 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModFileHashes",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Sha256 = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 32, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ModFileHashes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ModManifests",
                 columns: table => new
                 {
@@ -64,6 +51,32 @@ namespace PlumbBuddy.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ModManifests", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PackCodes",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PackCodes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TopologySnapshots",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Taken = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TopologySnapshots", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,61 +132,6 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModFileHashModManifest",
-                columns: table => new
-                {
-                    ModManifestSubsumedFilesId = table.Column<long>(type: "INTEGER", nullable: false),
-                    SubsumedFilesId = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ModFileHashModManifest", x => new { x.ModManifestSubsumedFilesId, x.SubsumedFilesId });
-                    table.ForeignKey(
-                        name: "FK_ModFileHashModManifest_ModFileHashes_SubsumedFilesId",
-                        column: x => x.SubsumedFilesId,
-                        principalTable: "ModFileHashes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ModFileHashModManifest_ModManifests_ModManifestSubsumedFilesId",
-                        column: x => x.ModManifestSubsumedFilesId,
-                        principalTable: "ModManifests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ModFiles",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ModManifestId = table.Column<long>(type: "INTEGER", nullable: true),
-                    Path = table.Column<string>(type: "TEXT", nullable: true),
-                    Creation = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LastWrite = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    Size = table.Column<long>(type: "INTEGER", nullable: true),
-                    FileType = table.Column<int>(type: "INTEGER", nullable: false),
-                    AbsenceNoticed = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ModFiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ModFiles_ModFileHashes_ModFileHashId",
-                        column: x => x.ModFileHashId,
-                        principalTable: "ModFileHashes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ModFiles_ModManifests_ModManifestId",
-                        column: x => x.ModManifestId,
-                        principalTable: "ModManifests",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RequiredMods",
                 columns: table => new
                 {
@@ -199,47 +157,25 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IntentionalOverrideModFileHash",
+                name: "ModManifestPackCode",
                 columns: table => new
                 {
-                    IntentionalOverridesModFilesId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ModFilesId = table.Column<long>(type: "INTEGER", nullable: false)
+                    RequiredByModsId = table.Column<long>(type: "INTEGER", nullable: false),
+                    RequiredPacksId = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IntentionalOverrideModFileHash", x => new { x.IntentionalOverridesModFilesId, x.ModFilesId });
+                    table.PrimaryKey("PK_ModManifestPackCode", x => new { x.RequiredByModsId, x.RequiredPacksId });
                     table.ForeignKey(
-                        name: "FK_IntentionalOverrideModFileHash_IntentionalOverrides_IntentionalOverridesModFilesId",
-                        column: x => x.IntentionalOverridesModFilesId,
-                        principalTable: "IntentionalOverrides",
+                        name: "FK_ModManifestPackCode_ModManifests_RequiredByModsId",
+                        column: x => x.RequiredByModsId,
+                        principalTable: "ModManifests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IntentionalOverrideModFileHash_ModFileHashes_ModFilesId",
-                        column: x => x.ModFilesId,
-                        principalTable: "ModFileHashes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ModFileResources",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ModFileId = table.Column<long>(type: "INTEGER", nullable: false),
-                    KeyType = table.Column<int>(type: "INTEGER", nullable: false),
-                    KeyGroup = table.Column<int>(type: "INTEGER", nullable: false),
-                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ModFileResources", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ModFileResources_ModFiles_ModFileId",
-                        column: x => x.ModFileId,
-                        principalTable: "ModFiles",
+                        name: "FK_ModManifestPackCode_PackCodes_RequiredPacksId",
+                        column: x => x.RequiredPacksId,
+                        principalTable: "PackCodes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -269,25 +205,104 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModFileHashRequiredMod",
+                name: "ModFileHashes",
                 columns: table => new
                 {
-                    FilesId = table.Column<long>(type: "INTEGER", nullable: false),
-                    RequiredModFilesId = table.Column<long>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Sha256 = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 32, nullable: false),
+                    ResourcesAndManifestCataloged = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ModManifestId = table.Column<long>(type: "INTEGER", nullable: true),
+                    IntentionalOverrideId = table.Column<long>(type: "INTEGER", nullable: true),
+                    RequiredModId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ModFileHashRequiredMod", x => new { x.FilesId, x.RequiredModFilesId });
+                    table.PrimaryKey("PK_ModFileHashes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ModFileHashRequiredMod_ModFileHashes_FilesId",
-                        column: x => x.FilesId,
+                        name: "FK_ModFileHashes_IntentionalOverrides_IntentionalOverrideId",
+                        column: x => x.IntentionalOverrideId,
+                        principalTable: "IntentionalOverrides",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ModFileHashes_ModManifests_ModManifestId",
+                        column: x => x.ModManifestId,
+                        principalTable: "ModManifests",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ModFileHashes_RequiredMods_RequiredModId",
+                        column: x => x.RequiredModId,
+                        principalTable: "RequiredMods",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFileResources",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
+                    KeyType = table.Column<int>(type: "INTEGER", nullable: false),
+                    KeyGroup = table.Column<int>(type: "INTEGER", nullable: false),
+                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFileResources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModFileResources_ModFileHashes_ModFileHashId",
+                        column: x => x.ModFileHashId,
                         principalTable: "ModFileHashes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFiles",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: true),
+                    Creation = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    LastWrite = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    Size = table.Column<long>(type: "INTEGER", nullable: true),
+                    FileType = table.Column<int>(type: "INTEGER", nullable: false),
+                    AbsenceNoticed = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ModFileHashRequiredMod_RequiredMods_RequiredModFilesId",
-                        column: x => x.RequiredModFilesId,
-                        principalTable: "RequiredMods",
+                        name: "FK_ModFiles_ModFileHashes_ModFileHashId",
+                        column: x => x.ModFileHashId,
+                        principalTable: "ModFileHashes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFileResourceTopologySnapshot",
+                columns: table => new
+                {
+                    ResourcesId = table.Column<long>(type: "INTEGER", nullable: false),
+                    TopologySnapshotsId = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFileResourceTopologySnapshot", x => new { x.ResourcesId, x.TopologySnapshotsId });
+                    table.ForeignKey(
+                        name: "FK_ModFileResourceTopologySnapshot_ModFileResources_ResourcesId",
+                        column: x => x.ResourcesId,
+                        principalTable: "ModFileResources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ModFileResourceTopologySnapshot_TopologySnapshots_TopologySnapshotsId",
+                        column: x => x.TopologySnapshotsId,
+                        principalTable: "TopologySnapshots",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -295,12 +310,8 @@ namespace PlumbBuddy.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FilesOfInterest_Path",
                 table: "FilesOfInterest",
-                column: "Path");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_IntentionalOverrideModFileHash_ModFilesId",
-                table: "IntentionalOverrideModFileHash",
-                column: "ModFilesId");
+                column: "Path",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_IntentionalOverrides_ModManfiestId",
@@ -323,25 +334,35 @@ namespace PlumbBuddy.Data.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ModFileHashes_IntentionalOverrideId",
+                table: "ModFileHashes",
+                column: "IntentionalOverrideId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFileHashes_ModManifestId",
+                table: "ModFileHashes",
+                column: "ModManifestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFileHashes_RequiredModId",
+                table: "ModFileHashes",
+                column: "RequiredModId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ModFileHashes_Sha256",
                 table: "ModFileHashes",
                 column: "Sha256",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModFileHashModManifest_SubsumedFilesId",
-                table: "ModFileHashModManifest",
-                column: "SubsumedFilesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ModFileHashRequiredMod_RequiredModFilesId",
-                table: "ModFileHashRequiredMod",
-                column: "RequiredModFilesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ModFileResources_ModFileId",
+                name: "IX_ModFileResources_ModFileHashId",
                 table: "ModFileResources",
-                column: "ModFileId");
+                column: "ModFileHashId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFileResourceTopologySnapshot_TopologySnapshotsId",
+                table: "ModFileResourceTopologySnapshot",
+                column: "TopologySnapshotsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ModFiles_ModFileHashId",
@@ -349,19 +370,25 @@ namespace PlumbBuddy.Data.Migrations
                 column: "ModFileHashId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModFiles_ModManifestId",
-                table: "ModFiles",
-                column: "ModManifestId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ModFiles_Path",
                 table: "ModFiles",
-                column: "Path");
+                column: "Path",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ModFiles_Path_Creation_LastWrite_Size",
                 table: "ModFiles",
                 columns: new[] { "Path", "Creation", "LastWrite", "Size" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModManifestPackCode_RequiredPacksId",
+                table: "ModManifestPackCode",
+                column: "RequiredPacksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PackCodes_Code",
+                table: "PackCodes",
+                column: "Code");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RequiredMods_ModManfiestId",
@@ -376,37 +403,40 @@ namespace PlumbBuddy.Data.Migrations
                 name: "FilesOfInterest");
 
             migrationBuilder.DropTable(
-                name: "IntentionalOverrideModFileHash");
-
-            migrationBuilder.DropTable(
                 name: "ModCreatorModManifest");
 
             migrationBuilder.DropTable(
                 name: "ModCreatorRequiredMod");
 
             migrationBuilder.DropTable(
-                name: "ModFileHashModManifest");
-
-            migrationBuilder.DropTable(
-                name: "ModFileHashRequiredMod");
-
-            migrationBuilder.DropTable(
-                name: "ModFileResources");
-
-            migrationBuilder.DropTable(
-                name: "IntentionalOverrides");
-
-            migrationBuilder.DropTable(
-                name: "ModCreators");
-
-            migrationBuilder.DropTable(
-                name: "RequiredMods");
+                name: "ModFileResourceTopologySnapshot");
 
             migrationBuilder.DropTable(
                 name: "ModFiles");
 
             migrationBuilder.DropTable(
+                name: "ModManifestPackCode");
+
+            migrationBuilder.DropTable(
+                name: "ModCreators");
+
+            migrationBuilder.DropTable(
+                name: "ModFileResources");
+
+            migrationBuilder.DropTable(
+                name: "TopologySnapshots");
+
+            migrationBuilder.DropTable(
+                name: "PackCodes");
+
+            migrationBuilder.DropTable(
                 name: "ModFileHashes");
+
+            migrationBuilder.DropTable(
+                name: "IntentionalOverrides");
+
+            migrationBuilder.DropTable(
+                name: "RequiredMods");
 
             migrationBuilder.DropTable(
                 name: "ModManifests");

@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-[Index(nameof(Path))]
+[Index(nameof(Path), IsUnique = true)]
 public class FileOfInterest
 {
     [Key]

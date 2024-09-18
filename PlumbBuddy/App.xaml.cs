@@ -3,13 +3,15 @@ namespace PlumbBuddy;
 public partial class App :
     Application
 {
+    const string packCodesModelMigration = "20240918172725_ModelV1";
+
     public App(ILifetimeScope lifetimeScope, PbDbContext pbDbContext, IAppLifecycleManager appLifecycleManager)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         var allMigrations = pbDbContext.Database.GetMigrations();
-        if (!allMigrations.Contains("20240918030901_ModelV3"))
-            throw new InvalidOperationException("The original pack codes model migration was removed. This logic needs to be refactored.");
+        if (!allMigrations.Contains(packCodesModelMigration))
+            throw new InvalidOperationException("The pack codes model migration was removed. This logic needs to be refactored.");
         var pendingMigrations = pbDbContext.Database.GetPendingMigrations();
         try
         {
@@ -76,7 +78,7 @@ public partial class App :
             pendingMigrations = pbDbContext.Database.GetPendingMigrations();
             pbDbContext.Database.Migrate();
         }
-        if (pendingMigrations.Contains("20240918030901_ModelV3"))
+        if (pendingMigrations.Contains(packCodesModelMigration))
         {
             pbDbContext.PackCodes.Add(new PackCode { Code = "FP01" });
             for (var ep = 1; ep <= 20; ++ep)

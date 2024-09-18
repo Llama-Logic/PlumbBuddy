@@ -5,10 +5,10 @@ public class ModFileResource
     [Key]
     public long Id { get; set; }
 
-    public long ModFileId { get; set; }
+    public long ModFileHashId { get; set; }
 
-    [ForeignKey(nameof(ModFileId))]
-    public ModFile? ModFile { get; set; }
+    [ForeignKey(nameof(ModFileHashId))]
+    public ModFileHash? ModFileHash { get; set; }
 
     [NotMapped]
     public ResourceKey Key

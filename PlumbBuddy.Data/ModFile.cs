@@ -1,7 +1,7 @@
 namespace PlumbBuddy.Data;
 
 [Index(nameof(Path), nameof(Creation), nameof(LastWrite), nameof(Size))]
-[Index(nameof(Path))]
+[Index(nameof(Path), IsUnique = true)]
 public class ModFile
 {
     [Key]
@@ -11,11 +11,6 @@ public class ModFile
 
     [ForeignKey(nameof(ModFileHashId))]
     public ModFileHash? ModFileHash { get; set; }
-
-    public long? ModManifestId { get; set; }
-
-    [ForeignKey(nameof(ModManifestId))]
-    public ModManifest? ModManifest { get; set; }
 
     public string? Path { get; set; }
 
@@ -28,7 +23,4 @@ public class ModFile
     public ModsDirectoryFileType FileType { get; set; }
 
     public DateTimeOffset? AbsenceNoticed { get; set; }
-
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileResource>? Resources { get; set; }
 }

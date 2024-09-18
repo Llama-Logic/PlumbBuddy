@@ -28,87 +28,262 @@
 
 <MudLayout>
     <MudAppBar>
-        <MudTooltip Text="Main Menu">
-            <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        </MudTooltip>
+        <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
         <MudImage Src="/img/PlumbBuddyLogo.svg" Elevation="2" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
-        <MudSpacer />
-        <MudSpacer />
         @if (Player.ShowThemeManager)
         {
             if (@manualLightDarkModeToggleEnabled)
             {
-                <MudTooltip Text="Manually Toggle Light/Dark Mode">
+                <MudTooltip Arrow="true" Text="Manually Toggle Light/Dark Mode">
                     <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-right: 5px;" />
                 </MudTooltip>
             }
-            <MudTooltip Text="Toggle Manual Control of Light/Dark Mode">
+            <MudTooltip Arrow="true" Text="Toggle Manual Control of Light/Dark Mode">
                 <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-right: 5px;" />
             </MudTooltip>
         }
-        <MudPaper Style="border-radius: 30px; padding: 0 5px;">
-            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.Sleeping)
-            {
-                <MudTooltip Text="It's probably best that I do not actively read your Mods folder while you're playing to maximize your computer's resources for the game itself. I'll wake up as soon as you exit the game. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Sleep" Color="Color.Dark">
-                        <ChildContent>Having Sweet Dreams while You Game</ChildContent>
-                    </MudChip>
-                </MudTooltip>
-            }
-            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.Debouncing)
-            {
-                <MudTooltip Text="Just waiting for activity in your Mods folder to die down and then I'll have a look. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.EarHearing" Color="Color.Tertiary" Class="plumbbuddy-is-thinking">
-                        <ChildContent>Listening to File System</ChildContent>
-                    </MudChip>
-                </MudTooltip>
-            }
-            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.Cataloging)
-            {
-                <MudTooltip Text="I'm currently combing through the files in your Mods folder, don't mind me. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Primary" Class="plumbbuddy-is-thinking">
-                        <ChildContent>Cataloging Mods</ChildContent>
-                    </MudChip>
-                </MudTooltip>
-            }
-            @if (ModsDirectoryCataloger.State == ModDirectoryCatalogerState.AnalyzingTopography)
-            {
-                <MudTooltip Text="I'm taking a closer look at your package load order to see if I need to warn you about anything. 😏">
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
-                        <ChildContent>Analyzing Topography</ChildContent>
-                    </MudChip>
-                </MudTooltip>
-            }
+        <MudPaper Style="border-radius: 30px; margin: 0 15px; padding: 0 5px;">
+            <MudTooltip Arrow="true">
+                <ChildContent>
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolder" />
+                </ChildContent>
+                <TooltipContent>
+                    <MudStack Row="true">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
+                        <MudTextM3 Typo="TypoM3.Title">Open Download Folder</MudTextM3>
+                    </MudStack>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                        Click here to open your Downloads folder.
+                    </MudTextM3>
+                </TooltipContent>
+            </MudTooltip>
+            <MudTooltip Arrow="true">
+                <ChildContent>
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="SmartSimObserver.OpenModsFolder" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)" />
+                </ChildContent>
+                <TooltipContent>
+                    <MudStack Row="true">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.FolderPound" />
+                        <MudTextM3 Typo="TypoM3.Title">Open Mods Folder</MudTextM3>
+                    </MudStack>
+                    <MudDivider />
+                    @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)
+                    {
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            Hey, I'm giving your Mods folder its much needed privacy while the game is running. 🫵 You should strongly consider doing the same!
+                        </MudTextM3>
+                    }
+                    @if (ModsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping)
+                    {
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            Click here to open your Mods folder.
+                        </MudTextM3>
+                    }
+                </TooltipContent>
+            </MudTooltip>
+            <MudTooltip Arrow="true">
+                <ChildContent>
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="SmartSimObserver.ClearCache" Disabled="@(Player.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)" />
+                </ChildContent>
+                <TooltipContent>
+                    <MudStack Row="true">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.Eraser" />
+                        <MudTextM3 Typo="TypoM3.Title">Clear Cache</MudTextM3>
+                    </MudStack>
+                    <MudDivider />
+                    @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)
+                    {
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            Sorry, Chief, the cache can't be cleared while it's in use! 🫢 You'll need to quit the game first.
+                        </MudTextM3>
+                    }
+                    @if (ModsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping)
+                    {
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            Click here to clear the game's cache files. This will cause it to load more slowly the next time it starts.
+                        </MudTextM3>
+                        @if (Player.CacheStatus is SmartSimCacheStatus.Stale)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                The game's cache files are currently stale. You should clear them to avoid anomalies and glitches.
+                            </MudTextM3>
+                        }
+                    }
+                    </TooltipContent>
+            </MudTooltip>
+            <MudTooltip Arrow="true" Color="Color.Info">
+                <ChildContent>
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
+                </ChildContent>
+                <TooltipContent>
+                    <MudStack Row="true">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" />
+                        <MudTextM3 Typo="TypoM3.Title">Ask for Help</MudTextM3>
+                    </MudStack>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                        Click here to start the process of requesting help with your game from a Support Discord.
+                    </MudTextM3>
+                </TooltipContent>
+            </MudTooltip>
             @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
             {
-                <MudTooltip Text="This is the number of packages I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Warning : Color.Default)" />
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Warning : Color.Default)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" />
+                            <MudTextM3 Typo="TypoM3.Title">Total Packages</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            This is the number of packages I was able to catalog in your Mods folder.
+                        </MudTextM3>
+                        @if (SmartSimObserver.IsModsDisabledGameSettingOn)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                Because Mods are disabled in your Game Options, these packages will not be loaded by The Sims 4.
+                            </MudTextM3>
+                        }
+                    </TooltipContent>
                 </MudTooltip>
             }
             @if (Player.Type is UserType.Creator && ModsDirectoryCataloger.ResourceCount > 0)
             {
-                <MudTooltip Text="This is the number of resources in the packages I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" Value="@ModsDirectoryCataloger.ResourceCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Warning : Color.Default)" />
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" Value="@ModsDirectoryCataloger.ResourceCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Warning : Color.Default)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" />
+                            <MudTextM3 Typo="TypoM3.Title">Total Resources</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            This is the number of resources in the packages I was able to catalog in your Mods folder.
+                            <em>Creator's Note: This sum does not account for resource overrides. It is a strict, "dumb sum".</em>
+                        </MudTextM3>
+                        @if (SmartSimObserver.IsModsDisabledGameSettingOn)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.
+                            </MudTextM3>
+                        }
+                    </TooltipContent>
                 </MudTooltip>
             }
             @if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.ScriptArchiveCount > 0)
             {
-                <MudTooltip Text="This is the number of script archives I was able to catalog in your Mods folder.">
-                    <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" Value="@ModsDirectoryCataloger.ScriptArchiveCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Warning : Color.Default)" />
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudChip T="int" Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" Value="@ModsDirectoryCataloger.ScriptArchiveCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Warning : Color.Default)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" />
+                            <MudTextM3 Typo="TypoM3.Title">Total Script Archives</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            This is the number of script archives I was able to catalog in your Mods folder.
+                        </MudTextM3>
+                        @if (SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4.
+                            </MudTextM3>
+                        }
+                    </TooltipContent>
                 </MudTooltip>
             }
-            <MudTooltip Text="Open Downloads Folder">
-                <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolder" />
-            </MudTooltip>
-            <MudTooltip Text="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping ? "Hey, I'm giving your Mods folder its much needed privacy while the game is running. 🫵 You should strongly consider doing the same!" : "Open Mods Folder")">
-                <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="SmartSimObserver.OpenModsFolder" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)" />
-            </MudTooltip>
-            <MudTooltip Text="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping ? "Sorry, Chief, the cache can't be cleared while it's in use! 🫢 You'll need to quit the game first." : "Clear Cache")">
-                <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="SmartSimObserver.ClearCache" Disabled="@(Player.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)" />
-            </MudTooltip>
-            <MudTooltip Text="Ask for Help">
-                <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
-            </MudTooltip>
+            @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)
+            {
+                <MudTooltip Arrow="true" Color="Color.Dark">
+                    <ChildContent>
+                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Sleep" Color="Color.Dark">
+                            <ChildContent>Sleeping</ChildContent>
+                        </MudChip>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" />
+                            <MudTextM3 Typo="TypoM3.Title">Sleeping</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            It's probably best that I do not actively read your Mods folder while you're playing to maximize your computer's resources for the game itself. I'll wake up as soon as you exit the game. 😏
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+            }
+            @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Debouncing)
+            {
+                <MudTooltip Arrow="true" Color="Color.Tertiary">
+                    <ChildContent>
+                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Tertiary" Class="plumbbuddy-is-thinking">
+                            <ChildContent>Waiting</ChildContent>
+                        </MudChip>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.Timer" />
+                            <MudTextM3 Typo="TypoM3.Title">Waiting</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            I'm just waiting for activity in your Mods folder to die down and then I'll have a look. 😏
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+            }
+            @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Cataloging)
+            {
+                <MudTooltip Arrow="true" Color="Color.Primary">
+                    <ChildContent>
+                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Primary" Class="plumbbuddy-is-thinking">
+                            <ChildContent>Cataloging Mods</ChildContent>
+                        </MudChip>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.CubeScan" />
+                            <MudTextM3 Typo="TypoM3.Title">Cataloging Mods</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            I'm currently combing through the files in your Mods folder and scribbling down notes, don't mind me. 😏
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+            }
+            @if (ModsDirectoryCataloger.State is ModDirectoryCatalogerState.AnalyzingTopography)
+            {
+                <MudTooltip Arrow="true" Color="Color.Secondary">
+                    <ChildContent>
+                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
+                            <ChildContent>Analyzing Topography</ChildContent>
+                        </MudChip>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.SelectCompare" />
+                            <MudTextM3 Typo="TypoM3.Title">Analyzing Topography</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            I'm taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+            }
         </MudPaper>
     </MudAppBar>
     <MudMainContent>

@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20240911232122_ModelV1")]
+    [Migration("20240918172725_ModelV1")]
     partial class ModelV1
     {
         /// <inheritdoc />
@@ -19,21 +19,6 @@ namespace PlumbBuddy.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
-
-            modelBuilder.Entity("IntentionalOverrideModFileHash", b =>
-                {
-                    b.Property<long>("IntentionalOverridesModFilesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("ModFilesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("IntentionalOverridesModFilesId", "ModFilesId");
-
-                    b.HasIndex("ModFilesId");
-
-                    b.ToTable("IntentionalOverrideModFileHash");
-                });
 
             modelBuilder.Entity("ModCreatorModManifest", b =>
                 {
@@ -65,34 +50,34 @@ namespace PlumbBuddy.Data.Migrations
                     b.ToTable("ModCreatorRequiredMod");
                 });
 
-            modelBuilder.Entity("ModFileHashModManifest", b =>
+            modelBuilder.Entity("ModFileResourceTopologySnapshot", b =>
                 {
-                    b.Property<long>("ModManifestSubsumedFilesId")
+                    b.Property<long>("ResourcesId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("SubsumedFilesId")
+                    b.Property<long>("TopologySnapshotsId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ModManifestSubsumedFilesId", "SubsumedFilesId");
+                    b.HasKey("ResourcesId", "TopologySnapshotsId");
 
-                    b.HasIndex("SubsumedFilesId");
+                    b.HasIndex("TopologySnapshotsId");
 
-                    b.ToTable("ModFileHashModManifest");
+                    b.ToTable("ModFileResourceTopologySnapshot");
                 });
 
-            modelBuilder.Entity("ModFileHashRequiredMod", b =>
+            modelBuilder.Entity("ModManifestPackCode", b =>
                 {
-                    b.Property<long>("FilesId")
+                    b.Property<long>("RequiredByModsId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("RequiredModFilesId")
+                    b.Property<long>("RequiredPacksId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("FilesId", "RequiredModFilesId");
+                    b.HasKey("RequiredByModsId", "RequiredPacksId");
 
-                    b.HasIndex("RequiredModFilesId");
+                    b.HasIndex("RequiredPacksId");
 
-                    b.ToTable("ModFileHashRequiredMod");
+                    b.ToTable("ModManifestPackCode");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.FileOfInterest", b =>
@@ -110,7 +95,8 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Path");
+                    b.HasIndex("Path")
+                        .IsUnique();
 
                     b.ToTable("FilesOfInterest");
                 });
@@ -196,9 +182,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<long>("ModFileHashId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("ModManifestId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Path")
                         .HasColumnType("TEXT");
 
@@ -209,9 +192,8 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasIndex("ModFileHashId");
 
-                    b.HasIndex("ModManifestId");
-
-                    b.HasIndex("Path");
+                    b.HasIndex("Path")
+                        .IsUnique();
 
                     b.HasIndex("Path", "Creation", "LastWrite", "Size");
 
@@ -224,6 +206,18 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<long?>("IntentionalOverrideId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("ModManifestId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("RequiredModId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ResourcesAndManifestCataloged")
+                        .HasColumnType("INTEGER");
+
                     b.Property<byte[]>("Sha256")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -231,6 +225,12 @@ namespace PlumbBuddy.Data.Migrations
                         .IsFixedLength();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IntentionalOverrideId");
+
+                    b.HasIndex("ModManifestId");
+
+                    b.HasIndex("RequiredModId");
 
                     b.HasIndex("Sha256")
                         .IsUnique();
@@ -253,12 +253,12 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<int>("KeyType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("ModFileId")
+                    b.Property<long>("ModFileHashId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModFileId");
+                    b.HasIndex("ModFileHashId");
 
                     b.ToTable("ModFileResources");
                 });
@@ -282,6 +282,23 @@ namespace PlumbBuddy.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ModManifests");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.PackCode", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code");
+
+                    b.ToTable("PackCodes");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.RequiredMod", b =>
@@ -319,19 +336,18 @@ namespace PlumbBuddy.Data.Migrations
                     b.ToTable("RequiredMods");
                 });
 
-            modelBuilder.Entity("IntentionalOverrideModFileHash", b =>
+            modelBuilder.Entity("PlumbBuddy.Data.TopologySnapshot", b =>
                 {
-                    b.HasOne("PlumbBuddy.Data.IntentionalOverride", null)
-                        .WithMany()
-                        .HasForeignKey("IntentionalOverridesModFilesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.HasOne("PlumbBuddy.Data.ModFileHash", null)
-                        .WithMany()
-                        .HasForeignKey("ModFilesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<DateTimeOffset>("Taken")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TopologySnapshots");
                 });
 
             modelBuilder.Entity("ModCreatorModManifest", b =>
@@ -364,32 +380,32 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModFileHashModManifest", b =>
+            modelBuilder.Entity("ModFileResourceTopologySnapshot", b =>
                 {
-                    b.HasOne("PlumbBuddy.Data.ModManifest", null)
+                    b.HasOne("PlumbBuddy.Data.ModFileResource", null)
                         .WithMany()
-                        .HasForeignKey("ModManifestSubsumedFilesId")
+                        .HasForeignKey("ResourcesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PlumbBuddy.Data.ModFileHash", null)
+                    b.HasOne("PlumbBuddy.Data.TopologySnapshot", null)
                         .WithMany()
-                        .HasForeignKey("SubsumedFilesId")
+                        .HasForeignKey("TopologySnapshotsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModFileHashRequiredMod", b =>
+            modelBuilder.Entity("ModManifestPackCode", b =>
                 {
-                    b.HasOne("PlumbBuddy.Data.ModFileHash", null)
+                    b.HasOne("PlumbBuddy.Data.ModManifest", null)
                         .WithMany()
-                        .HasForeignKey("FilesId")
+                        .HasForeignKey("RequiredByModsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PlumbBuddy.Data.RequiredMod", null)
+                    b.HasOne("PlumbBuddy.Data.PackCode", null)
                         .WithMany()
-                        .HasForeignKey("RequiredModFilesId")
+                        .HasForeignKey("RequiredPacksId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -413,24 +429,35 @@ namespace PlumbBuddy.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ModFileHash");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.ModFileHash", b =>
+                {
+                    b.HasOne("PlumbBuddy.Data.IntentionalOverride", null)
+                        .WithMany("ModFiles")
+                        .HasForeignKey("IntentionalOverrideId");
+
                     b.HasOne("PlumbBuddy.Data.ModManifest", "ModManifest")
-                        .WithMany()
+                        .WithMany("SubsumedFiles")
                         .HasForeignKey("ModManifestId");
 
-                    b.Navigation("ModFileHash");
+                    b.HasOne("PlumbBuddy.Data.RequiredMod", null)
+                        .WithMany("Files")
+                        .HasForeignKey("RequiredModId");
 
                     b.Navigation("ModManifest");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileResource", b =>
                 {
-                    b.HasOne("PlumbBuddy.Data.ModFile", "ModFile")
+                    b.HasOne("PlumbBuddy.Data.ModFileHash", "ModFileHash")
                         .WithMany("Resources")
-                        .HasForeignKey("ModFileId")
+                        .HasForeignKey("ModFileHashId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ModFile");
+                    b.Navigation("ModFileHash");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.RequiredMod", b =>
@@ -444,14 +471,16 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("ModManifest");
                 });
 
-            modelBuilder.Entity("PlumbBuddy.Data.ModFile", b =>
+            modelBuilder.Entity("PlumbBuddy.Data.IntentionalOverride", b =>
                 {
-                    b.Navigation("Resources");
+                    b.Navigation("ModFiles");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileHash", b =>
                 {
                     b.Navigation("ModFiles");
+
+                    b.Navigation("Resources");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModManifest", b =>
@@ -459,6 +488,13 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("IntentionalOverrides");
 
                     b.Navigation("RequiredMods");
+
+                    b.Navigation("SubsumedFiles");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.RequiredMod", b =>
+                {
+                    b.Navigation("Files");
                 });
 #pragma warning restore 612, 618
         }
