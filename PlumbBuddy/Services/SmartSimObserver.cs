@@ -356,7 +356,9 @@ public partial class SmartSimObserver :
 
     void PutCatalogerToBedIfGameIsRunning()
     {
-        if (modsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping && IsCacheLocked())
+        if (modsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping
+            && (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            || IsCacheLocked())
             Task.Run(PutCatalogerToBedWhileGameIsRunningAsync);
     }
 
