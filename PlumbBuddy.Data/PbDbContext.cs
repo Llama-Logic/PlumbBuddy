@@ -20,6 +20,7 @@ public class PbDbContext :
     public DbSet<ModFileResource> ModFileResources { get; set; }
     public DbSet<ModFile> ModFiles { get; set; }
     public DbSet<ModManifest> ModManifests { get; set; }
+    public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
     public DbSet<TopologySnapshot> TopologySnapshots { get; set; }
 

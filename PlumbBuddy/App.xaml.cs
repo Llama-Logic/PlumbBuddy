@@ -7,6 +7,10 @@ public partial class App :
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        var allMigrations = pbDbContext.Database.GetMigrations();
+        if (!allMigrations.Contains("20240918030901_ModelV3"))
+            throw new InvalidOperationException("The original pack codes model migration was removed. This logic needs to be refactored.");
+        var pendingMigrations = pbDbContext.Database.GetPendingMigrations();
         try
         {
             pbDbContext.Database.Migrate();
@@ -69,7 +73,19 @@ public partial class App :
             executeDbCommand("VACUUM");
             if (wasClosed)
                 sqliteConnection.Close();
+            pendingMigrations = pbDbContext.Database.GetPendingMigrations();
             pbDbContext.Database.Migrate();
+        }
+        if (pendingMigrations.Contains("20240918030901_ModelV3"))
+        {
+            pbDbContext.PackCodes.Add(new PackCode { Code = "FP01" });
+            for (var ep = 1; ep <= 20; ++ep)
+                pbDbContext.PackCodes.Add(new PackCode { Code = $"EP{ep:00}" });
+            for (var gp = 1; gp <= 20; ++gp)
+                pbDbContext.PackCodes.Add(new PackCode { Code = $"GP{gp:00}" });
+            for (var sp = 1; sp <= 60; ++sp)
+                pbDbContext.PackCodes.Add(new PackCode { Code = $"SP{sp:00}" });
+            pbDbContext.SaveChanges();
         }
         // I didn't inject you directly so that I could make sure I migrated before I woke you up
         // but guess what, it's time for school

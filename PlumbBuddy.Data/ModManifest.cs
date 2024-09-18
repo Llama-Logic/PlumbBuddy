@@ -19,6 +19,9 @@ public class ModManifest
     public ICollection<ModFileHash>? SubsumedFiles { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<PackCode>? RequiredPacks { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<RequiredMod>? RequiredMods { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]

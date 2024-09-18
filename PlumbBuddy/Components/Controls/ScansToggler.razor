@@ -16,7 +16,7 @@
     </ChildContent>
 </MudComboBox>
 <br />
-<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Mods Folder, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Installation and Mods Folders, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
     <ChildContent>
         @foreach (var scan in notFoundScanLabels)
         {

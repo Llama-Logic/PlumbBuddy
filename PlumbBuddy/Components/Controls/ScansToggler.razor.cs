@@ -37,7 +37,7 @@ partial class ScansToggler
             { nameof(ScanForMissingMccc), "...Deaderpool's MC Command Center" },
             { nameof(ScanForMissingBe), "...TwistedMexi's Better Exceptions" },
             { nameof(ScanForMissingModGuard), "...TwistedMexi's Mod Guard" },
-            { nameof(ScanForMissingDependency), "...a dependency mod specified by another mod you have installed" }
+            { nameof(ScanForMissingDependency), "...a pack or mod required by another mod you have installed" }
         }.ToImmutableDictionary();
         notFoundScanLabels =
         [

@@ -1,3 +1,5 @@
+using static ZXing.QrCode.Internal.Mode;
+
 namespace PlumbBuddy.Services;
 
 public class ModsDirectoryCataloger :
@@ -18,31 +20,87 @@ public class ModsDirectoryCataloger :
         };
     }
 
-    static async IAsyncEnumerable<ModCreator> TransformCreatorNamesEnumerableAsync(PbDbContext pbDbContext, IEnumerable<string> names)
+    static async IAsyncEnumerable<PackCode> TransformCodesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> codes)
+    {
+        var existingPackCodes = await pbDbContext.PackCodes.Where(pc => codes.Contains(pc.Code)).ToDictionaryAsync(pc => pc.Code).ConfigureAwait(false);
+        foreach (var code in codes)
+        {
+            if (existingPackCodes.TryGetValue(code, out var existingPackCode))
+                yield return existingPackCode;
+            var newPackCode = new PackCode { Code = code };
+            await pbDbContext.PackCodes.AddAsync(newPackCode).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newPackCode).State = EntityState.Detached;
+                newPackCode = await pbDbContext.PackCodes.FirstAsync(pc => pc.Code == code).ConfigureAwait(false);
+            }
+            existingPackCodes.Add(code, newPackCode);
+            yield return newPackCode;
+        }
+    }
+
+    static async IAsyncEnumerable<ModCreator> TransformCreatorNamesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> names)
     {
         var existingModCreators = await pbDbContext.ModCreators.Where(mc => names.Contains(mc.Name)).ToDictionaryAsync(mc => mc.Name).ConfigureAwait(false);
         foreach (var name in names)
-            yield return existingModCreators.TryGetValue(name, out var existingModCreator)
-                ? existingModCreator
-                : new ModCreator { Name = name };
+        {
+            if (existingModCreators.TryGetValue(name, out var existingModCreator))
+                yield return existingModCreator;
+            var newModCreator = new ModCreator { Name = name };
+            await pbDbContext.ModCreators.AddAsync(newModCreator).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newModCreator).State = EntityState.Detached;
+                newModCreator = await pbDbContext.ModCreators.FirstAsync(mc => mc.Name == name).ConfigureAwait(false);
+            }
+            existingModCreators.Add(name, newModCreator);
+            yield return newModCreator;
+        }
     }
 
-    static async IAsyncEnumerable<ModFileHash> TrasnformHashByteArraysEnumerableAsync(PbDbContext pbDbContext, IEnumerable<byte[]> hashes)
+    static async IAsyncEnumerable<ModFileHash> TrasnformHashByteArraysEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<byte[]> hashes)
     {
-        var existingModFileHashes = await pbDbContext.ModFileHashes.Where(mfh => Enumerable.Contains(hashes, mfh.Sha256)).ToDictionaryAsync(mfh => mfh.Sha256).ConfigureAwait(false);
+        var existingModFileHashes = (await pbDbContext.ModFileHashes.Where(mfh => Enumerable.Contains(hashes, mfh.Sha256)).ToListAsync().ConfigureAwait(false)).ToDictionary(mfh => mfh.Sha256.ToHexString());
         foreach (var hash in hashes)
-            yield return existingModFileHashes.TryGetValue(hash, out var existingModFileHash)
-                ? existingModFileHash
-                : new ModFileHash { Sha256 = hash };
+        {
+            var hashHexStr = hash.ToHexString();
+            if (existingModFileHashes.TryGetValue(hashHexStr, out var existingModFileHash))
+                yield return existingModFileHash;
+            var newModFileHash = new ModFileHash { Sha256 = hash };
+            await pbDbContext.ModFileHashes.AddAsync(newModFileHash).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newModFileHash).State = EntityState.Detached;
+                newModFileHash = await pbDbContext.ModFileHashes.FirstAsync(mfh => mfh.Sha256 == hash).ConfigureAwait(false);
+            }
+            existingModFileHashes.Add(hashHexStr, newModFileHash);
+            yield return newModFileHash;
+        }
     }
 
-    static async Task<ModManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileManifestModel modFileManifestModel)
+    static async Task<ModManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, ModFileManifestModel modFileManifestModel)
     {
         var modManifest = new ModManifest
         {
-            Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, modFileManifestModel.Creators).ToListAsync().ConfigureAwait(false),
+            Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Creators).ToListAsync().ConfigureAwait(false),
             Name = modFileManifestModel.Name,
-            SubsumedFiles = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, modFileManifestModel.SubsumedFiles).ToListAsync().ConfigureAwait(false),
+            RequiredPacks = await TransformCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
+            SubsumedFiles = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.SubsumedFiles).ToListAsync().ConfigureAwait(false),
             Url = modFileManifestModel.Url,
             Version = modFileManifestModel.Version
         };
@@ -53,7 +111,7 @@ public class ModsDirectoryCataloger :
                 intentionalOverrides.Add(new IntentionalOverride
                 {
                     Key = intentionalOverride.Key,
-                    ModFiles = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, intentionalOverride.ModFiles).ToListAsync().ConfigureAwait(false),
+                    ModFiles = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, intentionalOverride.ModFiles).ToListAsync().ConfigureAwait(false),
                     ModManifestKey = intentionalOverride.ModManifestKey,
                     ModName = intentionalOverride.ModName,
                     ModVersion = intentionalOverride.ModVersion,
@@ -67,8 +125,8 @@ public class ModsDirectoryCataloger :
             foreach (var requiredMod in modFileManifestModel.RequiredMods)
                 requiredMods.Add(new RequiredMod
                 {
-                    Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, requiredMod.Creators).ToListAsync().ConfigureAwait(false),
-                    Files = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, requiredMod.Files).ToListAsync().ConfigureAwait(false),
+                    Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, saveChangesLock, requiredMod.Creators).ToListAsync().ConfigureAwait(false),
+                    Files = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, requiredMod.Files).ToListAsync().ConfigureAwait(false),
                     ManifestKey = requiredMod.ModManifestKey,
                     Name = requiredMod.Name,
                     Url = requiredMod.Url,
@@ -399,7 +457,7 @@ public class ModsDirectoryCataloger :
                                 logger.LogDebug("{PackagePath} :: {ResourceKey} snippet tuning not a mod file manifest", path, snippetTuningKey);
                                 continue;
                             }
-                            modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileManifestModel).ConfigureAwait(false);
+                            modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
                             break;
                         }
                     }
@@ -413,7 +471,7 @@ public class ModsDirectoryCataloger :
                                 using var manifestStream = manifestEntry.Open();
                                 using var manifestReader = new StreamReader(manifestStream);
                                 if (ModFileManifestModel.TryParse(manifestReader.ReadToEnd(), out var modFileManifestModel))
-                                    modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileManifestModel).ConfigureAwait(false);
+                                    modFile.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
                             }
                         }
                         catch (Exception ex)
