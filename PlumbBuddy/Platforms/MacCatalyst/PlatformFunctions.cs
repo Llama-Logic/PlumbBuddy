@@ -1,4 +1,4 @@
-using AppKit;
+using UIKit;
 using UserNotifications;
 
 namespace PlumbBuddy.Platforms.MacCatalyst;
@@ -8,10 +8,15 @@ class PlatformFunctions :
 {
     static readonly TimeSpan gameProcessScanGracePeriod = TimeSpan.FromSeconds(5);
 
-    public PlatformFunctions() =>
-        UNUserNotificationCenter.Current.Delegate = new NotificationCenterDelegate();
+    public PlatformFunctions()
+    {
+        userNotificationCenter = UNUserNotificationCenter.Current;
+        Task.Run(InitializeNotificationsAsync);
+    }
 
     DateTimeOffset? lastGameProcessScan;
+    bool userNotificationsAllowed;
+    readonly UNUserNotificationCenter userNotificationCenter;
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.Ordinal;
@@ -44,21 +49,25 @@ class PlatformFunctions :
         return null;
     }
 
-    public void SendLocalNotification(string caption, string text)
+    async Task InitializeNotificationsAsync()
     {
-        var content = new UNMutableNotificationContent
+        (userNotificationsAllowed, _) = await userNotificationCenter.RequestAuthorizationAsync(UNAuthorizationOptions.Sound).ConfigureAwait(false);
+        if (userNotificationsAllowed)
+            userNotificationCenter.Delegate = new NotificationCenterDelegate();
+    }
+
+    public async Task SendLocalNotificationAsync(string caption, string text)
+    {
+        if (!userNotificationsAllowed)
+            return;
+        using var content = new UNMutableNotificationContent
         {
             Title = caption,
             Body = text,
             Sound = UNNotificationSound.Default
         };
-        var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
-        var request = UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger);
-        UNUserNotificationCenter.Current.AddNotificationRequest(request, (error) =>
-        {
-            if (error != null)
-                Console.WriteLine($"Error scheduling notification: {error}");
-        });
+        using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
+        await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
@@ -72,8 +81,20 @@ class PlatformFunctions :
     {
         public override void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            NSApplication.SharedApplication.ActivateIgnoringOtherApps(true);
+            UIApplication
+                .SharedApplication
+                .ConnectedScenes
+                .OfType<UIWindowScene>()
+                .FirstOrDefault()
+                ?.Windows
+                .FirstOrDefault()
+                ?.MakeKeyAndVisible();
             completionHandler();
+        }
+
+        public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+        {
+            completionHandler(UNNotificationPresentationOptions.Banner | UNNotificationPresentationOptions.Sound);
         }
     }
 }
