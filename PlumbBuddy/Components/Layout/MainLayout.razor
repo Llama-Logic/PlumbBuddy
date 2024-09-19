@@ -35,11 +35,11 @@
             if (@manualLightDarkModeToggleEnabled)
             {
                 <MudTooltip Arrow="true" Text="Manually Toggle Light/Dark Mode">
-                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-right: 5px;" />
+                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
                 </MudTooltip>
             }
             <MudTooltip Arrow="true" Text="Toggle Manual Control of Light/Dark Mode">
-                <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-right: 5px;" />
+                <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
             </MudTooltip>
         }
         <MudPaper Style="border-radius: 30px; margin: 0 15px; padding: 0 5px;">

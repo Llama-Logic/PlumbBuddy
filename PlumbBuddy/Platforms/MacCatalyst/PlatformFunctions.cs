@@ -1,9 +1,15 @@
+using AppKit;
+using UserNotifications;
+
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
 class PlatformFunctions :
     IPlatformFunctions
 {
     static readonly TimeSpan gameProcessScanGracePeriod = TimeSpan.FromSeconds(5);
+
+    public PlatformFunctions() =>
+        UNUserNotificationCenter.Current.Delegate = new NotificationCenterDelegate();
 
     DateTimeOffset? lastGameProcessScan;
 
@@ -38,9 +44,36 @@ class PlatformFunctions :
         return null;
     }
 
+    public void SendLocalNotification(string caption, string text)
+    {
+        var content = new UNMutableNotificationContent
+        {
+            Title = caption,
+            Body = text,
+            Sound = UNNotificationSound.Default
+        };
+        var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
+        var request = UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger);
+        UNUserNotificationCenter.Current.AddNotificationRequest(request, (error) =>
+        {
+            if (error != null)
+                Console.WriteLine($"Error scheduling notification: {error}");
+        });
+    }
+
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
         Process.Start("open", $"\"{directoryInfo.FullName}\"");
 
     public void ViewFile(FileInfo fileInfo) =>
         Process.Start("open", $"-R \"{fileInfo.FullName}\"");
+
+    class NotificationCenterDelegate :
+        UNUserNotificationCenterDelegate
+    {
+        public override void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
+        {
+            NSApplication.SharedApplication.ActivateIgnoringOtherApps(true);
+            completionHandler();
+        }
+    }
 }

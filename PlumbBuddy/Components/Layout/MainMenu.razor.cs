@@ -62,6 +62,7 @@ partial class MainMenu
         if (Player.DevToolsUnlocked)
         {
             Player.DevToolsUnlocked = false;
+            Player.ShowThemeManager = false;
             Snackbar.Add("Dev Tools locked. 🔒 I'll still help you with your mods, but please don't play with my heart. 🥲", Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartBroken);
         }
         else
