@@ -6,6 +6,7 @@ public interface ISmartSimObserver :
 {
     bool IsModsDisabledGameSettingOn { get; }
     bool IsScriptModsEnabledGameSettingOn { get; }
+    IReadOnlyList<ScanIssue> ScanIssues { get; }
 
     void ClearCache();
     void OpenDownloadsFolder();

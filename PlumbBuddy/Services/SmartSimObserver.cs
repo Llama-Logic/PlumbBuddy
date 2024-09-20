@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace PlumbBuddy.Services;
 
 public partial class SmartSimObserver :
@@ -26,8 +28,12 @@ public partial class SmartSimObserver :
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
+        scanInstances = [];
+        scanInstancesLock = new();
+        scanIssues = [];
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
-        this.player.PropertyChanged += PlayerPropertyChangedHandler;
+        this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        this.player.PropertyChanged += HandlePlayerPropertyChanged;
         ConnectToInstallationDirectory();
         ConnectToUserDataDirectory();
     }
@@ -45,6 +51,9 @@ public partial class SmartSimObserver :
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
+    IReadOnlyList<ScanIssue> scanIssues;
+    readonly Dictionary<Type, IScan> scanInstances;
+    readonly AsyncLock scanInstancesLock;
     readonly ISuperSnacks superSnacks;
     FileSystemWatcher? userDataDirectoryWatcher;
 
@@ -53,6 +62,8 @@ public partial class SmartSimObserver :
         get => isModsDisabledGameSettingOn;
         private set
         {
+            if (isModsDisabledGameSettingOn == value)
+                return;
             isModsDisabledGameSettingOn = value;
             OnPropertyChanged();
         }
@@ -63,7 +74,19 @@ public partial class SmartSimObserver :
         get => isScriptModsEnabledGameSettingOn;
         private set
         {
+            if (isScriptModsEnabledGameSettingOn == value)
+                return;
             isScriptModsEnabledGameSettingOn = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public IReadOnlyList<ScanIssue> ScanIssues
+    {
+        get => scanIssues;
+        private set
+        {
+            scanIssues = value;
             OnPropertyChanged();
         }
     }
@@ -166,6 +189,7 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
             installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
             installationDirectoryWatcher.EnableRaisingEvents = true;
+            UpdateScanInitializationStatus();
         }
     }
 
@@ -200,6 +224,7 @@ public partial class SmartSimObserver :
             userDataDirectoryWatcher.Error += UserDataDirectoryWatcherErrorHandler;
             userDataDirectoryWatcher.Renamed += UserDataDirectoryFileSystemEntryRenamedHandler;
             userDataDirectoryWatcher.EnableRaisingEvents = true;
+            UpdateScanInitializationStatus();
             PutCatalogerToBedIfGameIsRunning();
             modsDirectoryCataloger.Catalog(string.Empty);
         }
@@ -248,7 +273,8 @@ public partial class SmartSimObserver :
         {
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
-            player.PropertyChanged -= PlayerPropertyChangedHandler;
+            modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+            player.PropertyChanged -= HandlePlayerPropertyChanged;
             lifetimeScope.Dispose();
         }
     }
@@ -266,6 +292,36 @@ public partial class SmartSimObserver :
         {
             throw new ArgumentException("Path is not valid or not within the user data folder", nameof(fullPath), ex);
         }
+    }
+
+    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IModsDirectoryCataloger.State)
+            && modsDirectoryCataloger.State is ModDirectoryCatalogerState.Idle)
+            Scan();
+    }
+
+    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IPlayer.InstallationFolderPath))
+        {
+            DisconnectFromInstallationDirectoryWatcher();
+            ConnectToInstallationDirectory();
+        }
+        else if (e.PropertyName == nameof(IPlayer.Onboarded))
+        {
+            DisconnectFromInstallationDirectoryWatcher();
+            DisconnectFromUserDataDirectoryWatcher();
+            ConnectToInstallationDirectory();
+            ConnectToUserDataDirectory();
+        }
+        else if (e.PropertyName == nameof(IPlayer.UserDataFolderPath))
+        {
+            DisconnectFromUserDataDirectoryWatcher();
+            ConnectToUserDataDirectory();
+        }
+        else if (e.PropertyName?.StartsWith("Scan", StringComparison.OrdinalIgnoreCase) ?? false)
+            UpdateScanInitializationStatus();
     }
 
     void InstallationDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e)
@@ -333,27 +389,6 @@ public partial class SmartSimObserver :
         }
     }
 
-    void PlayerPropertyChangedHandler(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(player.InstallationFolderPath))
-        {
-            DisconnectFromInstallationDirectoryWatcher();
-            ConnectToInstallationDirectory();
-        }
-        else if (e.PropertyName == nameof(player.Onboarded))
-        {
-            DisconnectFromInstallationDirectoryWatcher();
-            DisconnectFromUserDataDirectoryWatcher();
-            ConnectToInstallationDirectory();
-            ConnectToUserDataDirectory();
-        }
-        else if (e.PropertyName == nameof(player.UserDataFolderPath))
-        {
-            DisconnectFromUserDataDirectoryWatcher();
-            ConnectToUserDataDirectory();
-        }
-    }
-
     void PutCatalogerToBedIfGameIsRunning()
     {
         if (modsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping
@@ -389,6 +424,9 @@ public partial class SmartSimObserver :
 
     async Task ResampleGameOptionsAsync()
     {
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        var previousIsModsDisabledGameSettingOn = IsModsDisabledGameSettingOn;
+        var previousIsScriptModsEnabledGameSettingOn = IsScriptModsEnabledGameSettingOn;
         var parsedSuccessfully = false;
         var optionsIniFile = new FileInfo(Path.Combine(player.UserDataFolderPath, "Options.ini"));
         if (optionsIniFile.Exists)
@@ -428,6 +466,9 @@ public partial class SmartSimObserver :
             IsModsDisabledGameSettingOn = true;
             IsScriptModsEnabledGameSettingOn = false;
         }
+        if (IsModsDisabledGameSettingOn != previousIsModsDisabledGameSettingOn
+            || IsScriptModsEnabledGameSettingOn != previousIsScriptModsEnabledGameSettingOn)
+            Scan();
     }
 
     bool ResampleGameOptionsIfTheyChanged(string relativePath)
@@ -438,6 +479,84 @@ public partial class SmartSimObserver :
             return true;
         }
         return false;
+    }
+
+    void Scan() =>
+        Task.Run(ScanAsync);
+
+    async Task ScanAsync()
+    {
+        using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
+        var combinedScanIssues = new ConcurrentBag<ScanIssue>();
+        var broadcastBlock = new BroadcastBlock<IScan>(scanInstance => scanInstance);
+        var actionBlock = new ActionBlock<IScan>(async scanInstance =>
+        {
+            await foreach (var scanIssue in scanInstance.ScanAsync())
+                combinedScanIssues.Add(scanIssue);
+        }, new ExecutionDataflowBlockOptions { BoundedCapacity = Math.Max(1, Environment.ProcessorCount / 2) });
+        broadcastBlock.LinkTo(actionBlock, new DataflowLinkOptions { PropagateCompletion = true });
+        foreach (var scanInstance in scanInstances.Values)
+            broadcastBlock.Post(scanInstance);
+        broadcastBlock.Complete();
+        await actionBlock.Completion.ConfigureAwait(false);
+        var scanIssuesList = new List<ScanIssue>();
+        while (combinedScanIssues.TryTake(out var scanIssue))
+            scanIssuesList.Add(scanIssue);
+        ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+    }
+
+    void UpdateScanInitializationStatus() =>
+        Task.Run(UpdateScanInitializationStatusAsync);
+
+    async Task UpdateScanInitializationStatusAsync()
+    {
+        using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
+        var fullyConnectedToGame = installationDirectoryWatcher is not null && userDataDirectoryWatcher is not null;
+        var scansInitialized = scanInstances.Count > 0;
+        if (!fullyConnectedToGame && scansInitialized)
+        {
+            foreach (var scan in scanInstances.Values)
+                scan.Dispose();
+            scanInstances.Clear();
+            scanInstances.TrimExcess();
+            ScanIssues = [];
+            return;
+        }
+        if (fullyConnectedToGame)
+        {
+            var initializationChange = false;
+            bool checkScanInitialization(bool playerHasScanEnabled, Type scanInterface)
+            {
+                if (playerHasScanEnabled && !scanInstances.ContainsKey(scanInterface))
+                {
+                    scanInstances.Add(scanInterface, (IScan)lifetimeScope.Resolve(scanInterface));
+                    return true;
+                }
+                if (!playerHasScanEnabled && scanInstances.Remove(scanInterface, out var scanInstance))
+                {
+                    scanInstance.Dispose();
+                    return true;
+                }
+                return false;
+            }
+            initializationChange |= checkScanInitialization(player.ScanForModsDisabled, typeof(IModSettingScan));
+            initializationChange |= checkScanInitialization(player.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
+            initializationChange |= checkScanInitialization(player.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
+            initializationChange |= checkScanInitialization(player.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
+            initializationChange |= checkScanInitialization(player.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
+            initializationChange |= checkScanInitialization(player.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
+            initializationChange |= checkScanInitialization(player.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
+            initializationChange |= checkScanInitialization(player.ScanForErrorLogs, typeof(IErrorLogScan));
+            initializationChange |= checkScanInitialization(player.ScanForMissingMccc, typeof(IMcccMissingScan));
+            initializationChange |= checkScanInitialization(player.ScanForMissingBe, typeof(IBeMissingScan));
+            initializationChange |= checkScanInitialization(player.ScanForMissingModGuard, typeof(IModGuardMissingScan));
+            initializationChange |= checkScanInitialization(player.ScanForMissingDependency, typeof(IDependencyMissingScan));
+            initializationChange |= checkScanInitialization(player.ScanForCacheStaleness, typeof(ICacheStalenessScan));
+            initializationChange |= checkScanInitialization(player.ScanForResourceConflicts, typeof(IResourceConflictScan));
+            initializationChange |= checkScanInitialization(player.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
+            if (initializationChange)
+                Scan();
+        }
     }
 
     void UserDataDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e)

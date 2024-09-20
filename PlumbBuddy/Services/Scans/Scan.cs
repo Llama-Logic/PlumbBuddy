@@ -12,6 +12,12 @@ public abstract class Scan :
         GC.SuppressFinalize(this);
     }
 
+    public virtual IAsyncEnumerable<ScanIssue> ScanAsync() =>
+        AsyncEnumerable.Empty<ScanIssue>();
+
+    public virtual Task ResolveIssueAsync(object issueData, object resolutionData) =>
+        Task.CompletedTask;
+
     protected virtual void Dispose(bool disposing)
     {
     }

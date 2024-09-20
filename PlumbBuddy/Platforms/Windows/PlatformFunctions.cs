@@ -33,7 +33,7 @@ class PlatformFunctions :
     void HandleToastActivated(ToastNotification toastNotification, object args) =>
         lifetimeScope.Resolve<IAppLifecycleManager>().ShowWindow();
 
-    public void SendLocalNotification(string caption, string text)
+    public Task SendLocalNotificationAsync(string caption, string text)
     {
         var toastXml = new global::Windows.Data.Xml.Dom.XmlDocument();
         toastXml.LoadXml
@@ -52,6 +52,7 @@ class PlatformFunctions :
         var toast = new ToastNotification(toastXml);
         toast.Activated += HandleToastActivated;
         toastNotifier.Show(toast);
+        return Task.CompletedTask;
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>

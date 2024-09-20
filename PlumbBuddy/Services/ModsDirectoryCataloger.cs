@@ -1,5 +1,3 @@
-using static ZXing.QrCode.Internal.Mode;
-
 namespace PlumbBuddy.Services;
 
 public class ModsDirectoryCataloger :
@@ -143,11 +141,12 @@ public class ModsDirectoryCataloger :
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
     static readonly TimeSpan fiveSeconds = TimeSpan.FromSeconds(5);
 
-    public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks)
+    public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlatformFunctions platformFunctions, ISynchronization synchronization, IPlayer player, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
+        ArgumentNullException.ThrowIfNull(synchronization);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.lifetimeScope = lifetimeScope;
@@ -157,7 +156,7 @@ public class ModsDirectoryCataloger :
         this.superSnacks = superSnacks;
         awakeManualResetEvent = new(true);
         pathsProcessingQueue = new();
-        saveChangesLock = new();
+        saveChangesLock = synchronization.EntityFrameworkCoreDatabaseContextWriteLock;
         Task.Run(UpdateAggregatePropertiesAsync);
         Task.Run(ProcessPathsQueueAsync);
     }
@@ -237,14 +236,22 @@ public class ModsDirectoryCataloger :
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
             {
+                await Task.Delay(fiveSeconds).ConfigureAwait(false);
+                State = ModDirectoryCatalogerState.Sleeping;
+                await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
+                State = ModDirectoryCatalogerState.Debouncing;
                 try
                 {
-                    await Task.Delay(fiveSeconds).ConfigureAwait(false);
-                    State = ModDirectoryCatalogerState.Sleeping;
-                    await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
-                    State = ModDirectoryCatalogerState.Debouncing;
                     if (!await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
                         break;
+                }
+                catch (OperationCanceledException) // this was OutputAvailableAsync -- usually Mr. Cleary documents his throws 🙄
+                {
+                    // if we're here, it's because the processing queue is empty -- time to get to start eating
+                    break;
+                }
+                try
+                {
                     while (await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
                     {
                         var path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
@@ -252,10 +259,9 @@ public class ModsDirectoryCataloger :
                             nomNom.Enqueue(path);
                     }
                 }
-                catch (OperationCanceledException) // this was OutputAvailableAsync -- usually Mr. Cleary documents his throws 🙄
+                catch (OperationCanceledException)
                 {
-                    // if we're here, it's because the processing queue is empty -- time to get to start eating
-                    break;
+                    continue;
                 }
             }
             State = ModDirectoryCatalogerState.Cataloging;
@@ -506,6 +512,8 @@ public class ModsDirectoryCataloger :
                 if (pbDbContext.Entry(modFile).State is EntityState.Added or EntityState.Modified)
                 {
                     using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                    if (pbDbContext.Entry(modFile).State is EntityState.Added)
+                        await pbDbContext.ModFiles.Where(mf => mf.Path == path).ExecuteUpdateAsync(u => u.SetProperty(mf => mf.Path, _ => null)).ConfigureAwait(false);
                     await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
                 }
             }
