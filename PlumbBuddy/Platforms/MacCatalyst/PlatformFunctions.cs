@@ -70,8 +70,18 @@ class PlatformFunctions :
         await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
     }
 
-    public void SetBadgeNumber(int number) =>
-        UIApplication.SharedApplication.SetApplicationIconBadgeNumber(number);
+    public async Task SetBadgeNumberAsync(int number)
+    {
+        if (!userNotificationsAllowed)
+            return;
+        using var content = new UNMutableNotificationContent
+        {
+            Badge = number,
+            Sound = UNNotificationSound.Default
+        };
+        using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
+        await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
+    }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
         Process.Start("open", $"\"{directoryInfo.FullName}\"");

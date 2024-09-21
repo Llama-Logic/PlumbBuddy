@@ -529,7 +529,7 @@ public partial class SmartSimObserver :
         while (combinedScanIssues.TryTake(out var scanIssue))
             scanIssuesList.Add(scanIssue);
         ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
-        platformFunctions.SetBadgeNumber(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy));
+        await platformFunctions.SetBadgeNumberAsync(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
         IsCurrentlyScanning = false;
     }
 
