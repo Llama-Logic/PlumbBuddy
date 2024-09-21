@@ -23,7 +23,7 @@ public sealed class ModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedRemove,
-            Caption = "Mods Game Option",
+            Caption = "Mods are Disabled in Options",
             Description = "You have mod packages installed, but the **Enable Custom Content and Mods** box is unchecked in **Game Options**.",
             Origin = this,
             Type = ScanIssueType.Dead,
@@ -52,7 +52,7 @@ public sealed class ModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedCheck,
-            Caption = "Mods Game Option",
+            Caption = "Mods Game Option is Fine",
             Description = "The **Enable Custom Content and Mods** box in **Game Options** isn't causing any problems at all at the moment.",
             Origin = this,
             Type = ScanIssueType.Healthy

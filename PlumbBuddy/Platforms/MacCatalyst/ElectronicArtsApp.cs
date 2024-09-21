@@ -15,7 +15,7 @@ class ElectronicArtsApp :
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "/usr/bin/mdfind",
-                    Arguments = $"-onlyin /Applications \"kMDItemCFBundleIdentifier == '{bundleId}'\"",
+                    Arguments = $"\"kMDItemCFBundleIdentifier == '{bundleId}'\"",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,

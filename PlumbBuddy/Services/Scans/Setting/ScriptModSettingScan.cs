@@ -26,7 +26,7 @@ public sealed class ScriptModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.SourceBranchRemove,
-            Caption = "Script Mods Game Option",
+            Caption = "Script Mods are Disabled in Options",
             Description = "You have script archives installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.",
             Origin = this,
             Type = ScanIssueType.Dead,
@@ -55,7 +55,7 @@ public sealed class ScriptModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.SourceBranchCheck,
-            Caption = "Script Mods Game Option",
+            Caption = "Script Mods Game Option is Fine",
             Description = "The **Script Mods Allowed** box in **Game Options** isn't causing any problems at all at the moment.",
             Origin = this,
             Type = ScanIssueType.Healthy

@@ -6,12 +6,12 @@
 <MudGrid Justify="Justify.Center">
     @foreach (var scanIssue in SmartSimObserver.ScanIssues)
     {
-        <MudItem xs="4">
-            <MudCard Elevation="5">
+        <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+            <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudAvatar Color="@(scanIssue.Type switch { ScanIssueType.Dead => Color.Dark, ScanIssueType.Sick => Color.Error, ScanIssueType.Uncomfortable => Color.Warning, _ => Color.Success })" Variant="Variant.Filled">
-                            <MudIcon Icon="@scanIssue.Icon" Color="@(scanIssue.Type switch { ScanIssueType.Dead => Color.Error, _ => Color.Default })" Size="Size.Large" />
+                        <MudAvatar Variant="Variant.Outlined">
+                            <MudIcon Icon="@scanIssue.Icon" Size="Size.Large" />
                         </MudAvatar>
                     </CardHeaderAvatar>
                     <CardHeaderContent>
@@ -23,7 +23,7 @@
                 </MudCardContent>
                 @if (scanIssue.Data is not null && scanIssue.Resolutions is not null && scanIssue.Resolutions.Count > 0)
                 {
-                    <MudCardActions>
+                    <MudCardActions Style="flex-direction: column;">
                         @foreach (var resolution in scanIssue.Resolutions)
                         {
                             <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>

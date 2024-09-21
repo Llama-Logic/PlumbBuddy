@@ -1,4 +1,4 @@
-<MudComboBox T="string" @bind-SelectedValues="@SelectedGameOptionScans" Label="In The Sims 4 game options..." AdornmentIcon="@MaterialDesignIcons.Normal.Cog" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Primary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+<MudComboBox T="string" @bind-SelectedValues="@SelectedGameOptionScans" Label="In The Sims 4 game options..." AdornmentIcon="@MaterialDesignIcons.Normal.Cog" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Primary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll>
     <ChildContent>
         @foreach (var scan in gameOptionsScanLabels)
         {
@@ -7,7 +7,7 @@
     </ChildContent>
 </MudComboBox>
 <br />
-<MudComboBox T="string" @bind-SelectedValues="@SelectedFoundScans" Label="Inside your Mods Folder, I find..." AdornmentIcon="@MaterialDesignIcons.Normal.FolderWrench" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Secondary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+<MudComboBox T="string" @bind-SelectedValues="@SelectedFoundScans" Label="Inside your Mods Folder, I find..." AdornmentIcon="@MaterialDesignIcons.Normal.FolderWrench" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Secondary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll>
     <ChildContent>
         @foreach (var scan in foundScanLabels)
         {
@@ -16,7 +16,7 @@
     </ChildContent>
 </MudComboBox>
 <br />
-<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Installation and Mods Folders, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Installation and Mods Folders, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll>
     <ChildContent>
         @foreach (var scan in notFoundScanLabels)
         {
@@ -25,7 +25,7 @@
     </ChildContent>
 </MudComboBox>
 <br />
-<MudComboBox T="string" @bind-SelectedValues="@SelectedAnalysisScans" Label="Mod file analysis suggests that..." AdornmentIcon="@MaterialDesignIcons.Normal.SyncAlert" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable>
+<MudComboBox T="string" @bind-SelectedValues="@SelectedAnalysisScans" Label="Mod file analysis suggests that..." AdornmentIcon="@MaterialDesignIcons.Normal.SyncAlert" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll>
     <ChildContent>
         @foreach (var scan in analysisScanLabels)
         {

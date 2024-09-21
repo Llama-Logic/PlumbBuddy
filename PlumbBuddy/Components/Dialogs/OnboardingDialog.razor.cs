@@ -5,7 +5,6 @@ partial class OnboardingDialog
     FoldersSelector? foldersSelector;
     bool isLoading;
     string? loadingText;
-    bool seenScansToggler;
 
     string InstallationFolderPath
     {
@@ -112,8 +111,7 @@ partial class OnboardingDialog
         set
         {
             Player.Type = value;
-            if (!seenScansToggler)
-                SetDefaultScansForUserType(value);
+            SetDefaultScansForUserType(value);
         }
     }
 
@@ -149,8 +147,6 @@ partial class OnboardingDialog
                     await foldersSelector.ValidateAsync();
                     prevent = !foldersSelector.IsValid;
                 }
-                if (!prevent)
-                    seenScansToggler = true;
                 return prevent;
         }
         return false;

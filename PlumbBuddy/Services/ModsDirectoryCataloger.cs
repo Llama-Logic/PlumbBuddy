@@ -247,7 +247,7 @@ public class ModsDirectoryCataloger :
                 }
                 catch (OperationCanceledException) // this was OutputAvailableAsync -- usually Mr. Cleary documents his throws 🙄
                 {
-                    // if we're here, it's because the processing queue is empty -- time to get to start eating
+                    // if we're here, it's because the processing queue is empty -- time to start eating
                     break;
                 }
                 try

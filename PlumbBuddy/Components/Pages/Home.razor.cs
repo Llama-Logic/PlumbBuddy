@@ -3,19 +3,34 @@ namespace PlumbBuddy.Components.Pages;
 partial class Home
 {
     /// <inheritdoc />
-    public void Dispose() =>
-        Player.PropertyChanged -= HandleUserPreferencesChanged;
-
-    void HandleUserPreferencesChanged(object? sender, PropertyChangedEventArgs e)
+    public void Dispose()
     {
-        if (e.PropertyName == nameof(Player.Type))
+        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
+    }
+
+    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPlayer.Type))
             StateHasChanged();
+    }
+
+    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISmartSimObserver.IsCurrentlyScanning))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
     }
 
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Player.PropertyChanged += HandleUserPreferencesChanged;
+        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
     }
 }

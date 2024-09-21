@@ -28,9 +28,11 @@ public partial class SmartSimObserver :
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
+        enqueuedScanningTaskLock = new();
         scanInstances = [];
         scanInstancesLock = new();
         scanIssues = [];
+        scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         this.player.PropertyChanged += HandlePlayerPropertyChanged;
@@ -42,8 +44,10 @@ public partial class SmartSimObserver :
         Dispose(false);
 
     ImmutableArray<FileSystemInfo> cacheComponents;
+    readonly AsyncLock enqueuedScanningTaskLock;
     readonly StringComparison fileSystemStringComparison;
     FileSystemWatcher? installationDirectoryWatcher;
+    bool isCurrentlyScanning;
     bool isModsDisabledGameSettingOn;
     bool isScriptModsEnabledGameSettingOn;
     readonly ILifetimeScope lifetimeScope;
@@ -54,8 +58,21 @@ public partial class SmartSimObserver :
     IReadOnlyList<ScanIssue> scanIssues;
     readonly Dictionary<Type, IScan> scanInstances;
     readonly AsyncLock scanInstancesLock;
+    readonly AsyncLock scanningTaskLock;
     readonly ISuperSnacks superSnacks;
     FileSystemWatcher? userDataDirectoryWatcher;
+
+    public bool IsCurrentlyScanning
+    {
+        get => isCurrentlyScanning;
+        private set
+        {
+            if (isCurrentlyScanning == value)
+                return;
+            isCurrentlyScanning = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool IsModsDisabledGameSettingOn
     {
@@ -486,7 +503,16 @@ public partial class SmartSimObserver :
 
     async Task ScanAsync()
     {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        cts.Cancel();
+        var enqueuedScanningTaskLockPotentiallyHeld = await enqueuedScanningTaskLock.LockAsync(token).ConfigureAwait(false);
+        if (enqueuedScanningTaskLockPotentiallyHeld is null)
+            return;
+        using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
+        enqueuedScanningTaskLockPotentiallyHeld.Dispose();
         using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
+        IsCurrentlyScanning = true;
         var combinedScanIssues = new ConcurrentBag<ScanIssue>();
         var broadcastBlock = new BroadcastBlock<IScan>(scanInstance => scanInstance);
         var actionBlock = new ActionBlock<IScan>(async scanInstance =>
@@ -503,6 +529,7 @@ public partial class SmartSimObserver :
         while (combinedScanIssues.TryTake(out var scanIssue))
             scanIssuesList.Add(scanIssue);
         ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+        IsCurrentlyScanning = false;
     }
 
     void UpdateScanInitializationStatus() =>

@@ -13,10 +13,9 @@
     }
 </style>
 
-<MudPaper Style="height: 100vh;">
-    <MudAnimate Selector="#menuLogo" AnimationType="AnimationType.Scale" Value="0.9" ValueSecondary="1" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseOut" AnimationDirection="AnimationDirection.Alternate" />
+<MudPaper Style="height: 100vh; position: fixed;">
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
-        <MudImage id="menuLogo" Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
+        <MudImage Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>
     <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">PlumbBuddy</MudTextM3>
     <MudTextM3 Typo="TypoM3.Body" Size="Size.Small" Align="Align.Center">The friendly helper for Sims 4 mods</MudTextM3>

@@ -101,13 +101,29 @@
                     @if (ModsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping)
                     {
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            Click here to clear the game's cache files. This will cause it to load more slowly the next time it starts.
+                            Click here to clear the game's cache files.
                         </MudTextM3>
+                        @if (Player.CacheStatus is SmartSimCacheStatus.Clear)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                I'd like to help you, but there simply aren't any cache files to clear at the moment.
+                            </MudTextM3>
+                        }
+                        @if (Player.CacheStatus is SmartSimCacheStatus.Normal)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Info">
+                                Don't just do this willy-nilly, since it will cause your game to load more slowly the next time it starts as it rebuilds the cache.
+                                I'll change the color of this button when it's important that we clear the cache.
+                            </MudTextM3>
+                        }
                         @if (Player.CacheStatus is SmartSimCacheStatus.Stale)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                                The game's cache files are currently stale. You should clear them to avoid anomalies and glitches.
+                                The game's cache files are currently stale.
+                                You should clear them to avoid anomalies and glitches.
                             </MudTextM3>
                         }
                     }

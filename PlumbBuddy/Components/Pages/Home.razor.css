@@ -1,0 +1,19 @@
+.mod-health-tab-container {
+    height: calc(100vh - 112px);
+    overflow-y: scroll;
+    padding: 24px;
+}
+
+    .mod-health-tab-container .background {
+        background-image: url(/img/ModHealthBackground.avif);
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        left: 0;
+        opacity: 0.35;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        width: 100vw;
+        z-index: -10;
+    }

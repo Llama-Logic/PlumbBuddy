@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Components.Controls;
 
-partial class ScansIssuesDisplay
+partial class ScanIssuesDisplay
 {
     public void Dispose() =>
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
