@@ -57,17 +57,18 @@ class PlatformFunctions :
         return Task.CompletedTask;
     }
 
-    public void SetBadgeNumber(int number)
+    public Task SetBadgeNumberAsync(int number)
     {
         if (number <= 0)
         {
             badgeUpdater.Clear();
-            return;
+            return Task.CompletedTask;
         }
         var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
         var badgeElement = (global::Windows.Data.Xml.Dom.XmlElement)badgeXml.SelectSingleNode("/badge");
         badgeElement.SetAttribute("value", number.ToString());
         badgeUpdater.Update(new BadgeNotification(badgeXml));
+        return Task.CompletedTask;
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
