@@ -5,7 +5,7 @@
 @inject ISmartSimObserver SmartSimObserver
 
 <MudTabs Centered="true" MinimumTabWidth="200px">
-    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.PuzzleHeart">
+    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.PuzzleHeart" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
         <MudLoading Loading="@SmartSimObserver.IsCurrentlyScanning" Overlap Darken LoaderType="LoaderType.Circular" Text="🔍 Looking for problems...">
             <div class="mod-health-tab-container">
                 <div class="background"></div>

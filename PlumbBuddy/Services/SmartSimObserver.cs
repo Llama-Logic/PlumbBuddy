@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace PlumbBuddy.Services;
 
 public partial class SmartSimObserver :
@@ -320,7 +318,9 @@ public partial class SmartSimObserver :
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IPlayer.InstallationFolderPath))
+        if (e.PropertyName is nameof(IPlayer.CacheStatus) or nameof(IPlayer.Type))
+            Scan();
+        else if (e.PropertyName == nameof(IPlayer.InstallationFolderPath))
         {
             DisconnectFromInstallationDirectoryWatcher();
             ConnectToInstallationDirectory();
@@ -529,6 +529,7 @@ public partial class SmartSimObserver :
         while (combinedScanIssues.TryTake(out var scanIssue))
             scanIssuesList.Add(scanIssue);
         ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+        platformFunctions.SetBadgeNumber(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy));
         IsCurrentlyScanning = false;
     }
 

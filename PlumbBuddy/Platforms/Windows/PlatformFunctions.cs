@@ -9,9 +9,11 @@ class PlatformFunctions :
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         this.lifetimeScope = lifetimeScope;
+        badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
         toastNotifier = ToastNotificationManager.CreateToastNotifier();
     }
 
+    readonly BadgeUpdater badgeUpdater;
     readonly ILifetimeScope lifetimeScope;
     readonly ToastNotifier toastNotifier;
 
@@ -53,6 +55,19 @@ class PlatformFunctions :
         toast.Activated += HandleToastActivated;
         toastNotifier.Show(toast);
         return Task.CompletedTask;
+    }
+
+    public void SetBadgeNumber(int number)
+    {
+        if (number <= 0)
+        {
+            badgeUpdater.Clear();
+            return;
+        }
+        var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+        var badgeElement = (global::Windows.Data.Xml.Dom.XmlElement)badgeXml.SelectSingleNode("/badge");
+        badgeElement.SetAttribute("value", number.ToString());
+        badgeUpdater.Update(new BadgeNotification(badgeXml));
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>

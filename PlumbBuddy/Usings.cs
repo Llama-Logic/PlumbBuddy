@@ -30,6 +30,7 @@ global using PlumbBuddy.Services.Scans.LooseArchive;
 global using PlumbBuddy.Services.Scans.Missing;
 global using PlumbBuddy.Services.Scans.Setting;
 global using Serilog;
+global using System.Collections.Concurrent;
 global using System.Collections.Immutable;
 global using System.ComponentModel;
 global using System.Data;

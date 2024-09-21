@@ -36,7 +36,7 @@ public abstract class LooseArchiveScan :
                 var file = new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", looseArchiveRelativePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because ZIP file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
                     return Task.CompletedTask;
                 }
                 var downloads = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
@@ -57,7 +57,7 @@ public abstract class LooseArchiveScan :
                 {
                     superSnacks.OfferRefreshments(new MarkupString(
                         $"""
-                        Boy, did that <em>not</em> work. Your computer's operating system said:
+                        Boy, did that *not* work. Your computer's operating system said:
 
                         `{moveEx.GetType().Name}: {moveEx.Message}`
                         """), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);

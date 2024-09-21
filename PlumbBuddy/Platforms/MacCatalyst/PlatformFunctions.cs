@@ -51,7 +51,7 @@ class PlatformFunctions :
 
     async Task InitializeNotificationsAsync()
     {
-        (userNotificationsAllowed, _) = await userNotificationCenter.RequestAuthorizationAsync(UNAuthorizationOptions.Sound).ConfigureAwait(false);
+        (userNotificationsAllowed, _) = await userNotificationCenter.RequestAuthorizationAsync(UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound).ConfigureAwait(false);
         if (userNotificationsAllowed)
             userNotificationCenter.Delegate = new NotificationCenterDelegate();
     }
@@ -69,6 +69,9 @@ class PlatformFunctions :
         using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
         await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
     }
+
+    public void SetBadgeNumber(int number) =>
+        UIApplication.SharedApplication.SetApplicationIconBadgeNumber(number);
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
         Process.Start("open", $"\"{directoryInfo.FullName}\"");

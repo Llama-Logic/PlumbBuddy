@@ -139,7 +139,7 @@ public class ModsDirectoryCataloger :
     static readonly PropertyChangedEventArgs resourceCountPropertyChangedEventArgs = new(nameof(ResourceCount));
     static readonly PropertyChangedEventArgs scriptArchiveCountPropertyChangedEventArgs = new(nameof(ScriptArchiveCount));
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
-    static readonly TimeSpan fiveSeconds = TimeSpan.FromSeconds(5);
+    static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
 
     public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlatformFunctions platformFunctions, ISynchronization synchronization, IPlayer player, ISuperSnacks superSnacks)
     {
@@ -236,7 +236,7 @@ public class ModsDirectoryCataloger :
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
             {
-                await Task.Delay(fiveSeconds).ConfigureAwait(false);
+                await Task.Delay(oneSecond).ConfigureAwait(false);
                 State = ModDirectoryCatalogerState.Sleeping;
                 await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
                 State = ModDirectoryCatalogerState.Debouncing;
