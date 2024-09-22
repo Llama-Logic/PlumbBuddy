@@ -2,6 +2,8 @@ namespace PlumbBuddy.Services;
 
 public interface IPlatformFunctions
 {
+    IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; }
+    IReadOnlyList<Regex> DiscardableFileNamePatterns { get; }
     StringComparison FileSystemStringComparison { get; }
 
     Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory);

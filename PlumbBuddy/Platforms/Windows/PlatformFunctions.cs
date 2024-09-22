@@ -2,9 +2,18 @@ using Windows.UI.Notifications;
 
 namespace PlumbBuddy.Platforms.Windows;
 
-class PlatformFunctions :
+partial class PlatformFunctions :
     IPlatformFunctions
 {
+    [GeneratedRegex(@"^desktop\.ini$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetDesktopDotIniPattern();
+
+    [GeneratedRegex(@"^iconcache.*\.db$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetIconCacheDotDbPattern();
+
+    [GeneratedRegex(@"^thumbs\.db$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetThumbsDotDbPattern();
+
     public PlatformFunctions(ILifetimeScope lifetimeScope)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
@@ -16,6 +25,17 @@ class PlatformFunctions :
     readonly BadgeUpdater badgeUpdater;
     readonly ILifetimeScope lifetimeScope;
     readonly ToastNotifier toastNotifier;
+
+    public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
+    [
+    ];
+
+    public IReadOnlyList<Regex> DiscardableFileNamePatterns { get; } =
+    [
+        GetDesktopDotIniPattern(),
+        GetIconCacheDotDbPattern(),
+        GetThumbsDotDbPattern()
+    ];
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.OrdinalIgnoreCase;

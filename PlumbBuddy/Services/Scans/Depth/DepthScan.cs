@@ -83,7 +83,15 @@ public abstract class DepthScan :
                     });
                     return Task.CompletedTask;
                 }
-                var originEntriesByConflicted = originDirectory.GetFileSystemInfos("*.*", SearchOption.TopDirectoryOnly).ToLookup(originFileSystemEntry => Path.Exists(Path.Combine(targetDirectory.FullName, originFileSystemEntry.Name)));
+                var originEntriesByConflicted = originDirectory.GetFileSystemInfos("*.*", SearchOption.TopDirectoryOnly).ToLookup(originFileSystemEntry =>
+                {
+                    var targetPath = Path.Combine(targetDirectory.FullName, originFileSystemEntry.Name);
+                    if (File.Exists(targetPath))
+                        return !platformFunctions.DiscardableFileNamePatterns.Any(pattern => pattern.IsMatch(originFileSystemEntry.Name));
+                    if (Directory.Exists(targetPath))
+                        return !platformFunctions.DiscardableDirectoryNamePatterns.Any(pattern => pattern.IsMatch(originFileSystemEntry.Name));
+                    return false;
+                });
                 var conflicts = originEntriesByConflicted[true].ToImmutableArray();
                 if (conflicts.Any())
                 {
@@ -112,12 +120,30 @@ public abstract class DepthScan :
                     });
                     return Task.CompletedTask;
                 }
-                foreach (var originEntry in originEntriesByConflicted[false])
+                try
                 {
-                    if (originEntry is FileInfo originFile)
-                        originFile.MoveTo(Path.Combine(targetDirectory.FullName, originFile.Name));
-                    else if (originEntry is DirectoryInfo originSubDirectory)
-                        originSubDirectory.MoveTo(Path.Combine(targetDirectory.FullName, originSubDirectory.Name));
+                    foreach (var originEntry in originEntriesByConflicted[false])
+                    {
+                        if (originEntry is FileInfo originFile)
+                            originFile.MoveTo(Path.Combine(targetDirectory.FullName, originFile.Name), true);
+                        else if (originEntry is DirectoryInfo originSubDirectory)
+                        {
+                            var targetPath = Path.Combine(targetDirectory.FullName, originSubDirectory.Name);
+                            if (Directory.Exists(targetPath))
+                                Directory.Delete(targetPath, true);
+                            originSubDirectory.MoveTo(targetPath);
+                        }
+                    }
+                }
+                catch (Exception moveEx)
+                {
+                    superSnacks.OfferRefreshments(new MarkupString(
+                        $"""
+                        Boy, did that *not* work. Your computer's operating system said:
+
+                        `{moveEx.GetType().Name}: {moveEx.Message}`
+                        """), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(Path.Combine(targetDirectory.FullName, file.Name));
                 superSnacks.OfferRefreshments(new MarkupString($"You got it, Chief. The file (and any of its pals) has been safely moved to a new home closer to the root of your Mods folder where the game shouldn't have any trouble with it."), Severity.Success, options =>

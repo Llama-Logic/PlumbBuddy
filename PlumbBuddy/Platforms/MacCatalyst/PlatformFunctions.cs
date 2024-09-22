@@ -3,10 +3,22 @@ using UserNotifications;
 
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
-class PlatformFunctions :
+partial class PlatformFunctions :
     IPlatformFunctions
 {
     static readonly TimeSpan gameProcessScanGracePeriod = TimeSpan.FromSeconds(5);
+
+    [GeneratedRegex(@"^\.DS_Store$", RegexOptions.Singleline)]
+    private static partial Regex GetDotDsUnderscoreStorePattern();
+
+    [GeneratedRegex(@"^\.fseventsd$", RegexOptions.Singleline)]
+    private static partial Regex GetDotFsEventsDPattern();
+
+    [GeneratedRegex(@"^\.localized$", RegexOptions.Singleline)]
+    private static partial Regex GetDotLocalizedPattern();
+
+    [GeneratedRegex(@"^\.TemporaryItems$", RegexOptions.Singleline)]
+    private static partial Regex GetDotTemporaryItemsPattern();
 
     public PlatformFunctions()
     {
@@ -17,6 +29,18 @@ class PlatformFunctions :
     DateTimeOffset? lastGameProcessScan;
     bool userNotificationsAllowed;
     readonly UNUserNotificationCenter userNotificationCenter;
+
+    public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
+    [
+        GetDotTemporaryItemsPattern(),
+        GetDotFsEventsDPattern()
+    ];
+
+    public IReadOnlyList<Regex> DiscardableFileNamePatterns { get; } =
+    [
+        GetDotDsUnderscoreStorePattern()
+        GetDotLocalizedPattern(),
+    ];
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.Ordinal;
