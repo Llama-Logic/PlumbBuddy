@@ -64,4 +64,7 @@ public class RequiredMod
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileHash>? Files { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFeature>? RequiredFeatures { get; set; }
 }

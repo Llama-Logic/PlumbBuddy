@@ -16,6 +16,9 @@ public class ModManifest
     public Uri? Url { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFeature>? Features { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileHash>? SubsumedFiles { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]

@@ -66,6 +66,30 @@ public class ModsDirectoryCataloger :
         }
     }
 
+    static async IAsyncEnumerable<ModFeature> TransformFeatureNamesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> names)
+    {
+        var existingModFeatures = await pbDbContext.ModFeatures.Where(mf => names.Contains(mf.Name)).ToDictionaryAsync(mf => mf.Name).ConfigureAwait(false);
+        foreach (var name in names)
+        {
+            if (existingModFeatures.TryGetValue(name, out var existingModFeature))
+                yield return existingModFeature;
+            var newModFeature = new ModFeature { Name = name };
+            await pbDbContext.ModFeatures.AddAsync(newModFeature).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newModFeature).State = EntityState.Detached;
+                newModFeature = await pbDbContext.ModFeatures.FirstAsync(mf => mf.Name == name).ConfigureAwait(false);
+            }
+            existingModFeatures.Add(name, newModFeature);
+            yield return newModFeature;
+        }
+    }
+
     static async IAsyncEnumerable<ModFileHash> TrasnformHashByteArraysEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<byte[]> hashes)
     {
         var existingModFileHashes = (await pbDbContext.ModFileHashes.Where(mfh => Enumerable.Contains(hashes, mfh.Sha256)).ToListAsync().ConfigureAwait(false)).ToDictionary(mfh => mfh.Sha256.ToHexString());
@@ -96,6 +120,7 @@ public class ModsDirectoryCataloger :
         var modManifest = new ModManifest
         {
             Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Creators).ToListAsync().ConfigureAwait(false),
+            Features = await TransformFeatureNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Features).ToListAsync().ConfigureAwait(false),
             Name = modFileManifestModel.Name,
             RequiredPacks = await TransformCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
             SubsumedFiles = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.SubsumedFiles).ToListAsync().ConfigureAwait(false),
@@ -127,6 +152,7 @@ public class ModsDirectoryCataloger :
                     Files = await TrasnformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, requiredMod.Files).ToListAsync().ConfigureAwait(false),
                     ManifestKey = requiredMod.ModManifestKey,
                     Name = requiredMod.Name,
+                    RequiredFeatures = await TransformFeatureNamesEnumerableAsync(pbDbContext, saveChangesLock, requiredMod.RequiredFeatures).ToListAsync().ConfigureAwait(false),
                     Url = requiredMod.Url,
                     Version = requiredMod.Version
                 });

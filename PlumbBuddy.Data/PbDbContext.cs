@@ -16,6 +16,7 @@ public class PbDbContext :
     public DbSet<FileOfInterest> FilesOfInterest { get; set; }
     public DbSet<IntentionalOverride> IntentionalOverrides { get; set; }
     public DbSet<ModCreator> ModCreators { get; set; }
+    public DbSet<ModFeature> ModFeatures { get; set; }
     public DbSet<ModFileHash> ModFileHashes { get; set; }
     public DbSet<ModFileResource> ModFileResources { get; set; }
     public DbSet<ModFile> ModFiles { get; set; }
