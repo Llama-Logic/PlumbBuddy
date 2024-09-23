@@ -38,8 +38,8 @@ partial class PlatformFunctions :
 
     public IReadOnlyList<Regex> DiscardableFileNamePatterns { get; } =
     [
-        GetDotDsUnderscoreStorePattern()
-        GetDotLocalizedPattern(),
+        GetDotDsUnderscoreStorePattern(),
+        GetDotLocalizedPattern()
     ];
 
     public StringComparison FileSystemStringComparison =>
