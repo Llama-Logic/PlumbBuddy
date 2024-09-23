@@ -25,7 +25,6 @@ public partial class MainLayout
     bool? manualLightDarkModeToggle;
     int packageCount;
     int scriptArchiveCount;
-    readonly MudTheme theme = CreatePlumbBuddyFactoryTheme();
     bool themeManagerOpen = false;
     ThemeManagerTheme themeManagerTheme = new()
     {
@@ -34,6 +33,18 @@ public partial class MainLayout
 
     [Inject]
     IJSRuntime JSRuntime { get; set; } = default!;
+
+    MudTheme Theme
+    {
+        get
+        {
+            if (Player.ShowThemeManager)
+                return themeManagerTheme.Theme;
+            var factory = CreatePlumbBuddyFactoryTheme();
+            ApplyPlayerSelectedTheme(factory);
+            return factory;
+        }
+    }
 
     bool isDarkMode;
     bool isMainMenuDrawerOpen = false;
@@ -72,6 +83,17 @@ public partial class MainLayout
         return Task.CompletedTask;
     }
 
+    void ApplyPlayerSelectedTheme(MudTheme theme)
+    {
+        var paletteDark = theme.PaletteDark;
+        if (Player.Theme is "Amethyst Lilac")
+        {
+            paletteDark.Primary = "#594ae2ff";
+            paletteDark.Surface = "#342d6bff";
+            paletteDark.Background = "#29226bff";
+        }
+    }
+
     /// <inheritdoc/>
     public void Dispose()
     {
@@ -79,6 +101,13 @@ public partial class MainLayout
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
         SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
+    }
+
+    bool? GetPlayerSelectedThemeIsDarkMode()
+    {
+        if (Player.Theme is "Amethyst Lilac")
+            return true;
+        return null;
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -97,14 +126,14 @@ public partial class MainLayout
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(Player.CacheStatus))
+        if (e.PropertyName is nameof(IPlayer.CacheStatus))
         {
             if (!Dispatcher.IsDispatchRequired)
                 StateHasChanged();
             else
                 Dispatcher.Dispatch(StateHasChanged);
         }
-        else if (e.PropertyName is nameof(Player.ShowThemeManager))
+        else if (e.PropertyName is nameof(IPlayer.ShowThemeManager))
         {
             manualLightDarkModeToggleEnabled = false;
             manualLightDarkModeToggle = null;
@@ -112,7 +141,12 @@ public partial class MainLayout
                 SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
             StateHasChanged();
         }
-        else if (e.PropertyName is nameof(Player.Type))
+        else if (e.PropertyName is nameof(IPlayer.Theme))
+        {
+            SetPreferredColorScheme(GetPlayerSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
+            StateHasChanged();
+        }
+        else if (e.PropertyName is nameof(IPlayer.Type))
             StateHasChanged();
     }
 
@@ -181,7 +215,7 @@ public partial class MainLayout
         themeManagerOpen = value;
 
     void SetPreferredColorScheme(string colorScheme) =>
-        isDarkMode = manualLightDarkModeToggle ?? colorScheme == "dark";
+        isDarkMode = manualLightDarkModeToggle ?? GetPlayerSelectedThemeIsDarkMode() ?? colorScheme == "dark";
 
     /// <inheritdoc/>
     [JSInvokable]

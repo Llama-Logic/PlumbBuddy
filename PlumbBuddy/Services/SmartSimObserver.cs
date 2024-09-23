@@ -178,7 +178,7 @@ public partial class SmartSimObserver :
         containerBuilder.RegisterType<McccMissingScan>().As<IMcccMissingScan>();
         containerBuilder.RegisterType<BeMissingScan>().As<IBeMissingScan>();
         containerBuilder.RegisterType<ModGuardMissingScan>().As<IModGuardMissingScan>();
-        containerBuilder.RegisterType<DependencyMissingScan>().As<IDependencyMissingScan>();
+        containerBuilder.RegisterType<DependencyScan>().As<IDependencyScan>();
         containerBuilder.RegisterType<CacheStalenessScan>().As<ICacheStalenessScan>();
         containerBuilder.RegisterType<ResourceConflictScan>().As<IResourceConflictScan>();
         containerBuilder.RegisterType<MultipleModVersionsScan>().As<IMultipleModVersionsScan>();
@@ -578,7 +578,7 @@ public partial class SmartSimObserver :
             initializationChange |= checkScanInitialization(player.ScanForMissingMccc, typeof(IMcccMissingScan));
             initializationChange |= checkScanInitialization(player.ScanForMissingBe, typeof(IBeMissingScan));
             initializationChange |= checkScanInitialization(player.ScanForMissingModGuard, typeof(IModGuardMissingScan));
-            initializationChange |= checkScanInitialization(player.ScanForMissingDependency, typeof(IDependencyMissingScan));
+            initializationChange |= checkScanInitialization(player.ScanForMissingDependency, typeof(IDependencyScan));
             initializationChange |= checkScanInitialization(player.ScanForCacheStaleness, typeof(ICacheStalenessScan));
             initializationChange |= checkScanInitialization(player.ScanForResourceConflicts, typeof(IResourceConflictScan));
             initializationChange |= checkScanInitialization(player.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));

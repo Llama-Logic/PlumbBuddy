@@ -127,7 +127,7 @@ partial class OnboardingDialog
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
-        if (targetIndex is >= 3)
+        if (targetIndex is >= 4)
         {
             Player.Onboarded = true;
             MudDialog?.Close(DialogResult.Ok(true));
@@ -137,10 +137,10 @@ partial class OnboardingDialog
             return false;
         switch (targetIndex)
         {
-            case 1:
+            case 2:
                 await ScanForFoldersAsync();
                 return false;
-            case 2:
+            case 3:
                 var prevent = false;
                 if (foldersSelector is not null)
                 {
@@ -154,15 +154,6 @@ partial class OnboardingDialog
 
     void HandleUserPreferencesChanged(object? sender, PropertyChangedEventArgs e) =>
         StateHasChanged();
-
-    Task LearnMoreAboutDiscordOnClickHandlerAsync() =>
-        Launcher.OpenAsync("https://discord.com/");
-
-    Task LearnMoreAboutMcccOnClickHandlerAsync() =>
-        Launcher.OpenAsync("https://deaderpool-mccc.com/");
-
-    Task LearnMoreAboutModGuardOnClickHandlerAsync() =>
-        Launcher.OpenAsync("https://www.patreon.com/posts/98126153");
 
     /// <inheritdoc />
     protected override void OnInitialized()
@@ -217,7 +208,7 @@ partial class OnboardingDialog
                 Player.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyMissingScan))?.IsEnabledByDefault ?? false;
+                Player.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForResourceConflicts = ScanAttribute.Get(typeof(IResourceConflictScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;

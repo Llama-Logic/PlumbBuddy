@@ -23,6 +23,7 @@ public interface IPlayer :
     bool ScanForResourceConflicts { get; set; }
     bool ScanForScriptModsDisabled { get; set; }
     bool ShowThemeManager { get; set; }
+    string? Theme { get; set; }
     UserType Type { get; set; }
     string UserDataFolderPath { get; set; }
 

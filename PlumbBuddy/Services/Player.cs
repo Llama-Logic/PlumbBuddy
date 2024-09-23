@@ -258,6 +258,18 @@ class Player :
         }
     }
 
+    public string? Theme
+    {
+        get => preferences.Get<string?>(nameof(Theme), null);
+        set
+        {
+            if (Theme == value)
+                return;
+            preferences.Set(nameof(Theme), value);
+            OnPropertyChanged();
+        }
+    }
+
     public UserType Type
     {
         get => Get(nameof(Type), UserType.Casual);

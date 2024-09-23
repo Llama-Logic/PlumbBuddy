@@ -8,30 +8,26 @@ partial class MainMenu
     [Parameter]
     public EventCallback CloseDrawer { get; set; }
 
-    async Task ClearCacheHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        SmartSimObserver.ClearCache();
-    }
-
-    async Task CloseWindowOnClickHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        AppLifecycleManager.HideWindow();
-    }
-
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
     }
 
-    protected override void OnInitialized()
+    async Task HandleClearCacheOnClickAsync()
     {
-        base.OnInitialized();
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        await CloseDrawer.InvokeAsync();
+        SmartSimObserver.ClearCache();
     }
+
+    async Task HandleCloseWindowOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        AppLifecycleManager.HideWindow();
+    }
+
+    Task HandleCloseMenuOnClickAsync() =>
+        CloseDrawer.InvokeAsync();
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -42,6 +38,18 @@ partial class MainMenu
             else
                 Dispatcher.Dispatch(StateHasChanged);
         }
+    }
+
+    async Task HandleOpenDownloadsFolderOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        SmartSimObserver.OpenDownloadsFolder();
+    }
+
+    async Task HandleOpenModsFolderOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        SmartSimObserver.OpenModsFolder();
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -55,6 +63,42 @@ partial class MainMenu
         }
         else if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
             StateHasChanged();
+    }
+
+    async Task HandleReonboardOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        if (await DialogService.ShowCautionDialogAsync("Get Reacquainted?", "Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we'll have to get to know each other all over again. Be sure that's what you want before you continue."))
+        {
+            Player.Forget(); // goodbye 😭
+            await DialogService.ShowOnboardingDialogAsync();
+        }
+    }
+
+    async Task HandleSettingsOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        await DialogService.ShowSettingsDialogAsync();
+    }
+
+    async Task HandleShutdownPlumbBuddyOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        if (Application.Current is { } app
+            && await DialogService.ShowCautionDialogAsync("Are You Sure?", "I can't monitor your Mods folder while I'm shut down. You won't receive any alerts about potential problems until you start me up again."))
+        {
+            AppLifecycleManager.PreventCasualClosing = false;
+            app.CloseWindow(app.Windows[0]);
+        }
+    }
+
+    async Task HandleToggleThemeManagerOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        if (Player.ShowThemeManager)
+            Player.ShowThemeManager = false;
+        else if (await DialogService.ShowCautionDialogAsync("Toggle Theme Manager?", "Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒."))
+            Player.ShowThemeManager = true;
     }
 
     void HandleVersionOnClick()
@@ -87,51 +131,10 @@ partial class MainMenu
         }
     }
 
-    async Task OpenDownloadsFolderHandlerAsync()
+    protected override void OnInitialized()
     {
-        await CloseDrawer.InvokeAsync();
-        SmartSimObserver.OpenDownloadsFolder();
-    }
-
-    async Task OpenModsFolderHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        SmartSimObserver.OpenModsFolder();
-    }
-
-    async Task ReonboardOnClickHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        if (await DialogService.ShowCautionDialogAsync("Get Reacquainted?", "Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we'll have to get to know each other all over again. Be sure that's what you want before you continue."))
-        {
-            Player.Forget(); // goodbye 😭
-            await DialogService.ShowOnboardingDialogAsync();
-        }
-    }
-
-    async Task SettingsOnClickHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        await DialogService.ShowSettingsDialogAsync();
-    }
-
-    async Task ShutdownPlumbBuddyOnClickHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        if (Application.Current is { } app
-            && await DialogService.ShowCautionDialogAsync("Are You Sure?", "I can't monitor your Mods folder while I'm shut down. You won't receive any alerts about potential problems until you start me up again."))
-        {
-            AppLifecycleManager.PreventCasualClosing = false;
-            app.CloseWindow(app.Windows[0]);
-        }
-    }
-
-    async Task ToggleThemeManagerOnClickHandlerAsync()
-    {
-        await CloseDrawer.InvokeAsync();
-        if (Player.ShowThemeManager)
-            Player.ShowThemeManager = false;
-        else if (await DialogService.ShowCautionDialogAsync("Toggle Theme Manager?", "Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒."))
-            Player.ShowThemeManager = true;
+        base.OnInitialized();
+        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        Player.PropertyChanged += HandlePlayerPropertyChanged;
     }
 }

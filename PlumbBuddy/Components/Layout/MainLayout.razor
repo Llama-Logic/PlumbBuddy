@@ -8,7 +8,7 @@
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
 
-<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@(Player.ShowThemeManager ? themeManagerTheme.Theme : theme)" />
+<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@Theme" />
 @if (Player.ShowThemeManager)
 {
     <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
@@ -153,7 +153,7 @@
                     <TooltipContent>
                         <MudStack Row="true">
                             <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" />
-                            <MudTextM3 Typo="TypoM3.Title">Total Packages</MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Title">Packages</MudTextM3>
                         </MudStack>
                         <MudDivider />
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
@@ -178,11 +178,14 @@
                     <TooltipContent>
                         <MudStack Row="true">
                             <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" />
-                            <MudTextM3 Typo="TypoM3.Title">Total Resources</MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Title">Resources</MudTextM3>
                         </MudStack>
                         <MudDivider />
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
                             This is the number of resources in the packages I was able to catalog in your Mods folder.
+                        </MudTextM3>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
                             <em>Creator's Note: This sum does not account for resource overrides. It is a strict, "dumb sum".</em>
                         </MudTextM3>
                         @if (SmartSimObserver.IsModsDisabledGameSettingOn)
@@ -204,7 +207,7 @@
                     <TooltipContent>
                         <MudStack Row="true">
                             <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" />
-                            <MudTextM3 Typo="TypoM3.Title">Total Script Archives</MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Title">Script Archives</MudTextM3>
                         </MudStack>
                         <MudDivider />
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
@@ -215,6 +218,58 @@
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
                                 Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4.
+                            </MudTextM3>
+                        }
+                    </TooltipContent>
+                </MudTooltip>
+            }
+            @if (Player.Type is UserType.Creator && ModsDirectoryCataloger.PythonScriptCount > 0)
+            {
+                <MudTooltip Arrow="true" Color="Color.Warning">
+                    <ChildContent>
+                        <MudChip T="int" Icon="@MaterialDesignIcons.Normal.SpeedometerSlow" Value="@ModsDirectoryCataloger.PythonScriptCount" Color="Color.Warning" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.SpeedometerSlow" />
+                            <MudTextM3 Typo="TypoM3.Title">Python Scripts</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            This is the number of <strong>uncompiled</strong> Python scripts I found in script archives in your Mods folder.
+                        </MudTextM3>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            <em>
+                                Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them.
+                                Maxis' SmartSim engine <strong>does not</strong> Just-in-Time compile Python scripts in script archives.
+                                This means they will underperform <strong>considerably</strong>.
+                                If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.
+                            </em>
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+            }
+            @if (Player.Type is UserType.Creator && ModsDirectoryCataloger.PythonByteCodeFileCount > 0)
+            {
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudChip T="int" Icon="@MaterialDesignIcons.Normal.Speedometer" Value="@ModsDirectoryCataloger.PythonByteCodeFileCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? Color.Warning : Color.Default)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.Speedometer" />
+                            <MudTextM3 Typo="TypoM3.Title">Python Byte Code Files</MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            This is the number of compiled Python byte code files I found in script archives in your Mods folder.
+                        </MudTextM3>
+                        @if (SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn)
+                        {
+                            <MudDivider />
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4.
                             </MudTextM3>
                         }
                     </TooltipContent>

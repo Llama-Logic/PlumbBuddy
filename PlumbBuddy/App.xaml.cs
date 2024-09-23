@@ -3,7 +3,7 @@ namespace PlumbBuddy;
 public partial class App :
     Application
 {
-    const string packCodesModelMigration = "20240918172725_ModelV1";
+    const string packCodesModelMigration = "20240923020432_ModelV1";
 
     public App(ILifetimeScope lifetimeScope, PbDbContext pbDbContext, IAppLifecycleManager appLifecycleManager)
     {

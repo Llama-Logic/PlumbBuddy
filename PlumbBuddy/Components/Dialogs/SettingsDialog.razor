@@ -33,6 +33,9 @@
                 <MudSelectItem Value="@UserType.Creator">Mod Creator</MudSelectItem>
             </MudSelect>
         </MudTabPanel>
+        <MudTabPanel Text="Theme" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
+            <ThemeSelector @ref="@themeSelector" />
+        </MudTabPanel>
         <MudTabPanel Text="Folders" Icon="@MaterialDesignIcons.Normal.Folder">
             <br />
             <br />

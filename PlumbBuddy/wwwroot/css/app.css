@@ -6,6 +6,20 @@
     max-width: 280px;
 }
 
+.mud-thememanager-button {
+    z-index: 1000;
+}
+
+.main-menu {
+    height: calc(100vh - 331px);
+    overflow-y: auto;
+}
+
+.scan-issues-container, .scan-issues-container * {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
 .user-type-carousel .d-flex .d-flex div:nth-child(1) svg {
     fill: var(--mud-palette-primary);
     filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.5));

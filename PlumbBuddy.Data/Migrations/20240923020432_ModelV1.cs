@@ -39,6 +39,19 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ModFeatures",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFeatures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ModManifests",
                 columns: table => new
                 {
@@ -132,6 +145,30 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ModFeatureModManifest",
+                columns: table => new
+                {
+                    FeaturesId = table.Column<long>(type: "INTEGER", nullable: false),
+                    SpecifiedByModManifestsId = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFeatureModManifest", x => new { x.FeaturesId, x.SpecifiedByModManifestsId });
+                    table.ForeignKey(
+                        name: "FK_ModFeatureModManifest_ModFeatures_FeaturesId",
+                        column: x => x.FeaturesId,
+                        principalTable: "ModFeatures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ModFeatureModManifest_ModManifests_SpecifiedByModManifestsId",
+                        column: x => x.SpecifiedByModManifestsId,
+                        principalTable: "ModManifests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RequiredMods",
                 columns: table => new
                 {
@@ -199,6 +236,30 @@ namespace PlumbBuddy.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ModCreatorRequiredMod_RequiredMods_AttributedRequiredModsId",
                         column: x => x.AttributedRequiredModsId,
+                        principalTable: "RequiredMods",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFeatureRequiredMod",
+                columns: table => new
+                {
+                    RequiredFeaturesId = table.Column<long>(type: "INTEGER", nullable: false),
+                    SpecifiedByRequiredModsId = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFeatureRequiredMod", x => new { x.RequiredFeaturesId, x.SpecifiedByRequiredModsId });
+                    table.ForeignKey(
+                        name: "FK_ModFeatureRequiredMod_ModFeatures_RequiredFeaturesId",
+                        column: x => x.RequiredFeaturesId,
+                        principalTable: "ModFeatures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ModFeatureRequiredMod_RequiredMods_SpecifiedByRequiredModsId",
+                        column: x => x.SpecifiedByRequiredModsId,
                         principalTable: "RequiredMods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -284,6 +345,34 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ScriptModArchiveEntries",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", nullable: true),
+                    CompressedLength = table.Column<long>(type: "INTEGER", nullable: false),
+                    SignedCrc32 = table.Column<int>(type: "INTEGER", nullable: false),
+                    ExternalAttributes = table.Column<int>(type: "INTEGER", nullable: false),
+                    FullName = table.Column<string>(type: "TEXT", nullable: false),
+                    IsEncrypted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    LastWriteTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    Length = table.Column<long>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScriptModArchiveEntries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScriptModArchiveEntries_ModFileHashes_ModFileHashId",
+                        column: x => x.ModFileHashId,
+                        principalTable: "ModFileHashes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ModFileResourceTopologySnapshot",
                 columns: table => new
                 {
@@ -332,6 +421,22 @@ namespace PlumbBuddy.Data.Migrations
                 name: "IX_ModCreators_Name",
                 table: "ModCreators",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFeatureModManifest_SpecifiedByModManifestsId",
+                table: "ModFeatureModManifest",
+                column: "SpecifiedByModManifestsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFeatureRequiredMod_SpecifiedByRequiredModsId",
+                table: "ModFeatureRequiredMod",
+                column: "SpecifiedByRequiredModsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFeatures_Name",
+                table: "ModFeatures",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ModFileHashes_IntentionalOverrideId",
@@ -394,6 +499,12 @@ namespace PlumbBuddy.Data.Migrations
                 name: "IX_RequiredMods_ModManfiestId",
                 table: "RequiredMods",
                 column: "ModManfiestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScriptModArchiveEntries_ModFileHashId_FullName",
+                table: "ScriptModArchiveEntries",
+                columns: new[] { "ModFileHashId", "FullName" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -409,6 +520,12 @@ namespace PlumbBuddy.Data.Migrations
                 name: "ModCreatorRequiredMod");
 
             migrationBuilder.DropTable(
+                name: "ModFeatureModManifest");
+
+            migrationBuilder.DropTable(
+                name: "ModFeatureRequiredMod");
+
+            migrationBuilder.DropTable(
                 name: "ModFileResourceTopologySnapshot");
 
             migrationBuilder.DropTable(
@@ -418,7 +535,13 @@ namespace PlumbBuddy.Data.Migrations
                 name: "ModManifestPackCode");
 
             migrationBuilder.DropTable(
+                name: "ScriptModArchiveEntries");
+
+            migrationBuilder.DropTable(
                 name: "ModCreators");
+
+            migrationBuilder.DropTable(
+                name: "ModFeatures");
 
             migrationBuilder.DropTable(
                 name: "ModFileResources");

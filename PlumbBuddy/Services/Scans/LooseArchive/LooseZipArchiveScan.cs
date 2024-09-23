@@ -30,10 +30,10 @@ public sealed class LooseZipArchiveScan :
 
                 `{file.FullName}`
 
-                While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.
+                You may believe that it's not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be <strong>very bad</strong>. Let's move it to your Downloads folder right away.
                 """,
             Origin = this,
-            Type = ScanIssueType.Uncomfortable,
+            Type = ScanIssueType.Sick,
             Data = fileOfInterest.Path,
             Resolutions =
             [
@@ -49,7 +49,7 @@ public sealed class LooseZipArchiveScan :
                     Icon = MaterialDesignIcons.Normal.Cancel,
                     Label = "Stop telling me",
                     CautionCaption = "Disable this scan?",
-                    CautionText = "I mean, I get that this is nit picky, but it's bad Mods folder hygiene to have that ZIP file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause.",
+                    CautionText = "Look, this ZIP file being in your Mods folder can't do any good and it just might do harm. Turning off this scan is just hiding this warning about it, not prevent that potential harm.",
                     Data = "stopTellingMe"
                 }
             ]

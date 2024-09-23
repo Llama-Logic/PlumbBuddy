@@ -4,6 +4,7 @@ partial class SettingsDialog
 {
     FoldersSelector? foldersSelector;
     MudTabs? tabs;
+    ThemeSelector? themeSelector;
 
     string InstallationFolderPath { get; set; } = string.Empty;
 
@@ -77,8 +78,11 @@ partial class SettingsDialog
         Type = Player.Type;
     }
 
-    void CancelOnClickHandler() =>
+    void CancelOnClickHandler()
+    {
+        themeSelector?.Cancel();
         MudDialog?.Close(DialogResult.Cancel());
+    }
 
     async Task OkOnClickHandlerAsync()
     {

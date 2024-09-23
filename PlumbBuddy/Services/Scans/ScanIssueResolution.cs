@@ -8,4 +8,5 @@ public class ScanIssueResolution
     public required object Data { get; init; }
     public required string Icon { get; init; }
     public required string Label { get; init; }
+    public Uri? Url { get; init; }
 }

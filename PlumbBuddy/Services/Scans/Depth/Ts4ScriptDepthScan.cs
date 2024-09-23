@@ -14,7 +14,7 @@ public sealed class Ts4ScriptDepthScan :
         {
             Icon = MaterialDesignIcons.Normal.FolderArrowUpDown,
             Caption = "No Script Archives are Too Deep",
-            Description = "I didn't find any script archives more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game could not have.",
+            Description = "I didn't find any script archives more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.",
             Origin = this,
             Type = ScanIssueType.Healthy
         };

@@ -1,0 +1,30 @@
+@inject IPlayer Player
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="3">
+        <MudCard Elevation="5">
+            <MudCardMedia Image="/img/PlumbBuddyLogo.svg" Height="160" />
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Title">PlumbBuddy</MudTextM3>
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">Light or Dark Mode</MudChip>
+                <MudTextM3 Typo="TypoM3.Body">Factory default theme.</MudTextM3>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => SelectTheme(null))">Select</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="3">
+        <MudCard Elevation="5">
+            <MudCardMedia Image="/img/ThemeAmethystLilac.png" Height="160" />
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Title">Amethyst Lilac</MudTextM3>
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Dark">Dark Mode Only</MudChip>
+                <MudTextM3 Typo="TypoM3.Body">Visit on <MudLink Href="https://www.patreon.com/amethystlilac" Target="_blank">Patreon</MudLink>!</MudTextM3>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => SelectTheme(amethystLilac))">Select</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>

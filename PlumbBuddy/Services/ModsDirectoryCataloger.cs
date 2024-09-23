@@ -162,6 +162,8 @@ public class ModsDirectoryCataloger :
     }
 
     static readonly PropertyChangedEventArgs packageCountPropertyChangedEventArgs = new(nameof(PackageCount));
+    static readonly PropertyChangedEventArgs pythonByteCodeFileCountPropertyChangedEventArgs = new(nameof(PythonByteCodeFileCount));
+    static readonly PropertyChangedEventArgs pythonScriptCountPropertyChangedEventArgs = new(nameof(PythonScriptCount));
     static readonly PropertyChangedEventArgs resourceCountPropertyChangedEventArgs = new(nameof(ResourceCount));
     static readonly PropertyChangedEventArgs scriptArchiveCountPropertyChangedEventArgs = new(nameof(ScriptArchiveCount));
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
@@ -194,6 +196,8 @@ public class ModsDirectoryCataloger :
     readonly AsyncProducerConsumerQueue<string> pathsProcessingQueue;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
+    int pythonByteCodeFileCount;
+    int pythonScriptCount;
     int resourceCount;
     readonly AsyncLock saveChangesLock;
     int scriptArchiveCount;
@@ -209,6 +213,26 @@ public class ModsDirectoryCataloger :
         {
             packageCount = value;
             PropertyChanged?.Invoke(this, packageCountPropertyChangedEventArgs);
+        }
+    }
+
+    public int PythonByteCodeFileCount
+    {
+        get => pythonByteCodeFileCount;
+        private set
+        {
+            pythonByteCodeFileCount = value;
+            PropertyChanged?.Invoke(this, pythonByteCodeFileCountPropertyChangedEventArgs);
+        }
+    }
+
+    public int PythonScriptCount
+    {
+        get => pythonScriptCount;
+        private set
+        {
+            pythonScriptCount = value;
+            PropertyChanged?.Invoke(this, pythonScriptCountPropertyChangedEventArgs);
         }
     }
 
@@ -489,17 +513,42 @@ public class ModsDirectoryCataloger :
                             try
                             {
                                 using var archive = ZipFile.OpenRead(fileInfo.FullName);
-                                if (archive.Entries.FirstOrDefault(entry => entry.FullName.Equals("manifest.yml", StringComparison.OrdinalIgnoreCase)) is { } manifestEntry)
+                                var scriptModArchiveEntries = new List<ScriptModArchiveEntry>();
+                                foreach (var entry in archive.Entries)
                                 {
-                                    using var manifestStream = manifestEntry.Open();
-                                    using var manifestReader = new StreamReader(manifestStream);
-                                    if (ModFileManifestModel.TryParse(manifestReader.ReadToEnd(), out var modFileManifestModel))
-                                        modFileHash.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
+                                    scriptModArchiveEntries.Add(new()
+                                    {
+                                        Comment = entry.Comment,
+                                        CompressedLength = entry.CompressedLength,
+                                        Crc32 = entry.Crc32,
+                                        ExternalAttributes = entry.ExternalAttributes,
+                                        FullName = entry.FullName,
+                                        IsEncrypted = entry.IsEncrypted,
+                                        LastWriteTime = entry.LastWriteTime,
+                                        Length = entry.Length,
+                                        ModFileHash = modFileHash,
+                                        Name = entry.Name
+                                    });
+                                    if (entry.FullName.Equals("manifest.yml", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        try
+                                        {
+                                            using var manifestStream = entry.Open();
+                                            using var manifestReader = new StreamReader(manifestStream);
+                                            if (ModFileManifestModel.TryParse(manifestReader.ReadToEnd(), out var modFileManifestModel))
+                                                modFileHash.ModManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, modFileManifestModel).ConfigureAwait(false);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            logger.LogWarning(ex, "failed to read manifest in {ScriptArchivePath}", path);
+                                        }
+                                    }
                                 }
+                                modFileHash.ScriptModArchiveEntries = scriptModArchiveEntries;
                             }
                             catch (Exception ex)
                             {
-                                logger.LogWarning(ex, "failed to check for manifest in {ScriptArchivePath}", path);
+                                logger.LogWarning(ex, "failed to analyze script mod at {ScriptArchivePath}", path);
                             }
                         }
                         modFileHash.ResourcesAndManifestCataloged = true;
@@ -514,10 +563,17 @@ public class ModsDirectoryCataloger :
                     if (fileType is ModsDirectoryFileType.Package)
                     {
                         ++PackageCount;
-                        ResourceCount += modFileHash.Resources?.Count ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
+                        ResourceCount += modFileHash.Resources?.Count
+                            ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
                     }
                     else
+                    {
                         ++ScriptArchiveCount;
+                        PythonByteCodeFileCount += modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc"));
+                        PythonScriptCount += modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py"));
+                    }
                 }
                 else if (modFile.AbsenceNoticed is not null)
                 {
@@ -525,10 +581,17 @@ public class ModsDirectoryCataloger :
                     if (fileType is ModsDirectoryFileType.Package)
                     {
                         --PackageCount;
-                        ResourceCount -= modFileHash!.Resources?.Count ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
+                        ResourceCount -= modFileHash!.Resources?.Count
+                            ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
                     }
                     else
+                    {
                         --ScriptArchiveCount;
+                        PythonByteCodeFileCount -= modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc"));
+                        PythonScriptCount -= modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py"));
+                    }
                 }
                 modFile.Path = path;
                 modFile.Creation = creation;
@@ -586,6 +649,14 @@ public class ModsDirectoryCataloger :
     {
         PackageCount = await pbDbContext.ModFiles
             .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package)
+            .ConfigureAwait(false);
+        PythonByteCodeFileCount = await pbDbContext.ModFiles
+            .Where(mf => mf.Path != null)
+            .SumAsync(mf => mf.ModFileHash!.ScriptModArchiveEntries!.Count(smae => smae.Name.EndsWith(".pyc")))
+            .ConfigureAwait(false);
+        PythonScriptCount = await pbDbContext.ModFiles
+            .Where(mf => mf.Path != null)
+            .SumAsync(mf => mf.ModFileHash!.ScriptModArchiveEntries!.Count(smae => smae.Name.EndsWith(".py")))
             .ConfigureAwait(false);
         ResourceCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)

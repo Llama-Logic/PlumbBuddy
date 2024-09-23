@@ -23,6 +23,7 @@ public class PbDbContext :
     public DbSet<ModManifest> ModManifests { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
+    public DbSet<ScriptModArchiveEntry> ScriptModArchiveEntries { get; set; }
     public DbSet<TopologySnapshot> TopologySnapshots { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

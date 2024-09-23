@@ -17,29 +17,30 @@
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
         <MudImage Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>
+    <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" Style="position: absolute; top: 0; right: 0;" OnClick="HandleCloseMenuOnClickAsync" />
     <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">PlumbBuddy</MudTextM3>
     <MudTextM3 Typo="TypoM3.Body" Size="Size.Small" Align="Align.Center">The friendly helper for Sims 4 mods</MudTextM3>
     <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">(Version @AppInfo.VersionString)</MudTextM3>
+    <MudDivider Class="my-2" />
     <MudNavMenu Class="main-menu">
-        <MudDivider Class="my-2" />
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="OpenDownloadsFolderHandlerAsync">Open Downloads Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="OpenModsFolderHandlerAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="ClearCacheHandlerAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">Open Downloads Folder</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="HandleOpenModsFolderOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" IconColor="Color.Info">Ask for Help</MudNavLink>
         <MudDivider Class="my-2" />
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="SettingsOnClickHandlerAsync">Settings</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">Settings</MudNavLink>
         @if (Player.DevToolsUnlocked)
         {
             <MudNavGroup Icon="@MaterialDesignIcons.Normal.Tools" IconColor="Color.Warning" Title="Dev Tools">
-                <MudNavLink Icon="@MaterialDesignIcons.Normal.HumanGreeting" OnClick="ReonboardOnClickHandlerAsync">Get Reacquainted</MudNavLink>
-                <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="ToggleThemeManagerOnClickHandlerAsync">Toggle Theme Manager</MudNavLink>
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.HumanGreeting" OnClick="HandleReonboardOnClickAsync">Get Reacquainted</MudNavLink>
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="HandleToggleThemeManagerOnClickAsync">Toggle Theme Manager</MudNavLink>
             </MudNavGroup>
         }
         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
         {
-            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" OnClick="CloseWindowOnClickHandlerAsync">Close Window</MudNavLink>
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" OnClick="HandleCloseWindowOnClickAsync">Close Window</MudNavLink>
             <MudDivider Class="my-2" />
-            <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="ShutdownPlumbBuddyOnClickHandlerAsync">Shutdown PlumbBuddy</MudNavLink>
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="HandleShutdownPlumbBuddyOnClickAsync">Shutdown PlumbBuddy</MudNavLink>
         }
     </MudNavMenu>
 </MudPaper>

@@ -7,6 +7,10 @@ public interface IModsDirectoryCataloger :
 
     int PackageCount { get; }
 
+    int PythonByteCodeFileCount { get; }
+
+    int PythonScriptCount { get; }
+
     int ResourceCount { get; }
 
     int ScriptArchiveCount { get; }

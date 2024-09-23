@@ -3,7 +3,7 @@
 @inject IDispatcher Dispatcher
 @inject ISmartSimObserver SmartSimObserver
 
-<MudGrid Justify="Justify.Center">
+<MudGrid Justify="Justify.Center" Class="scan-issues-container">
     @foreach (var scanIssue in SmartSimObserver.ScanIssues)
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
@@ -26,7 +26,14 @@
                     <MudCardActions Style="flex-direction: column;">
                         @foreach (var resolution in scanIssue.Resolutions)
                         {
-                            <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>
+                            if (resolution.Url is { } url)
+                            {
+                                <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" Href="@url.ToString()" Target="_blank">@resolution.Label</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>
+                            }
                         }
                     </MudCardActions>
                 }
