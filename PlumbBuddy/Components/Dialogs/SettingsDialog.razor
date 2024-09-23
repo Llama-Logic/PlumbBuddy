@@ -41,7 +41,7 @@
             <br />
             <FoldersSelector @ref="@foldersSelector" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
         </MudTabPanel>
-        <MudTabPanel Text="Mod Health Scans" Icon="@MaterialDesignIcons.Normal.PuzzleHeart">
+        <MudTabPanel Text="Scans" Icon="@MaterialDesignIcons.Normal.CubeScan">
             <div style="margin: 0 auto; width: 85%;">
                 <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" />
             </div>

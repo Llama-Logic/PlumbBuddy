@@ -99,7 +99,6 @@ public partial class MainLayout
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
-        SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
         SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
     }
 
@@ -112,10 +111,7 @@ public partial class MainLayout
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is (nameof(IModsDirectoryCataloger.State))
-            or (nameof(IModsDirectoryCataloger.PackageCount))
-            or (nameof(IModsDirectoryCataloger.ResourceCount))
-            or (nameof(IModsDirectoryCataloger.ScriptArchiveCount)))
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
         {
             if (!Dispatcher.IsDispatchRequired)
                 StateHasChanged();
@@ -145,20 +141,6 @@ public partial class MainLayout
         {
             SetPreferredColorScheme(GetPlayerSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
             StateHasChanged();
-        }
-        else if (e.PropertyName is nameof(IPlayer.Type))
-            StateHasChanged();
-    }
-
-    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
-            or nameof(ISmartSimObserver.IsScriptModsEnabledGameSettingOn))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
         }
     }
 
@@ -193,7 +175,6 @@ public partial class MainLayout
             StateHasChanged();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
-        SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
         SuperSnacks.RefreshmentsOffered += HandleSuperSnacksRefreshmentsOffered;
         packageCount = ModsDirectoryCataloger.PackageCount;
         scriptArchiveCount = ModsDirectoryCataloger.ScriptArchiveCount;

@@ -161,6 +161,7 @@ public class ModsDirectoryCataloger :
         return modManifest;
     }
 
+    static readonly PropertyChangedEventArgs estimatedStateTimeRemainingPropertyChangedEventArgs = new(nameof(EstimatedStateTimeRemaining));
     static readonly PropertyChangedEventArgs packageCountPropertyChangedEventArgs = new(nameof(PackageCount));
     static readonly PropertyChangedEventArgs pythonByteCodeFileCountPropertyChangedEventArgs = new(nameof(PythonByteCodeFileCount));
     static readonly PropertyChangedEventArgs pythonScriptCountPropertyChangedEventArgs = new(nameof(PythonScriptCount));
@@ -190,6 +191,7 @@ public class ModsDirectoryCataloger :
     }
 
     readonly AsyncManualResetEvent awakeManualResetEvent;
+    TimeSpan? estimatedStateTimeRemaining;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
@@ -201,16 +203,30 @@ public class ModsDirectoryCataloger :
     int resourceCount;
     readonly AsyncLock saveChangesLock;
     int scriptArchiveCount;
-    ModDirectoryCatalogerState state;
+    ModsDirectoryCatalogerState state;
     readonly ISuperSnacks superSnacks;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public TimeSpan? EstimatedStateTimeRemaining
+    {
+        get => estimatedStateTimeRemaining;
+        private set
+        {
+            if (estimatedStateTimeRemaining == value)
+                return;
+            estimatedStateTimeRemaining = value;
+            PropertyChanged?.Invoke(this, estimatedStateTimeRemainingPropertyChangedEventArgs);
+        }
+    }
 
     public int PackageCount
     {
         get => packageCount;
         private set
         {
+            if (packageCount == value)
+                return;
             packageCount = value;
             PropertyChanged?.Invoke(this, packageCountPropertyChangedEventArgs);
         }
@@ -221,6 +237,8 @@ public class ModsDirectoryCataloger :
         get => pythonByteCodeFileCount;
         private set
         {
+            if (pythonByteCodeFileCount == value)
+                return;
             pythonByteCodeFileCount = value;
             PropertyChanged?.Invoke(this, pythonByteCodeFileCountPropertyChangedEventArgs);
         }
@@ -231,6 +249,8 @@ public class ModsDirectoryCataloger :
         get => pythonScriptCount;
         private set
         {
+            if (pythonScriptCount == value)
+                return;
             pythonScriptCount = value;
             PropertyChanged?.Invoke(this, pythonScriptCountPropertyChangedEventArgs);
         }
@@ -241,6 +261,8 @@ public class ModsDirectoryCataloger :
         get => resourceCount;
         private set
         {
+            if (resourceCount == value)
+                return;
             resourceCount = value;
             PropertyChanged?.Invoke(this, resourceCountPropertyChangedEventArgs);
         }
@@ -251,16 +273,20 @@ public class ModsDirectoryCataloger :
         get => scriptArchiveCount;
         private set
         {
+            if (scriptArchiveCount == value)
+                return;
             scriptArchiveCount = value;
             PropertyChanged?.Invoke(this, scriptArchiveCountPropertyChangedEventArgs);
         }
     }
 
-    public ModDirectoryCatalogerState State
+    public ModsDirectoryCatalogerState State
     {
         get => state;
         private set
         {
+            if (state == value)
+                return;
             state = value;
             PropertyChanged?.Invoke(this, statePropertyChangedEventArgs);
         }
@@ -279,17 +305,17 @@ public class ModsDirectoryCataloger :
         cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
-            State = ModDirectoryCatalogerState.Sleeping;
+            State = ModsDirectoryCatalogerState.Sleeping;
             await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
-            State = ModDirectoryCatalogerState.Debouncing;
+            State = ModsDirectoryCatalogerState.Debouncing;
             var nomNom = new Queue<string>();
             nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
             {
                 await Task.Delay(oneSecond).ConfigureAwait(false);
-                State = ModDirectoryCatalogerState.Sleeping;
+                State = ModsDirectoryCatalogerState.Sleeping;
                 await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
-                State = ModDirectoryCatalogerState.Debouncing;
+                State = ModsDirectoryCatalogerState.Debouncing;
                 try
                 {
                     if (!await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
@@ -314,7 +340,7 @@ public class ModsDirectoryCataloger :
                     continue;
                 }
             }
-            State = ModDirectoryCatalogerState.Cataloging;
+            State = ModsDirectoryCatalogerState.Cataloging;
             using var nestedScope = lifetimeScope.BeginLifetimeScope();
             var pbDbContext = nestedScope.Resolve<PbDbContext>();
             while (nomNom.TryDequeue(out var path))
@@ -326,10 +352,20 @@ public class ModsDirectoryCataloger :
                     await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
                 else if (Directory.Exists(fullPath))
                 {
+                    var catalogingStarted = DateTimeOffset.Now;
+                    var filesToCatalog = 0;
+                    var filesCataloged = 0;
+                    var filesCatalogedLock = new AsyncLock();
                     var broadcastBlock = new BroadcastBlock<FileInfo>(fileInfo => fileInfo);
                     var actionBlock = new ActionBlock<FileInfo>
                     (
-                        fileInfo => ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo),
+                        async fileInfo =>
+                        {
+                            await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
+                            using var filesCatalogedLockHeld = await filesCatalogedLock.LockAsync().ConfigureAwait(false);
+                            ++filesCataloged;
+                            EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / filesCataloged * (filesToCatalog - filesCataloged) / 10000000 * 10000000 + 10000000);
+                        },
                         new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) }
                     );
                     broadcastBlock.LinkTo(actionBlock, new DataflowLinkOptions { PropagateCompletion = true });
@@ -338,6 +374,7 @@ public class ModsDirectoryCataloger :
                     foreach (var fileInfo in new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories))
                     {
                         broadcastBlock.Post(fileInfo);
+                        ++filesToCatalog;
                         var fileType = GetFileType(fileInfo);
                         if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
                             preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
@@ -370,8 +407,9 @@ public class ModsDirectoryCataloger :
                         .ConfigureAwait(false);
                 }
             }
+            EstimatedStateTimeRemaining = null;
             await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
-            State = ModDirectoryCatalogerState.AnalyzingTopography;
+            State = ModsDirectoryCatalogerState.AnalyzingTopography;
             var resourceWasRemovedOrReplaced = false;
             var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
             using (var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false))
@@ -430,7 +468,7 @@ public class ModsDirectoryCataloger :
             }
             if (resourceWasRemovedOrReplaced && player.CacheStatus is SmartSimCacheStatus.Normal)
                 player.CacheStatus = SmartSimCacheStatus.Stale;
-            State = ModDirectoryCatalogerState.Idle;
+            State = ModsDirectoryCatalogerState.Idle;
         }
     }
 

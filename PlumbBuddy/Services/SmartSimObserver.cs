@@ -312,7 +312,7 @@ public partial class SmartSimObserver :
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(IModsDirectoryCataloger.State)
-            && modsDirectoryCataloger.State is ModDirectoryCatalogerState.Idle)
+            && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
             Scan();
     }
 
@@ -408,7 +408,7 @@ public partial class SmartSimObserver :
 
     void PutCatalogerToBedIfGameIsRunning()
     {
-        if (modsDirectoryCataloger.State is not ModDirectoryCatalogerState.Sleeping
+        if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping
             && (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
             || IsCacheLocked())
             Task.Run(PutCatalogerToBedWhileGameIsRunningAsync);

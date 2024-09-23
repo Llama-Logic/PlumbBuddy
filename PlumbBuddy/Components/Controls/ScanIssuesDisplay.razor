@@ -1,42 +1,88 @@
 @implements IDisposable
 @inject IDialogService DialogService
 @inject IDispatcher Dispatcher
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject ISmartSimObserver SmartSimObserver
 
 <MudGrid Justify="Justify.Center" Class="scan-issues-container">
-    @foreach (var scanIssue in SmartSimObserver.ScanIssues)
+    @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+    {
+        foreach (var scanIssue in SmartSimObserver.ScanIssues)
+        {
+            <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+                <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Variant="Variant.Outlined">
+                                <MudIcon Icon="@scanIssue.Icon" Size="Size.Large" />
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudTextM3 Typo="TypoM3.Title">@scanIssue.Caption</MudTextM3>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudMarkdown Value="@scanIssue.Description" />
+                    </MudCardContent>
+                    @if (scanIssue.Data is not null && scanIssue.Resolutions is not null && scanIssue.Resolutions.Count > 0)
+                    {
+                        <MudCardActions Style="flex-direction: column;">
+                            @foreach (var resolution in scanIssue.Resolutions)
+                            {
+                                if (resolution.Url is { } url)
+                                {
+                                    <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" Href="@url.ToString()" Target="_blank">@resolution.Label</MudButton>
+                                }
+                                else
+                                {
+                                    <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>
+                                }
+                            }
+                        </MudCardActions>
+                    }
+                </MudCard>
+            </MudItem>
+        }
+    }
+    else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-            <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
+            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Variant="Variant.Outlined">
-                            <MudIcon Icon="@scanIssue.Icon" Size="Size.Large" />
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" Size="Size.Large" />
                         </MudAvatar>
                     </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudTextM3 Typo="TypoM3.Title">@scanIssue.Caption</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">Game's Running... So Sleepy...</MudTextM3>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudMarkdown Value="@scanIssue.Description" />
+                    <MudTextM3 Typo="TypoM3.Body">Since we shouldn't be doing anything to your Mods folder while the game is running, I hope you won't mind if I catch a few winks while you play.</MudTextM3>
                 </MudCardContent>
-                @if (scanIssue.Data is not null && scanIssue.Resolutions is not null && scanIssue.Resolutions.Count > 0)
-                {
-                    <MudCardActions Style="flex-direction: column;">
-                        @foreach (var resolution in scanIssue.Resolutions)
-                        {
-                            if (resolution.Url is { } url)
-                            {
-                                <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" Href="@url.ToString()" Target="_blank">@resolution.Label</MudButton>
-                            }
-                            else
-                            {
-                                <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>
-                            }
-                        }
-                    </MudCardActions>
-                }
+            </MudCard>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Variant="Variant.Outlined">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderSync" Size="Size.Large" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudTextM3 Typo="TypoM3.Title">I'm Looking at Your Mods Folder...</MudTextM3>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextM3 Typo="TypoM3.Body">Once I'm done I'll let you know if there's anything to be concerned about. Don't worry, anything important will be at the top of the list!</MudTextM3>
+                    <br />
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning">Please don't launch the game right now!</MudChip>
+                </MudCardContent>
             </MudCard>
         </MudItem>
     }

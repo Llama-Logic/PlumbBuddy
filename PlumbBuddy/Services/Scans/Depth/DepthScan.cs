@@ -38,7 +38,7 @@ public abstract class DepthScan :
         {
             if (resolutionCmd is "move")
             {
-                if (modsDirectoryCataloger.State is ModDirectoryCatalogerState.Sleeping)
+                if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FolderLock);
                     return Task.CompletedTask;

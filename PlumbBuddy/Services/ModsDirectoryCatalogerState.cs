@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Services;
 
-public enum ModDirectoryCatalogerState
+public enum ModsDirectoryCatalogerState
 {
     Idle,
     Sleeping,

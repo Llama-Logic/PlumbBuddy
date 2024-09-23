@@ -9,13 +9,17 @@ public sealed class ModGuardMissingScan :
     {
     }
 
-    protected override string ModName { get; } = "ModGuard";
+    protected override string ModName { get; } =
+        "ModGuard";
 
-    protected override Uri ModUrl { get; } = new("https://www.patreon.com/posts/98126153", UriKind.Absolute);
+    protected override Uri ModUrl { get; } =
+        new("https://llama-logic.github.io/PlumbBuddy-Pages/ModGuard.html", UriKind.Absolute);
 
-    protected override string ModUtility { get; } = "protection from hacking, phishing, and other malware attacks which may occur if a modder's online accounts are compromised";
+    protected override string ModUtility { get; } =
+        "protection from hacking, phishing, and other malware attacks which may occur if a modder's online accounts are compromised";
 
-    protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } = null;
+    protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } =
+        null;
 
     protected override IReadOnlyList<string>? RequiredScriptArchiveFullNames { get; } =
     [

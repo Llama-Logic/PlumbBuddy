@@ -9,11 +9,14 @@ public sealed class BeMissingScan :
     {
     }
 
-    protected override string ModName { get; } = "Better Exceptions";
+    protected override string ModName { get; } =
+        "Better Exceptions";
 
-    protected override Uri ModUrl { get; } = new("https://www.patreon.com/posts/99403318", UriKind.Absolute);
+    protected override Uri ModUrl { get; } =
+        new("https://llama-logic.github.io/PlumbBuddy-Pages/BetterExceptions.html", UriKind.Absolute);
 
-    protected override string ModUtility => "detailed exception, mod conflict, and patch day analyses";
+    protected override string ModUtility =>
+        "detailed exception, mod conflict, and patch day analyses";
 
     protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } = null;
 

@@ -3,7 +3,7 @@ namespace PlumbBuddy.Services;
 public interface IModsDirectoryCataloger :
     INotifyPropertyChanged
 {
-    ModDirectoryCatalogerState State { get; }
+    TimeSpan? EstimatedStateTimeRemaining { get; }
 
     int PackageCount { get; }
 
@@ -14,6 +14,8 @@ public interface IModsDirectoryCataloger :
     int ResourceCount { get; }
 
     int ScriptArchiveCount { get; }
+
+    ModsDirectoryCatalogerState State { get; }
 
     void Catalog(string path);
 

@@ -1,23 +1,24 @@
-namespace PlumbBuddy.Components.Pages;
+namespace PlumbBuddy.Components.Controls;
 
-partial class Home
+partial class HUD
 {
-    /// <inheritdoc />
     public void Dispose()
     {
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.PackageCount)
+            or nameof(IModsDirectoryCataloger.ScriptArchiveCount)
+            or nameof(IModsDirectoryCataloger.State))
         {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
+            if (!Dispatcher.IsDispatchRequired)
                 StateHasChanged();
+            else
+                Dispatcher.Dispatch(StateHasChanged);
         }
     }
 
@@ -29,16 +30,16 @@ partial class Home
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ISmartSimObserver.IsCurrentlyScanning))
+        if (e.PropertyName is nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
+            or nameof(ISmartSimObserver.IsScriptModsEnabledGameSettingOn))
         {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
+            if (!Dispatcher.IsDispatchRequired)
                 StateHasChanged();
+            else
+                Dispatcher.Dispatch(StateHasChanged);
         }
     }
 
-    /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
