@@ -26,9 +26,6 @@ partial class PlatformFunctions :
     readonly ILifetimeScope lifetimeScope;
     readonly ToastNotifier toastNotifier;
 
-    public int DataflowBoundedCapacity =>
-        Math.Max(1, Environment.ProcessorCount / 2);
-
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
     [
     ];

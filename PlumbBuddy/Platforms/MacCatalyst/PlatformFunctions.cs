@@ -30,16 +30,6 @@ partial class PlatformFunctions :
     bool userNotificationsAllowed;
     readonly UNUserNotificationCenter userNotificationCenter;
 
-    /*
-     * This looks alarming but it is absolutely necessary due to how the .NET CLR has to negotiate with the macOS Task Scheduler.
-     * You can either believe me and leave it alone, or mess with it, break shit, and get Meg on your case.
-     * It is greatly mitigated by two factors:
-     * (1) macOS does what it damn well pleases and will throttle and sleep PB's threads to its heart's content regardless; and,
-     * (2) unlike in Windows, PB does NOT run in the background at startup on Macs.
-     */
-    public int DataflowBoundedCapacity =>
-        DataflowBlockOptions.Unbounded;
-
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
     [
         GetDotTemporaryItemsPattern(),

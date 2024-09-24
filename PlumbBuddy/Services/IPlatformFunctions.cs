@@ -2,7 +2,6 @@ namespace PlumbBuddy.Services;
 
 public interface IPlatformFunctions
 {
-    int DataflowBoundedCapacity { get; }
     IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> DiscardableFileNamePatterns { get; }
     StringComparison FileSystemStringComparison { get; }
