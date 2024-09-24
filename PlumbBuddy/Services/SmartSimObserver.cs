@@ -513,21 +513,22 @@ public partial class SmartSimObserver :
         enqueuedScanningTaskLockPotentiallyHeld.Dispose();
         using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         IsCurrentlyScanning = true;
-        var combinedScanIssues = new ConcurrentBag<ScanIssue>();
-        var broadcastBlock = new BroadcastBlock<IScan>(scanInstance => scanInstance);
-        var actionBlock = new ActionBlock<IScan>(async scanInstance =>
+        var broadcastScans = new BroadcastBlock<IScan>(scanInstance => scanInstance);
+        var transformScansToScanIssues = new TransformManyBlock<IScan, ScanIssue>(async scanInstance =>
         {
+            var result = new List<ScanIssue>();
             await foreach (var scanIssue in scanInstance.ScanAsync())
-                combinedScanIssues.Add(scanIssue);
+                result.Add(scanIssue);
+            return result;
         }, new ExecutionDataflowBlockOptions { BoundedCapacity = Math.Max(1, Environment.ProcessorCount / 2) });
-        broadcastBlock.LinkTo(actionBlock, new DataflowLinkOptions { PropagateCompletion = true });
-        foreach (var scanInstance in scanInstances.Values)
-            broadcastBlock.Post(scanInstance);
-        broadcastBlock.Complete();
-        await actionBlock.Completion.ConfigureAwait(false);
+        broadcastScans.LinkTo(transformScansToScanIssues, new DataflowLinkOptions { PropagateCompletion = true });
         var scanIssuesList = new List<ScanIssue>();
-        while (combinedScanIssues.TryTake(out var scanIssue))
-            scanIssuesList.Add(scanIssue);
+        var collectScanIssues = new ActionBlock<ScanIssue>(scanIssuesList.Add);
+        transformScansToScanIssues.LinkTo(collectScanIssues, new DataflowLinkOptions { PropagateCompletion = true });
+        foreach (var scanInstance in scanInstances.Values)
+            broadcastScans.Post(scanInstance);
+        broadcastScans.Complete();
+        await collectScanIssues.Completion.ConfigureAwait(false);
         ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
         await platformFunctions.SetBadgeNumberAsync(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
         IsCurrentlyScanning = false;
