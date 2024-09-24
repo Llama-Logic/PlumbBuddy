@@ -355,9 +355,8 @@ public class ModsDirectoryCataloger :
                     var modsDirectoryFiles = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories).ToImmutableArray();
                     var filesCataloged = 0;
                     var filesToCatalog = modsDirectoryFiles.Length;
-                    var preservedModFilePaths = new List<string>();
-                    var preservedFileOfInterestPaths = new List<string>();
-                    var filesCatalogedLock = new AsyncLock();
+                    var preservedModFilePaths = new ConcurrentBag<string>();
+                    var preservedFileOfInterestPaths = new ConcurrentBag<string>();
                     using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
                     {
                         var catalogingStarted = DateTimeOffset.Now;
@@ -367,9 +366,8 @@ public class ModsDirectoryCataloger :
                             try
                             {
                                 await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
-                                using var filesCatalogedLockHeld = await filesCatalogedLock.LockAsync().ConfigureAwait(false);
-                                ++filesCataloged;
-                                EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / filesCataloged * (filesToCatalog - filesCataloged) / 10000000 * 10000000 + 10000000);
+                                var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
+                                EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / newFilesCataloged * (filesToCatalog - newFilesCataloged) / 10000000 * 10000000 + 10000000);
                                 var fileType = GetFileType(fileInfo);
                                 if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
                                     preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);

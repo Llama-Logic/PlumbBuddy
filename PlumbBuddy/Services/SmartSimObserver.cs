@@ -513,30 +513,25 @@ public partial class SmartSimObserver :
         enqueuedScanningTaskLockPotentiallyHeld.Dispose();
         using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         IsCurrentlyScanning = true;
-        var scanIssuesList = new List<ScanIssue>();
-#if WINDOWS
-        var broadcastScans = new BroadcastBlock<IScan>(scanInstance => scanInstance);
-        var transformScansToScanIssues = new TransformManyBlock<IScan, ScanIssue>(async scanInstance =>
+        var scanIssues = new ConcurrentBag<ScanIssue>();
+        using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
         {
-            var result = new List<ScanIssue>();
-            await foreach (var scanIssue in scanInstance.ScanAsync())
-                result.Add(scanIssue);
-            return result;
-        }, new ExecutionDataflowBlockOptions { BoundedCapacity = Math.Max(1, Environment.ProcessorCount / 2) });
-        broadcastScans.LinkTo(transformScansToScanIssues, new DataflowLinkOptions { PropagateCompletion = true });
-        var collectScanIssues = new ActionBlock<ScanIssue>(scanIssuesList.Add);
-        transformScansToScanIssues.LinkTo(collectScanIssues, new DataflowLinkOptions { PropagateCompletion = true });
-        foreach (var scanInstance in scanInstances.Values)
-            broadcastScans.Post(scanInstance);
-        broadcastScans.Complete();
-        await collectScanIssues.Completion.ConfigureAwait(false);
-#else
-        foreach (var scanInstance in scanInstances.Values)
-            await foreach (var scanIssue in scanInstance.ScanAsync())
-                scanIssuesList.Add(scanIssue);
-#endif
-        ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
-        await platformFunctions.SetBadgeNumberAsync(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
+            await Task.WhenAll(scanInstances.Values.Select(async scanInstance =>
+            {
+                await semaphore.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    await foreach (var scanIssue in scanInstance.ScanAsync())
+                        scanIssues.Add(scanIssue);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })).ConfigureAwait(false);
+        }
+        ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+        await platformFunctions.SetBadgeNumberAsync(scanIssues.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
         IsCurrentlyScanning = false;
     }
 
