@@ -520,7 +520,7 @@ public partial class SmartSimObserver :
             await foreach (var scanIssue in scanInstance.ScanAsync())
                 result.Add(scanIssue);
             return result;
-        }, new ExecutionDataflowBlockOptions { BoundedCapacity = Math.Max(1, Environment.ProcessorCount / 2) });
+        }, new ExecutionDataflowBlockOptions { BoundedCapacity = platformFunctions.DataflowBoundedCapacity });
         broadcastScans.LinkTo(transformScansToScanIssues, new DataflowLinkOptions { PropagateCompletion = true });
         var scanIssuesList = new List<ScanIssue>();
         var collectScanIssues = new ActionBlock<ScanIssue>(scanIssuesList.Add);

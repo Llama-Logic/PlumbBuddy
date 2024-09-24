@@ -366,7 +366,7 @@ public class ModsDirectoryCataloger :
                             ++filesCataloged;
                             EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / filesCataloged * (filesToCatalog - filesCataloged) / 10000000 * 10000000 + 10000000);
                         },
-                        new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) }
+                        new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = platformFunctions.DataflowBoundedCapacity }
                     );
                     broadcastBlock.LinkTo(actionBlock, new DataflowLinkOptions { PropagateCompletion = true });
                     var preservedModFilePaths = new List<string>();
