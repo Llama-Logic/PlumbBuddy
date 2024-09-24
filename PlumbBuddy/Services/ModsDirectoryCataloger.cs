@@ -352,44 +352,36 @@ public class ModsDirectoryCataloger :
                     await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
                 else if (Directory.Exists(fullPath))
                 {
-                    var catalogingStarted = DateTimeOffset.Now;
-                    var filesToCatalog = 0;
+                    var modsDirectoryFiles = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories).ToImmutableArray();
                     var filesCataloged = 0;
-                    var filesCatalogedLock = new AsyncLock();
-                    var broadcastBlock = new BroadcastBlock<FileInfo>(fileInfo => fileInfo);
-                    var actionBlock = new ActionBlock<FileInfo>
-                    (
-                        async fileInfo =>
-                        {
-                            await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
-                            using var filesCatalogedLockHeld = await filesCatalogedLock.LockAsync().ConfigureAwait(false);
-                            ++filesCataloged;
-                            EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / filesCataloged * (filesToCatalog - filesCataloged) / 10000000 * 10000000 + 10000000);
-                        },
-                        new ExecutionDataflowBlockOptions
-                        {
-#if WINDOWS
-                            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
-#else
-                            MaxDegreeOfParallelism = 1
-#endif
-                        }
-                    );
-                    broadcastBlock.LinkTo(actionBlock, new DataflowLinkOptions { PropagateCompletion = true });
+                    var filesToCatalog = modsDirectoryFiles.Length;
                     var preservedModFilePaths = new List<string>();
                     var preservedFileOfInterestPaths = new List<string>();
-                    foreach (var fileInfo in new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories))
+                    var filesCatalogedLock = new AsyncLock();
+                    using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
                     {
-                        broadcastBlock.Post(fileInfo);
-                        ++filesToCatalog;
-                        var fileType = GetFileType(fileInfo);
-                        if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
-                            preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
-                        else if (fileType is not ModsDirectoryFileType.Ignored)
-                            preservedFileOfInterestPaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                        var catalogingStarted = DateTimeOffset.Now;
+                        await Task.WhenAll(modsDirectoryFiles.Select(async fileInfo =>
+                        {
+                            await semaphore.WaitAsync().ConfigureAwait(false);
+                            try
+                            {
+                                await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
+                                using var filesCatalogedLockHeld = await filesCatalogedLock.LockAsync().ConfigureAwait(false);
+                                ++filesCataloged;
+                                EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - catalogingStarted).Ticks / filesCataloged * (filesToCatalog - filesCataloged) / 10000000 * 10000000 + 10000000);
+                                var fileType = GetFileType(fileInfo);
+                                if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
+                                    preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                                else if (fileType is not ModsDirectoryFileType.Ignored)
+                                    preservedFileOfInterestPaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                            }
+                        })).ConfigureAwait(false);
                     }
-                    broadcastBlock.Complete();
-                    await actionBlock.Completion.ConfigureAwait(false);
                     using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
                     await pbDbContext.ModFiles
                         .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
