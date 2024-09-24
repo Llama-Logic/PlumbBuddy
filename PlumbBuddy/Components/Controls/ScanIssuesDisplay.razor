@@ -10,7 +10,7 @@
         foreach (var scanIssue in SmartSimObserver.ScanIssues)
         {
             <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-                <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
+                <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
                     <MudCardHeader>
                         <CardHeaderAvatar>
                             <MudAvatar Variant="Variant.Outlined">
@@ -47,7 +47,7 @@
     else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);">
+            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Variant="Variant.Outlined">
@@ -67,7 +67,7 @@
     else
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);">
+            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Variant="Variant.Outlined">
