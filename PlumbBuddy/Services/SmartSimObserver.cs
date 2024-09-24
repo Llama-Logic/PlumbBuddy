@@ -514,11 +514,7 @@ public partial class SmartSimObserver :
         using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         IsCurrentlyScanning = true;
         var scanIssuesList = new List<ScanIssue>();
-#if !WINDOWS
-        foreach (var scanInstance in scanInstances.Values)
-            await foreach (var scanIssue in scanInstance.ScanAsync())
-                scanIssuesList.Add(scanIssue);
-#else
+#if WINDOWS
         var broadcastScans = new BroadcastBlock<IScan>(scanInstance => scanInstance);
         var transformScansToScanIssues = new TransformManyBlock<IScan, ScanIssue>(async scanInstance =>
         {
@@ -534,6 +530,10 @@ public partial class SmartSimObserver :
             broadcastScans.Post(scanInstance);
         broadcastScans.Complete();
         await collectScanIssues.Completion.ConfigureAwait(false);
+#else
+        foreach (var scanInstance in scanInstances.Values)
+            await foreach (var scanIssue in scanInstance.ScanAsync())
+                scanIssuesList.Add(scanIssue);
 #endif
         ScanIssues = [..scanIssuesList.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
         await platformFunctions.SetBadgeNumberAsync(scanIssuesList.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
