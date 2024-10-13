@@ -11,20 +11,17 @@ public class ModFileHash
     [SuppressMessage("Performance", "CA1819: Properties should not return arrays")]
     public required byte[] Sha256 { get; set; }
 
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFile>? ModFiles { get; set; }
+
     [Required]
     public bool ResourcesAndManifestCataloged { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileResource>? Resources { get; set; }
 
-    public long? ModManifestId { get; set; }
-
-    [ForeignKey(nameof(ModManifestId))]
-    public ModManifest? ModManifest { get; set; }
-
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFile>? ModFiles { get; set; }
-
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ScriptModArchiveEntry>? ScriptModArchiveEntries { get; set; }
+
+    public ModManifest? ModManifest { get; set; }
 }

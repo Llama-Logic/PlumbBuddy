@@ -7,6 +7,7 @@ public interface ISmartSimObserver :
     bool IsCurrentlyScanning { get; }
     bool IsModsDisabledGameSettingOn { get; }
     bool IsScriptModsEnabledGameSettingOn { get; }
+    bool IsShowModListStartupGameSettingOn { get; }
     IReadOnlyList<ScanIssue> ScanIssues { get; }
 
     void ClearCache();

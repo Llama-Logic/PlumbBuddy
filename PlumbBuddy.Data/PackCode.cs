@@ -11,4 +11,12 @@ public class PackCode
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModManifest>? RequiredByMods { get; set; }
+
+    [InverseProperty(nameof(RequiredMod.IgnoreIfPackAvailable))]
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<RequiredMod>? DisqualifyingByPresence { get; set; }
+
+    [InverseProperty(nameof(RequiredMod.IgnoreIfPackUnavailable))]
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<RequiredMod>? DisqualifyingByAbsence { get; set; }
 }

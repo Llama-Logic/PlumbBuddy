@@ -1,0 +1,8 @@
+<MudTextFieldExtended T="string" Label="@Label" Variant="Variant.Filled" @bind-Text="FilePath" Immediate Required Validation="@(new Func<string, string?>(ValidateModFilePath))" Disabled="Disabled" ReadOnly>
+    <AdornmentStart>
+        <MudIcon Icon="@icon" />
+    </AdornmentStart>
+    <AdornmentEnd>
+        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseOnClickAsync" Disabled="Disabled">Browse...</MudButton>
+    </AdornmentEnd>
+</MudTextFieldExtended>

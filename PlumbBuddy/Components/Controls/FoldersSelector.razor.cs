@@ -128,7 +128,8 @@ partial class FoldersSelector
         if (!File.Exists(Path.Combine(path, "Game", "Bin", "TS4_x64.exe")))
             return "That's not a valid The Sims 4 installation. 🙄";
 #elif MACCATALYST
-        // TODO: Grovel to someone smarter than me to implement this for macOS
+        if (!File.Exists(Path.Combine(path, "Contents", "MacOS", "The Sims 4")))
+            return "That's not a valid The Sims 4 installation. 🙄";
 #else
         throw new NotSupportedException("The actual fu--");
 #endif
@@ -143,7 +144,8 @@ partial class FoldersSelector
         if (File.Exists(Path.Combine(path, "Game", "Bin", "TS4_x64.exe")))
             return "Woah, woah, woah. 🤚 That's your Installation Folder, not your User Data Folder.";
 #elif MACCATALYST
-        // TODO: Grovel to someone smarter than me to implement this for macOS
+        if (File.Exists(Path.Combine(path, "Contents", "MacOS", "The Sims 4")))
+            return "Woah, woah, woah. 🤚 That's your App Bundle (Installation Folder), not your User Data Folder.";
 #else
         throw new NotSupportedException("The actual fu--");
 #endif

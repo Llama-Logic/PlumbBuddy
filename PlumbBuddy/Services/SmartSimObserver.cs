@@ -48,6 +48,7 @@ public partial class SmartSimObserver :
     bool isCurrentlyScanning;
     bool isModsDisabledGameSettingOn;
     bool isScriptModsEnabledGameSettingOn;
+    bool isShowModListStartupGameSettingOn;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
@@ -92,6 +93,18 @@ public partial class SmartSimObserver :
             if (isScriptModsEnabledGameSettingOn == value)
                 return;
             isScriptModsEnabledGameSettingOn = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsShowModListStartupGameSettingOn
+    {
+        get => isShowModListStartupGameSettingOn;
+        private set
+        {
+            if (isShowModListStartupGameSettingOn == value)
+                return;
+            isShowModListStartupGameSettingOn = value;
             OnPropertyChanged();
         }
     }
@@ -169,6 +182,7 @@ public partial class SmartSimObserver :
     {
         containerBuilder.RegisterType<ModSettingScan>().As<IModSettingScan>();
         containerBuilder.RegisterType<ScriptModSettingScan>().As<IScriptModSettingScan>();
+        containerBuilder.RegisterType<ShowModListStartupSettingScan>().As<IShowModListStartupSettingScan>();
         containerBuilder.RegisterType<PackageDepthScan>().As<IPackageDepthScan>();
         containerBuilder.RegisterType<Ts4ScriptDepthScan>().As<ITs4ScriptDepthScan>();
         containerBuilder.RegisterType<LooseZipArchiveScan>().As<ILooseZipArchiveScan>();
@@ -273,6 +287,7 @@ public partial class SmartSimObserver :
             cacheComponents = [];
             IsModsDisabledGameSettingOn = true;
             IsScriptModsEnabledGameSettingOn = false;
+            IsShowModListStartupGameSettingOn = true;
         }
     }
 
@@ -444,6 +459,7 @@ public partial class SmartSimObserver :
         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
         var previousIsModsDisabledGameSettingOn = IsModsDisabledGameSettingOn;
         var previousIsScriptModsEnabledGameSettingOn = IsScriptModsEnabledGameSettingOn;
+        var previousIsShowModListStartupGameSettingOn = IsShowModListStartupGameSettingOn;
         var parsedSuccessfully = false;
         var optionsIniFile = new FileInfo(Path.Combine(player.UserDataFolderPath, "Options.ini"));
         if (optionsIniFile.Exists)
@@ -455,6 +471,7 @@ public partial class SmartSimObserver :
                 var optionsData = data["options"];
                 IsModsDisabledGameSettingOn = optionsData["modsdisabled"] == "1";
                 IsScriptModsEnabledGameSettingOn = optionsData["scriptmodsenabled"] == "1";
+                IsShowModListStartupGameSettingOn = optionsData["showmodliststartup"] == "1";
                 parsedSuccessfully = true;
             }
             catch (ParsingException ex)
@@ -482,9 +499,11 @@ public partial class SmartSimObserver :
         {
             IsModsDisabledGameSettingOn = true;
             IsScriptModsEnabledGameSettingOn = false;
+            IsShowModListStartupGameSettingOn = true;
         }
         if (IsModsDisabledGameSettingOn != previousIsModsDisabledGameSettingOn
-            || IsScriptModsEnabledGameSettingOn != previousIsScriptModsEnabledGameSettingOn)
+            || IsScriptModsEnabledGameSettingOn != previousIsScriptModsEnabledGameSettingOn
+            || IsShowModListStartupGameSettingOn != previousIsShowModListStartupGameSettingOn)
             Scan();
     }
 
@@ -571,6 +590,7 @@ public partial class SmartSimObserver :
             }
             initializationChange |= checkScanInitialization(player.ScanForModsDisabled, typeof(IModSettingScan));
             initializationChange |= checkScanInitialization(player.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
+            initializationChange |= checkScanInitialization(player.ScanForShowModsListAtStartupEnabled, typeof(IShowModListStartupSettingScan));
             initializationChange |= checkScanInitialization(player.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
             initializationChange |= checkScanInitialization(player.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
             initializationChange |= checkScanInitialization(player.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));

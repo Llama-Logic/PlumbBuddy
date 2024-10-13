@@ -91,6 +91,8 @@ public class IntentionalOverride
     /// </summary>
     public long? ModManifestKeyFullInstance { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileHash>? ModFiles { get; set; }
+    public long? ModManifestHashId { get; set; }
+
+    [ForeignKey(nameof(ModManifestHashId))]
+    public ModManifestHash? ModManifestHash { get; set; }
 }

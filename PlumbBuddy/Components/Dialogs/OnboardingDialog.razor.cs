@@ -87,6 +87,12 @@ partial class OnboardingDialog
         set => Player.ScanForMultipleModVersions = value;
     }
 
+    bool ScanForMutuallyExclusiveMods
+    {
+        get => Player.ScanForMutuallyExclusiveMods;
+        set => Player.ScanForMutuallyExclusiveMods = value;
+    }
+
     bool ScanForModsDisabled
     {
         get => Player.ScanForModsDisabled;
@@ -103,6 +109,12 @@ partial class OnboardingDialog
     {
         get => Player.ScanForScriptModsDisabled;
         set => Player.ScanForScriptModsDisabled = value;
+    }
+
+    bool ScanForShowModsListAtStartupEnabled
+    {
+        get => Player.ScanForShowModsListAtStartupEnabled;
+        set => Player.ScanForShowModsListAtStartupEnabled = value;
     }
 
     UserType Type
@@ -195,6 +207,8 @@ partial class OnboardingDialog
                 Player.ScanForCacheStaleness = false;
                 Player.ScanForResourceConflicts = false;
                 Player.ScanForMultipleModVersions = false;
+                Player.ScanForMutuallyExclusiveMods = false;
+                Player.ScanForShowModsListAtStartupEnabled = false;
                 break;
             default:
                 Player.ScanForModsDisabled = ScanAttribute.Get(typeof(IModSettingScan))?.IsEnabledByDefault ?? false;
@@ -212,6 +226,8 @@ partial class OnboardingDialog
                 Player.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForResourceConflicts = ScanAttribute.Get(typeof(IResourceConflictScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
+                Player.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
+                Player.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
                 break;
         }
     }

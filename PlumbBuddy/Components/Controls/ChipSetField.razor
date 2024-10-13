@@ -1,0 +1,11 @@
+@inject IJSRuntime JSRuntime
+
+<MudField Variant="Variant.Filled" Label="@Label" Adornment="Adornment.Start" AdornmentIcon="@AdornmentIcon" HelperText="@HelperText" Class="@Class">
+    <MudChipSet T="string" Color="@Color" AllClosable OnClose="HandleChipClosedAsync" Class="mb-1">
+        @foreach (var value in values)
+        {
+            <MudChip Icon="@ChipIcon" Text="@value" />
+        }
+    </MudChipSet>
+    <MudTextField T="string" @ref="@entry" @bind-Text="@entryText" Variant="Variant.Outlined" Placeholder="@Placeholder" Immediate Class="@($"no-material-variant {randomClass}")" />
+</MudField>

@@ -212,6 +212,18 @@ class Player :
         }
     }
 
+    public bool ScanForMutuallyExclusiveMods
+    {
+        get => preferences.Get(nameof(ScanForMutuallyExclusiveMods), true);
+        set
+        {
+            if (ScanForMutuallyExclusiveMods == value)
+                return;
+            preferences.Set(nameof(ScanForMutuallyExclusiveMods), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ScanForResourceConflicts
     {
         get => preferences.Get(nameof(ScanForResourceConflicts), true);
@@ -232,6 +244,18 @@ class Player :
             if (ScanForScriptModsDisabled == value)
                 return;
             preferences.Set(nameof(ScanForScriptModsDisabled), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ScanForShowModsListAtStartupEnabled
+    {
+        get => preferences.Get(nameof(ScanForShowModsListAtStartupEnabled), true);
+        set
+        {
+            if (ScanForShowModsListAtStartupEnabled == value)
+                return;
+            preferences.Set(nameof(ScanForShowModsListAtStartupEnabled), value);
             OnPropertyChanged();
         }
     }

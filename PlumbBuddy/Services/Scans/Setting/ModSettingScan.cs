@@ -13,13 +13,13 @@ public sealed class ModSettingScan :
     {
     }
 
-    protected override bool AreGameOptionsDisablingFeature(ISmartSimObserver smartSimObserver) =>
+    protected override bool AreGameOptionsUndesirable(ISmartSimObserver smartSimObserver) =>
         smartSimObserver.IsModsDisabledGameSettingOn;
 
     protected override void CorrectIniOptions(IniParser.Model.KeyDataCollection options) =>
         options["modsdisabled"] = "0";
 
-    protected override ScanIssue GenerateDeadScanIssue() =>
+    protected override ScanIssue GenerateUndesirableScanIssue() =>
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedRemove,

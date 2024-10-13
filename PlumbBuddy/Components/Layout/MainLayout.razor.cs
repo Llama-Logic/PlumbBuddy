@@ -7,20 +7,22 @@ public partial class MainLayout
         {
             PaletteLight = new PaletteLight()
             {
-                Error = "#ab273dff",
+                //Error = "#ab273dff",
                 Primary = "#594ae2ff",
                 Tertiary = "#7bb56bff",
                 Warning = "#d98806ff"
             },
             PaletteDark = new PaletteDark()
             {
-                Error = "#ab273dff",
+                //Error = "#ab273dff",
                 Primary = "#00a2ffff",
                 Tertiary = "#7bb56bff",
                 Warning = "#d98806ff"
             }
         };
 
+    bool isDarkMode;
+    bool isMainMenuDrawerOpen = false;
     bool manualLightDarkModeToggleEnabled;
     bool? manualLightDarkModeToggle;
     int packageCount;
@@ -30,9 +32,6 @@ public partial class MainLayout
     {
         Theme = CreatePlumbBuddyFactoryTheme()
     };
-
-    [Inject]
-    IJSRuntime JSRuntime { get; set; } = default!;
 
     MudTheme Theme
     {
@@ -45,9 +44,6 @@ public partial class MainLayout
             return factory;
         }
     }
-
-    bool isDarkMode;
-    bool isMainMenuDrawerOpen = false;
 
     bool ManualLightDarkModeToggleEnabled
     {

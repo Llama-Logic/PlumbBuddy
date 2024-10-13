@@ -5,8 +5,9 @@
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
 
-<MudTabs Centered="true" MinimumTabWidth="200px">
-    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.PuzzleHeart" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
+<div class="main-tabs-backdrop"></div>
+<MudTabs Centered="true" MinimumTabWidth="200px" KeepPanelsAlive Class="main-tabs">
+    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
         <MudLoading Loading="@SmartSimObserver.IsCurrentlyScanning" Overlap Darken LoaderType="LoaderType.Circular" Text="🔍 Looking for problems...">
             <div class="mod-health-tab-container">
                 <div class="background"></div>
@@ -14,13 +15,31 @@
             </div>
         </MudLoading>
     </MudTabPanel>
+    <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
+
+    </MudTabPanel>
     @* <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink">
         <PreJector />
     </MudTabPanel> *@
     @if (Player.Type is UserType.Creator)
     {
-        <MudTabPanel Text="Creator Tools" Icon="@MaterialDesignIcons.Normal.PackageVariant">
-
+        <MudTabPanel Text="Manifest Editor" Icon="@MaterialDesignIcons.Normal.TagEdit">
+            <div class="manifest-editor-tab-container">
+                <div class="background"></div>
+                <div class="background-animation-wrapper">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ManifestEditor />
+            </div>
         </MudTabPanel>
     }
 </MudTabs>

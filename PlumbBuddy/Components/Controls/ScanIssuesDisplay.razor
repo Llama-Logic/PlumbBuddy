@@ -10,7 +10,7 @@
         foreach (var scanIssue in SmartSimObserver.ScanIssues)
         {
             <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-                <MudCard Outlined="true" Elevation="5" Style="@($"backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-{scanIssue.Type switch { ScanIssueType.Dead => "error", ScanIssueType.Sick => "error", ScanIssueType.Uncomfortable => "warning", _ => "surface" }}) {scanIssue.Type switch { ScanIssueType.Dead => "70%", _ => "40%" }}); height: 100%;")">
+                <MudCard Outlined="true" Elevation="5" Class="@($"scan-issue scan-issue-{scanIssue.Type}")">
                     <MudCardHeader>
                         <CardHeaderAvatar>
                             <MudAvatar Variant="Variant.Outlined">
@@ -47,7 +47,7 @@
     else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);">
+            <MudCard Outlined="true" Class="scan-issue scan-issue-sleeping">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Variant="Variant.Outlined">
@@ -67,7 +67,7 @@
     else
     {
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
-            <MudCard Outlined="true" Elevation="5" Style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);">
+            <MudCard Outlined="true" Class="scan-issue scan-issue-refreshing">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Variant="Variant.Outlined">
@@ -80,8 +80,7 @@
                 </MudCardHeader>
                 <MudCardContent>
                     <MudTextM3 Typo="TypoM3.Body">Once I'm done I'll let you know if there's anything to be concerned about. Don't worry, anything important will be at the top of the list!</MudTextM3>
-                    <br />
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning">Please don't launch the game right now!</MudChip>
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning" Class="mt-4">Please don't launch the game right now!</MudChip>
                 </MudCardContent>
             </MudCard>
         </MudItem>

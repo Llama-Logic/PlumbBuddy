@@ -1,0 +1,72 @@
+<MudGrid Spacing="4">
+    <MudItem xs="12">
+        <ModFileSelector Label="Local Path" File="@File" FileChanged="HandleFileChanged" />
+    </MudItem>
+    <MudItem xs="12">
+        <MudSwitchM3 T="bool" Value="@IsRequired" ValueChanged="HandleIsRequiredChanged" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Asterisk">My mod requires this file to work properly — it is not an optional add-on to suit the player's preferences.</MudSwitchM3>
+    </MudItem>
+    @if (IsRequired)
+    {
+        <MudItem md="12">
+            <MudTextFieldExtended T="string" Text="@RequirementIdentifier" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="Requirement Identifier" HelperText="Only one file with the same requirement identifier will be necessary. For each unique requirement identifier, so long as an agent discovers at least one of your files specifying it in the load order, the absence of any your other files also doing so will not generate a warning for the player." Placeholder="(currently independently required)">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudToggleIconButton @bind-Toggled="@requirementIdentifierPopoverOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
+                    <MudPopover Open="@requirementIdentifierPopoverOpen" AnchorOrigin="Origin.BottomCenter" Fixed TransformOrigin="Origin.TopRight">
+                        <MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" Style="max-width: 525px;">
+                            <InlineMarkdown>
+                                **Requirement Identifiers** are scoped only to your mod. You don't need to worry about making them globally unique.
+                            </InlineMarkdown>
+                        </MudAlert>
+                    </MudPopover>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Available" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(use a pack code like EP01 for Get to Work)" />
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Unavailable" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(use a pack code like SP46 for Home Chef Hustle)" />
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Available" HelperText="Instructs agents to ignore this requirement if the presence of a mod manifest hash in the load order indicates the player has installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen">Browse...</MudButton>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Unavailable" HelperText="Instructs agents to ignore this requirement if the absence of a mod manifest hash in the load order indicates the player has not installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen">Browse...</MudButton>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+        </MudItem>
+    }
+    <MudItem xs="12">
+        <MudTextFieldExtended T="string" Text="@Exclusivity" TextChanged="HandleExclusivityChanged" Variant="Variant.Filled" Clearable Label="Exclusivity" HelperText="Only one file with the same exclusivity will be permitted. If an agent discovers multiple manifests in the same load order with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed." Placeholder="(currently not exclusive with any other file)">
+            <AdornmentStart>
+                <MudIcon Icon="@MaterialDesignIcons.Normal.SetLeftRight" />
+            </AdornmentStart>
+            <AdornmentEnd>
+                <MudToggleIconButton @bind-Toggled="@exclusivityPopoverOpen" Icon="@MaterialDesignIcons.Outline.Alert" Color="Color.Warning" />
+                <MudPopover Open="@exclusivityPopoverOpen" AnchorOrigin="Origin.BottomCenter" Fixed TransformOrigin="Origin.TopRight">
+                    <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight" Style="max-width: 525px;">
+                        <InlineMarkdown>
+                            **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:
+                            > vyxated - Chalk'd UI - Support - TMEX - Smarter Pie Menu
+                        </InlineMarkdown>
+                    </MudAlert>
+                </MudPopover>
+            </AdornmentEnd>
+        </MudTextFieldExtended>
+    </MudItem>
+</MudGrid>

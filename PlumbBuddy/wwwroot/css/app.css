@@ -2,12 +2,28 @@
     overflow-x: hidden;
 }
 
+article:last-child > * {
+    margin-bottom: 0 !important;
+}
+
 .mud-popover.mud-tooltip {
     max-width: 280px;
 }
 
 .mud-thememanager-button {
     z-index: 1000;
+}
+
+.main-tabs .mud-tabs-tabbar {
+    background-color: transparent;
+}
+
+div.mud-input-control.no-material-variant .mud-input-outlined-border {
+    display: none;
+}
+
+div.mud-input-control.no-material-variant .mud-input > * {
+    padding: 0 5px;
 }
 
 .main-menu {
@@ -18,6 +34,11 @@
 .scan-issues-container, .scan-issues-container * {
     overflow-wrap: anywhere;
     word-break: normal;
+}
+
+.user-type-carousel {
+    border-radius: 5px;
+    height: 600px;
 }
 
 .user-type-carousel .d-flex .d-flex div:nth-child(1) svg {
@@ -121,4 +142,38 @@
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
     margin-top: 1em;
     padding: 1em;
+}
+
+.scan-issue {
+    backdrop-filter: blur(10px);
+    height: 100%;
+    -webkit-backdrop-filter: blur(10px);
+}
+
+    .scan-issue > .mud-card-header {
+        padding-bottom: 0;
+    }
+
+.scan-issue-refreshing {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);
+}
+
+.scan-issue-sleeping {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);
+}
+
+.scan-issue-Healthy {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
+}
+
+.scan-issue-Uncomfortable {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-warning) 40%);
+}
+
+.scan-issue-Sick {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-error) 40%);
+}
+
+.scan-issue-Dead {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-error) 70%);
 }

@@ -16,12 +16,14 @@ public interface IPlayer :
     bool ScanForMissingDependency { get; set; }
     bool ScanForMissingMccc { get; set; }
     bool ScanForMissingModGuard { get; set; }
+    bool ScanForMutuallyExclusiveMods { get; set; }
     bool ScanForInvalidModSubdirectoryDepth { get; set; }
     bool ScanForInvalidScriptModSubdirectoryDepth { get; set; }
     bool ScanForModsDisabled { get; set; }
     bool ScanForMultipleModVersions { get; set; }
     bool ScanForResourceConflicts { get; set; }
     bool ScanForScriptModsDisabled { get; set; }
+    bool ScanForShowModsListAtStartupEnabled { get; set; }
     bool ShowThemeManager { get; set; }
     string? Theme { get; set; }
     UserType Type { get; set; }

@@ -1,0 +1,344 @@
+@inject IDialogService DialogService
+@inject IDispatcher Dispatcher
+@inject IJSRuntime JSRuntime
+@inject IPlatformFunctions PlatformFunctions
+
+<MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
+    <MudStepperExtended @ref="stepper" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" Linear ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
+        <ChildContent>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="Select">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            Teach me about your mod so I can help players (and other creators) with it.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            It will be <em>manifestly</em> awesome. 😏
+                        </MudTextM3>
+                        <MudGrid Justify="Justify.Center" Class="mb-4">
+                            <MudItem xs="10">
+                                <MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
+                                    Let's start by selecting <strong>any</strong> file for your mod.
+                                </MudTextM3>
+                                <MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
+                                    It doesn’t matter if it’s a package or a script archive.
+                                    If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷.
+                                    You'll be able to specify any remaining files on the next step.
+                                </MudTextM3>
+                                <MudForm @ref="selectStepForm" Class="mt-4">
+                                    <ModFileSelector Label="Any File from Your Mod" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
+                                </MudForm>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCheck" Title="Components">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            Here are all the files we currently consider a part of your mod.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            🏗️ Are we leaving anything out?
+                        </MudTextM3>
+                        <MudGrid Justify="Justify.Center" Class="mb-4">
+                            <MudItem Class="relative mt-4" xs="4">
+                                <MudPaper Class="overflow-y-auto" Style="height: calc(100vh - 435px);">
+                                    <MudTreeView T="ModComponent" @bind-SelectedValue="@ComponentsStepSelectedComponent" @bind-SelectedValues="@componentsStepSelectedComponents" SelectionMode="@componentsStepSelectionMode" Items="@componentTreeItemData" AutoExpand AutoSelectParent ExpandOnDoubleClick Hover Class="manifest-editor-components-step-tree-view" Style="overflow-wrap: anywhere;">
+                                        <ItemTemplate>
+                                            <MudTreeViewItem @bind-Expanded="@context.Expanded" CanExpand="@context.Expandable" Icon="@context.Icon" Items="@context.Children" Text="@context.Text" Value="@context.Value" />
+                                        </ItemTemplate>
+                                    </MudTreeView>
+                                </MudPaper>
+                                <MudStack Row Class="absolute mr-8 mb-4" Style="bottom: 0; right: 0;">
+                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
+                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
+                                </MudStack>
+                            </MudItem>
+                            <MudItem Class="relative mt-4" xs="8">
+                                <MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
+                                    @if (ComponentsStepSelectedComponent is { } component)
+                                    {
+                                        <ModComponentEditor ModComponent="@component" />
+                                    }
+                                </MudPaper>
+                                <MudStack Row Class="absolute ml-4 mb-4" Style="bottom: 0;">
+                                    @if (ComponentsStepSelectedComponent is not null)
+                                    {
+                                        <MudTooltip Arrow Placement="Placement.Top">
+                                            <ChildContent>
+                                                <MudFab StartIcon="@MaterialDesignIcons.Normal.ContentDuplicate" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDuplicateComponentSettingsClickedAsync" />
+                                            </ChildContent>
+                                            <TooltipContent>
+                                                <MudStack Row="true">
+                                                    <MudIcon Icon="@MaterialDesignIcons.Normal.ContentDuplicate" />
+                                                    <MudTextM3 Typo="TypoM3.Title">Duplicate Settings</MudTextM3>
+                                                </MudStack>
+                                                <MudDivider />
+                                                <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                                    Duplicate these settings, applying them to multiple mod files at once.
+                                                </MudTextM3>
+                                            </TooltipContent>
+                                        </MudTooltip>
+                                    }
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.Tag" Title="Details">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            Well, now that all of <em>that</em> is all out of the way... 😅
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            📝 Let's cover the basics.
+                        </MudTextM3>
+                        <MudGrid Justify="Justify.Center" Class="mb-4">
+                            <MudItem xs="8">
+                                <MudForm @ref="@detailsStepForm">
+                                    <MudTextField T="string" @bind-Text="@title" Variant="Variant.Filled" Label="Mod Title" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" HelperText="What's your mod called? Pretty simple." Immediate Required Class="mt-4" />
+                                    <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="So uhh... 🕵️‍♂️ who's responsible for this?" Class="mt-4" />
+                                    <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="Download Page URL" HelperText="This should be a web page on which links or buttons are available to download the mod files for THIS MOD." Immediate Required Validation="@(new Func<string, IEnumerable<string>>(ValidateUrl))" Class="mt-4">
+                                        <AdornmentStart>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.Download" />
+                                        </AdornmentStart>
+                                        <AdornmentEnd>
+                                            <MudToggleIconButton @bind-Toggled="@urlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
+                                            <MudPopover Open="@urlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopCenter" Fixed TransformOrigin="Origin.BottomRight">
+                                                <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
+                                                    <InlineMarkdown>
+                                                        Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
+                                                        * your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);
+                                                        * your Patreon feed (as opposed to a Patreon post devoted to this mod);
+                                                        * your Mod the Sims, CurseForge, or The Sims Resource profile; or,
+                                                        * any other page which does not feature a one-click step to downloading your mod's files.
+                                                    </InlineMarkdown>
+                                                </MudAlert>
+                                            </MudPopover>
+                                            <MudToggleIconButton @bind-Toggled="@urlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
+                                            <MudPopover Open="@urlEncouragingGuidanceOpen" AnchorOrigin="Origin.BottomCenter" Fixed TransformOrigin="Origin.TopRight">
+                                                <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
+                                                    <InlineMarkdown>
+                                                        It is completely okay if on this same page you *also*:
+                                                        * feature your other modding content;
+                                                        * feature links to other creators;
+                                                        * display ads to the player; and,
+                                                        * solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts' Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/).
+                                                    </InlineMarkdown>
+                                                </MudAlert>
+                                            </MudPopover>
+                                        </AdornmentEnd>
+                                    </MudTextFieldExtended>
+                                </MudForm>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.Asterisk" Title="Requirements">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            🤔 We're all searching for fulfillment at the end of the day.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            What does your mod <strong>need</strong> to be happy? 😊
+                        </MudTextM3>
+                        <MudForm @ref="@requirementsStepForm">
+                            <MudGrid Justify="Justify.Center" Class="mb-4 align-center">
+                                <MudItem xs="8">
+                                    <div class="mt-4 d-flex flex-row align-center">
+                                        <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="Required Packs" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="Type a pack code like GP08 for Realm of Magic and press enter" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" Class="flex-grow-1" />
+                                        <MudToggleIconButton @bind-Toggled="@requiredPacksGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" Class="ml-1" />
+                                        <MudPopover Open="@requiredPacksGuidanceOpen" AnchorOrigin="Origin.BottomRight" Fixed TransformOrigin="Origin.TopRight">
+                                            <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
+                                                <InlineMarkdown>
+                                                    Just because your mod *can* utilize the features of a pack does not mean that it *requires* that the pack is there to function, and that is what this field is describing.<br />
+                                                    **Input the packs without which your mod will not work**.
+                                                </InlineMarkdown>
+                                            </MudAlert>
+                                        </MudPopover>
+                                    </div>
+                                </MudItem>
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" Disabled>Add Required Mod...</MudButton>
+                                </MudItem>
+                                <MudItem Class="ml-n4">
+                                    <MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
+                                    <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.BottomRight" Fixed TransformOrigin="Origin.TopRight">
+                                        <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
+                                            <InlineMarkdown>
+                                                If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.<br />
+                                                If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don't worry! You can always go back!
+                                            </InlineMarkdown>
+                                        </MudAlert>
+                                    </MudPopover>
+                                </MudItem>
+                            </MudGrid>
+                        </MudForm>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.Offer" Title="Cross-Mod">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            🕹️ Entertaining the player ourselves isn't the only way we can bring value.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            Sometimes it's helping others shine. 💁‍♀️
+                        </MudTextM3>
+                        <MudGrid Justify="Justify.Center" Class="my-4 align-center">
+                            <MudItem>
+                                <MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">I maintain versions of my mod.</MudSwitchM3>
+                            </MudItem>
+                            <MudItem>
+                                <MudNumericField @bind-Value="@versionMajor" Variant="Variant.Filled" Label="Major" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
+                            </MudItem>
+                            <MudItem>
+                                <MudNumericField @bind-Value="@versionMinor" Variant="Variant.Filled" Label="Minor" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
+                            </MudItem>
+                            <MudItem>
+                                <MudNumericField @bind-Value="@versionBuild" Variant="Variant.Filled" Label="Build" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
+                            </MudItem>
+                            <MudItem>
+                                <MudNumericField @bind-Value="@versionRevision" Variant="Variant.Filled" Label="Revision" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudItem>
+                                <MudPaper Class="pa-4">
+                                    <MudTextM3 Typo="TypoM3.Title">Quick Semantic Versioning Links</MudTextM3>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudIcon Icon="@MaterialDesignIcons.Normal.AutorenewOff" Color="Color.Warning" />
+                                        <MudLink OnClick="HandleQuickSemanticMajorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I made changes to my mod which will break other mods that require it.</MudLink>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudIcon Icon="@MaterialDesignIcons.Normal.Autorenew" Color="Color.Success" />
+                                        <MudLink OnClick="HandleQuickSemanticMinorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I added features to my mod in a way which will not break other mods that require it.</MudLink>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudIcon Icon="@MaterialDesignIcons.Normal.Autorenew" />
+                                        <MudLink OnClick="HandleQuickSemanticBuildOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I made other changes to my mod in a way which will not break other mods that require it.</MudLink>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudIcon Icon="@MaterialDesignIcons.Normal.Autorenew" Color="Color.Dark" />
+                                        <MudLink OnClick="HandleQuickSemanticRevisionOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I made functionally superficial changes to my mod (no tuning, Sim Data, or Python was altered).</MudLink>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                            <MudFlexBreak />
+                            <MudItem xs="8">
+                                <ChipSetField @ref="@featuresChipSetField" @bind-Values="@features" Color="Color.Tertiary" Label="Features" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Placeholder="Type a feature name here and press enter" HelperText="You can use this field to establish feature flags. When other creators reference your mod as a requirement, they will be able to specify which features they need. This can be seen as an alternative to version ranges." />
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.BarcodeScan" Title="Hashing">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            Some players like to alter packages for their own purposes. 📦
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            🔐 We should talk about what you're comfortable with.
+                        </MudTextM3>
+                        <MudGrid Justify="Justify.Center" Class="my-4 align-center">
+                            <MudItem xs="8">
+                                <MudSlider @bind-Value="@hashingLevel" Min="0" Max="3" Step="1" Variant="Variant.Filled" Color="@(hashingLevel switch { 0 => Color.Info, 2 => Color.Warning, 3 => Color.Error, _ => Color.Success })" Size="Size.Large" TickMarks TickMarkLabels="@hashingLevelTickMarkLabels" />
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Justify="Justify.Center" Class="my-4">
+                            <MudItem xs="8">
+                                <MudPaper>
+                                    <MudAlert Severity="Severity.Info">
+                                        <InlineMarkdown>
+                                            Agents (like me) identify your mod's files on players' computers by examining the contents of the files, *not* by trusting file names. This is because players can (and do) rename mod files to influence the game's mod load order. We (the agents) need to know what things in your mod's files to consider in identifying your mod.
+                                        </InlineMarkdown>
+                                    </MudAlert>
+                                </MudPaper>
+                                <MudPaper Class="mt-6">
+                                    <MudAlert Severity="Severity.Warning">
+                                        <InlineMarkdown>
+                                            The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention.
+                                        </InlineMarkdown>
+                                    </MudAlert>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem>
+                                <MudPaper Class="pa-4">
+                                    <MudTextM3 Typo="TypoM3.Title">Hashing Elements</MudTextM3>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudBadge Icon="@MaterialDesignIcons.Normal.Lock" Color="Color.Info" Origin="Origin.BottomRight" Overlap>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.Xml" />
+                                        </MudBadge>
+                                        <MudTextM3>Tuning</MudTextM3>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudBadge Icon="@MaterialDesignIcons.Normal.Lock" Color="Color.Info" Origin="Origin.BottomRight" Overlap>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.DataMatrix" />
+                                        </MudBadge>
+                                        <MudTextM3>Sim Data</MudTextM3>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudBadge Icon="@(hashingLevel is >= 1 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 1 ? Color.Success : Color.Dark)" Origin="Origin.BottomRight" Overlap>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.DatabaseCog" />
+                                        </MudBadge>
+                                        <MudTextM3>Other Package Data</MudTextM3>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudBadge Icon="@(hashingLevel is >= 2 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 2 ? Color.Warning : Color.Dark)" Origin="Origin.BottomRight" Overlap>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.Translate" />
+                                        </MudBadge>
+                                        <MudTextM3>String Tables</MudTextM3>
+                                    </MudStack>
+                                    <MudStack Row Class="align-center mt-2">
+                                        <MudBadge Icon="@(hashingLevel is >= 3 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 3 ? Color.Error : Color.Dark)" Origin="Origin.BottomRight" Overlap>
+                                            <MudIcon Icon="@MaterialDesignIcons.Normal.ImageMultiple" />
+                                        </MudBadge>
+                                        <MudTextM3>Images</MudTextM3>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileSign" Title="Confirm">
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            📃 If you're happy with this summary of what I'm about to do, click <strong>Finish</strong>.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            I'll update your mod manifest(s) and then your files will be ready to go. 🚀
+                        </MudTextM3>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+            <MudStepExtended IsResultStep>
+                <ChildContent>
+                    <div class="step-content">
+                        <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                            ☝️ Please wait just a moment.
+                        </MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                            🚧 Manifest Composition is in progress. 🚧
+                        </MudTextM3>
+                    </div>
+                </ChildContent>
+            </MudStepExtended>
+        </ChildContent>
+        <ActionContent>
+            @if (components.Count > 0 && !isComposing)
+            {
+                <MudButton OnClick="HandleCancelOnClickAsync">Cancel</MudButton>
+            }
+        </ActionContent>
+    </MudStepperExtended>
+</MudLoading>

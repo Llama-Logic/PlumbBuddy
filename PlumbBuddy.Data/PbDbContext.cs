@@ -14,15 +14,19 @@ public class PbDbContext :
     }
 
     public DbSet<FileOfInterest> FilesOfInterest { get; set; }
+    public DbSet<HashResourceKey> HashResourceKeys { get; set; }
     public DbSet<IntentionalOverride> IntentionalOverrides { get; set; }
     public DbSet<ModCreator> ModCreators { get; set; }
+    public DbSet<ModExclusivity> ModExclusivities { get; set; }
     public DbSet<ModFeature> ModFeatures { get; set; }
     public DbSet<ModFileHash> ModFileHashes { get; set; }
     public DbSet<ModFileResource> ModFileResources { get; set; }
     public DbSet<ModFile> ModFiles { get; set; }
     public DbSet<ModManifest> ModManifests { get; set; }
+    public DbSet<ModManifestHash> ModManifestHashes { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
+    public DbSet<RequirementIdentifier> RequirementIdentifiers { get; set; }
     public DbSet<ScriptModArchiveEntry> ScriptModArchiveEntries { get; set; }
     public DbSet<TopologySnapshot> TopologySnapshots { get; set; }
 
@@ -58,6 +62,10 @@ public class PbDbContext :
             .Property(e => e.ModVersion)
             .HasConversion(nullableVersionValueConverter);
         modelBuilder.Entity<ModFileHash>()
+            .Property(e => e.Sha256)
+            .HasMaxLength(32)
+            .IsFixedLength(true);
+        modelBuilder.Entity<ModManifestHash>()
             .Property(e => e.Sha256)
             .HasMaxLength(32)
             .IsFixedLength(true);

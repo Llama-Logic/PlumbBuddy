@@ -13,7 +13,7 @@ public sealed class BeMissingScan :
         "Better Exceptions";
 
     protected override Uri ModUrl { get; } =
-        new("https://llama-logic.github.io/PlumbBuddy-Pages/BetterExceptions.html", UriKind.Absolute);
+        new("https://plumbbuddy.app/redirect?to=BetterExceptions", UriKind.Absolute);
 
     protected override string ModUtility =>
         "detailed exception, mod conflict, and patch day analyses";

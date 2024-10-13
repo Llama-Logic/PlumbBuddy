@@ -13,7 +13,7 @@ public sealed class ScriptModSettingScan :
     {
     }
 
-    protected override bool AreGameOptionsDisablingFeature(ISmartSimObserver smartSimObserver) =>
+    protected override bool AreGameOptionsUndesirable(ISmartSimObserver smartSimObserver) =>
         smartSimObserver.IsModsDisabledGameSettingOn || !smartSimObserver.IsScriptModsEnabledGameSettingOn;
 
     protected override void CorrectIniOptions(IniParser.Model.KeyDataCollection options)
@@ -22,7 +22,7 @@ public sealed class ScriptModSettingScan :
         options["scriptmodsenabled"] = "1";
     }
 
-    protected override ScanIssue GenerateDeadScanIssue() =>
+    protected override ScanIssue GenerateUndesirableScanIssue() =>
         new()
         {
             Icon = MaterialDesignIcons.Normal.SourceBranchRemove,

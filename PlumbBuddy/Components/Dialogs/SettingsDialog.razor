@@ -25,7 +25,7 @@
 </style>
 
 <MudStack>
-    <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer="true" KeepPanelsAlive="true" PanelClass="pa-6">
+    <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer="true" KeepPanelsAlive="true" PanelClass="pa-6" SliderAnimation="false">
         <MudTabPanel Text="General" Icon="@MaterialDesignIcons.Normal.Cog">
             <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
                 <MudSelectItem Value="@UserType.Casual">Casual Player</MudSelectItem>
@@ -37,18 +37,20 @@
             <ThemeSelector @ref="@themeSelector" />
         </MudTabPanel>
         <MudTabPanel Text="Folders" Icon="@MaterialDesignIcons.Normal.Folder">
-            <br />
-            <br />
-            <FoldersSelector @ref="@foldersSelector" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
-        </MudTabPanel>
-        <MudTabPanel Text="Scans" Icon="@MaterialDesignIcons.Normal.CubeScan">
-            <div style="margin: 0 auto; width: 85%;">
-                <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" />
+            <div class="mt-8">
+                <FoldersSelector @ref="@foldersSelector" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
             </div>
         </MudTabPanel>
+        <MudTabPanel Text="Scans" Icon="@MaterialDesignIcons.Normal.CubeScan">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="10">
+                    <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
     </MudTabs>
-    <MudGrid Justify="Justify.FlexEnd" Style="padding: 8px;">
+    <MudGrid Justify="Justify.FlexEnd" Class="pa-2">
         <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="OkOnClickHandlerAsync" Style="margin-left: 8px;">Ok</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OkOnClickHandlerAsync" Class="ml-2">Ok</MudButton>
     </MudGrid>
 </MudStack>

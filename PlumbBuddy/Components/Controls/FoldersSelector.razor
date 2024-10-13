@@ -4,7 +4,7 @@
 
 <MudGrid Spacing="12" Justify="Justify.Center">
     <MudItem>
-        <MudStack Row="true" Spacing="6">
+        <MudStack Row Spacing="6">
             <MudBadge Icon="@MaterialDesignIcons.Outline.CheckboxMarkedCircle" Color="Color.Success" Overlap="true">
                 <img src="@(DeviceInfo.Current.Platform == DevicePlatform.macOS || DeviceInfo.Current.Platform == DevicePlatform.MacCatalyst ? "/img/macOSLogo.png" : "/img/WindowsLogo.svg")" width="56" height="56" />
             </MudBadge>
@@ -27,13 +27,12 @@
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @CultureInfo.CurrentCulture.NativeName
                 </MudTextM3>
-                <br />
-                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" OnClick="UseDefaultUserDataFolderOnClickAsync">Reset Path</MudButton>
+                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataFolderOnClickAsync">Reset Path</MudButton>
             </MudStack>
         </MudStack>
     </MudItem>
     <MudItem>
-        <MudStack Row="true" Spacing="6">
+        <MudStack Row Spacing="6">
             <MudBadge Icon="@(isEAAppInstalled ? isTS4AvailableFromEA ? MaterialDesignIcons.Outline.CheckboxMarkedCircleAuto : MaterialDesignIcons.Outline.CheckboxMarkedCircle : MaterialDesignIcons.Outline.CheckboxBlankCircle)" Color="@(isTS4AvailableFromEA ? Color.Success : Color.Dark)" Overlap="true">
                 <img src="/img/EAAppLogo.png" width="56" height="56" />
             </MudBadge>
@@ -54,14 +53,13 @@
                 </MudTextM3>
                 @if (isTS4AvailableFromEA)
                 {
-                    <br />
-                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" OnClick="UseEAAppVersionOnClickAsync">Select</MudLoadingButton>
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseEAAppVersionOnClickAsync">Select</MudLoadingButton>
                 }
             </MudStack>
         </MudStack>
     </MudItem>
     <MudItem>
-        <MudStack Row="true" Spacing="6">
+        <MudStack Row Spacing="6">
             <MudBadge Icon="@(isSteamInstalled ? isTS4AvailableFromValve ? MaterialDesignIcons.Outline.CheckboxMarkedCircleAuto : MaterialDesignIcons.Outline.CheckboxMarkedCircle : MaterialDesignIcons.Outline.CheckboxBlankCircle)" Color="@(isTS4AvailableFromValve ? Color.Success : Color.Dark)" Overlap="true">
                 <img src="/img/SteamLogo.svg" width="56" height="56" />
             </MudBadge>
@@ -82,43 +80,42 @@
                 </MudTextM3>
                 @if (isTS4AvailableFromValve)
                 {
-                    <br />
-                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" OnClick="UseSteamVersionOnClickAsync">Select</MudLoadingButton>
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseSteamVersionOnClickAsync">Select</MudLoadingButton>
                 }
             </MudStack>
         </MudStack>
     </MudItem>
 </MudGrid>
-<br />
-<br />
 @if (IsOnboarding)
 {
-    <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+    <MudTextM3 Typo="TypoM3.Title" Align="Align.Center" Class="mt-8">
         But, ya know... 👉👈... I can make mistakes just like anyone else.
     </MudTextM3>
     <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
         You can change either of these if they're wrong.
     </MudTextM3>
-    <br />
-    <br />
 }
-<MudForm @ref="@foldersForm" style="margin: 0 auto; width: 80%;">
-    <MudTextFieldExtended T="string" Label="User Data Folder" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate="true" Required="true" Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
-        <AdornmentStart>
-            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
-        </AdornmentStart>
-        <AdornmentEnd>
-            <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">Browse...</MudButton>
-        </AdornmentEnd>
-    </MudTextFieldExtended>
-    <br />
-    <MudTextFieldExtended T="string" Label="Installation Folder" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate="true" Required="true" Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
-        <AdornmentStart>
-            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
-        </AdornmentStart>
-        <AdornmentEnd>
-            <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">Browse...</MudButton>
-        </AdornmentEnd>
-    </MudTextFieldExtended>
-</MudForm>
+<MudGrid Justify="Justify.Center" Class="mt-8 mb-4">
+    <MudItem xs="10">
+        <MudForm @ref="@foldersForm">
+            <MudTextFieldExtended T="string" Label="User Data Folder" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">Browse...</MudButton>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+            <br />
+            <MudTextFieldExtended T="string" Label="Installation Folder" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">Browse...</MudButton>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+        </MudForm>
+    </MudItem>
+</MudGrid>
 <br />

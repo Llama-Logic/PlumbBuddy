@@ -13,7 +13,7 @@ public sealed class McccMissingScan :
         "MC Command Center";
 
     protected override Uri ModUrl { get; } =
-        new("https://llama-logic.github.io/PlumbBuddy-Pages/GetMCCommandCenter.html", UriKind.Absolute);
+        new("https://plumbbuddy.app/redirect?to=GetMCCommandCenter", UriKind.Absolute);
 
     protected override string ModUtility { get; } =
         "your Sims 4 game experience, NPC story progression options, and error logging";

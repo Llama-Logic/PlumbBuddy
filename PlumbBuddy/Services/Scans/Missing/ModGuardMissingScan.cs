@@ -13,7 +13,7 @@ public sealed class ModGuardMissingScan :
         "ModGuard";
 
     protected override Uri ModUrl { get; } =
-        new("https://llama-logic.github.io/PlumbBuddy-Pages/ModGuard.html", UriKind.Absolute);
+        new("https://plumbbuddy.app/redirect?to=ModGuard", UriKind.Absolute);
 
     protected override string ModUtility { get; } =
         "protection from hacking, phishing, and other malware attacks which may occur if a modder's online accounts are compromised";

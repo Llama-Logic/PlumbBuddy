@@ -63,8 +63,33 @@ public class RequiredMod
     public long? ManifestKeyFullInstance { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileHash>? Files { get; set; }
+    public ICollection<ModManifestHash>? Hashes { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFeature>? RequiredFeatures { get; set; }
+
+    public long? RequirementIdentifierId { get; set; }
+
+    [ForeignKey(nameof(RequirementIdentifierId))]
+    public RequirementIdentifier? RequirementIdentifier { get; set; }
+
+    public long? IgnoreIfHashAvailableId { get; set; }
+
+    [ForeignKey(nameof(IgnoreIfHashAvailableId))]
+    public ModManifestHash? IgnoreIfHashAvailable { get; set; }
+
+    public long? IgnoreIfHashUnavailableId { get; set; }
+
+    [ForeignKey(nameof(IgnoreIfHashUnavailableId))]
+    public ModManifestHash? IgnoreIfHashUnavailable { get; set; }
+
+    public long? IgnoreIfPackAvailableId { get; set; }
+
+    [ForeignKey(nameof(IgnoreIfPackAvailableId))]
+    public PackCode? IgnoreIfPackAvailable { get; set; }
+
+    public long? IgnoreIfPackUnavailableId { get; set; }
+
+    [ForeignKey(nameof(IgnoreIfPackUnavailableId))]
+    public PackCode? IgnoreIfPackUnavailable { get; set; }
 }

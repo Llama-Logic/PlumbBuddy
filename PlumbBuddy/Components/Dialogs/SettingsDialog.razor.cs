@@ -35,11 +35,15 @@ partial class SettingsDialog
 
     bool ScanForMultipleModVersions { get; set; }
 
+    bool ScanForMutuallyExclusiveMods { get; set; }
+
     bool ScanForModsDisabled { get; set; }
 
     bool ScanForResourceConflicts { get; set; }
 
     bool ScanForScriptModsDisabled { get; set; }
+
+    bool ScanForShowModsListAtStartupEnabled { get; set; }
 
     UserType Type { get; set; }
 
@@ -73,8 +77,10 @@ partial class SettingsDialog
         ScanForMissingModGuard = Player.ScanForMissingModGuard;
         ScanForModsDisabled = Player.ScanForModsDisabled;
         ScanForMultipleModVersions = Player.ScanForMultipleModVersions;
+        ScanForMutuallyExclusiveMods = Player.ScanForMutuallyExclusiveMods;
         ScanForResourceConflicts = Player.ScanForResourceConflicts;
         ScanForScriptModsDisabled = Player.ScanForScriptModsDisabled;
+        ScanForShowModsListAtStartupEnabled = Player.ScanForShowModsListAtStartupEnabled;
         Type = Player.Type;
     }
 
@@ -109,8 +115,10 @@ partial class SettingsDialog
         Player.ScanForMissingModGuard = ScanForMissingModGuard;
         Player.ScanForModsDisabled = ScanForModsDisabled;
         Player.ScanForMultipleModVersions = ScanForMultipleModVersions;
+        Player.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
         Player.ScanForResourceConflicts = ScanForResourceConflicts;
         Player.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
+        Player.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
         Player.Type = Type;
         Player.UserDataFolderPath = UserDataFolderPath;
         MudDialog?.Close(DialogResult.Ok(true));

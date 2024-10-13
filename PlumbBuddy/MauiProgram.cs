@@ -84,6 +84,8 @@ public static class MauiProgram
             config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
         });
 
+        builder.Services.AddMudMarkdownServices();
+
         builder.Services.AddMudExtensions();
 
 #if DEBUG
