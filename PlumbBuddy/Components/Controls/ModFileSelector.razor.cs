@@ -10,8 +10,8 @@ partial class ModFileSelector
             FileTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>()
             {
                 { DevicePlatform.WinUI, [".package", ".ts4script"] },
-                { DevicePlatform.macOS, [".package", ".ts4script"] },
-                { DevicePlatform.MacCatalyst, [".package", ".ts4script"] }
+                { DevicePlatform.macOS, ["public.data"] },
+                { DevicePlatform.MacCatalyst, ["public.data"] }
             })
         }) is { } result)
             return new(result.FullPath);
@@ -27,8 +27,8 @@ partial class ModFileSelector
             FileTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>()
             {
                 { DevicePlatform.WinUI, [".package", ".ts4script"] },
-                { DevicePlatform.macOS, [".package", ".ts4script"] },
-                { DevicePlatform.MacCatalyst, [".package", ".ts4script"] }
+                { DevicePlatform.macOS, ["public.data"] },
+                { DevicePlatform.MacCatalyst, ["public.data"] }
             })
         }) is { } results)
             files.AddRange(results.Select(result => new FileInfo(result.FullPath)));

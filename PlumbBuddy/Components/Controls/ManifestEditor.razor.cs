@@ -293,7 +293,11 @@ partial class ManifestEditor
                     .Zip(splitPath, (part1, part2) => part1 == part2 ? part1 : null)
                     .TakeWhile(part => part != null)
                     .ToArray()!;
-            var commonPath = Path.Combine(commonPathSegments);
+            var commonPath = 
+#if MACCATALYST
+                "/" +
+#endif
+                Path.Combine(commonPathSegments);
             if (Directory.Exists(commonPath))
                 commonComponentDirectory = new(commonPath);
             else if (File.Exists(commonPath))
