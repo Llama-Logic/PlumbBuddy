@@ -3,9 +3,9 @@ namespace PlumbBuddy;
 public partial class App :
     Application
 {
-    const string packCodesModelMigration = "20240929042523_ModelV1";
+    const string packCodesModelMigration = "20241015012905_ModelV1";
 
-    public App(ILifetimeScope lifetimeScope, PbDbContext pbDbContext, IAppLifecycleManager appLifecycleManager)
+    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, PbDbContext pbDbContext, IAppLifecycleManager appLifecycleManager)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
@@ -19,6 +19,7 @@ public partial class App :
         }
         catch (SqliteException)
         {
+            logger.LogInformation("The preceding error occurred because the migration succession has been broken by terrible, lazy developers. I will recover now by rebuilding your database. I'm sorry that I'll have to scan all your mods again.");
             var objects = new List<(string? name, string? type)>();
             var sqliteConnection = pbDbContext.Database.GetDbConnection();
             var wasClosed = sqliteConnection.State is ConnectionState.Closed;

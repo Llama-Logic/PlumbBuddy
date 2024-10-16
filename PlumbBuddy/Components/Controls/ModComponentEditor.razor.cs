@@ -2,9 +2,9 @@ namespace PlumbBuddy.Components.Controls;
 
 partial class ModComponentEditor
 {
-    bool exclusivityPopoverOpen;
+    bool exclusivityGuidanceOpen;
     ModComponent? lastModComponent;
-    bool requirementIdentifierPopoverOpen;
+    bool requirementIdentifierGuidanceOpen;
 
     [Parameter]
     public string? Exclusivity { get; set; }
@@ -21,8 +21,30 @@ partial class ModComponentEditor
     [Parameter]
     public string? IgnoreIfPackAvailable { get; set; }
 
+    KeyValuePair<string, PackDescription>? IgnoreIfPackAvailablePair
+    {
+        get =>
+            IgnoreIfPackAvailable is { } packCode
+            && (PublicCatalogs.PackCatalog?.TryGetValue(packCode, out var packDescription) ?? false)
+            ? new(packCode, packDescription)
+            : null;
+        set =>
+            HandleIgnoreIfPackAvailableChanged(value?.Key);
+    }
+
     [Parameter]
     public string? IgnoreIfPackUnavailable { get; set; }
+
+    KeyValuePair<string, PackDescription>? IgnoreIfPackUnavailablePair
+    {
+        get =>
+            IgnoreIfPackUnavailable is { } packCode
+            && (PublicCatalogs.PackCatalog?.TryGetValue(packCode, out var packDescription) ?? false)
+            ? new(packCode, packDescription)
+            : null;
+        set =>
+            HandleIgnoreIfPackUnavailableChanged(value?.Key);
+    }
 
     [Parameter]
     public bool IsRequired { get; set; }
@@ -32,6 +54,18 @@ partial class ModComponentEditor
 
     [Parameter]
     public string? RequirementIdentifier { get; set; }
+
+    public void CloseGuidance()
+    {
+        requirementIdentifierGuidanceOpen = false;
+        exclusivityGuidanceOpen = false;
+    }
+
+    public void Dispose()
+    {
+        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
+    }
 
     void HandleExclusivityChanged(string? newValue)
     {
@@ -82,11 +116,40 @@ partial class ModComponentEditor
             modComponent.IsRequired = newValue;
     }
 
+    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
+    }
+
+    void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
+    }
+
     void HandleRequirementIdentifierChanged(string? newValue)
     {
         RequirementIdentifier = newValue;
         if (ModComponent is { } modComponent)
             modComponent.RequirementIdentifier = newValue;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
     }
 
     protected override async Task OnParametersSetAsync()

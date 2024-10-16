@@ -87,4 +87,13 @@ partial class ChipSetField
         if (firstRender && entry is not null)
             await JSRuntime.InvokeVoidAsync("handleReturnFromDotNet", $".{randomClass}", DotNetObjectReference.Create(this), nameof(AddEntryAsync));
     }
+
+    protected override void OnParametersSet()
+    {
+        if (Values.Count is > 0 && values.Count is 0)
+        {
+            values.AddRange(Values);
+            StateHasChanged();
+        }
+    }
 }

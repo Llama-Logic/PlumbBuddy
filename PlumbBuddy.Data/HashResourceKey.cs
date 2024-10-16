@@ -5,10 +5,10 @@ public class HashResourceKey
     [Key]
     public long Id { get; set; }
 
-    public long ModManifestId { get; set; }
+    public long ModFileManifestId { get; set; }
 
-    [ForeignKey(nameof(ModManifestId))]
-    public ModManifest? ModManifest { get; set; }
+    [ForeignKey(nameof(ModFileManifestId))]
+    public ModFileManifest? ModFileManifest { get; set; }
 
     [NotMapped]
     public ResourceKey Key

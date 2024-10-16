@@ -18,30 +18,6 @@ public class ModsDirectoryCataloger :
         };
     }
 
-    static async IAsyncEnumerable<PackCode> TransformCodesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> codes)
-    {
-        var existingPackCodes = await pbDbContext.PackCodes.Where(pc => codes.Contains(pc.Code)).ToDictionaryAsync(pc => pc.Code).ConfigureAwait(false);
-        foreach (var code in codes)
-        {
-            if (existingPackCodes.TryGetValue(code, out var existingPackCode))
-                yield return existingPackCode;
-            var newPackCode = new PackCode { Code = code };
-            await pbDbContext.PackCodes.AddAsync(newPackCode).ConfigureAwait(false);
-            try
-            {
-                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
-                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-            }
-            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
-            {
-                pbDbContext.Entry(newPackCode).State = EntityState.Detached;
-                newPackCode = await pbDbContext.PackCodes.FirstAsync(pc => pc.Code == code).ConfigureAwait(false);
-            }
-            existingPackCodes.Add(code, newPackCode);
-            yield return newPackCode;
-        }
-    }
-
     static async IAsyncEnumerable<ModCreator> TransformCreatorNamesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> names)
     {
         var existingModCreators = await pbDbContext.ModCreators.Where(mc => names.Contains(mc.Name)).ToDictionaryAsync(mc => mc.Name).ConfigureAwait(false);
@@ -63,6 +39,30 @@ public class ModsDirectoryCataloger :
             }
             existingModCreators.Add(name, newModCreator);
             yield return newModCreator;
+        }
+    }
+
+    static async IAsyncEnumerable<ElectronicArtsPromoCode> TransformElectronicArtsPromoCodesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> codes)
+    {
+        var existingElectronicArtsPromoCodes = await pbDbContext.ElectronicArtsPromoCodes.Where(eapc => codes.Contains(eapc.Code)).ToDictionaryAsync(eapc => eapc.Code).ConfigureAwait(false);
+        foreach (var code in codes)
+        {
+            if (existingElectronicArtsPromoCodes.TryGetValue(code, out var existingElectronicArtsPromoCode))
+                yield return existingElectronicArtsPromoCode;
+            var newElectronicArtsPromoCode = new ElectronicArtsPromoCode { Code = code };
+            await pbDbContext.ElectronicArtsPromoCodes.AddAsync(newElectronicArtsPromoCode).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newElectronicArtsPromoCode).State = EntityState.Detached;
+                newElectronicArtsPromoCode = await pbDbContext.ElectronicArtsPromoCodes.FirstAsync(eapc => eapc.Code == code).ConfigureAwait(false);
+            }
+            existingElectronicArtsPromoCodes.Add(code, newElectronicArtsPromoCode);
+            yield return newElectronicArtsPromoCode;
         }
     }
 
@@ -114,17 +114,17 @@ public class ModsDirectoryCataloger :
         }
     }
 
-    static async IAsyncEnumerable<ModManifestHash> TransformHashByteArraysEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<ImmutableArray<byte>> hashes)
+    static async IAsyncEnumerable<ModFileManifestHash> TransformHashByteArraysEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<ImmutableArray<byte>> hashes)
     {
         var hashesAsArrays = hashes.Select(hash => Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash)).ToImmutableArray();
-        var existingModManifestHashes = (await pbDbContext.ModManifestHashes.Where(mmh => Enumerable.Contains(hashesAsArrays, mmh.Sha256)).ToListAsync().ConfigureAwait(false)).ToDictionary(mfh => mfh.Sha256.ToHexString());
+        var existingModManifestHashes = (await pbDbContext.ModFileManifestHashes.Where(mmh => Enumerable.Contains(hashesAsArrays, mmh.Sha256)).ToListAsync().ConfigureAwait(false)).ToDictionary(mfh => mfh.Sha256.ToHexString());
         foreach (var hashArray in hashesAsArrays)
         {
             var hashHexStr = hashArray.ToHexString();
             if (existingModManifestHashes.TryGetValue(hashHexStr, out var existingModManifestHash))
                 yield return existingModManifestHash;
-            var newModManifestHash = new ModManifestHash { Sha256 = hashArray };
-            await pbDbContext.ModManifestHashes.AddAsync(newModManifestHash).ConfigureAwait(false);
+            var newModManifestHash = new ModFileManifestHash { Sha256 = hashArray };
+            await pbDbContext.ModFileManifestHashes.AddAsync(newModManifestHash).ConfigureAwait(false);
             try
             {
                 using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
@@ -133,24 +133,28 @@ public class ModsDirectoryCataloger :
             catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
             {
                 pbDbContext.Entry(newModManifestHash).State = EntityState.Detached;
-                newModManifestHash = await pbDbContext.ModManifestHashes.FirstAsync(mmh => mmh.Sha256 == hashArray).ConfigureAwait(false);
+                newModManifestHash = await pbDbContext.ModFileManifestHashes.FirstAsync(mmh => mmh.Sha256 == hashArray).ConfigureAwait(false);
             }
             existingModManifestHashes.Add(hashHexStr, newModManifestHash);
             yield return newModManifestHash;
         }
     }
 
-    static async Task<ModManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, ModFileManifestModel modFileManifestModel)
+    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, ModFileManifestModel modFileManifestModel)
     {
-        var modManifest = new ModManifest
+        var modManifest = new ModFileManifest
         {
             Creators = await TransformCreatorNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Creators).ToListAsync().ConfigureAwait(false),
             Exclusivities = await TransformExclusivityNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Exclusivities).ToListAsync().ConfigureAwait(false),
+            ElectronicArtsPromoCode = !string.IsNullOrWhiteSpace(modFileManifestModel.ElectronicArtsPromoCode)
+                ? await TransformElectronicArtsPromoCodesEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.ElectronicArtsPromoCode]).FirstAsync().ConfigureAwait(false)
+                : null,
             Features = await TransformFeatureNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Features).ToListAsync().ConfigureAwait(false),
             HashResourceKeys = modFileManifestModel.HashResourceKeys.Select(key => new HashResourceKey { KeyType = unchecked((int)(uint)key.Type), KeyGroup = unchecked((int)key.Group), KeyFullInstance = unchecked((long)key.FullInstance) }).ToList(),
-            InscribedModManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.Hash]).FirstAsync().ConfigureAwait(false),
+            InscribedModFileManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.Hash]).FirstAsync().ConfigureAwait(false),
+            IncompatiblePacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.IncompatiblePacks).ToListAsync().ConfigureAwait(false),
             Name = modFileManifestModel.Name,
-            RequiredPacks = await TransformCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
+            RequiredPacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
             ResourceHashStrategy = modFileManifestModel.ResourceHashStrategy is not ModFileManifestResourceHashStrategy.None
                 ? modFileManifestModel.ResourceHashStrategy
                 : null,
@@ -162,23 +166,6 @@ public class ModsDirectoryCataloger :
             Url = modFileManifestModel.Url,
             Version = modFileManifestModel.Version
         };
-        if (modFileManifestModel.IntentionalOverrides.Count > 0)
-        {
-            var intentionalOverrides = new List<IntentionalOverride>();
-            foreach (var intentionalOverride in modFileManifestModel.IntentionalOverrides)
-                intentionalOverrides.Add(new IntentionalOverride
-                {
-                    Key = intentionalOverride.Key,
-                    ModManifestHash = !intentionalOverride.Hash.IsDefaultOrEmpty
-                        ? await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [intentionalOverride.Hash]).FirstAsync().ConfigureAwait(false)
-                        : null,
-                    ModManifestKey = intentionalOverride.ModManifestKey,
-                    ModName = intentionalOverride.ModName,
-                    ModVersion = intentionalOverride.ModVersion,
-                    Name = intentionalOverride.Name
-                });
-            modManifest.IntentionalOverrides = intentionalOverrides;
-        }
         if (modFileManifestModel.RequiredMods.Count > 0)
         {
             var requiredMods = new List<RequiredMod>();
@@ -194,10 +181,10 @@ public class ModsDirectoryCataloger :
                         ? await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfHashUnavailable]).FirstAsync().ConfigureAwait(false)
                         : null,
                     IgnoreIfPackAvailable = !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackAvailable)
-                        ? await TransformCodesEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfPackAvailable]).FirstAsync().ConfigureAwait(false)
+                        ? await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfPackAvailable]).FirstAsync().ConfigureAwait(false)
                         : null,
                     IgnoreIfPackUnavailable = !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable)
-                        ? await TransformCodesEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfPackUnavailable]).FirstAsync().ConfigureAwait(false)
+                        ? await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfPackUnavailable]).FirstAsync().ConfigureAwait(false)
                         : null,
                     ManifestKey = requiredMod.ModManifestKey,
                     Name = requiredMod.Name,
@@ -211,6 +198,30 @@ public class ModsDirectoryCataloger :
             modManifest.RequiredMods = requiredMods;
         }
         return modManifest;
+    }
+
+    static async IAsyncEnumerable<PackCode> TransformPackCodesEnumerableAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, IEnumerable<string> codes)
+    {
+        var existingPackCodes = await pbDbContext.PackCodes.Where(pc => codes.Contains(pc.Code)).ToDictionaryAsync(pc => pc.Code).ConfigureAwait(false);
+        foreach (var code in codes)
+        {
+            if (existingPackCodes.TryGetValue(code, out var existingPackCode))
+                yield return existingPackCode;
+            var newPackCode = new PackCode { Code = code };
+            await pbDbContext.PackCodes.AddAsync(newPackCode).ConfigureAwait(false);
+            try
+            {
+                using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                pbDbContext.Entry(newPackCode).State = EntityState.Detached;
+                newPackCode = await pbDbContext.PackCodes.FirstAsync(pc => pc.Code == code).ConfigureAwait(false);
+            }
+            existingPackCodes.Add(code, newPackCode);
+            yield return newPackCode;
+        }
     }
 
     static async Task<RequirementIdentifier> TrasnformRequirementIdentifierAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, string identifier)
@@ -615,7 +626,7 @@ public class ModsDirectoryCataloger :
                                 var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.ResourceHashStrategy, manifest.HashResourceKeys).ConfigureAwait(false);
                                 dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
 
-                                modFileHash.ModManifest = dbManifest;
+                                modFileHash.ModFileManifest = dbManifest;
                             }
                         }
                         else
@@ -643,7 +654,7 @@ public class ModsDirectoryCataloger :
                             {
                                 var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
                                 dbManifest.ModFileHash = modFileHash;
-                                modFileHash.ModManifest = dbManifest;
+                                modFileHash.ModFileManifest = dbManifest;
                             }
                         }
                         modFileHash.ResourcesAndManifestCataloged = true;

@@ -1,3 +1,5 @@
+using Serilog.Events;
+
 namespace PlumbBuddy;
 
 /// <summary>
@@ -27,43 +29,48 @@ public static class MauiProgram
         if (!Directory.Exists(plumbBuddyDocumentsDirectoryPath))
             Directory.CreateDirectory(plumbBuddyDocumentsDirectoryPath);
 
-        var logPath = Path.Combine(plumbBuddyDocumentsDirectoryPath, "Log.txt");
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog
         (
             new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #if DEBUG
-            .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "Log.txt"), rollingInterval: RollingInterval.Day)
-            .WriteTo.Debug()
-            .Enrich.WithAssemblyVersion()
-            .Enrich.WithProcessId()
-            .Enrich.WithProcessName()
-            .Enrich.WithThreadId()
-            .Enrich.WithThreadName()
+                .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .WriteTo.Debug()
+                .Enrich.WithAssemblyVersion()
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithThreadId()
+                .Enrich.WithThreadName()
 #else
-            .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "Log.txt"), Serilog.Events.LogEventLevel.Warning, rollingInterval: RollingInterval.Month)
-            .Enrich.WithAssemblyInformationalVersion()
-            .Enrich.WithEnvironmentName()
-            .Enrich.WithMemoryUsage()
+                .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "Log.txt"), Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Month, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .Enrich.WithAssemblyInformationalVersion()
+                .Enrich.WithEnvironmentName()
+                .Enrich.WithMemoryUsage()
 #endif
-            .Enrich.WithAssemblyName()
-            .Enrich.WithExceptionData()
-            .Enrich.WithExceptionStackTraceHash()
-            .Enrich.WithDemystifiedStackTraces()
+                .Enrich.WithAssemblyName()
+                .Enrich.WithExceptionData()
+                .Enrich.WithExceptionStackTraceHash()
+                .Enrich.WithDemystifiedStackTraces()
 #if WINDOWS
-            .Enrich.WithProperty("HostOperatingSystem", "Windows")
+                .Enrich.WithProperty("HostOperatingSystem", "Windows")
 #endif
 #if MACCATALYST
-            .Enrich.WithProperty("HostOperatingSystem", "macOS")
+                .Enrich.WithProperty("HostOperatingSystem", "macOS")
 #endif
-            .CreateLogger()
+                .CreateLogger()
         );
 
         builder.Services.AddSingleton(Preferences.Default);
 
         builder.Services.AddDbContext<PbDbContext>
         (
-            options => options.UseSqlite($"Data Source={Path.Combine(plumbBuddyDocumentsDirectoryPath, "PlumbBuddy.sqlite")}"),
+            (serviceProvider, options) => options
+                .UseSqlite($"Data Source={Path.Combine(plumbBuddyDocumentsDirectoryPath, "PlumbBuddy.sqlite")}")
+#if DEBUG
+                .EnableSensitiveDataLogging()
+#endif
+                ,
             ServiceLifetime.Transient,
             ServiceLifetime.Transient
         );
@@ -90,6 +97,9 @@ public static class MauiProgram
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
+#else
+        if (Preferences.Default.Get(nameof(IPlayer.DevToolsUnlocked), false))
+            builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
         if (configureMauiAppBuilder is not null)

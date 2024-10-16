@@ -2,8 +2,6 @@ namespace PlumbBuddy.Components.Controls;
 
 partial class ThemeSelector
 {
-    const string amethystLilac = "Amethyst Lilac";
-
     string? originalTheme;
 
     public void Cancel() =>

@@ -1,6 +1,9 @@
 window.blurElement = selector =>
     document.querySelector(selector).blur();
 
+window.delay = ms =>
+    new Promise(resolve => setTimeout(resolve, ms));
+
 window.focusElement = selector =>
     document.querySelector(selector).focus();
 
@@ -16,6 +19,9 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
         }
     });
 };
+
+window.setCssVariable = (variableName, value) =>
+    document.documentElement.style.setProperty(variableName, value);
 
 window.subscribeToPreferredColorSchemeChanges = dotNetObjRef =>
     window

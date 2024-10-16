@@ -1,6 +1,8 @@
 @page "/"
 @implements IDisposable
+@inject ICustomThemes CustomThemes
 @inject IDispatcher Dispatcher
+@inject IJSRuntime JSRuntime
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
@@ -8,12 +10,10 @@
 <div class="main-tabs-backdrop"></div>
 <MudTabs Centered="true" MinimumTabWidth="200px" KeepPanelsAlive Class="main-tabs">
     <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
-        <MudLoading Loading="@SmartSimObserver.IsCurrentlyScanning" Overlap Darken LoaderType="LoaderType.Circular" Text="🔍 Looking for problems...">
-            <div class="mod-health-tab-container">
-                <div class="background"></div>
-                <ScanIssuesDisplay />
-            </div>
-        </MudLoading>
+        <div class="mod-health-tab-container">
+            <div class="background"></div>
+            <ScanIssuesDisplay />
+        </div>
     </MudTabPanel>
     <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
 

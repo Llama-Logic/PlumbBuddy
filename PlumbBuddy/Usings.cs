@@ -25,6 +25,7 @@ global using PlumbBuddy.Components.Controls;
 global using PlumbBuddy.Components.Dialogs;
 global using PlumbBuddy.Data;
 global using PlumbBuddy.Localization;
+global using PlumbBuddy.Models;
 global using PlumbBuddy.Services;
 global using PlumbBuddy.Services.Scans;
 global using PlumbBuddy.Services.Scans.Depth;

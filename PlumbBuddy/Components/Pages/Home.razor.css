@@ -15,12 +15,12 @@
 }
 
     .mod-health-tab-container .background {
-        background-image: url(/img/ModHealthBackgroundLight.png);
+        background-image: var(--plumbbuddy-tab-background-mod-health-light);
         background-position: center;
-        background-size: cover;
+        background-repeat: var(--plumbbuddy-tab-background-mod-health-repeat);
+        background-size: var(--plumbbuddy-tab-background-mod-health-size);
         height: 100vh;
         left: 0;
-        opacity: 0.65;
         overflow: hidden;
         position: fixed;
         top: 0;
@@ -35,12 +35,12 @@
 }
 
     .manifest-editor-tab-container .background {
-        background-image: url(/img/ManifestEditorBackgroundLight.png);
+        background-image: var(--plumbbuddy-tab-background-manifest-editor-light);
         background-position: center;
-        background-size: cover;
+        background-repeat: var(--plumbbuddy-tab-background-manifest-editor-repeat);
+        background-size: var(--plumbbuddy-tab-background-manifest-editor-size);
         height: 100vh;
         left: 0;
-        opacity: 0.65;
         overflow: hidden;
         position: fixed;
         top: 0;
@@ -135,12 +135,10 @@
 
 @media (prefers-color-scheme: dark) {
     .mod-health-tab-container .background {
-        opacity: 0.35;
-        background-image: url(/img/ModHealthBackgroundDark.png);
+        background-image: var(--plumbbuddy-tab-background-mod-health-dark);
     }
 
     .manifest-editor-tab-container .background {
-        opacity: 0.35;
-        background-image: url(/img/ManifestEditorBackgroundDark.png);
+        background-image: var(--plumbbuddy-tab-background-manifest-editor-dark);
     }
 }

@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-public class ModManifest
+public class ModFileManifest
 {
     [Key]
     public long Id { get; set; }
@@ -16,27 +16,27 @@ public class ModManifest
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModCreator>? Creators { get; set; }
 
-    public Version? Version { get; set; }
+    public string? Version { get; set; }
 
     public Uri? Url { get; set; }
 
-    public long InscribedModManifestHashId { get; set; }
+    public long InscribedModFileManifestHashId { get; set; }
 
-    [ForeignKey(nameof(InscribedModManifestHashId))]
-    public ModManifestHash? InscribedModManifestHash { get; set; }
+    [ForeignKey(nameof(InscribedModFileManifestHashId))]
+    public ModFileManifestHash? InscribedModFileManifestHash { get; set; }
 
     public ModFileManifestResourceHashStrategy? ResourceHashStrategy { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<HashResourceKey>? HashResourceKeys { get; set; }
 
-    public long CalculatedModManifestHashId { get; set; }
+    public long CalculatedModFileManifestHashId { get; set; }
 
-    [ForeignKey(nameof(CalculatedModManifestHashId))]
-    public ModManifestHash? CalculatedModFileHash { get; set; }
+    [ForeignKey(nameof(CalculatedModFileManifestHashId))]
+    public ModFileManifestHash? CalculatedModFileHash { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModManifestHash>? SubsumedHashes { get; set; }
+    public ICollection<ModFileManifestHash>? SubsumedHashes { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFeature>? Features { get; set; }
@@ -47,11 +47,16 @@ public class ModManifest
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<PackCode>? RequiredPacks { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? RequiredMods { get; set; }
+    public long? ElectronicArtsPromoCodeId { get; set; }
+
+    [ForeignKey(nameof(ElectronicArtsPromoCodeId))]
+    public ElectronicArtsPromoCode? ElectronicArtsPromoCode { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<IntentionalOverride>? IntentionalOverrides { get; set; }
+    public ICollection<PackCode>? IncompatiblePacks { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<RequiredMod>? RequiredMods { get; set; }
 
     public string? TuningName { get; set; }
 

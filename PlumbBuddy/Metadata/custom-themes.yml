@@ -1,0 +1,35 @@
+amethyst-lilac:
+  display_name: Amethyst Lilac
+  description: |
+    Visit on [Patreon](https://www.patreon.com/amethystlilac)!
+  palette_dark:
+    Background: '#29226bff'
+    Surface: '#342d6bff'
+    Primary: '#594ae2ff'
+    Tertiary: '#178c42ff'
+  backgrounded_tabs:
+    mod-health: null
+    manifest-editor:
+      repeat: no-repeat
+      size: contain
+
+meg:
+  display_name: Meg
+  description: |
+    Behold [beauty](https://www.apple.com/mac/).
+  backgrounded_tabs:
+    mod-health: null
+
+sim-realist:
+  display_name: Sim Realist
+  description: |
+    Visit our [website](https://www.simrealist.com/)!
+  palette_light:
+    Background: '#c0c0c0ff'
+    Surface: '#ffffffff'
+    Primary: '#1986d9ff'
+    Secondary: '#1986d9ff'
+    Tertiary: '#64aa30ff'
+  backgrounded_tabs:
+    mod-health: null
+    manifest-editor: null

@@ -23,5 +23,5 @@ public class ModFileHash
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ScriptModArchiveEntry>? ScriptModArchiveEntries { get; set; }
 
-    public ModManifest? ModManifest { get; set; }
+    public ModFileManifest? ModFileManifest { get; set; }
 }

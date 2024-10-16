@@ -1,5 +1,13 @@
 :root {
     overflow-x: hidden;
+    --plumbbuddy-tab-background-mod-health-dark: url('/img/ModHealthBackgroundDark.png');
+    --plumbbuddy-tab-background-mod-health-light: url('/img/ModHealthBackgroundLight.png');
+    --plumbbuddy-tab-background-mod-health-repeat: unset;
+    --plumbbuddy-tab-background-mod-health-size: cover;
+    --plumbbuddy-tab-background-manifest-editor-dark: url('/img/ManifestEditorBackgroundDark.png');
+    --plumbbuddy-tab-background-manifest-editor-light: url('/img/ManifestEditorBackgroundLight.png');
+    --plumbbuddy-tab-background-manifest-editor-repeat: unset;
+    --plumbbuddy-tab-background-manifest-editor-size: cover;
 }
 
 article:last-child > * {

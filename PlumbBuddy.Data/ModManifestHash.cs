@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-public class ModManifestHash
+public class ModFileManifestHash
 {
     [Key]
     public long Id { get; set; }
@@ -12,9 +12,6 @@ public class ModManifestHash
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<RequiredMod>? Dependents { get; set; }
-
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<IntentionalOverride>? Overriders { get; set; }
 
     [InverseProperty(nameof(RequiredMod.IgnoreIfHashAvailable))]
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]

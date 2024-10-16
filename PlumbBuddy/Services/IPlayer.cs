@@ -27,6 +27,7 @@ public interface IPlayer :
     bool ShowThemeManager { get; set; }
     string? Theme { get; set; }
     UserType Type { get; set; }
+    bool UsePublicPackCatalog { get; set; }
     string UserDataFolderPath { get; set; }
 
     void Forget();

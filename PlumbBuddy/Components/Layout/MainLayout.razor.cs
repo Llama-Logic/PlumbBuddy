@@ -81,12 +81,16 @@ public partial class MainLayout
 
     void ApplyPlayerSelectedTheme(MudTheme theme)
     {
-        var paletteDark = theme.PaletteDark;
-        if (Player.Theme is "Amethyst Lilac")
+        if (Player.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
         {
-            paletteDark.Primary = "#594ae2ff";
-            paletteDark.Surface = "#342d6bff";
-            paletteDark.Background = "#29226bff";
+            if (customTheme.PaletteLight is { } customThemeLightPaletteChanges)
+                foreach (var (key, value) in customThemeLightPaletteChanges)
+                    if (value is not null)
+                        typeof(PaletteLight).GetProperty(key)?.SetValue(theme.PaletteLight, (MudBlazor.Utilities.MudColor)value);
+            if (customTheme.PaletteDark is { } customThemeDarkPaletteChanges)
+                foreach (var (key, value) in customThemeDarkPaletteChanges)
+                    if (value is not null)
+                        typeof(PaletteDark).GetProperty(key)?.SetValue(theme.PaletteDark, (MudBlazor.Utilities.MudColor)value);
         }
     }
 
@@ -100,8 +104,17 @@ public partial class MainLayout
 
     bool? GetPlayerSelectedThemeIsDarkMode()
     {
-        if (Player.Theme is "Amethyst Lilac")
-            return true;
+        if (Player.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
+        {
+            var noLightPalette = customTheme.PaletteLight is null;
+            var noDarkPalette = customTheme.PaletteDark is null;
+            if (noLightPalette && noDarkPalette)
+                return null;
+            if (noDarkPalette)
+                return false;
+            if (noLightPalette)
+                return true;
+        }
         return null;
     }
 

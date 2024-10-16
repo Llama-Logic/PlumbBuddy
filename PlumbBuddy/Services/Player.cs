@@ -318,6 +318,18 @@ class Player :
         }
     }
 
+    public bool UsePublicPackCatalog
+    {
+        get => preferences.Get(nameof(UsePublicPackCatalog), false);
+        set
+        {
+            if (UsePublicPackCatalog == value)
+                return;
+            preferences.Set(nameof(UsePublicPackCatalog), value);
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Forget()

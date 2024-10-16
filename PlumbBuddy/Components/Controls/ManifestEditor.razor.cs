@@ -23,30 +23,30 @@ partial class ManifestEditor
     IReadOnlyList<string> creators = [];
     ChipSetField? creatorsChipSetField;
     MudForm? detailsStepForm;
+    string electronicArtsPromoCode = string.Empty;
     IReadOnlyList<string> features = [];
     ChipSetField? featuresChipSetField;
     int hashingLevel;
     bool isComposing;
     bool isLoading;
+    IReadOnlyList<string> incompatiblePacks = [];
+    ChipSetField? incompatibleChipSetField;
     string loadingText = string.Empty;
+    ModComponentEditor? modComponentEditor;
+    string name = string.Empty;
     readonly List<ModRequirement> requiredMods = [];
     IReadOnlyList<string> requiredPacks = [];
     ChipSetField? requiredPacksChipSetField;
-    bool requiredPacksGuidanceOpen;
     MudForm? requirementsStepForm;
     MudStepperExtended? stepper;
     FileInfo? selectStepFile;
     ModsDirectoryFileType selectStepFileType;
     MudForm? selectStepForm;
-    string title = string.Empty;
     string url = string.Empty;
-    bool urlProhibitiveGuidanceOpen;
     bool urlEncouragingGuidanceOpen;
-    int versionBuild;
+    bool urlProhibitiveGuidanceOpen;
     bool versionEnabled;
-    int versionMajor;
-    int versionMinor;
-    int versionRevision;
+    string version = string.Empty;
 
     ModComponent? ComponentsStepSelectedComponent
     {
@@ -58,6 +58,64 @@ partial class ManifestEditor
             componentsStepSelectedComponent = value;
             StateHasChanged();
         }
+    }
+
+    IEnumerable<KeyValuePair<string, PackDescription>> IncompatiblePackPairs
+    {
+        get => [..incompatiblePacks
+            .Select(packCode => (packCode, packDescription: (PublicCatalogs.PackCatalog?.TryGetValue(packCode, out var packDescription) ?? false) ? packDescription : null))
+            .Where(t => t.packDescription is not null)
+            .Select(t => new KeyValuePair<string, PackDescription>(t.packCode, t.packDescription!))];
+        set =>
+            incompatiblePacks = [.. value.Select(kv => kv.Key)];
+    }
+
+    IEnumerable<KeyValuePair<string, PackDescription>> RequiredPackPairs
+    {
+        get => [..requiredPacks
+            .Select(packCode => (packCode, packDescription: (PublicCatalogs.PackCatalog?.TryGetValue(packCode, out var packDescription) ?? false) ? packDescription : null))
+            .Where(t => t.packDescription is not null)
+            .Select(t => new KeyValuePair<string, PackDescription>(t.packCode, t.packDescription!))];
+        set =>
+            requiredPacks = [.. value.Select(kv => kv.Key)];
+    }
+
+    public bool UrlEncouragingGuidanceOpen
+    {
+        get => urlEncouragingGuidanceOpen;
+        set
+        {
+            urlEncouragingGuidanceOpen = value;
+            if (value)
+            {
+                UrlProhibitiveGuidanceOpen = false;
+            }
+        }
+    }
+
+    public bool UrlProhibitiveGuidanceOpen
+    {
+        get => urlProhibitiveGuidanceOpen;
+        set
+        {
+            urlProhibitiveGuidanceOpen = value;
+            if (value)
+            {
+                UrlEncouragingGuidanceOpen = false;
+            }
+        }
+    }
+
+    public bool UsePublicPackCatalog
+    {
+        get => Player.UsePublicPackCatalog;
+        set => Player.UsePublicPackCatalog = value;
+    }
+
+    public void Dispose()
+    {
+        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
     }
 
     async Task HandleAddFilesClickedAsync()
@@ -124,8 +182,27 @@ partial class ManifestEditor
         }
     }
 
+    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
+    }
+
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
+        var activeIndex = stepper?.GetActiveIndex();
+        if (activeIndex is 1)
+            modComponentEditor?.CloseGuidance();
+        else if (activeIndex is 2)
+        {
+            UrlProhibitiveGuidanceOpen = false;
+            UrlEncouragingGuidanceOpen = false;
+        }
         if (direction is StepChangeDirection.Backward)
             return false;
         if (targetIndex == 1 && components.Count == 0)
@@ -164,6 +241,8 @@ partial class ManifestEditor
                 return true;
             if (requiredPacksChipSetField is not null)
                 await requiredPacksChipSetField.CommitPendingEntryIfEmptyAsync();
+            if (incompatibleChipSetField is not null)
+                await incompatibleChipSetField.CommitPendingEntryIfEmptyAsync();
             foreach (var requiredMod in requiredMods)
             {
                 if (requiredMod.CreatorsChipSetField is { } creatorsChipSetField)
@@ -191,29 +270,16 @@ partial class ManifestEditor
         return false;
     }
 
-    void HandleQuickSemanticBuildOnClick()
+    void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        ++versionBuild;
-        versionRevision = 0;
+        if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
     }
-
-    void HandleQuickSemanticMajorOnClick()
-    {
-        ++versionMajor;
-        versionMinor = 0;
-        versionBuild = 0;
-        versionRevision = 0;
-    }
-
-    void HandleQuickSemanticMinorOnClick()
-    {
-        ++versionMinor;
-        versionBuild = 0;
-        versionRevision = 0;
-    }
-
-    void HandleQuickSemanticRevisionOnClick() =>
-        ++versionRevision;
 
     async Task HandleRemoveFilesClickedAsync()
     {
@@ -243,21 +309,27 @@ partial class ManifestEditor
         }
     }
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
+    }
+
     async Task ResetAsync()
     {
         hashingLevel = 0;
         await (featuresChipSetField?.ClearAsync() ?? Task.CompletedTask);
-        versionRevision = 0;
-        versionBuild = 0;
-        versionMinor = 0;
-        versionMajor = 0;
+        version = string.Empty;
         versionEnabled = false;
         requiredMods.Clear();
+        await (incompatibleChipSetField?.ClearAsync() ?? Task.CompletedTask);
+        electronicArtsPromoCode = string.Empty;
         await (requiredPacksChipSetField?.ClearAsync() ?? Task.CompletedTask);
         await (requirementsStepForm?.ResetAsync() ?? Task.CompletedTask);
         url = string.Empty;
         await (creatorsChipSetField?.ClearAsync() ?? Task.CompletedTask);
-        title = string.Empty;
+        name = string.Empty;
         await (detailsStepForm?.ResetAsync() ?? Task.CompletedTask);
         componentsStepSelectedComponent = null;
         componentsStepSelectionMode = MudBlazor.SelectionMode.SingleSelection;

@@ -127,6 +127,7 @@ partial class MainMenu
                 devToolsUnlockProgressBadgeVisible = false;
                 devToolsUnlockProgress = 10;
                 Snackbar.Add("Marry me, you beautiful human. Dev Tools unlocked! 🔓", Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.Heart);
+                Snackbar.Add("An inversion of control change just occurred which cannot take effect until the application is restarted.", Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.RestartAlert);
             }
         }
     }

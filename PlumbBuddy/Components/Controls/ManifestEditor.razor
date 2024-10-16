@@ -1,7 +1,10 @@
+@implements IDisposable
 @inject IDialogService DialogService
 @inject IDispatcher Dispatcher
 @inject IJSRuntime JSRuntime
 @inject IPlatformFunctions PlatformFunctions
+@inject IPlayer Player
+@inject IPublicCatalogs PublicCatalogs
 
 <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
     <MudStepperExtended @ref="stepper" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" Linear ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
@@ -43,7 +46,15 @@
                             🏗️ Are we leaving anything out?
                         </MudTextM3>
                         <MudGrid Justify="Justify.Center" Class="mb-4">
-                            <MudItem Class="relative mt-4" xs="4">
+                            <MudItem Class="mt-4" xs="8">
+                                <MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
+                                    @if (ComponentsStepSelectedComponent is { } component)
+                                    {
+                                        <ModComponentEditor @ref="@modComponentEditor" ModComponent="@component" />
+                                    }
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem Class="mt-4" xs="4">
                                 <MudPaper Class="overflow-y-auto" Style="height: calc(100vh - 435px);">
                                     <MudTreeView T="ModComponent" @bind-SelectedValue="@ComponentsStepSelectedComponent" @bind-SelectedValues="@componentsStepSelectedComponents" SelectionMode="@componentsStepSelectionMode" Items="@componentTreeItemData" AutoExpand AutoSelectParent ExpandOnDoubleClick Hover Class="manifest-editor-components-step-tree-view" Style="overflow-wrap: anywhere;">
                                         <ItemTemplate>
@@ -51,19 +62,13 @@
                                         </ItemTemplate>
                                     </MudTreeView>
                                 </MudPaper>
-                                <MudStack Row Class="absolute mr-8 mb-4" Style="bottom: 0; right: 0;">
-                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
-                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
-                                </MudStack>
                             </MudItem>
-                            <MudItem Class="relative mt-4" xs="8">
-                                <MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
-                                    @if (ComponentsStepSelectedComponent is { } component)
-                                    {
-                                        <ModComponentEditor ModComponent="@component" />
-                                    }
-                                </MudPaper>
-                                <MudStack Row Class="absolute ml-4 mb-4" Style="bottom: 0;">
+                        </MudGrid>
+                    </div>
+                    <div class="absolute" style="left: 48px; right: 24px; transform: translateY(5px);">
+                        <MudGrid>
+                            <MudItem xs="8" Class="pr-8">
+                                <MudStack Justify="Justify.FlexEnd" Row>
                                     @if (ComponentsStepSelectedComponent is not null)
                                     {
                                         <MudTooltip Arrow Placement="Placement.Top">
@@ -84,6 +89,12 @@
                                     }
                                 </MudStack>
                             </MudItem>
+                            <MudItem xs="4" Class="pl-8">
+                                <MudStack Row>
+                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
+                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
+                                </MudStack>
+                            </MudItem>
                         </MudGrid>
                     </div>
                 </ChildContent>
@@ -100,15 +111,15 @@
                         <MudGrid Justify="Justify.Center" Class="mb-4">
                             <MudItem xs="8">
                                 <MudForm @ref="@detailsStepForm">
-                                    <MudTextField T="string" @bind-Text="@title" Variant="Variant.Filled" Label="Mod Title" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" HelperText="What's your mod called? Pretty simple." Immediate Required Class="mt-4" />
+                                    <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="Mod Name" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" HelperText="What's your mod called? Pretty simple." Immediate Required Class="mt-4" />
                                     <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="So uhh... 🕵️‍♂️ who's responsible for this?" Class="mt-4" />
                                     <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="Download Page URL" HelperText="This should be a web page on which links or buttons are available to download the mod files for THIS MOD." Immediate Required Validation="@(new Func<string, IEnumerable<string>>(ValidateUrl))" Class="mt-4">
                                         <AdornmentStart>
                                             <MudIcon Icon="@MaterialDesignIcons.Normal.Download" />
                                         </AdornmentStart>
                                         <AdornmentEnd>
-                                            <MudToggleIconButton @bind-Toggled="@urlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
-                                            <MudPopover Open="@urlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopCenter" Fixed TransformOrigin="Origin.BottomRight">
+                                            <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
+                                            <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                 <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
                                                     <InlineMarkdown>
                                                         Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
@@ -117,10 +128,13 @@
                                                         * your Mod the Sims, CurseForge, or The Sims Resource profile; or,
                                                         * any other page which does not feature a one-click step to downloading your mod's files.
                                                     </InlineMarkdown>
+                                                    <InlineMarkdown>
+                                                            If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs.
+                                                    </InlineMarkdown>
                                                 </MudAlert>
                                             </MudPopover>
-                                            <MudToggleIconButton @bind-Toggled="@urlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
-                                            <MudPopover Open="@urlEncouragingGuidanceOpen" AnchorOrigin="Origin.BottomCenter" Fixed TransformOrigin="Origin.TopRight">
+                                            <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
+                                            <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                 <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
                                                     <InlineMarkdown>
                                                         It is completely okay if on this same page you *also*:
@@ -149,20 +163,29 @@
                             What does your mod <strong>need</strong> to be happy? 😊
                         </MudTextM3>
                         <MudForm @ref="@requirementsStepForm">
-                            <MudGrid Justify="Justify.Center" Class="mb-4 align-center">
+                            <MudGrid Justify="Justify.Center" Class="my-4 align-center">
                                 <MudItem xs="8">
-                                    <div class="mt-4 d-flex flex-row align-center">
-                                        <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="Required Packs" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="Type a pack code like GP08 for Realm of Magic and press enter" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" Class="flex-grow-1" />
-                                        <MudToggleIconButton @bind-Toggled="@requiredPacksGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" Class="ml-1" />
-                                        <MudPopover Open="@requiredPacksGuidanceOpen" AnchorOrigin="Origin.BottomRight" Fixed TransformOrigin="Origin.TopRight">
-                                            <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
-                                                <InlineMarkdown>
-                                                    Just because your mod *can* utilize the features of a pack does not mean that it *requires* that the pack is there to function, and that is what this field is describing.<br />
-                                                    **Input the packs without which your mod will not work**.
-                                                </InlineMarkdown>
-                                            </MudAlert>
-                                        </MudPopover>
-                                    </div>
+                                    @if (PublicCatalogs.PackCatalog is { } packCatalog)
+                                    {
+                                        <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@RequiredPackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Required Packs" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" Placeholder="(click here to select/search for packs)" />
+                                    }
+                                    else
+                                    {
+                                        <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="Required Packs" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="Type a pack code like GP08 for Realm of Magic and press enter" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" />
+                                    }
+                                </MudItem>
+                                <MudItem xs="8">
+                                    <MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="EA Promo Code" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" HelperText="If you have been invited to the EA Creator Network, PlumbBuddy can give players your Promo Code to use at check-out when buying packs to use with your mod." Disabled="@(requiredPacks.Count == 0)" />
+                                </MudItem>
+                                <MudItem xs="8">
+                                    @if (PublicCatalogs.PackCatalog is { } packCatalog)
+                                    {
+                                        <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@IncompatiblePackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Incompatible Packs" HelperText="Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?" Placeholder="(click here to select/search for packs)" />
+                                    }
+                                    else
+                                    {
+                                        <ChipSetField @ref="@incompatibleChipSetField" @bind-Values="@incompatiblePacks" Color="Color.Tertiary" Label="Incompatible Packs" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" ChipIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Placeholder="Type a pack code like GP12 for Werewolves and press enter" HelperText="Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?" />
+                                    }
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem>
@@ -170,7 +193,7 @@
                                 </MudItem>
                                 <MudItem Class="ml-n4">
                                     <MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
-                                    <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.BottomRight" Fixed TransformOrigin="Origin.TopRight">
+                                    <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight">
                                         <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
                                             <InlineMarkdown>
                                                 If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.<br />
@@ -198,19 +221,10 @@
                                 <MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">I maintain versions of my mod.</MudSwitchM3>
                             </MudItem>
                             <MudItem>
-                                <MudNumericField @bind-Value="@versionMajor" Variant="Variant.Filled" Label="Major" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
-                            </MudItem>
-                            <MudItem>
-                                <MudNumericField @bind-Value="@versionMinor" Variant="Variant.Filled" Label="Minor" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
-                            </MudItem>
-                            <MudItem>
-                                <MudNumericField @bind-Value="@versionBuild" Variant="Variant.Filled" Label="Build" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
-                            </MudItem>
-                            <MudItem>
-                                <MudNumericField @bind-Value="@versionRevision" Variant="Variant.Filled" Label="Revision" Min="0" Immediate Disabled="@(!versionEnabled)" Style="max-width: 100px;" />
+                                <MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="Version" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
                             </MudItem>
                             <MudFlexBreak />
-                            <MudItem>
+                            @* <MudItem>
                                 <MudPaper Class="pa-4">
                                     <MudTextM3 Typo="TypoM3.Title">Quick Semantic Versioning Links</MudTextM3>
                                     <MudStack Row Class="align-center mt-2">
@@ -231,7 +245,7 @@
                                     </MudStack>
                                 </MudPaper>
                             </MudItem>
-                            <MudFlexBreak />
+                            <MudFlexBreak /> *@
                             <MudItem xs="8">
                                 <ChipSetField @ref="@featuresChipSetField" @bind-Values="@features" Color="Color.Tertiary" Label="Features" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Placeholder="Type a feature name here and press enter" HelperText="You can use this field to establish feature flags. When other creators reference your mod as a requirement, they will be able to specify which features they need. This can be seen as an alternative to version ranges." />
                             </MudItem>
@@ -335,10 +349,19 @@
             </MudStepExtended>
         </ChildContent>
         <ActionContent>
-            @if (components.Count > 0 && !isComposing)
-            {
-                <MudButton OnClick="HandleCancelOnClickAsync">Cancel</MudButton>
-            }
+            <MudGrid Class="align-center">
+                <MudItem>
+                    @if (components.Count > 0 && !isComposing)
+                    {
+                        <MudButton OnClick="HandleCancelOnClickAsync" Variant="Variant.Filled" Color="Color.Warning">Cancel</MudButton>
+                    }
+                </MudItem>
+                <MudItem>
+                    <MudTooltip Text="Switching this on will cause fields which expect Pack Codes to connect to the PlumbBuddy.app web site, allowing you to search and select from its Public Pack Catalog instead of having to know the codes yourself. This feature requires an Internet connection." Color="Color.Tertiary" Placement="Placement.Top" Arrow>
+                        <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Label="Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+                    </MudTooltip>
+                </MudItem>
+            </MudGrid>
         </ActionContent>
     </MudStepperExtended>
 </MudLoading>
