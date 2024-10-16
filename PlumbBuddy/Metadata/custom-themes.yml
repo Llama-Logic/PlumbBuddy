@@ -3,13 +3,17 @@ amethyst-lilac:
   description: |
     Visit on [Patreon](https://www.patreon.com/amethystlilac)!
   palette_dark:
-    Background: '#29226bff'
+    Background: '#322d62ff'
     Surface: '#342d6bff'
     Primary: '#594ae2ff'
     Tertiary: '#178c42ff'
   backgrounded_tabs:
-    mod-health: null
+    mod-health:
+      dark: mod-health.png
+      light: mod-health.png
     manifest-editor:
+      dark: manifest-editor.png
+      light: manifest-editor.png
       repeat: no-repeat
       size: contain
 
@@ -18,7 +22,9 @@ meg:
   description: |
     Behold [beauty](https://www.apple.com/mac/).
   backgrounded_tabs:
-    mod-health: null
+    mod-health:
+      dark: mod-health.png
+      light: mod-health.png
 
 sim-realist:
   display_name: Sim Realist
@@ -31,5 +37,9 @@ sim-realist:
     Secondary: '#1986d9ff'
     Tertiary: '#64aa30ff'
   backgrounded_tabs:
-    mod-health: null
-    manifest-editor: null
+    mod-health:
+      dark: mod-health.png
+      light: mod-health.png
+    manifest-editor:
+      dark: manifest-editor.png
+      light: manifest-editor.png

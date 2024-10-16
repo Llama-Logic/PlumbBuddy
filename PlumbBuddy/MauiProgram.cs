@@ -1,5 +1,3 @@
-using Serilog.Events;
-
 namespace PlumbBuddy;
 
 /// <summary>
@@ -25,17 +23,13 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(FolderPicker.Default);
 
-        var plumbBuddyDocumentsDirectoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PlumbBuddy");
-        if (!Directory.Exists(plumbBuddyDocumentsDirectoryPath))
-            Directory.CreateDirectory(plumbBuddyDocumentsDirectoryPath);
-
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog
         (
             new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #if DEBUG
-                .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .WriteTo.File(Path.Combine(FileSystem.AppDataDirectory, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
                 .WriteTo.Debug()
                 .Enrich.WithAssemblyVersion()
                 .Enrich.WithProcessId()
@@ -43,7 +37,7 @@ public static class MauiProgram
                 .Enrich.WithThreadId()
                 .Enrich.WithThreadName()
 #else
-                .WriteTo.File(Path.Combine(plumbBuddyDocumentsDirectoryPath, "Log.txt"), Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Month, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .WriteTo.File(Path.Combine(FileSystem.AppDataDirectory, "Log.txt"), Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Month, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
                 .Enrich.WithAssemblyInformationalVersion()
                 .Enrich.WithEnvironmentName()
                 .Enrich.WithMemoryUsage()
@@ -66,7 +60,7 @@ public static class MauiProgram
         builder.Services.AddDbContext<PbDbContext>
         (
             (serviceProvider, options) => options
-                .UseSqlite($"Data Source={Path.Combine(plumbBuddyDocumentsDirectoryPath, "PlumbBuddy.sqlite")}")
+                .UseSqlite($"Data Source={Path.Combine(FileSystem.AppDataDirectory, "PlumbBuddy.sqlite")}")
 #if DEBUG
                 .EnableSensitiveDataLogging()
 #endif

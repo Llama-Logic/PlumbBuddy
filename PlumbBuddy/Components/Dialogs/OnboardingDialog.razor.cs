@@ -1,3 +1,5 @@
+using ABI.Windows.ApplicationModel.Activation;
+
 namespace PlumbBuddy.Components.Dialogs;
 
 partial class OnboardingDialog
@@ -139,7 +141,7 @@ partial class OnboardingDialog
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
-        if (targetIndex is >= 4)
+        if (targetIndex is >= 5)
         {
             Player.Onboarded = true;
             MudDialog?.Close(DialogResult.Ok(true));
@@ -149,10 +151,9 @@ partial class OnboardingDialog
             return false;
         switch (targetIndex)
         {
-            case 2:
-                await ScanForFoldersAsync();
-                return false;
             case 3:
+                return await ScanForFoldersAsync();
+            case 4:
                 var prevent = false;
                 if (foldersSelector is not null)
                 {
@@ -175,16 +176,29 @@ partial class OnboardingDialog
         SetDefaultScansForUserType(Player.Type);
     }
 
-    async Task ScanForFoldersAsync()
+    async Task<bool> ScanForFoldersAsync()
     {
         if (foldersSelector is null)
-            return;
+            return true;
+        if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+        {
+            if (!await DialogService.ShowCautionDialogAsync("I may be about to spook your Mac",
+                """
+                It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.<br />
+                I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.<br />
+                *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*
+                """))
+                return true;
+            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents")))
+                return true;
+        }
         loadingText = "☝️ Just a moment, I'm taking a looking at your computer...";
         isLoading = true;
         StateHasChanged();
         await foldersSelector.ScanForFoldersAsync();
         isLoading = false;
         StateHasChanged();
+        return false;
     }
 
     void SetDefaultScansForUserType(UserType value)

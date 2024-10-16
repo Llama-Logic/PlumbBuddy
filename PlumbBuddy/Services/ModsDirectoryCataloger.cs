@@ -600,6 +600,8 @@ public class ModsDirectoryCataloger :
                         }
                         catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
                         {
+                            // whoops, another MDC thread processing the identical mod file (perhaps even in another location because players are nuttier than a Snickers bar) beat us to the punch
+                            // but that's fine, it just means we reuse its mod file hash entry instead of creating a new one
                             pbDbContext.Entry(modFileHash).State = EntityState.Detached;
                             modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
                         }

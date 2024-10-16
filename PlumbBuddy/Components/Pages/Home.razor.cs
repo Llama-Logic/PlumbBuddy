@@ -7,6 +7,7 @@ partial class Home
     {
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -33,12 +34,24 @@ partial class Home
             StateHasChanged();
     }
 
+    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISmartSimObserver.ScanIssues))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
+    }
+
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
     }
 
     protected override async Task OnInitializedAsync()
@@ -64,8 +77,16 @@ partial class Home
         {
             if (backgroundedTabs.TryGetValue("mod-health", out var modHealth))
             {
-                await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", $"url('/img/custom-themes/{customThemeName}/mod-health-light.png')");
-                await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", $"url('/img/custom-themes/{customThemeName}/mod-health-dark.png')");
+                if ((modHealth?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (modHealth?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", $"url('/img/custom-themes/{customThemeName}/mod-health-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", $"url('/img/custom-themes/{customThemeName}/mod-health-light.png')");
+                }
                 if ((modHealth?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-repeat", repeat);
                 if ((modHealth?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
@@ -73,8 +94,16 @@ partial class Home
             }
             if (backgroundedTabs.TryGetValue("manifest-editor", out var manifestEditor))
             {
-                await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", $"url('/img/custom-themes/{customThemeName}/manifest-editor-light.png')");
-                await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", $"url('/img/custom-themes/{customThemeName}/manifest-editor-dark.png')");
+                if ((manifestEditor?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (manifestEditor?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", $"url('/img/custom-themes/{customThemeName}/manifest-editor-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", $"url('/img/custom-themes/{customThemeName}/manifest-editor-light.png')");
+                }
                 if ((manifestEditor?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-repeat", repeat);
                 if ((manifestEditor?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))

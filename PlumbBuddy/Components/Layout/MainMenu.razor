@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject IDispatcher Dispatcher
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IPlatformFunctions PlatformFunctions
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
@@ -32,6 +33,7 @@
         @if (Player.DevToolsUnlocked)
         {
             <MudNavGroup Icon="@MaterialDesignIcons.Normal.Tools" IconColor="Color.Warning" Title="Dev Tools">
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderCog" OnClick="HandleOpenPlumbBuddyStorageOnClickAsync">Open Local Storage</MudNavLink>
                 <MudNavLink Icon="@MaterialDesignIcons.Normal.HumanGreeting" OnClick="HandleReonboardOnClickAsync">Get Reacquainted</MudNavLink>
                 <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="HandleToggleThemeManagerOnClickAsync">Toggle Theme Manager</MudNavLink>
             </MudNavGroup>

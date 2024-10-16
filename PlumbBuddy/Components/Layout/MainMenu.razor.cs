@@ -52,6 +52,12 @@ partial class MainMenu
         SmartSimObserver.OpenModsFolder();
     }
 
+    async Task HandleOpenPlumbBuddyStorageOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        PlatformFunctions.ViewDirectory(new DirectoryInfo(FileSystem.AppDataDirectory));
+    }
+
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.CacheStatus))

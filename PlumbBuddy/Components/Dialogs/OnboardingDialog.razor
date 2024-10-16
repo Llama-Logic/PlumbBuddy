@@ -1,4 +1,5 @@
 @implements IDisposable
+@inject IDialogService DialogService
 @inject IPlayer Player
 
 <MudLoading @bind-Loading="@isLoading" @bind-Text="@loadingText" Color="Color.Primary" LoaderType="LoaderType.Linear" Overlap>
@@ -6,6 +7,28 @@
         <DialogContent>
             <MudStepperExtended Class="mud-width-full mb-4" Color="Color.Primary" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear="true" PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled">
                 <ChildContent>
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.DrawPen" Title="EULA">
+                        <ChildContent>
+                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                                I hate to have to begin our relationship this way, but... 😔
+                            </MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                                I need you to say you won't sue my parents.
+                            </MudTextM3>
+                            <div class="mt-4">
+                                <InlineMarkdown>
+                                    #### End User License Agreement<br />
+                                    By proceeding beyond this screen, you (the "User") agree to the terms outlined below. If you do not agree to these terms, please close the application. Use of this software constitutes acceptance of these terms.<br /><br />
+                                    1. **License**<br />PlumbBuddy is provided to you under the [MIT License](https://github.com/Llama-Logic/PlumbBuddy/blob/main/LICENSE), which you can view in full on [the project’s GitHub repository](https://github.com/Llama-Logic/PlumbBuddy). By using this software, you agree to the terms of the [MIT License](https://github.com/Llama-Logic/PlumbBuddy/blob/main/LICENSE), including the permissions and limitations outlined therein.<br /><br />
+                                    2. **No Warranty**<br />PlumbBuddy is provided "as-is," without any warranty of any kind, either expressed or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. You acknowledge that there is no guarantee that PlumbBuddy will function without errors, and there is no guarantee that it will not inadvertently cause issues with your Sims 4 game installation or mods.<br /><br />
+                                    3. **Limitation of Liability**<br />To the maximum extent permitted by law, in no event shall the developers of PlumbBuddy, including any contributors, be held liable for any damages arising out of or in connection with the use of the software, including but not limited to any direct, indirect, incidental, special, or consequential damages (such as data loss, corruption, or interruption of gameplay).<br /><br />
+                                    4. **User Responsibility**<br />The User acknowledges that they are responsible for the use of this software. The User assumes all risks associated with downloading, installing, and using PlumbBuddy, including any modifications to their Sims 4 game or related software. The developers do not guarantee compatibility with all third-party mods, and the use of PlumbBuddy is at the User’s own risk.<br /><br />
+                                    5. **Indemnification**<br />You agree to indemnify and hold harmless the developers and contributors of PlumbBuddy from any claims, damages, liabilities, or losses arising from your use of the software or any third-party modifications made through or in conjunction with it.<br /><br />
+                                    6. **Termination of Use**<br />Your right to use PlumbBuddy may be terminated at any time without notice if you are found to be in violation of these terms or the [MIT License](https://github.com/Llama-Logic/PlumbBuddy/blob/main/LICENSE). Upon termination, you must cease all use of the software and destroy any copies in your possession.
+                                </InlineMarkdown>
+                            </div>
+                        </ChildContent>
+                    </MudStepExtended>
                     <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="Introductions">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
