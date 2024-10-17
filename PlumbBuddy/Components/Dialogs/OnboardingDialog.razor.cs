@@ -187,8 +187,16 @@ partial class OnboardingDialog
                 *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*
                 """))
                 return true;
-            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents")))
+            var randomDocumentsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", Guid.NewGuid().ToString("n"));
+            using (var randomDocumentsFileStream = File.Open(randomDocumentsFile, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var randomDocumentsFileStreamWriter = new StreamWriter(randomDocumentsFileStream))
+            {
+                await randomDocumentsFileStreamWriter.WriteAsync("Hi!");
+                await randomDocumentsFileStreamWriter.FlushAsync();
+            }
+            if (!File.Exists(randomDocumentsFile))
                 return true;
+            File.Delete(randomDocumentsFile);
         }
         loadingText = "☝️ Just a moment, I'm taking a looking at your computer...";
         isLoading = true;
