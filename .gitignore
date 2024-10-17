@@ -399,3 +399,7 @@ FodyWeavers.xsd
 
 # macOS Desktop Services Store
 .DS_Store
+
+# macOS deployment semantics
+.env
+PlumbBuddy.zip
