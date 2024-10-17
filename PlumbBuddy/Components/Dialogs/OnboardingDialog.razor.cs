@@ -188,14 +188,14 @@ partial class OnboardingDialog
     async Task ScanForFoldersAsync()
     {
         if (foldersSelector is null)
-            return true;
+            return;
         loadingText = "☝️ Just a moment, I'm taking a looking at your computer...";
         isLoading = true;
         StateHasChanged();
         await foldersSelector.ScanForFoldersAsync();
         isLoading = false;
         StateHasChanged();
-        return false;
+        return;
     }
 
     void SetDefaultScansForUserType(UserType value)
