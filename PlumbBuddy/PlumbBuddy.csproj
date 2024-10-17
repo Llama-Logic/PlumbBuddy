@@ -5,7 +5,7 @@
     <PropertyGroup>
         <AssemblyName>PlumbBuddy</AssemblyName>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
-        <NoWarn>NU1701</NoWarn>
+        <NoWarn>NU1701;PRI263</NoWarn>
         <OutputType>Exe</OutputType>
         <RootNamespace>PlumbBuddy</RootNamespace>
         <SingleProject>true</SingleProject>
@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>0.1.27</ApplicationDisplayVersion>
-        <ApplicationVersion>0.1.27</ApplicationVersion>
+        <ApplicationDisplayVersion>0.1.28</ApplicationDisplayVersion>
+        <ApplicationVersion>0.1.28</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -71,11 +71,11 @@
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="ini-parser" Version="2.5.2" />
         <PackageReference Include="LlamaLogic.Packages" Version="2.11.0" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.91" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.91" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.91" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.92" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.92" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.92" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
-        <PackageReference Include="MudBlazor" Version="7.12.1" />
+        <PackageReference Include="MudBlazor" Version="7.13.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="7.8.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="2.1.0" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />

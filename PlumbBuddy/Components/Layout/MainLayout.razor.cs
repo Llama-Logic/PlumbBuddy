@@ -23,6 +23,7 @@ public partial class MainLayout
 
     bool isDarkMode;
     bool isMainMenuDrawerOpen = false;
+    DotNetObjectReference<MainLayout>? javaScriptThis;
     bool manualLightDarkModeToggleEnabled;
     bool? manualLightDarkModeToggle;
     int packageCount;
@@ -100,6 +101,7 @@ public partial class MainLayout
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
         SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
+        javaScriptThis?.Dispose();
     }
 
     bool? GetPlayerSelectedThemeIsDarkMode()
@@ -163,12 +165,27 @@ public partial class MainLayout
             nomNom();
     }
 
+    [JSInvokable]
+    public async Task LaunchExternalUrlAsync(string url)
+    {
+        try
+        {
+            if (!await Browser.OpenAsync(url, BrowserLaunchMode.External))
+                throw new Exception($"{nameof(Browser)}.{nameof(Browser.OpenAsync)} returned false");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "launching an external URL on the web view's behalf failed: {URL}", url);
+        }
+    }
+
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            await JSRuntime.InvokeVoidAsync("registerExternalLinkHandler", javaScriptThis);
             if (!Player.Onboarded)
                 await DialogService.ShowOnboardingDialogAsync();
         }
@@ -193,10 +210,11 @@ public partial class MainLayout
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        javaScriptThis = DotNetObjectReference.Create(this);
         if (Application.Current is { } app && app.MainPage is MainPage mainPage)
         {
             SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
-            await JSRuntime.InvokeVoidAsync("subscribeToPreferredColorSchemeChanges", DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("subscribeToPreferredColorSchemeChanges", javaScriptThis);
             await mainPage.ShowWebViewAsync();
         }
     }

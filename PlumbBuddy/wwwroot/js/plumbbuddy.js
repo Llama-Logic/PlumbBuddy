@@ -20,6 +20,14 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
     });
 };
 
+window.registerExternalLinkHandler = handlerInstance =>
+    document.body.addEventListener('click', e => {
+        if (e.target.tagName === 'A' && e.target.href && !e.target.href.startsWith(window.location.origin)) {
+            e.preventDefault();
+            handlerInstance.invokeMethodAsync('LaunchExternalUrlAsync', e.target.href);
+        }
+    });
+
 window.setCssVariable = (variableName, value) =>
     document.documentElement.style.setProperty(variableName, value);
 
