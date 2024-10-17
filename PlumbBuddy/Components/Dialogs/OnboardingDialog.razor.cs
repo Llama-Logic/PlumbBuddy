@@ -141,6 +141,16 @@ partial class OnboardingDialog
     {
         if (targetIndex is >= 5)
         {
+            if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            {
+                if (!await DialogService.ShowCautionDialogAsync("I may be about to spook your Mac",
+                    """
+                    It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.<br />
+                    I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.<br />
+                    *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*
+                    """))
+                    return true;
+            }
             Player.Onboarded = true;
             MudDialog?.Close(DialogResult.Ok(true));
             return false;
@@ -150,7 +160,8 @@ partial class OnboardingDialog
         switch (targetIndex)
         {
             case 3:
-                return await ScanForFoldersAsync();
+                await ScanForFoldersAsync();
+                return false;
             case 4:
                 var prevent = false;
                 if (foldersSelector is not null)
@@ -174,30 +185,10 @@ partial class OnboardingDialog
         SetDefaultScansForUserType(Player.Type);
     }
 
-    async Task<bool> ScanForFoldersAsync()
+    async Task ScanForFoldersAsync()
     {
         if (foldersSelector is null)
             return true;
-        if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
-        {
-            if (!await DialogService.ShowCautionDialogAsync("I may be about to spook your Mac",
-                """
-                It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.<br />
-                I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.<br />
-                *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*
-                """))
-                return true;
-            var randomDocumentsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", Guid.NewGuid().ToString("n"));
-            using (var randomDocumentsFileStream = File.Open(randomDocumentsFile, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (var randomDocumentsFileStreamWriter = new StreamWriter(randomDocumentsFileStream))
-            {
-                await randomDocumentsFileStreamWriter.WriteAsync("Hi!");
-                await randomDocumentsFileStreamWriter.FlushAsync();
-            }
-            if (!File.Exists(randomDocumentsFile))
-                return true;
-            File.Delete(randomDocumentsFile);
-        }
         loadingText = "☝️ Just a moment, I'm taking a looking at your computer...";
         isLoading = true;
         StateHasChanged();
