@@ -51,7 +51,6 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::IsOSPlatform('osx'))">
-        <CodesignKey>Developer ID Application: Daniel Henry (UA3C4N249P)</CodesignKey>
         <MtouchLink>none</MtouchLink>
         <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
         <UseInterpreter>true</UseInterpreter>
@@ -129,11 +128,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Metadata\**" />
+        <None Remove="Metadata\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Metadata\**" />
+        <EmbeddedResource Include="Metadata\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -149,6 +148,10 @@
             <LastGenOutput>AppText.Designer.cs</LastGenOutput>
             <Generator>ResXFileCodeGenerator</Generator>
         </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="**/*.sh" />
     </ItemGroup>
 
 </Project>
