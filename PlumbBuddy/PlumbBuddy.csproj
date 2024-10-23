@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>0.1.28</ApplicationDisplayVersion>
-        <ApplicationVersion>0.1.28</ApplicationVersion>
+        <ApplicationDisplayVersion>0.1.29</ApplicationDisplayVersion>
+        <ApplicationVersion>0.1.29</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -69,16 +69,16 @@
         <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="ini-parser" Version="2.5.2" />
-        <PackageReference Include="LlamaLogic.Packages" Version="2.11.0" />
+        <PackageReference Include="LlamaLogic.Packages" Version="2.12.3" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.92" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.92" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.92" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
-        <PackageReference Include="MudBlazor" Version="7.13.0" />
+        <PackageReference Include="MudBlazor" Version="7.14.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="7.8.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="2.1.0" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
-        <PackageReference Include="Serilog" Version="4.0.2" />
+        <PackageReference Include="Serilog" Version="4.1.0" />
         <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="2.0.0" />
         <PackageReference Include="Serilog.Enrichers.Demystifier" Version="1.0.2" />
         <PackageReference Include="Serilog.Enrichers.Dynamic" Version="1.0.9" />

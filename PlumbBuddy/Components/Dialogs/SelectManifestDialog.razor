@@ -1,0 +1,36 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.TagMultiple" Color="Color.Tertiary" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Tertiary">Select Manifest</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStack>
+            @if (Manifests is not null)
+                foreach (var (key, manifest) in Manifests)
+                {
+                    <MudCard Class="@(key == selectedResourceKey ? "mud-background-tertiary-selected" : "mud-background")">
+                        <MudCardHeader>
+                            <MudTextM3 Typo="TypoM3.Title" Size="Size.Small">@manifest.Name</MudTextM3>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudStack>
+                                <MudField Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Key" AdornmentColor="Color.Tertiary" Label="Resource Key">@key.ToString()</MudField>
+                                <MudField Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Identifier" AdornmentColor="Color.Tertiary" Label="Decimal Instance">@key.FullInstance.ToString()</MudField>
+                                <MudField Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.IdCard" AdornmentColor="Color.Tertiary" Label="Tuning Resource Name">@manifest.TuningName</MudField>
+                                <MudField Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BarcodeScan" AdornmentColor="Color.Tertiary" Label="Hash">@manifest.Hash.ToHexString()</MudField>
+                            </MudStack>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Text" StartIcon="@(key == selectedResourceKey ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Tertiary" OnClick="@(() => selectedResourceKey = key)" Disabled="@(key == selectedResourceKey)">Select</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        <MudButton Color="Color.Tertiary" OnClick="OkOnClickHandler">Ok</MudButton>
+    </DialogActions>
+</MudDialog>

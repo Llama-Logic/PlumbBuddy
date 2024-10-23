@@ -34,6 +34,18 @@ div.mud-input-control.no-material-variant .mud-input > * {
     padding: 0 5px;
 }
 
+.mud-background-primary-selected {
+    background-color: color-mix(in srgb, var(--mud-palette-background), var(--mud-palette-primary) 10%);
+}
+
+.mud-background-secondary-selected {
+    background-color: color-mix(in srgb, var(--mud-palette-background), var(--mud-palette-secondary) 10%);
+}
+
+.mud-background-tertiary-selected {
+    background-color: color-mix(in srgb, var(--mud-palette-background), var(--mud-palette-tertiary) 10%);
+}
+
 .main-menu {
     height: calc(100vh - 331px);
     overflow-y: auto;

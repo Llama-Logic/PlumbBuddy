@@ -84,7 +84,7 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Sha256 = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 32, nullable: false),
-                    ResourcesAndManifestCataloged = table.Column<bool>(type: "INTEGER", nullable: false)
+                    ResourcesAndManifestsCataloged = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -230,22 +230,6 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HashResourceKeys",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ModFileManifestId = table.Column<long>(type: "INTEGER", nullable: false),
-                    KeyType = table.Column<int>(type: "INTEGER", nullable: false),
-                    KeyGroup = table.Column<int>(type: "INTEGER", nullable: false),
-                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HashResourceKeys", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ModCreatorModFileManifest",
                 columns: table => new
                 {
@@ -360,7 +344,6 @@ namespace PlumbBuddy.Data.Migrations
                     Version = table.Column<string>(type: "TEXT", nullable: true),
                     Url = table.Column<string>(type: "TEXT", nullable: true),
                     InscribedModFileManifestHashId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ResourceHashStrategy = table.Column<int>(type: "INTEGER", nullable: true),
                     CalculatedModFileManifestHashId = table.Column<long>(type: "INTEGER", nullable: false),
                     ElectronicArtsPromoCodeId = table.Column<long>(type: "INTEGER", nullable: true),
                     TuningName = table.Column<string>(type: "TEXT", nullable: true),
@@ -441,6 +424,28 @@ namespace PlumbBuddy.Data.Migrations
                         name: "FK_ModFileManifestPackCode1_PackCodes_RequiredPacksId",
                         column: x => x.RequiredPacksId,
                         principalTable: "PackCodes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFileManifestResourceKeys",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileManifestId = table.Column<long>(type: "INTEGER", nullable: false),
+                    KeyType = table.Column<int>(type: "INTEGER", nullable: false),
+                    KeyGroup = table.Column<int>(type: "INTEGER", nullable: false),
+                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFileManifestResourceKeys", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModFileManifestResourceKeys_ModFileManifests_ModFileManifestId",
+                        column: x => x.ModFileManifestId,
+                        principalTable: "ModFileManifests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -531,11 +536,6 @@ namespace PlumbBuddy.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_HashResourceKeys_ModFileManifestId",
-                table: "HashResourceKeys",
-                column: "ModFileManifestId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ModCreatorModFileManifest_CreatorsId",
                 table: "ModCreatorModFileManifest",
                 column: "CreatorsId");
@@ -604,6 +604,11 @@ namespace PlumbBuddy.Data.Migrations
                 column: "RequiredPacksId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ModFileManifestResourceKeys_ModFileManifestId",
+                table: "ModFileManifestResourceKeys",
+                column: "ModFileManifestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ModFileManifests_CalculatedModFileManifestHashId",
                 table: "ModFileManifests",
                 column: "CalculatedModFileManifestHashId");
@@ -621,8 +626,7 @@ namespace PlumbBuddy.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ModFileManifests_ModFileHashId",
                 table: "ModFileManifests",
-                column: "ModFileHashId",
-                unique: true);
+                column: "ModFileHashId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ModFileResources_ModFileHashId",
@@ -698,14 +702,6 @@ namespace PlumbBuddy.Data.Migrations
                 unique: true);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_HashResourceKeys_ModFileManifests_ModFileManifestId",
-                table: "HashResourceKeys",
-                column: "ModFileManifestId",
-                principalTable: "ModFileManifests",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_ModCreatorModFileManifest_ModFileManifests_AttributedModsId",
                 table: "ModCreatorModFileManifest",
                 column: "AttributedModsId",
@@ -764,9 +760,6 @@ namespace PlumbBuddy.Data.Migrations
                 name: "FilesOfInterest");
 
             migrationBuilder.DropTable(
-                name: "HashResourceKeys");
-
-            migrationBuilder.DropTable(
                 name: "ModCreatorModFileManifest");
 
             migrationBuilder.DropTable(
@@ -789,6 +782,9 @@ namespace PlumbBuddy.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ModFileManifestPackCode1");
+
+            migrationBuilder.DropTable(
+                name: "ModFileManifestResourceKeys");
 
             migrationBuilder.DropTable(
                 name: "ModFileResourceTopologySnapshot");

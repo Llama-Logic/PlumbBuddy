@@ -15,15 +15,15 @@ public class PbDbContext :
 
     public DbSet<ElectronicArtsPromoCode> ElectronicArtsPromoCodes { get; set; }
     public DbSet<FileOfInterest> FilesOfInterest { get; set; }
-    public DbSet<HashResourceKey> HashResourceKeys { get; set; }
     public DbSet<ModCreator> ModCreators { get; set; }
     public DbSet<ModExclusivity> ModExclusivities { get; set; }
     public DbSet<ModFeature> ModFeatures { get; set; }
     public DbSet<ModFileHash> ModFileHashes { get; set; }
     public DbSet<ModFileResource> ModFileResources { get; set; }
     public DbSet<ModFile> ModFiles { get; set; }
-    public DbSet<ModFileManifest> ModFileManifests { get; set; }
     public DbSet<ModFileManifestHash> ModFileManifestHashes { get; set; }
+    public DbSet<ModFileManifestResourceKey> ModFileManifestResourceKeys { get; set; }
+    public DbSet<ModFileManifest> ModFileManifests { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
     public DbSet<RequirementIdentifier> RequirementIdentifiers { get; set; }

@@ -1,26 +1,27 @@
 namespace PlumbBuddy.Components.Controls;
 
-public class ModComponent(FileInfo file, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string? exclusivity, string? title) :
+public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? name, string subsumedHashes) :
+    IDisposable,
     INotifyPropertyChanged
 {
-    string? exclusivity = exclusivity;
+    string exclusivities = exclusivities;
     FileInfo file = file;
     string? ignoreIfHashAvailable = ignoreIfHashAvailable;
     string? ignoreIfHashUnavailable = ignoreIfHashUnavailable;
     string? ignoreIfPackAvailable = ignoreIfPackAvailable;
     string? ignoreIfPackUnavailable = ignoreIfPackUnavailable;
     bool isRequired = isRequired;
+    string? manifestResourceName = manifestResourceName;
+    string? name = name;
     string? requirementIdentifier = requirementIdentifier;
-    string? title = title;
+    string subsumedHashes = subsumedHashes;
 
-    public string? Exclusivity
+    public IReadOnlyList<string> Exclusivities
     {
-        get => exclusivity;
+        get => exclusivities.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         set
         {
-            if (exclusivity == value)
-                return;
-            exclusivity = value;
+            exclusivities = string.Join(Environment.NewLine, value);
             OnPropertyChanged();
         }
     }
@@ -36,6 +37,8 @@ public class ModComponent(FileInfo file, bool isRequired, string? requirementIde
             OnPropertyChanged();
         }
     }
+
+    public IDisposable FileObjectModel { get; } = fileObjectModel;
 
     public string? IgnoreIfHashAvailable
     {
@@ -97,6 +100,30 @@ public class ModComponent(FileInfo file, bool isRequired, string? requirementIde
         }
     }
 
+    public string? ManifestResourceName
+    {
+        get => manifestResourceName;
+        set
+        {
+            if (manifestResourceName == value)
+                return;
+            manifestResourceName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string? Name
+    {
+        get => name;
+        set
+        {
+            if (name == value)
+                return;
+            name = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string? RequirementIdentifier
     {
         get => requirementIdentifier;
@@ -109,19 +136,20 @@ public class ModComponent(FileInfo file, bool isRequired, string? requirementIde
         }
     }
 
-    public string? Title
+    public IReadOnlyList<string> SubsumedHashes
     {
-        get => title;
+        get => subsumedHashes.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         set
         {
-            if (title == value)
-                return;
-            title = value;
+            subsumedHashes = string.Join(Environment.NewLine, value);
             OnPropertyChanged();
         }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void Dispose() =>
+        FileObjectModel.Dispose();
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

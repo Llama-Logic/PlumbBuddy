@@ -13,6 +13,9 @@ partial class ThemeSelector
         originalTheme = Player.Theme;
     }
 
-    void SelectTheme(string? theme) =>
+    void SelectTheme(string? theme)
+    {
         Player.Theme = theme;
+        StateHasChanged();
+    }
 }

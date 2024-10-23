@@ -1,0 +1,14 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Outline.CheckboxMarkedCircle" Color="Color.Success" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Success">@Caption</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudMarkdown Value="@Text" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OkOnClickHandler">Ok</MudButton>
+    </DialogActions>
+</MudDialog>

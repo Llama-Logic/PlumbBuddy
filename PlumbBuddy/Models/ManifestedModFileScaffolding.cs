@@ -3,19 +3,8 @@ namespace PlumbBuddy.Models;
 public sealed class ManifestedModFileScaffolding :
     IParsable<ManifestedModFileScaffolding>
 {
-    static TBuilder ConfigureBuilder<TBuilder>(TBuilder builder)
-        where TBuilder : BuilderSkeleton<TBuilder> => builder
-            .WithTypeConverter(new YamlHashHexConverter())
-            .WithNamingConvention(UnderscoredNamingConvention.Instance);
-
-    static IDeserializer CreateYamlDeserializer() =>
-        ConfigureBuilder(new DeserializerBuilder()).Build();
-
-    static ISerializer CreateYamlSerializer() =>
-        ConfigureBuilder(new SerializerBuilder()).Build();
-
     static string GetScaffoldingPath(FileInfo modFile) =>
-        $"{modFile.FullName}.manifestScaffolding.yaml";
+        $"{modFile.FullName}.manifest_scaffolding.yml";
 
     public static ManifestedModFileScaffolding Parse(string s) =>
         Parse(s, null);
@@ -33,8 +22,17 @@ public sealed class ManifestedModFileScaffolding :
         modFile.Refresh();
         if (!modFile.Exists)
             return null;
-        if (TryParse(await File.ReadAllTextAsync(GetScaffoldingPath(modFile)).ConfigureAwait(false), out var scaffolding))
-            return scaffolding;
+        var scaffoldingPath = GetScaffoldingPath(modFile);
+        if (!File.Exists(scaffoldingPath))
+            return null;
+        try
+        {
+            if (TryParse(await File.ReadAllTextAsync(scaffoldingPath).ConfigureAwait(false), out var scaffolding))
+                return scaffolding;
+        }
+        catch
+        {
+        }
         return null;
     }
 
@@ -43,7 +41,7 @@ public sealed class ManifestedModFileScaffolding :
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out ManifestedModFileScaffolding result)
     {
-        if (s is not null && CreateYamlDeserializer().Deserialize<ManifestedModFileScaffolding>(s) is { } scaffolding)
+        if (s is not null && Yaml.CreateYamlDeserializer().Deserialize<ManifestedModFileScaffolding>(s) is { } scaffolding)
         {
             result = scaffolding;
             return true;
@@ -52,17 +50,11 @@ public sealed class ManifestedModFileScaffolding :
         return false;
     }
 
-    [YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults, Description = "this was the manifest hash of this mod file at the last time you inscribed it")]
-    public ImmutableArray<byte> Hash { get; set; }
+    [YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "this tells me how lenient vs. strict your hashing preference was last")]
+    public int HashingLevel { get; set; }
 
-    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults, Description = "whether or not your mod will work without this file installed")]
-    public bool IsPlayerOptional { get; set; }
-
-    [YamlMember(Order = 3, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "pointers to the other mod files which are a part of your mod")]
+    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "these are pointers to the other mod files which are a part of your mod")]
     public Collection<ManifestedModFileScaffoldingReferencedModFile> OtherModComponents { get; private set; } = [];
-
-    [YamlMember(Order = 4, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "pointers to the other mod files which are not a part of your mod, but which your mod requires")]
-    public Collection<ManifestedModFileScaffoldingReferencedModFile> Dependencies { get; private set; } = [];
 
     public async Task CommitForAsync(FileInfo modFile)
     {
@@ -74,7 +66,7 @@ public sealed class ManifestedModFileScaffolding :
         (
             $"""
             # I am a Manifest Scaffolding file.
-            # I am used by Mod Creator tooling to make it faster and easier for you to update the manifests in your mods prior to publishing updates to them.
+            # I am used by PlumbBuddy's Manifest Editor to make it faster and easier for you to update the manifests in your mods prior to publishing updates to them.
             # Thanks for doing that, by the way — you're making players' and support techs' lives a bit easier!
             # 
             # IMPORTANT:
@@ -88,5 +80,5 @@ public sealed class ManifestedModFileScaffolding :
     }
 
     public override string ToString() =>
-        CreateYamlSerializer().Serialize(this);
+        Yaml.CreateYamlSerializer().Serialize(this);
 }

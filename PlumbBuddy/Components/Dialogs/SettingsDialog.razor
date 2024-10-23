@@ -34,7 +34,9 @@
             </MudSelect>
         </MudTabPanel>
         <MudTabPanel Text="Theme" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
-            <ThemeSelector @ref="@themeSelector" />
+            <div class="mx-n6 my-n2 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 210px);">
+                <ThemeSelector @ref="@themeSelector" />
+            </div>
         </MudTabPanel>
         <MudTabPanel Text="Folders" Icon="@MaterialDesignIcons.Normal.Folder">
             <div class="mt-8">
@@ -44,7 +46,7 @@
         <MudTabPanel Text="Scans" Icon="@MaterialDesignIcons.Normal.CubeScan">
             <MudGrid Justify="Justify.Center">
                 <MudItem xs="10">
-                    <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
+                    <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
                 </MudItem>
             </MudGrid>
         </MudTabPanel>

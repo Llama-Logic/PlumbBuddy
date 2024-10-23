@@ -25,10 +25,8 @@ public class ModFileManifest
     [ForeignKey(nameof(InscribedModFileManifestHashId))]
     public ModFileManifestHash? InscribedModFileManifestHash { get; set; }
 
-    public ModFileManifestResourceHashStrategy? ResourceHashStrategy { get; set; }
-
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<HashResourceKey>? HashResourceKeys { get; set; }
+    public ICollection<ModFileManifestResourceKey>? HashResourceKeys { get; set; }
 
     public long CalculatedModFileManifestHashId { get; set; }
 

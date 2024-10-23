@@ -1,21 +1,23 @@
 @implements IDisposable
+@inject IDialogService DialogService
 @inject IDispatcher Dispatcher
 @inject IPlayer Player
 @inject IPublicCatalogs PublicCatalogs
+@inject PbDbContext PbDbContext
 
-<MudGrid Spacing="4">
+<MudGrid Justify="Justify.Center" Spacing="4">
     <MudItem xs="12">
-        <ModFileSelector Label="Local Path" File="@File" FileChanged="HandleFileChanged" />
+        <ModFileSelector Label="Local Path" File="@File" Disabled />
     </MudItem>
     <MudItem xs="12">
-        <MudSwitchM3 T="bool" Value="@IsRequired" ValueChanged="HandleIsRequiredChanged" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Asterisk">My mod requires this file to work properly — it is not an optional add-on to suit the player's preferences.</MudSwitchM3>
+        <MudSwitchM3 T="bool" Value="@IsRequired" ValueChanged="HandleIsRequiredChanged" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.Asterisk">My mod requires this file to work properly — it is not an optional add-on to suit the player's preferences.</MudSwitchM3>
     </MudItem>
     @if (IsRequired)
     {
         <MudItem md="12">
             <MudTextFieldExtended T="string" Text="@RequirementIdentifier" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="Requirement Identifier" HelperText="If set, the player must have at least one file using this requirement identifier." Placeholder="(currently independently required)">
                 <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" />
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" Color="Color.Tertiary" />
                 </AdornmentStart>
                 <AdornmentEnd>
                     <MudToggleIconButton @bind-Toggled="@requirementIdentifierGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
@@ -32,60 +34,70 @@
         <MudItem xs="12" lg="6">
             @if (PublicCatalogs.PackCatalog is { } packCatalog)
             {
-                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Available" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(click here to select/search for a pack)" />
+                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Available" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(click here to select/search for a pack)" />
             }
             else
             {
-                <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Available" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(use a pack code like EP01 for Get to Work)" />
+                <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Available" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(use a pack code like EP01 for Get to Work)" />
             }
         </MudItem>
         <MudItem xs="12" lg="6">
             @if (PublicCatalogs.PackCatalog is { } packCatalog)
             {
-                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Unavailable" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(click here to select/search for a pack)" />
+                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Unavailable" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(click here to select/search for a pack)" />
             }
             else
             {
-                <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Unavailable" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(use a pack code like SP46 for Home Chef Hustle)" />
+                <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Unavailable" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(use a pack code like SP46 for Home Chef Hustle)" />
             }
         </MudItem>
         <MudItem xs="12" lg="6">
             <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Available" HelperText="Instructs agents to ignore this requirement if the presence of a mod manifest hash in the load order indicates the player has installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
                 <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" />
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen">Browse...</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">Browse...</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
         </MudItem>
         <MudItem xs="12" lg="6">
             <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Unavailable" HelperText="Instructs agents to ignore this requirement if the absence of a mod manifest hash in the load order indicates the player has not installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
                 <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" />
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen">Browse...</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">Browse...</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
         </MudItem>
     }
     <MudItem xs="12">
-        <MudTextFieldExtended T="string" Text="@Exclusivity" TextChanged="HandleExclusivityChanged" Variant="Variant.Filled" Clearable Label="Exclusivity" HelperText="Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed." Placeholder="(currently not exclusive with any other file)">
-            <AdornmentStart>
-                <MudIcon Icon="@MaterialDesignIcons.Normal.SetLeftRight" />
-            </AdornmentStart>
-            <AdornmentEnd>
-                <MudToggleIconButton @bind-Toggled="@exclusivityGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Alert" Color="Color.Warning" />
-                <MudPopover Open="@exclusivityGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                    <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight" Style="max-width: 525px;">
-                        <InlineMarkdown>
-                            **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:
-                            > vyxated - Chalk'd UI - Support - TMEX - Smarter Pie Menu
-                        </InlineMarkdown>
-                    </MudAlert>
-                </MudPopover>
-            </AdornmentEnd>
-        </MudTextFieldExtended>
+        <ChipSetField Values="@Exclusivities" ValuesChanged="HandleExclusivitiesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SetLeftRight" ChipIcon="@MaterialDesignIcons.Normal.SetCenter" Label="Exclusivities" HelperText="Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed." Placeholder="Type the name of an exclusivity here and press enter" />
+        @if (Exclusivities.Count is > 0)
+        {
+            <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight">
+                <InlineMarkdown>
+                    **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:
+                    > vyxated - Chalk'd UI - Support - TMEX - Smarter Pie Menu
+                </InlineMarkdown>
+            </MudAlert>
+        }
     </MudItem>
+    <MudItem xs="12">
+        <MudTextField T="string" Value="@Name" ValueChanged="HandleNameChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" Label="Component Name" HelperText="Since each file in your mod will have its own manifest resource, it can technically have a different name if you want it to. This can be good for specifically labeling add-ons. It would probably be smart, however, to still include the full name of your mod, e.g. Vacuum Clean the Cats: Discover University Support." Placeholder="(type a specific name for this component if you want)" />
+    </MudItem>
+    @if (@ManifestResourceName is not null)
+    {
+        <MudItem xs="12">
+            <MudTextField T="string" Value="@ManifestResourceName" ValueChanged="HandleManifestResourceNameChanged" Variant="Variant.Filled" Label="Manifest Snippet Tuning Resource Name" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.IdCard" HelperText="Because this component of your mod is a package file, its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set." Immediate />
+        </MudItem>
+    }
+    <MudItem xs="12">
+        <ChipSetField Values="@SubsumedHashes" ValuesChanged="HandleSubsumedHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.History" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Subsumed Hashes" HelperText="These are the hashes of previous version of this mod file. The manifest keeps them so that if I'm checking to see if a player has your mod installed because another mod requires it, the other mod requiring an older version of your mod is not a problem. However, if you make breaking changes in this mod file you should probably clear these out so that it will be obvious that your newer version isn't going to work well with the other mod. Otherwise, it's best to leave this field alone and let me manage it for you." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
+    </MudItem>
+    <MudItem>
+        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Warning" OnClick="HandleBrowseForAddSubsumedHashOnClickAsync">Add subsumed hash from mod file...</MudButton>
+    </MudItem>
+    <MudFlexBreak />
 </MudGrid>

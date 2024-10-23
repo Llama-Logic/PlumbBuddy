@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-public class HashResourceKey
+public class ModFileManifestResourceKey
 {
     [Key]
     public long Id { get; set; }

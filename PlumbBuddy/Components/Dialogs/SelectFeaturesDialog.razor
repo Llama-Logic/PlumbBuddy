@@ -1,0 +1,30 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.Offer" Color="Color.Tertiary" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Tertiary">Select @(Manifest?.Name ?? "Mod") Features</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Class="align-center">
+            <InlineMarkdown>
+                **Amazing news!** @(Manifest?.Creators.Humanize() ?? "This mod's creator") included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it's giving me more details about what issues could arise if things change later on.<br />
+                Move available features on the left over to the required list on the right. What will you have? 😏<br />
+                <iframe src="https://giphy.com/embed/x49H7NdakLhNgLoy7v" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/archerfx-x49H7NdakLhNgLoy7v">via GIPHY</a></p>
+            </InlineMarkdown>
+            <MudTransferList T="string" @bind-StartCollection="@availableFeatures" @bind-EndCollection="@requiredFeatures" Color="Color.Tertiary" SelectAllType="SelectAllType.SelectAllItem" StyleListCommon="background-color: var(--mud-palette-background-gray);" StartTitle="@($"Available {(Manifest?.Name ?? "Required Mod")} Features")" EndTitle="@("Features My Mod Needs")" MultiSelection OrderFunc="@(e => e.Order().ToList())" />
+            @if (Manifest?.Url is { } url)
+            {
+                <MudAlert Severity="Severity.Info">
+                    <InlineMarkdown>
+                        If you're having any trouble picking from this list, you may want to visit [the download page for @(Manifest?.Name ?? "the mod")](@(url.ToString())), which may have more information or links to it.
+                    </InlineMarkdown>
+                </MudAlert>
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        <MudButton Color="Color.Tertiary" OnClick="OkOnClickHandler">Ok</MudButton>
+    </DialogActions>
+</MudDialog>

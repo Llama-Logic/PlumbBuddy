@@ -8,6 +8,9 @@ partial class ChipSetField
     readonly List<string> values = [];
 
     [Parameter]
+    public MudBlazor.Color AdornmentColor { get; set; } = MudBlazor.Color.Default;
+
+    [Parameter]
     public string? AdornmentIcon { get; set; }
 
     [Parameter]
@@ -90,8 +93,9 @@ partial class ChipSetField
 
     protected override void OnParametersSet()
     {
-        if (Values.Count is > 0 && values.Count is 0)
+        if (!Values.Order().SequenceEqual(values.Order()))
         {
+            values.Clear();
             values.AddRange(Values);
             StateHasChanged();
         }

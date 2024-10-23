@@ -195,6 +195,7 @@ public partial class MainLayout
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        StaticDispatcher.RegisterDispatcher(Dispatcher);
         if (Application.Current is { } app)
             app.Windows[0].Title = "PlumbBuddy";
         if (Player.ShowThemeManager)

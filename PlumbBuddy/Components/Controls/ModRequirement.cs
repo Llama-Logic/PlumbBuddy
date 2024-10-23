@@ -1,44 +1,37 @@
 namespace PlumbBuddy.Components.Controls;
 
 [SuppressMessage("Design", "CA1054: URI-like parameters should not be strings", Justification = "Take it up with MudBlazor")]
-public class ModRequirement(string? name, IReadOnlyList<string> hashes, IReadOnlyList<string> requiredFeatures, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, IReadOnlyList<string> creators, string? url, Version? version) :
+public class ModRequirement(string? name, string hashes, string requiredFeatures, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string creators, string? url, string? version) :
     INotifyPropertyChanged
 {
-    IReadOnlyList<string> creators = creators;
-    IReadOnlyList<string> hashes = hashes;
+    string creators = creators;
+    string hashes = hashes;
     string? ignoreIfHashAvailable = ignoreIfHashAvailable;
     string? ignoreIfHashUnavailable = ignoreIfHashUnavailable;
     string? ignoreIfPackAvailable = ignoreIfPackAvailable;
     string? ignoreIfPackUnavailable = ignoreIfPackUnavailable;
     string? name = name;
-    IReadOnlyList<string> requiredFeatures = requiredFeatures;
+    string requiredFeatures = requiredFeatures;
     string? requirementIdentifier = requirementIdentifier;
     string? url = url;
-    Version? version = version;
-
-    public ChipSetField? CreatorsChipSetField;
-    public ChipSetField? HashesChipSetField;
+    string? version = version;
 
     public IReadOnlyList<string> Creators
     {
-        get => creators;
+        get => creators.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         set
         {
-            if (!creators.SequenceEqual(value))
-                return;
-            creators = value;
+            creators = string.Join(Environment.NewLine, value);
             OnPropertyChanged();
         }
     }
 
     public IReadOnlyList<string> Hashes
     {
-        get => hashes;
+        get => hashes.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         set
         {
-            if (!hashes.SequenceEqual(value))
-                return;
-            hashes = value;
+            hashes = string.Join(Environment.NewLine, value);
             OnPropertyChanged();
         }
     }
@@ -105,12 +98,10 @@ public class ModRequirement(string? name, IReadOnlyList<string> hashes, IReadOnl
 
     public IReadOnlyList<string> RequiredFeatures
     {
-        get => requiredFeatures;
+        get => requiredFeatures.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         set
         {
-            if (!requiredFeatures.SequenceEqual(value))
-                return;
-            requiredFeatures = value;
+            requiredFeatures = string.Join(Environment.NewLine, value);
             OnPropertyChanged();
         }
     }
@@ -140,12 +131,12 @@ public class ModRequirement(string? name, IReadOnlyList<string> hashes, IReadOnl
         }
     }
 
-    public Version? Version
+    public string? Version
     {
         get => version;
         set
         {
-            if (EqualityComparer<Version>.Default.Equals(version, value))
+            if (version == value)
                 return;
             version = value;
             OnPropertyChanged();

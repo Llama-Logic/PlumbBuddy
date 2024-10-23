@@ -99,12 +99,6 @@ partial class OnboardingDialog
         set => Player.ScanForModsDisabled = value;
     }
 
-    bool ScanForResourceConflicts
-    {
-        get => Player.ScanForResourceConflicts;
-        set => Player.ScanForResourceConflicts = value;
-    }
-
     bool ScanForScriptModsDisabled
     {
         get => Player.ScanForScriptModsDisabled;
@@ -216,7 +210,6 @@ partial class OnboardingDialog
                 Player.ScanForMissingModGuard = false;
                 Player.ScanForMissingDependency = false;
                 Player.ScanForCacheStaleness = false;
-                Player.ScanForResourceConflicts = false;
                 Player.ScanForMultipleModVersions = false;
                 Player.ScanForMutuallyExclusiveMods = false;
                 Player.ScanForShowModsListAtStartupEnabled = false;
@@ -235,7 +228,6 @@ partial class OnboardingDialog
                 Player.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForResourceConflicts = ScanAttribute.Get(typeof(IResourceConflictScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
                 Player.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;

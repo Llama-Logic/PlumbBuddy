@@ -39,8 +39,6 @@ partial class SettingsDialog
 
     bool ScanForModsDisabled { get; set; }
 
-    bool ScanForResourceConflicts { get; set; }
-
     bool ScanForScriptModsDisabled { get; set; }
 
     bool ScanForShowModsListAtStartupEnabled { get; set; }
@@ -78,7 +76,6 @@ partial class SettingsDialog
         ScanForModsDisabled = Player.ScanForModsDisabled;
         ScanForMultipleModVersions = Player.ScanForMultipleModVersions;
         ScanForMutuallyExclusiveMods = Player.ScanForMutuallyExclusiveMods;
-        ScanForResourceConflicts = Player.ScanForResourceConflicts;
         ScanForScriptModsDisabled = Player.ScanForScriptModsDisabled;
         ScanForShowModsListAtStartupEnabled = Player.ScanForShowModsListAtStartupEnabled;
         Type = Player.Type;
@@ -116,7 +113,6 @@ partial class SettingsDialog
         Player.ScanForModsDisabled = ScanForModsDisabled;
         Player.ScanForMultipleModVersions = ScanForMultipleModVersions;
         Player.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
-        Player.ScanForResourceConflicts = ScanForResourceConflicts;
         Player.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
         Player.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
         Player.Type = Type;

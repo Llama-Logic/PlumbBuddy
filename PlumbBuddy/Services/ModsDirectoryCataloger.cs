@@ -150,14 +150,11 @@ public class ModsDirectoryCataloger :
                 ? await TransformElectronicArtsPromoCodesEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.ElectronicArtsPromoCode]).FirstAsync().ConfigureAwait(false)
                 : null,
             Features = await TransformFeatureNamesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.Features).ToListAsync().ConfigureAwait(false),
-            HashResourceKeys = modFileManifestModel.HashResourceKeys.Select(key => new HashResourceKey { KeyType = unchecked((int)(uint)key.Type), KeyGroup = unchecked((int)key.Group), KeyFullInstance = unchecked((long)key.FullInstance) }).ToList(),
+            HashResourceKeys = modFileManifestModel.HashResourceKeys.Select(key => new ModFileManifestResourceKey { KeyType = unchecked((int)(uint)key.Type), KeyGroup = unchecked((int)key.Group), KeyFullInstance = unchecked((long)key.FullInstance) }).ToList(),
             InscribedModFileManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.Hash]).FirstAsync().ConfigureAwait(false),
             IncompatiblePacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.IncompatiblePacks).ToListAsync().ConfigureAwait(false),
             Name = modFileManifestModel.Name,
             RequiredPacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
-            ResourceHashStrategy = modFileManifestModel.ResourceHashStrategy is not ModFileManifestResourceHashStrategy.None
-                ? modFileManifestModel.ResourceHashStrategy
-                : null,
             SubsumedHashes = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.SubsumedHashes).ToListAsync().ConfigureAwait(false),
             TuningFullInstance = modFileManifestModel.TuningFullInstance is not 0
                 ? unchecked((long)modFileManifestModel.TuningFullInstance)
@@ -606,30 +603,24 @@ public class ModsDirectoryCataloger :
                             modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
                         }
                     }
-                    if (!modFileHash.ResourcesAndManifestCataloged)
+                    if (!modFileHash.ResourcesAndManifestsCataloged)
                     {
                         if (fileType is ModsDirectoryFileType.Package)
                         {
                             using var dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
                             var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
                             modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
-                            var (manifestKey, manifest) = await ModFileManifestModel.GetModFileManifestAndKeyAsync(dbpf).ConfigureAwait(false);
-                            if (manifest is not null)
+                            var dbManifests = new List<ModFileManifest>();
+                            foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                             {
                                 var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
                                 dbManifest.ModFileHash = modFileHash;
                                 dbManifest.Key = manifestKey;
-
-                                // Amethyst Lilac trusts NO ONE
-                                if (manifest.ResourceHashStrategy is not ModFileManifestResourceHashStrategy.None)
-                                    manifest.HashResourceKeys.Add(manifestKey);
-                                else
-                                    manifest.HashResourceKeys.Remove(manifestKey);
-                                var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.ResourceHashStrategy, manifest.HashResourceKeys).ConfigureAwait(false);
+                                var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
                                 dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
-
-                                modFileHash.ModFileManifest = dbManifest;
+                                dbManifests.Add(dbManifest);
                             }
+                            modFileHash.ModFileManifests = dbManifests;
                         }
                         else
                         {
@@ -656,10 +647,10 @@ public class ModsDirectoryCataloger :
                             {
                                 var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
                                 dbManifest.ModFileHash = modFileHash;
-                                modFileHash.ModFileManifest = dbManifest;
+                                modFileHash.ModFileManifests = [dbManifest];
                             }
                         }
-                        modFileHash.ResourcesAndManifestCataloged = true;
+                        modFileHash.ResourcesAndManifestsCataloged = true;
                     }
                     modFile = modFileHash.ModFiles?.Where(mf => mf.Path?.Equals(path, platformFunctions.FileSystemStringComparison) ?? false).FirstOrDefault();
                 }

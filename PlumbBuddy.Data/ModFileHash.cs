@@ -15,7 +15,7 @@ public class ModFileHash
     public ICollection<ModFile>? ModFiles { get; set; }
 
     [Required]
-    public bool ResourcesAndManifestCataloged { get; set; }
+    public bool ResourcesAndManifestsCataloged { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileResource>? Resources { get; set; }
@@ -23,5 +23,6 @@ public class ModFileHash
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ScriptModArchiveEntry>? ScriptModArchiveEntries { get; set; }
 
-    public ModFileManifest? ModFileManifest { get; set; }
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFileManifest>? ModFileManifests { get; set; }
 }

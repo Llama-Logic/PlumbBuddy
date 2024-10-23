@@ -32,19 +32,6 @@
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="Introductions">
-                        <ChildContent>
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                In order to serve you best, it helps me to know what kind of player you are.
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                Use the colored circles or arrows below to choose.
-                            </MudTextM3>
-                            <div class="mt-4">
-                                <UserTypeSelector @bind-Type="@Type" />
-                            </div>
-                        </ChildContent>
-                    </MudStepExtended>
                     <MudStepExtended Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Title="Theme" Optional="false">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
@@ -56,8 +43,21 @@
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
                                 Either way, how I look is up to you!
                             </MudTextM3>
-                            <div class="mt-8 mb-4">
+                            <div class="mt-4 mb-2 mx-n6 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 440px);">
                                 <ThemeSelector />
+                            </div>
+                        </ChildContent>
+                    </MudStepExtended>
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="Introductions">
+                        <ChildContent>
+                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                                In order to serve you best, it helps me to know what kind of player you are.
+                            </MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                                Use the colored circles or arrows below to choose.
+                            </MudTextM3>
+                            <div class="mt-4">
+                                <UserTypeSelector @bind-Type="@Type" />
                             </div>
                         </ChildContent>
                     </MudStepExtended>
@@ -141,7 +141,7 @@
                                 </MudTextM3>
                                 <MudGrid Justify="Justify.Center" Class="mb-4">
                                     <MudItem xs="10">
-                                        <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForResourceConflicts="@ScanForResourceConflicts" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
+                                        <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
                                     </MudItem>
                                 </MudGrid>
                             }

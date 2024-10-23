@@ -224,18 +224,6 @@ class Player :
         }
     }
 
-    public bool ScanForResourceConflicts
-    {
-        get => preferences.Get(nameof(ScanForResourceConflicts), true);
-        set
-        {
-            if (ScanForResourceConflicts == value)
-                return;
-            preferences.Set(nameof(ScanForResourceConflicts), value);
-            OnPropertyChanged();
-        }
-    }
-
     public bool ScanForScriptModsDisabled
     {
         get => preferences.Get(nameof(ScanForScriptModsDisabled), true);

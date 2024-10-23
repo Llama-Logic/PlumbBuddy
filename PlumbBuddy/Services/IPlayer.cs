@@ -21,7 +21,6 @@ public interface IPlayer :
     bool ScanForInvalidScriptModSubdirectoryDepth { get; set; }
     bool ScanForModsDisabled { get; set; }
     bool ScanForMultipleModVersions { get; set; }
-    bool ScanForResourceConflicts { get; set; }
     bool ScanForScriptModsDisabled { get; set; }
     bool ScanForShowModsListAtStartupEnabled { get; set; }
     bool ShowThemeManager { get; set; }

@@ -51,14 +51,12 @@ partial class ScansToggler
         analysisScanLabelByName = new Dictionary<string, string>
         {
             { nameof(ScanForCacheStaleness), "...it is appropriate to clear the cache files" },
-            { nameof(ScanForResourceConflicts), "...a resource override conflict is occurring" },
             { nameof(ScanForMultipleModVersions), "...multiple versions of the same mod" },
             { nameof(ScanForMutuallyExclusiveMods), "...one or more mutually-exclusive mods" }
         }.ToImmutableDictionary();
         analysisScanLabels =
         [
             analysisScanLabelByName[nameof(ScanForCacheStaleness)],
-            analysisScanLabelByName[nameof(ScanForResourceConflicts)],
             analysisScanLabelByName[nameof(ScanForMultipleModVersions)],
             analysisScanLabelByName[nameof(ScanForMutuallyExclusiveMods)]
         ];
@@ -158,12 +156,6 @@ partial class ScansToggler
     public EventCallback<bool> ScanForMutuallyExclusiveModsChanged { get; set; }
 
     [Parameter]
-    public bool ScanForResourceConflicts { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> ScanForResourceConflictsChanged { get; set; }
-
-    [Parameter]
     public bool ScanForScriptModsDisabled { get; set; }
 
     [Parameter]
@@ -215,7 +207,6 @@ partial class ScansToggler
         ScanForModsDisabled = false;
         ScanForMultipleModVersions = false;
         ScanForMutuallyExclusiveMods = false;
-        ScanForResourceConflicts = false;
         ScanForScriptModsDisabled = false;
         ScanForShowModsListAtStartupEnabled = false;
         StateHasChanged();
@@ -237,7 +228,6 @@ partial class ScansToggler
         ScanForModsDisabled = true;
         ScanForMultipleModVersions = true;
         ScanForMutuallyExclusiveMods = true;
-        ScanForResourceConflicts = true;
         ScanForScriptModsDisabled = true;
         ScanForShowModsListAtStartupEnabled = true;
         StateHasChanged();
@@ -267,7 +257,6 @@ partial class ScansToggler
         ScanForModsDisabled = ScanAttribute.Get(typeof(IModSettingScan))?.IsEnabledByDefault ?? false;
         ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
         ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
-        ScanForResourceConflicts = ScanAttribute.Get(typeof(IResourceConflictScan))?.IsEnabledByDefault ?? false;
         ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
         ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
         StateHasChanged();
