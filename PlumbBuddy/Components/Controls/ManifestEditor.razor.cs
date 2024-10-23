@@ -773,6 +773,8 @@ partial class ManifestEditor
                 return true;
             if (confirmationStepMessages.Any(csm => csm.severity is Severity.Warning) && !await DialogService.ShowCautionDialogAsync("Point of No Return", "You *still* have **unresolved warnings** regarding your mod's manifest. I *can* proceed with these issues if you think I'm mistaken, but *you are responsible for ignoring these warnings if I'm not*."))
                 return true;
+            for (var i = 0; i < 6; ++i)
+                await stepper!.CompleteStep(i, false);
             _ = Task.Run(ComposeAsync);
         }
         return false;
@@ -781,13 +783,13 @@ partial class ManifestEditor
     void HandleQuickSemanticMajorOnClick()
     {
         var v = ParsedVersion;
-        ParsedVersion = new(v.Major + 1, 0, -1);
+        ParsedVersion = new(v.Major + 1, 0);
     }
 
     void HandleQuickSemanticMinorOnClick()
     {
         var v = ParsedVersion;
-        ParsedVersion = new(v.Major, v.Minor + 1, -1);
+        ParsedVersion = new(v.Major, v.Minor + 1);
     }
 
     void HandleQuickSemanticPatchOnClick()
