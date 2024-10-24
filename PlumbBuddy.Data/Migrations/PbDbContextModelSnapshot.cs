@@ -164,6 +164,9 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.ToTable("ElectronicArtsPromoCodes");
                 });
 
@@ -200,7 +203,8 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("ModCreators");
                 });
@@ -378,6 +382,9 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasIndex("ModFileManifestId");
 
+                    b.HasIndex("Sha256")
+                        .IsUnique();
+
                     b.ToTable("ModFileManifestHashes");
                 });
 
@@ -443,7 +450,8 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code");
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.ToTable("PackCodes");
                 });
@@ -735,7 +743,7 @@ namespace PlumbBuddy.Data.Migrations
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifest", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.ModFileManifestHash", "CalculatedModFileHash")
-                        .WithMany()
+                        .WithMany("ManifestsByCalculation")
                         .HasForeignKey("CalculatedModFileManifestHashId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -745,7 +753,7 @@ namespace PlumbBuddy.Data.Migrations
                         .HasForeignKey("ElectronicArtsPromoCodeId");
 
                     b.HasOne("PlumbBuddy.Data.ModFileManifestHash", "InscribedModFileManifestHash")
-                        .WithMany()
+                        .WithMany("ManifestsByInscription")
                         .HasForeignKey("InscribedModFileManifestHashId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -876,6 +884,10 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("DisqualifyingByAbsence");
 
                     b.Navigation("DisqualifyingByPresence");
+
+                    b.Navigation("ManifestsByCalculation");
+
+                    b.Navigation("ManifestsByInscription");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.PackCode", b =>

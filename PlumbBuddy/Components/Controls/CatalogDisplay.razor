@@ -1,0 +1,178 @@
+@implements IDisposable
+@inject IDispatcher Dispatcher
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IPlatformFunctions PlatformFunctions
+@inject IPlayer Player;
+@inject PbDbContext PbDbContext
+
+<MudGrid Justify="Justify.Center" Class="align-center">
+    <MudItem Class="flex-grow-1">
+        <div class="catalog-note rounded">
+            <MudAlert Severity="Severity.Info">Mods appear in your Catalog when creators have included manifests in them.</MudAlert>
+        </div>
+    </MudItem>
+    <MudItem>
+        <MudTextField T="string" @bind-Value="@ModsSearchText" Variant="Variant.Filled" Label="Search Catalog" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" />
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="4">
+        <div class="catalog-list overflow-y-auto rounded mud-paper-outlined">
+            <MudList T="ModKey" @bind-SelectedValue="@selectedModKey">
+                @if (mods is not null)
+                    foreach (var (modKey, modValue) in mods.Where(kv => IncludeMod(kv)).OrderBy(kv => kv.Key.Name).ThenBy(kv => kv.Key.Creators ?? kv.Key.Url?.ToString()))
+                    {
+                        <MudListItem T="ModKey" Value="@modKey" Text="@modKey.Name" SecondaryText="@(modKey.Creators ?? modKey.Url?.ToString())" Icon="@MaterialDesignIcons.Normal.Puzzle" />
+                    }
+            </MudList>
+        </div>
+    </MudItem>
+    <MudItem xs="8">
+        <div class="catalog-details overflow-y-auto rounded mud-paper-outlined pa-4">
+            <MudGrid Justify="Justify.Center" Spacing="1">
+                @if (selectedModKey is not null && (mods?.TryGetValue(selectedModKey, out var selectedMod) ?? false))
+                {
+                    var version = selectedMod.Select(t => t.manifest.Version).Where(v => !string.IsNullOrWhiteSpace(v)).Cast<string>().GroupBy(v => v).OrderByDescending(g => g.Key)?.FirstOrDefault()?.Key;
+                    var creators = selectedMod.SelectMany(t => t.manifest.Creators).Distinct().ToImmutableArray();
+                    var files = selectedMod.SelectMany(t => t.files).DistinctBy(fi => fi.FullName).OrderBy(fi => fi.FullName).ToImmutableArray();
+                    var dependencies = selectedMod.SelectMany(t => t.dependencies).Distinct().OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
+                    var indexableDependents = selectedMod.SelectMany(t => t.dependents).Distinct().Where(mods.ContainsKey).OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
+                    <MudItem>
+                        <MudStack Row AlignItems="AlignItems.Baseline">
+                            <MudTextM3 Typo="TypoM3.Headline">@(selectedModKey.Name)</MudTextM3>
+                            @if (!string.IsNullOrWhiteSpace(version))
+                            {
+                                <MudTextM3 Typo="TypoM3.Headline" Size="Size.Small">@version</MudTextM3>
+                            }
+                        </MudStack>
+                    </MudItem>
+                    <MudFlexBreak />
+                    @if (selectedModKey.Url is { } url)
+                    {
+                        <MudItem>
+                            <MudLink Href="@url.ToString()">@url</MudLink>
+                        </MudItem>
+                    }
+                    <MudFlexBreak />
+                    @if (creators.Length is > 0)
+                    {
+                        <MudItem>
+                            <MudStack Row>
+                                @foreach (var creator in creators)
+                                {
+                                    <MudChip T="string" Text="@creator" Icon="@MaterialDesignIcons.Normal.Account" Color="Color.Primary" />
+                                }
+                            </MudStack>
+                        </MudItem>
+                        <MudFlexBreak />
+                    }
+                    <MudItem xs="12">
+                        <MudTable T="FileInfo" Items="@files" Breakpoint="Breakpoint.Md" Dense Filter="IncludeFile" Class="mt-2">
+                            <ToolBarContent>
+                                <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">Files</MudTextM3>
+                                <MudSpacer />
+                                <MudTextField @bind-Value="@filesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Mods Folder Path</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Mods Folder Path">
+                                    <MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0" />
+                                </MudTd>
+                                <MudTd>
+                                    <MudStack Row Justify="Justify.FlexEnd">
+                                        <MudTooltip Text="View this File" Arrow>
+                                            <MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInNew" Size="Size.Small" OnClick="(() => PlatformFunctions.ViewFile(context))" />
+                                        </MudTooltip>
+                                    </MudStack>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudItem>
+                    @if (dependencies.Length is > 0)
+                    {
+                        <MudItem xs="12">
+                            <MudTable T="ModKey" Items="dependencies" Breakpoint="Breakpoint.Md" Dense Filter="IncludeDependency" Class="mt-2">
+                                <ToolBarContent>
+                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">Dependencies</MudTextM3>
+                                    <MudSpacer />
+                                    <MudTextField @bind-Value="@dependenciesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Name</MudTh>
+                                    <MudTh>Creators</MudTh>
+                                    <MudTh>URL</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Name">
+                                        <MudTextM3 Color="@(mods.ContainsKey(context) ? Color.Default : Color.Error)">@context.Name</MudTextM3>
+                                    </MudTd>
+                                    <MudTd DataLabel="Creators">
+                                        <MudTextM3>@context.Creators</MudTextM3>
+                                    </MudTd>
+                                    <MudTd DataLabel="URL">
+                                        <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
+                                    </MudTd>
+                                    <MudTd>
+                                        <MudStack Row Justify="Justify.FlexEnd">
+                                            @if (mods.ContainsKey(context))
+                                            {
+                                                <MudTooltip Text="Open Catalog Entry" Arrow>
+                                                    <MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInApp" Size="Size.Small" OnClick="@(() => selectedModKey = context)" />
+                                                </MudTooltip>
+                                            }
+                                            else
+                                            {
+                                                <MudTooltip Text="This dependency is missing!" Arrow Color="Color.Error">
+                                                    <MudIcon Icon="@MaterialDesignIcons.Normal.FileQuestion" Size="Size.Small" Color="Color.Error" />
+                                                </MudTooltip>
+                                            }
+                                        </MudStack>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudItem>
+                    }
+                    @if (indexableDependents.Length is > 0)
+                    {
+                        <MudItem xs="12">
+                            <MudTable T="ModKey" Items="indexableDependents" Breakpoint="Breakpoint.Md" Dense Filter="IncludeDependent" Class="mt-2">
+                                <ToolBarContent>
+                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">Dependents</MudTextM3>
+                                    <MudSpacer />
+                                    <MudTextField @bind-Value="@dependentsSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Name</MudTh>
+                                    <MudTh>Creators</MudTh>
+                                    <MudTh>URL</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Name">
+                                        <MudTextM3>@context.Name</MudTextM3>
+                                    </MudTd>
+                                    <MudTd DataLabel="Creators">
+                                        <MudTextM3>@context.Creators</MudTextM3>
+                                    </MudTd>
+                                    <MudTd DataLabel="URL">
+                                        <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
+                                    </MudTd>
+                                    <MudTd>
+                                        <MudStack Row Justify="Justify.FlexEnd">
+                                            <MudTooltip Text="Open Catalog Entry" Arrow>
+                                                <MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInApp" Size="Size.Small" OnClick="@(() => selectedModKey = context)" />
+                                            </MudTooltip>
+                                        </MudStack>
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudItem>
+                    }
+                }
+            </MudGrid>
+        </div>
+    </MudItem>
+</MudGrid>

@@ -94,63 +94,7 @@ partial class ModFileSelector
                     .ToDictionary
                     (
                         modFileManifest => new ResourceKey(ResourceType.SnippetTuning, 0x80000000, unchecked((ulong)(modFileManifest.TuningFullInstance ?? ++fullInstanceGuard))),
-                        modFileManifest =>
-                        {
-                            var model = new ModFileManifestModel
-                            {
-                                ElectronicArtsPromoCode = modFileManifest.ElectronicArtsPromoCode?.Code,
-                                Hash = (modFileManifest.InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
-                                Name = modFileManifest.Name,
-                                TuningFullInstance = unchecked((ulong)(modFileManifest.TuningFullInstance ?? fullInstanceGuard)),
-                                TuningName = modFileManifest.TuningName,
-                                Url = modFileManifest.Url,
-                                Version = modFileManifest.Version
-                            };
-                            static void addCollectionElements<TElement, TEntity>(ICollection<TEntity>? maybeNullEntityCollection, Collection<TElement> elementCollection, Func<TEntity, TElement> elementSelector)
-                            {
-                                if (maybeNullEntityCollection is { } entityCollection && entityCollection.Count is > 0)
-                                    foreach (var entity in entityCollection)
-                                        elementCollection.Add(elementSelector(entity));
-                            }
-                            static void addHashSetElements<TElement, TEntity>(ICollection<TEntity>? maybeNullEntityCollection, HashSet<TElement> elementHashSet, Func<TEntity, TElement> elementSelector)
-                            {
-                                if (maybeNullEntityCollection is { } entityCollection && entityCollection.Count is > 0)
-                                    foreach (var entity in entityCollection)
-                                        elementHashSet.Add(elementSelector(entity));
-                            }
-                            addCollectionElements(modFileManifest.Creators, model.Creators, entity => entity.Name);
-                            addCollectionElements(modFileManifest.Exclusivities, model.Exclusivities, entity => entity.Name);
-                            addCollectionElements(modFileManifest.Features, model.Features, entity => entity.Name);
-                            addHashSetElements(modFileManifest.HashResourceKeys, model.HashResourceKeys, entity => new ResourceKey(unchecked((ResourceType)(uint)entity.KeyType), unchecked((uint)entity.KeyGroup), unchecked((ulong)entity.KeyFullInstance)));
-                            addCollectionElements(modFileManifest.IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
-                            addCollectionElements(modFileManifest.RequiredMods, model.RequiredMods, entity =>
-                            {
-                                var requiredMod = new ModFileManifestModelRequiredMod
-                                {
-                                    IgnoreIfHashAvailable = (entity.IgnoreIfHashAvailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
-                                    IgnoreIfHashUnavailable = (entity.IgnoreIfHashUnavailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
-                                    IgnoreIfPackAvailable = entity.IgnoreIfPackAvailable?.Code,
-                                    IgnoreIfPackUnavailable = entity.IgnoreIfPackUnavailable?.Code,
-                                    ModManifestKey =
-                                        entity.ManifestKeyType is { } type
-                                        && entity.ManifestKeyGroup is { } group
-                                        && entity.ManifestKeyFullInstance is { } fullInstance
-                                        ? new ResourceKey(unchecked((ResourceType)(uint)type), unchecked((uint)group), unchecked((ulong)fullInstance))
-                                        : (ResourceKey?)null,
-                                    Name = entity.Name,
-                                    RequirementIdentifier = entity.RequirementIdentifier?.Identifier,
-                                    Url = entity.Url,
-                                    Version = entity.Version,
-                                };
-                                addCollectionElements(entity.Creators, requiredMod.Creators, entity => entity.Name);
-                                addHashSetElements(entity.Hashes, requiredMod.Hashes, entity => [..entity.Sha256]);
-                                addCollectionElements(entity.RequiredFeatures, requiredMod.RequiredFeatures, entity => entity.Name);
-                                return requiredMod;
-                            });
-                            addCollectionElements(modFileManifest.RequiredPacks, model.RequiredPacks, entity => entity.Code);
-                            addHashSetElements(modFileManifest.SubsumedHashes, model.SubsumedHashes, entity => entity.Sha256.ToImmutableArray());
-                            return model;
-                        }
+                        modFileManifest => modFileManifest.ToModel()
                     );
             }
             else if (modFile.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase))

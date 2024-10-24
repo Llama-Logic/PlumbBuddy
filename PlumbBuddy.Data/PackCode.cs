@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-[Index(nameof(Code))]
+[Index(nameof(Code), IsUnique = true)]
 public class PackCode
 {
     [Key]

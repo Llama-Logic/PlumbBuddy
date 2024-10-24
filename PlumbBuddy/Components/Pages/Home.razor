@@ -6,6 +6,7 @@
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
+@inject PbDbContext PbDbContext
 
 <div class="main-tabs-backdrop"></div>
 <MudTabs Centered="true" MinimumTabWidth="200px" KeepPanelsAlive Class="main-tabs">
@@ -15,8 +16,20 @@
             <ScanIssuesDisplay />
         </div>
     </MudTabPanel>
-    <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
+    @if (catalogIsVisible)
+    {
+        <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
+            <div class="catalog-tab-container">
+                <div class="background"></div>
+                <CatalogDisplay />
+            </div>
+        </MudTabPanel>
+    }
+    <MudTabPanel Text="SimVault" Icon="@MaterialDesignIcons.Normal.ArchiveSync">
+        <div class="simvault-tab-container">
+            <div class="background"></div>
 
+        </div>
     </MudTabPanel>
     @* <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink">
         <PreJector />

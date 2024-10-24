@@ -4,10 +4,22 @@
     --plumbbuddy-tab-background-mod-health-light: url('/img/ModHealthBackgroundLight.png');
     --plumbbuddy-tab-background-mod-health-repeat: unset;
     --plumbbuddy-tab-background-mod-health-size: cover;
+    --plumbbuddy-tab-background-catalog-dark: url('/img/CatalogBackgroundDark.png');
+    --plumbbuddy-tab-background-catalog-light: url('/img/CatalogBackgroundLight.png');
+    --plumbbuddy-tab-background-catalog-repeat: unset;
+    --plumbbuddy-tab-background-catalog-size: cover;
+    --plumbbuddy-tab-background-simvault-dark: url('/img/SimVaultBackground.png');
+    --plumbbuddy-tab-background-simvault-light: url('/img/SimVaultBackground.png');
+    --plumbbuddy-tab-background-simvault-repeat: unset;
+    --plumbbuddy-tab-background-simvault-size: cover;
     --plumbbuddy-tab-background-manifest-editor-dark: url('/img/ManifestEditorBackgroundDark.png');
     --plumbbuddy-tab-background-manifest-editor-light: url('/img/ManifestEditorBackgroundLight.png');
     --plumbbuddy-tab-background-manifest-editor-repeat: unset;
     --plumbbuddy-tab-background-manifest-editor-size: cover;
+}
+
+html {
+    overflow-y: hidden;
 }
 
 article:last-child > * {
@@ -196,4 +208,24 @@ div.mud-input-control.no-material-variant .mud-input > * {
 
 .scan-issue-Dead {
     background-color: color-mix(in srgb, transparent, var(--mud-palette-error) 70%);
+}
+
+.catalog-note {
+    backdrop-filter: blur(10px);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 80%);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.catalog-list {
+    backdrop-filter: blur(10px);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
+    height: calc(100vh - 240px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.catalog-details {
+    backdrop-filter: blur(10px);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
+    height: calc(100vh - 240px);
+    -webkit-backdrop-filter: blur(10px);
 }

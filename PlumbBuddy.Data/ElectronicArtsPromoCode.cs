@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Data;
 
+[Index(nameof(Code), IsUnique = true)]
 public class ElectronicArtsPromoCode
 {
     [Key]

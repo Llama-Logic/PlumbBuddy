@@ -105,4 +105,65 @@ public class ModFileManifest
     /// Do not forget to perform <see langword="unchecked"/> conversions to <see cref="long"/> of any literal values you intend to use in relation to this column in queries.
     /// </summary>
     public long? KeyFullInstance { get; set; }
+
+    /// <summary>
+    /// Convert this entity to its LLP model equivalent
+    /// </summary>
+    public ModFileManifestModel ToModel()
+    {
+        var model = new ModFileManifestModel
+        {
+            ElectronicArtsPromoCode = ElectronicArtsPromoCode?.Code,
+            Hash = (InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+            Name = Name,
+            TuningFullInstance = TuningFullInstance is null ? 0UL : unchecked((ulong)TuningFullInstance),
+            TuningName = TuningName,
+            Url = Url,
+            Version = Version
+        };
+        static void addCollectionElements<TElement, TEntity>(ICollection<TEntity>? maybeNullEntityCollection, Collection<TElement> elementCollection, Func<TEntity, TElement> elementSelector)
+        {
+            if (maybeNullEntityCollection is { } entityCollection && entityCollection.Count is > 0)
+                foreach (var entity in entityCollection)
+                    elementCollection.Add(elementSelector(entity));
+        }
+        static void addHashSetElements<TElement, TEntity>(ICollection<TEntity>? maybeNullEntityCollection, HashSet<TElement> elementHashSet, Func<TEntity, TElement> elementSelector)
+        {
+            if (maybeNullEntityCollection is { } entityCollection && entityCollection.Count is > 0)
+                foreach (var entity in entityCollection)
+                    elementHashSet.Add(elementSelector(entity));
+        }
+        addCollectionElements(Creators, model.Creators, entity => entity.Name);
+        addCollectionElements(Exclusivities, model.Exclusivities, entity => entity.Name);
+        addCollectionElements(Features, model.Features, entity => entity.Name);
+        addHashSetElements(HashResourceKeys, model.HashResourceKeys, entity => new ResourceKey(unchecked((ResourceType)(uint)entity.KeyType), unchecked((uint)entity.KeyGroup), unchecked((ulong)entity.KeyFullInstance)));
+        addCollectionElements(IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
+        addCollectionElements(RequiredMods, model.RequiredMods, entity =>
+        {
+            var requiredMod = new ModFileManifestModelRequiredMod
+            {
+                IgnoreIfHashAvailable = (entity.IgnoreIfHashAvailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+                IgnoreIfHashUnavailable = (entity.IgnoreIfHashUnavailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+                IgnoreIfPackAvailable = entity.IgnoreIfPackAvailable?.Code,
+                IgnoreIfPackUnavailable = entity.IgnoreIfPackUnavailable?.Code,
+                ModManifestKey =
+                    entity.ManifestKeyType is { } type
+                    && entity.ManifestKeyGroup is { } group
+                    && entity.ManifestKeyFullInstance is { } fullInstance
+                    ? new ResourceKey(unchecked((ResourceType)(uint)type), unchecked((uint)group), unchecked((ulong)fullInstance))
+                    : (ResourceKey?)null,
+                Name = entity.Name,
+                RequirementIdentifier = entity.RequirementIdentifier?.Identifier,
+                Url = entity.Url,
+                Version = entity.Version,
+            };
+            addCollectionElements(entity.Creators, requiredMod.Creators, entity => entity.Name);
+            addHashSetElements(entity.Hashes, requiredMod.Hashes, entity => [.. entity.Sha256]);
+            addCollectionElements(entity.RequiredFeatures, requiredMod.RequiredFeatures, entity => entity.Name);
+            return requiredMod;
+        });
+        addCollectionElements(RequiredPacks, model.RequiredPacks, entity => entity.Code);
+        addHashSetElements(SubsumedHashes, model.SubsumedHashes, entity => entity.Sha256.ToImmutableArray());
+        return model;
+    }
 }

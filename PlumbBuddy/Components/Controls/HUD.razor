@@ -135,6 +135,26 @@
         </TooltipContent>
     </MudTooltip>
 }
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Composing)
+{
+    <MudTooltip Arrow="true" Color="Color.Tertiary">
+        <ChildContent>
+            <MudChip T="string" Icon="@MaterialDesignIcons.Normal.FileSign" Color="Color.Tertiary">
+                <ChildContent>Composing Manifests</ChildContent>
+            </MudChip>
+        </ChildContent>
+        <TooltipContent>
+            <MudStack Row="true">
+                <MudIcon Icon="@MaterialDesignIcons.Normal.FileSign" />
+                <MudTextM3 Typo="TypoM3.Title">Composing Manifests</MudTextM3>
+            </MudStack>
+            <MudDivider />
+            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                It's probably best that I do not actively read your Mods folder while I'm also... writing to it? I'll resume cataloging as soon as these manifests are written. 😏
+            </MudTextM3>
+        </TooltipContent>
+    </MudTooltip>
+}
 @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
 {
     <MudTooltip Arrow="true" Color="Color.Dark">

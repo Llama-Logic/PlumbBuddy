@@ -31,7 +31,7 @@ sim-realist:
   description: |
     Visit our [website](https://www.simrealist.com/)!
   palette_light:
-    Background: '#c0c0c0ff'
+    Background: '#d8d8d8ff'
     Surface: '#ffffffff'
     Primary: '#1986d9ff'
     Secondary: '#1986d9ff'
@@ -40,6 +40,9 @@ sim-realist:
     mod-health:
       dark: mod-health.png
       light: mod-health.png
+    catalog:
+      dark: catalog.png
+      light: catalog.png
     manifest-editor:
       dark: manifest-editor.png
       light: manifest-editor.png

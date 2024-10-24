@@ -100,4 +100,7 @@ partial class ChipSetField
             StateHasChanged();
         }
     }
+
+    public void Refresh() =>
+        StateHasChanged();
 }

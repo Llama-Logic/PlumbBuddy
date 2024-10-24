@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Data;
 
-[Index(nameof(Name))]
+[Index(nameof(Name), IsUnique = true)]
 public class ModCreator
 {
     [Key]

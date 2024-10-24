@@ -24,7 +24,10 @@ public class ModsDirectoryCataloger :
         foreach (var name in names)
         {
             if (existingModCreators.TryGetValue(name, out var existingModCreator))
+            {
                 yield return existingModCreator;
+                continue;
+            }
             var newModCreator = new ModCreator { Name = name };
             await pbDbContext.ModCreators.AddAsync(newModCreator).ConfigureAwait(false);
             try
@@ -48,7 +51,10 @@ public class ModsDirectoryCataloger :
         foreach (var code in codes)
         {
             if (existingElectronicArtsPromoCodes.TryGetValue(code, out var existingElectronicArtsPromoCode))
+            {
                 yield return existingElectronicArtsPromoCode;
+                continue;
+            }
             var newElectronicArtsPromoCode = new ElectronicArtsPromoCode { Code = code };
             await pbDbContext.ElectronicArtsPromoCodes.AddAsync(newElectronicArtsPromoCode).ConfigureAwait(false);
             try
@@ -72,7 +78,10 @@ public class ModsDirectoryCataloger :
         foreach (var name in names)
         {
             if (existingModExclusivities.TryGetValue(name, out var existingModExclusivity))
+            {
                 yield return existingModExclusivity;
+                continue;
+            }
             var newModExclusivity = new ModExclusivity { Name = name };
             await pbDbContext.ModExclusivities.AddAsync(newModExclusivity).ConfigureAwait(false);
             try
@@ -96,7 +105,10 @@ public class ModsDirectoryCataloger :
         foreach (var name in names)
         {
             if (existingModFeatures.TryGetValue(name, out var existingModFeature))
+            {
                 yield return existingModFeature;
+                continue;
+            }
             var newModFeature = new ModFeature { Name = name };
             await pbDbContext.ModFeatures.AddAsync(newModFeature).ConfigureAwait(false);
             try
@@ -122,7 +134,10 @@ public class ModsDirectoryCataloger :
         {
             var hashHexStr = hashArray.ToHexString();
             if (existingModManifestHashes.TryGetValue(hashHexStr, out var existingModManifestHash))
+            {
                 yield return existingModManifestHash;
+                continue;
+            }
             var newModManifestHash = new ModFileManifestHash { Sha256 = hashArray };
             await pbDbContext.ModFileManifestHashes.AddAsync(newModManifestHash).ConfigureAwait(false);
             try
@@ -203,7 +218,10 @@ public class ModsDirectoryCataloger :
         foreach (var code in codes)
         {
             if (existingPackCodes.TryGetValue(code, out var existingPackCode))
+            {
                 yield return existingPackCode;
+                continue;
+            }
             var newPackCode = new PackCode { Code = code };
             await pbDbContext.PackCodes.AddAsync(newPackCode).ConfigureAwait(false);
             try
@@ -394,6 +412,8 @@ public class ModsDirectoryCataloger :
                 await Task.Delay(oneSecond).ConfigureAwait(false);
                 State = ModsDirectoryCatalogerState.Sleeping;
                 await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
+                State = ModsDirectoryCatalogerState.Composing;
+                await ManifestEditor.WaitForCompositionClearance().ConfigureAwait(false);
                 State = ModsDirectoryCatalogerState.Debouncing;
                 try
                 {
@@ -605,51 +625,93 @@ public class ModsDirectoryCataloger :
                     }
                     if (!modFileHash.ResourcesAndManifestsCataloged)
                     {
+                        var dbManifests = new List<ModFileManifest>();
                         if (fileType is ModsDirectoryFileType.Package)
                         {
-                            using var dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
-                            var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
-                            modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
-                            var dbManifests = new List<ModFileManifest>();
-                            foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
+                            DataBasePackedFile dbpf;
+                            var ioExceptionGraceAttempts = 10;
+                            while (true)
                             {
-                                var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
-                                dbManifest.ModFileHash = modFileHash;
-                                dbManifest.Key = manifestKey;
-                                var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
-                                dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
-                                dbManifests.Add(dbManifest);
+                                try
+                                {
+                                    dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
+                                    break;
+                                }
+                                catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
+                                {
+                                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                                }
                             }
-                            modFileHash.ModFileManifests = dbManifests;
+                            try
+                            {
+                                var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
+                                modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
+                                foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
+                                {
+                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
+                                    dbManifest.ModFileHash = modFileHash;
+                                    dbManifest.Key = manifestKey;
+                                    var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
+                                    dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
+                                    dbManifests.Add(dbManifest);
+                                }
+                            }
+                            finally
+                            {
+                                dbpf.Dispose();
+                            }
                         }
                         else
                         {
-                            using var archive = ZipFile.OpenRead(fileInfo.FullName);
-                            var scriptModArchiveEntries = new List<ScriptModArchiveEntry>();
-                            foreach (var entry in archive.Entries)
+                            ZipArchive zipArchive;
+                            var ioExceptionGraceAttempts = 10;
+                            while (true)
                             {
-                                scriptModArchiveEntries.Add(new()
+                                try
                                 {
-                                    Comment = entry.Comment,
-                                    CompressedLength = entry.CompressedLength,
-                                    Crc32 = entry.Crc32,
-                                    ExternalAttributes = entry.ExternalAttributes,
-                                    FullName = entry.FullName,
-                                    IsEncrypted = entry.IsEncrypted,
-                                    LastWriteTime = entry.LastWriteTime,
-                                    Length = entry.Length,
-                                    ModFileHash = modFileHash,
-                                    Name = entry.Name
-                                });
+                                    zipArchive = ZipFile.OpenRead(fileInfo.FullName);
+                                    break;
+                                }
+                                catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
+                                {
+                                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                                }
                             }
-                            modFileHash.ScriptModArchiveEntries = scriptModArchiveEntries;
-                            if (await ModFileManifestModel.GetModFileManifestAsync(archive).ConfigureAwait(false) is { } manifest)
+                            try
                             {
-                                var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
-                                dbManifest.ModFileHash = modFileHash;
-                                modFileHash.ModFileManifests = [dbManifest];
+                                var scriptModArchiveEntries = new List<ScriptModArchiveEntry>();
+                                foreach (var entry in zipArchive.Entries)
+                                {
+                                    scriptModArchiveEntries.Add(new()
+                                    {
+                                        Comment = entry.Comment,
+                                        CompressedLength = entry.CompressedLength,
+                                        Crc32 = entry.Crc32,
+                                        ExternalAttributes = entry.ExternalAttributes,
+                                        FullName = entry.FullName,
+                                        IsEncrypted = entry.IsEncrypted,
+                                        LastWriteTime = entry.LastWriteTime,
+                                        Length = entry.Length,
+                                        ModFileHash = modFileHash,
+                                        Name = entry.Name
+                                    });
+                                }
+                                modFileHash.ScriptModArchiveEntries = scriptModArchiveEntries;
+                                if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
+                                {
+                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
+                                    dbManifest.ModFileHash = modFileHash;
+                                    var calculatedHash = ModFileManifestModel.GetModFileHash(zipArchive);
+                                    dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
+                                    dbManifests.Add(dbManifest);
+                                }
+                            }
+                            finally
+                            {
+                                zipArchive.Dispose();
                             }
                         }
+                        modFileHash.ModFileManifests = dbManifests;
                         modFileHash.ResourcesAndManifestsCataloged = true;
                     }
                     modFile = modFileHash.ModFiles?.Where(mf => mf.Path?.Equals(path, platformFunctions.FileSystemStringComparison) ?? false).FirstOrDefault();
@@ -728,7 +790,7 @@ public class ModsDirectoryCataloger :
                 Brief technical details:<br />
                 <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
                 <br />
-                There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents.
+                More detailed technical information is available in my log.
                 """), Severity.Warning, options =>
                 {
                     options.RequireInteraction = true;

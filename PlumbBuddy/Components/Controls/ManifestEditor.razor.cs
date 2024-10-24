@@ -9,8 +9,7 @@ partial class ManifestEditor
         Unreadable,
         Succeeded,
         AlreadyAdded,
-        SucceededManifested,
-        MaliformedMultipleExclusivities
+        SucceededManifested
     }
 
     static readonly string[] hashingLevelTickMarkLabels =
@@ -19,9 +18,13 @@ partial class ManifestEditor
         "Moderate (Recommended)",
         "Strict"
     ];
+    static readonly AsyncManualResetEvent compositionResetEvent = new(true);
 
     [GeneratedRegex(@"^https?://.*")]
     private static partial Regex GetUrlPattern();
+
+    public static Task WaitForCompositionClearance(CancellationToken cancellationToken = default) =>
+        compositionResetEvent.WaitAsync(cancellationToken);
 
     bool addRequiredModGuidanceOpen;
     DirectoryInfo? commonComponentDirectory;
@@ -80,7 +83,7 @@ partial class ManifestEditor
             .Where(t => t.packDescription is not null)
             .Select(t => new KeyValuePair<string, PackDescription>(t.packCode, t.packDescription!))];
         set =>
-            incompatiblePacks = [.. value.Select(kv => kv.Key)];
+            incompatiblePacks = [..value.Select(kv => kv.Key)];
     }
 
     Version ParsedVersion
@@ -100,7 +103,7 @@ partial class ManifestEditor
             .Where(t => t.packDescription is not null)
             .Select(t => new KeyValuePair<string, PackDescription>(t.packCode, t.packDescription!))];
         set =>
-            requiredPacks = [.. value.Select(kv => kv.Key)];
+            requiredPacks = [..value.Select(kv => kv.Key)];
     }
 
     public bool UrlEncouragingGuidanceOpen
@@ -235,8 +238,14 @@ partial class ManifestEditor
     {
         var filesAdded = false;
         foreach (var modFile in modFiles)
-            if (await AddFileAsync(modFile).ConfigureAwait(false) is AddFileResult.Succeeded or AddFileResult.SucceededManifested)
+        {
+            var addFileResult = await AddFileAsync(modFile).ConfigureAwait(false);
+            if (addFileResult is AddFileResult.Succeeded or AddFileResult.SucceededManifested)
+            {
                 filesAdded = true;
+                RemoveComponentFromRequiredMods(components[^1], addFileResult);
+            }
+        }
         return filesAdded;
     }
 
@@ -437,6 +446,8 @@ partial class ManifestEditor
                 }
             }
 
+            compositionResetEvent.Reset();
+
             // stage 5: commit manifests
             foreach (var component in components)
             {
@@ -459,6 +470,7 @@ partial class ManifestEditor
                     }
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
+                    component.FileObjectModel.Dispose();
                     await updateStatusAsync(4, $"Creating scaffolding for `{componentRelativePath}`").ConfigureAwait(false);
                     var scaffolding = new ManifestedModFileScaffolding { HashingLevel = hashingLevel };
                     foreach (var otherComponent in components.Except([component]))
@@ -481,6 +493,8 @@ partial class ManifestEditor
             Logger.LogError(ex, "unhandled exception during manifest composition");
             await DialogService.ShowErrorDialogAsync("Something went wrong", "While I was writing your manifests, an unexpected error occurred. I've written it to my log file.");
         }
+
+        compositionResetEvent.Set();
 
         await updateStatusAsync(5, "All component manifests have been updated and scaffolding has been written").ConfigureAwait(false);
         await Task.Delay(5000).ConfigureAwait(false);
@@ -647,10 +661,13 @@ partial class ManifestEditor
                         throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
                     name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
                     creators = manifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
+                    creatorsChipSetField?.Refresh();
                     url = manifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
                     requiredPacks = manifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
+                    requiredPacksChipSetField?.Refresh();
                     electronicArtsPromoCode = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.ElectronicArtsPromoCode))?.ElectronicArtsPromoCode ?? string.Empty;
                     incompatiblePacks = manifests.SelectMany(manifest => manifest.IncompatiblePacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
+                    incompatibleChipSetField?.Refresh();
                     requiredMods.AddRange(manifests
                         .SelectMany(manifest => manifest.RequiredMods)
                         .GroupBy(requiredMod => $"{string.Join(string.Empty, requiredMod.Hashes.Select(hash => hash.ToHexString()).Order())}|{requiredMod.RequirementIdentifier}|{requiredMod.IgnoreIfPackAvailable}|{requiredMod.IgnoreIfPackUnavailable}|{requiredMod.IgnoreIfHashAvailable}|{requiredMod.IgnoreIfHashUnavailable}")
@@ -691,34 +708,6 @@ partial class ManifestEditor
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent
                             && !string.IsNullOrWhiteSpace(otherModComponent.LocalAbsolutePath))
                             addScaffoldedComponentResult = await AddFileAsync(new FileInfo(otherModComponent.LocalAbsolutePath));
-                        if (addScaffoldedComponentResult is AddFileResult.SucceededManifested)
-                        {
-                            // if the scaffolded mod file was manifested, that means we added it to required mods earlier...
-                            // ... remove any of its hashes from required mods
-                            var component = components[^1];
-                            if (component.Name == name)
-                                component.Name = null;
-                            ImmutableHashSet<string> inscribedHashes;
-                            var fileObjectModel = component.FileObjectModel;
-                            if (fileObjectModel is DataBasePackedFile dbpf)
-                                inscribedHashes = [..(await ModFileManifestModel.GetModFileManifestsAsync(dbpf))
-                                    .Values
-                                    .Select(manifest => manifest.Hash.ToHexString())];
-                            else if (fileObjectModel is ZipArchive zipArchive)
-                                inscribedHashes = [(await ModFileManifestModel.GetModFileManifestAsync(zipArchive))!.Hash.ToHexString()];
-                            else
-                                throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
-                            foreach (var requiredMod in requiredMods)
-                                if (requiredMod.Hashes.Any(hash => inscribedHashes.Contains(hash)))
-                                {
-                                    requiredMod.Hashes = [..requiredMod.Hashes.Where(hash => !inscribedHashes.Contains(hash))];
-                                    component.RequirementIdentifier = requiredMod.RequirementIdentifier;
-                                    component.IgnoreIfPackAvailable = requiredMod.IgnoreIfPackAvailable;
-                                    component.IgnoreIfPackUnavailable = requiredMod.IgnoreIfPackUnavailable;
-                                    component.IgnoreIfHashAvailable = requiredMod.IgnoreIfHashAvailable;
-                                    component.IgnoreIfHashUnavailable = requiredMod.IgnoreIfHashUnavailable;
-                                }
-                        }
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent)
                             await DialogService.ShowErrorDialogAsync("Scaffolding points to missing file",
                                 $"""
@@ -726,9 +715,8 @@ partial class ManifestEditor
                                 `{otherModComponent.LocalAbsolutePath}`<br /><br />
                                 <iframe src="https://giphy.com/embed/6uGhT1O4sxpi8" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8">via GIPHY</a></p>
                                 """);
+                        RemoveComponentFromRequiredMods(components[^1], addScaffoldedComponentResult);
                     }
-                    // and if there are any required mods with no hashes remaining, yeah... bye bye
-                    requiredMods.RemoveAll(requiredMod => !requiredMod.Hashes.Any());
                 }
                 else if (selectStepFileAddResult is AddFileResult.SucceededManifested)
                     await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
@@ -952,6 +940,28 @@ partial class ManifestEditor
         confirmationStepMessages = [..messages];
     }
 
+    void RemoveComponentFromRequiredMods(ModComponent component, AddFileResult addFileResult)
+    {
+        if (addFileResult is AddFileResult.SucceededManifested)
+        {
+            var wasRequired = false;
+            var componentHashes = component.SubsumedHashes.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var requiredMod in requiredMods)
+                if (requiredMod.Hashes.Any(componentHashes.Contains))
+                {
+                    wasRequired = true;
+                    requiredMod.Hashes = [.. requiredMod.Hashes.Where(hash => !componentHashes.Contains(hash))];
+                    component.RequirementIdentifier = requiredMod.RequirementIdentifier;
+                    component.IgnoreIfPackAvailable = requiredMod.IgnoreIfPackAvailable;
+                    component.IgnoreIfPackUnavailable = requiredMod.IgnoreIfPackUnavailable;
+                    component.IgnoreIfHashAvailable = requiredMod.IgnoreIfHashAvailable;
+                    component.IgnoreIfHashUnavailable = requiredMod.IgnoreIfHashUnavailable;
+                }
+            component.IsRequired = wasRequired;
+            requiredMods.RemoveAll(requiredMod => !requiredMod.Hashes.Any());
+        }
+    }
+
     async Task ResetAsync()
     {
         compositionStep = 0;
@@ -974,7 +984,14 @@ partial class ManifestEditor
         foreach (var component in components)
         {
             component.PropertyChanged -= HandleComponentPropertyChanged;
-            component.Dispose();
+            try
+            {
+                component.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // 🤷‍♂️
+            }
         }
         components.Clear();
         UpdateComponentsStructure();

@@ -2,6 +2,19 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
+    bool catalogIsVisible;
+
+    async Task CheckCatalogIsVisibleAsync()
+    {
+        var shouldBeVisible = await PbDbContext.ModFileManifestHashes.AnyAsync(mfmh => mfmh.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))).ConfigureAwait(false);
+        if (catalogIsVisible != shouldBeVisible)
+            Dispatcher.Dispatch(() =>
+            {
+                catalogIsVisible = shouldBeVisible;
+                StateHasChanged();
+            });
+    }
+
     /// <inheritdoc />
     public void Dispose()
     {
@@ -18,6 +31,8 @@ partial class Home
                 Dispatcher.Dispatch(StateHasChanged);
             else
                 StateHasChanged();
+            if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+                _ = Task.Run(CheckCatalogIsVisibleAsync);
         }
     }
 
@@ -52,6 +67,7 @@ partial class Home
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
+        _ = Task.Run(CheckCatalogIsVisibleAsync);
     }
 
     protected override async Task OnInitializedAsync()
@@ -66,6 +82,14 @@ partial class Home
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", "url('/img/ModHealthBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-size", "cover");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-dark", "url('/img/SimVaultBackground.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-light", "url('/img/SimVaultBackground.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-repeat", "unset");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-size", "cover");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", "url('/img/CatalogBackgroundDark.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", "url('/img/CatalogBackgroundLight.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", "unset");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", "cover");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", "url('/img/ManifestEditorBackgroundDark.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", "url('/img/ManifestEditorBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-repeat", "unset");
@@ -91,6 +115,40 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-repeat", repeat);
                 if ((modHealth?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-size", size);
+            }
+            if (backgroundedTabs.TryGetValue("catalog", out var catalog))
+            {
+                if ((catalog?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (catalog?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", $"url('/img/custom-themes/{customThemeName}/catalog-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", $"url('/img/custom-themes/{customThemeName}/catalog-light.png')");
+                }
+                if ((catalog?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", repeat);
+                if ((catalog?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", size);
+            }
+            if (backgroundedTabs.TryGetValue("simvault", out var simVault))
+            {
+                if ((simVault?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (simVault?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-dark", $"url('/img/custom-themes/{customThemeName}/catalog-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-light", $"url('/img/custom-themes/{customThemeName}/catalog-light.png')");
+                }
+                if ((simVault?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", repeat);
+                if ((simVault?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", size);
             }
             if (backgroundedTabs.TryGetValue("manifest-editor", out var manifestEditor))
             {
