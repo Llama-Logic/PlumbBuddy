@@ -212,6 +212,7 @@ partial class ManifestEditor
                 """).ConfigureAwait(false);
             return AddFileResult.Unrecognized;
         }
+        var componentName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name;
         var component = new ModComponent
         (
             modFile,
@@ -224,7 +225,7 @@ partial class ManifestEditor
             null,
             null,
             string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.Exclusivities).Distinct()),
-            manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name,
+            componentName == name ? null : componentName,
             string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.SubsumedHashes.Concat([manifest.Hash])).Select(hash => hash.ToHexString()).Distinct(StringComparer.OrdinalIgnoreCase))
         );
         component.PropertyChanged += HandleComponentPropertyChanged;
