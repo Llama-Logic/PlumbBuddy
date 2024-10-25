@@ -76,13 +76,13 @@
                                 @foreach (var requiredPackCode in requiredPackCodes)
                                 {
                                     <MudTooltip Arrow Text="@($"{selectedModKey.Name} requires that {requiredPackCode} is installed. You do{(installedPackCodes.Contains(requiredPackCode) ? string.Empty : " NOT")} have {requiredPackCode} installed. Click here to view the store page for {requiredPackCode}.")" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
-                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Href="@($"https://plumbbuddy.app/redirect?purchase-pack={requiredPackCode}")" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
+                                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Browser.OpenAsync(new Uri($"https://plumbbuddy.app/redirect?purchase-pack={requiredPackCode}", UriKind.Absolute), BrowserLaunchMode.External))" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
                                     </MudTooltip>
                                 }
                                 @foreach (var incompatiblePackCode in incompatiblePackCodes)
                                 {
                                     <MudTooltip Arrow Text="@($"{selectedModKey.Name} requires that {incompatiblePackCode} is NOT installed. You {(installedPackCodes.Contains(incompatiblePackCode) ? "DO" : "do not")} have {incompatiblePackCode} installed. Click here to view information about how to remove or disable packs.")" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
-                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Href="https://jamesturner.yt/disablepacks" Icon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
+                                        <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Browser.OpenAsync(new Uri("https://jamesturner.yt/disablepacks", UriKind.Absolute), BrowserLaunchMode.External))" StartIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
                                     </MudTooltip>
                                 }
                             </MudStack>
