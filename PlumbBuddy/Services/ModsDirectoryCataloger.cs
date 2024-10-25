@@ -155,7 +155,7 @@ public class ModsDirectoryCataloger :
         }
     }
 
-    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, ModFileManifestModel modFileManifestModel)
+    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, AsyncLock saveChangesLock, ModFileManifestModel modFileManifestModel, ResourceKey? key)
     {
         var modManifest = new ModFileManifest
         {
@@ -168,6 +168,7 @@ public class ModsDirectoryCataloger :
             HashResourceKeys = modFileManifestModel.HashResourceKeys.Select(key => new ModFileManifestResourceKey { KeyType = unchecked((int)(uint)key.Type), KeyGroup = unchecked((int)key.Group), KeyFullInstance = unchecked((long)key.FullInstance) }).ToList(),
             InscribedModFileManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [modFileManifestModel.Hash]).FirstAsync().ConfigureAwait(false),
             IncompatiblePacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.IncompatiblePacks).ToListAsync().ConfigureAwait(false),
+            Key = key,
             Name = modFileManifestModel.Name,
             RequiredPacks = await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.RequiredPacks).ToListAsync().ConfigureAwait(false),
             SubsumedHashes = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, modFileManifestModel.SubsumedHashes).ToListAsync().ConfigureAwait(false),
@@ -198,7 +199,6 @@ public class ModsDirectoryCataloger :
                     IgnoreIfPackUnavailable = !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable)
                         ? await TransformPackCodesEnumerableAsync(pbDbContext, saveChangesLock, [requiredMod.IgnoreIfPackUnavailable]).FirstAsync().ConfigureAwait(false)
                         : null,
-                    ManifestKey = requiredMod.ModManifestKey,
                     Name = requiredMod.Name,
                     RequiredFeatures = await TransformFeatureNamesEnumerableAsync(pbDbContext, saveChangesLock, requiredMod.RequiredFeatures).ToListAsync().ConfigureAwait(false),
                     RequirementIdentifier = requiredMod.RequirementIdentifier is { } identifier
@@ -281,6 +281,8 @@ public class ModsDirectoryCataloger :
         this.player = player;
         this.superSnacks = superSnacks;
         awakeManualResetEvent = new(true);
+        busyManualResetEvent = new(true);
+        idleManualResetEvent = new(true);
         pathsProcessingQueue = new();
         saveChangesLock = synchronization.EntityFrameworkCoreDatabaseContextWriteLock;
         Task.Run(UpdateAggregatePropertiesAsync);
@@ -288,7 +290,9 @@ public class ModsDirectoryCataloger :
     }
 
     readonly AsyncManualResetEvent awakeManualResetEvent;
+    readonly AsyncManualResetEvent busyManualResetEvent;
     TimeSpan? estimatedStateTimeRemaining;
+    readonly AsyncManualResetEvent idleManualResetEvent;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
@@ -402,6 +406,8 @@ public class ModsDirectoryCataloger :
         cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
+            idleManualResetEvent.Reset();
+            busyManualResetEvent.Set();
             State = ModsDirectoryCatalogerState.Sleeping;
             await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
             State = ModsDirectoryCatalogerState.Debouncing;
@@ -571,6 +577,8 @@ public class ModsDirectoryCataloger :
             if (resourceWasRemovedOrReplaced && player.CacheStatus is SmartSimCacheStatus.Normal)
                 player.CacheStatus = SmartSimCacheStatus.Stale;
             State = ModsDirectoryCatalogerState.Idle;
+            busyManualResetEvent.Reset();
+            idleManualResetEvent.Set();
         }
     }
 
@@ -580,6 +588,8 @@ public class ModsDirectoryCataloger :
         if (fileType is ModsDirectoryFileType.Ignored)
             return;
         var path = fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..];
+        if (path is SmartSimObserver.GlobalModsManifestPackageName)
+            return;
         try
         {
             using var nestedScope = lifetimeScope.BeginLifetimeScope();
@@ -645,14 +655,24 @@ public class ModsDirectoryCataloger :
                             try
                             {
                                 var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
+                                if (keys.Contains(GlobalModsManifestModel.ResourceKey))
+                                {
+                                    // BAD PLAYER (or frick'n hacker)
+                                    dbpf.Dispose();
+                                    dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: false).ConfigureAwait(false);
+                                    dbpf.Delete(GlobalModsManifestModel.ResourceKey);
+                                    await dbpf.SaveAsync().ConfigureAwait(false);
+                                    // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
+                                    return;
+                                }
                                 modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
                                 foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                                 {
-                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
+                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest, manifestKey).ConfigureAwait(false);
                                     dbManifest.ModFileHash = modFileHash;
                                     dbManifest.Key = manifestKey;
                                     var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
-                                    dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
+                                    dbManifest.CalculatedModFileManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
                                     dbManifests.Add(dbManifest);
                                 }
                             }
@@ -699,10 +719,10 @@ public class ModsDirectoryCataloger :
                                 modFileHash.ScriptModArchiveEntries = scriptModArchiveEntries;
                                 if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
                                 {
-                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest).ConfigureAwait(false);
+                                    var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, saveChangesLock, manifest, null).ConfigureAwait(false);
                                     dbManifest.ModFileHash = modFileHash;
                                     var calculatedHash = ModFileManifestModel.GetModFileHash(zipArchive);
-                                    dbManifest.CalculatedModFileHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
+                                    dbManifest.CalculatedModFileManifestHash = await TransformHashByteArraysEnumerableAsync(pbDbContext, saveChangesLock, [calculatedHash]).FirstAsync().ConfigureAwait(false);
                                     dbManifests.Add(dbManifest);
                                 }
                             }
@@ -827,6 +847,12 @@ public class ModsDirectoryCataloger :
             .CountAsync(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.ScriptArchive)
             .ConfigureAwait(false);
     }
+
+    public Task WaitForBusyAsync(CancellationToken cancellationToken = default) =>
+        busyManualResetEvent.WaitAsync(cancellationToken);
+
+    public Task WaitForIdleAsync(CancellationToken cancellationToken = default) =>
+        idleManualResetEvent.WaitAsync(cancellationToken);
 
     public void WakeUp() =>
         awakeManualResetEvent.Set();

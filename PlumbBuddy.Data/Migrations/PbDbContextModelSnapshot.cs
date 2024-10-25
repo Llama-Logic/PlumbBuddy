@@ -474,15 +474,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<long?>("IgnoreIfPackUnavailableId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("ManifestKeyFullInstance")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ManifestKeyGroup")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ManifestKeyType")
-                        .HasColumnType("INTEGER");
-
                     b.Property<long>("ModManfiestId")
                         .HasColumnType("INTEGER");
 
@@ -742,7 +733,7 @@ namespace PlumbBuddy.Data.Migrations
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifest", b =>
                 {
-                    b.HasOne("PlumbBuddy.Data.ModFileManifestHash", "CalculatedModFileHash")
+                    b.HasOne("PlumbBuddy.Data.ModFileManifestHash", "CalculatedModFileManifestHash")
                         .WithMany("ManifestsByCalculation")
                         .HasForeignKey("CalculatedModFileManifestHashId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -764,7 +755,7 @@ namespace PlumbBuddy.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CalculatedModFileHash");
+                    b.Navigation("CalculatedModFileManifestHash");
 
                     b.Navigation("ElectronicArtsPromoCode");
 

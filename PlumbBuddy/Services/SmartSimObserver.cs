@@ -9,10 +9,15 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^(?<path>.*?)[\\/]?$")]
     private static partial Regex GetTrimmedLocalPathSegmentsPattern();
 
+    [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
+    private static partial Regex GetTs4PackCodePattern();
+
     static readonly Regex modsDirectoryRelativePathPattern = GetModsDirectoryRelativePathPattern();
     static readonly Regex trimmedLocalPathSegmentsPattern = GetTrimmedLocalPathSegmentsPattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
+    public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
+
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, PbDbContext pbDbContext)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -20,13 +25,19 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        ArgumentNullException.ThrowIfNull(pbDbContext);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
+        this.pbDbContext = pbDbContext;
         enqueuedScanningTaskLock = new();
+        enqueuedResamplingPacksTaskLock = new();
+        enqueuedFresheningTaskLock = new();
+        fresheningTaskLock = new();
+        resamplingPacksTaskLock = new();
         scanInstances = [];
         scanInstancesLock = new();
         scanIssues = [];
@@ -42,18 +53,26 @@ public partial class SmartSimObserver :
         Dispose(false);
 
     ImmutableArray<FileSystemInfo> cacheComponents;
+    readonly AsyncLock enqueuedFresheningTaskLock;
+    readonly AsyncLock enqueuedResamplingPacksTaskLock;
     readonly AsyncLock enqueuedScanningTaskLock;
     readonly StringComparison fileSystemStringComparison;
+    readonly AsyncLock fresheningTaskLock;
+    ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
     FileSystemWatcher? installationDirectoryWatcher;
     bool isCurrentlyScanning;
     bool isModsDisabledGameSettingOn;
     bool isScriptModsEnabledGameSettingOn;
     bool isShowModListStartupGameSettingOn;
+    IReadOnlyList<string> installedPackCodes = [];
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
+    FileSystemWatcher? packsDirectoryWatcher;
+    readonly PbDbContext pbDbContext;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
+    readonly AsyncLock resamplingPacksTaskLock;
     IReadOnlyList<ScanIssue> scanIssues;
     readonly Dictionary<Type, IScan> scanInstances;
     readonly AsyncLock scanInstancesLock;
@@ -109,6 +128,31 @@ public partial class SmartSimObserver :
         }
     }
 
+    public IReadOnlyList<string> InstalledPackCodes
+    {
+        get => installedPackCodes;
+        private set
+        {
+            var cleaned = value
+                .Where(code => GetTs4PackCodePattern().IsMatch(code))
+                .Select(code => code.Trim().ToUpperInvariant())
+                .Distinct()
+                .Order();
+            if (installedPackCodes.SequenceEqual(cleaned))
+                return;
+            installedPackCodes = [..cleaned];
+            FreshenGlobalManifest(force: true);
+            OnPropertyChanged();
+        }
+    }
+
+    string PacksDirectoryPath =>
+#if MACCATALYST
+        Path.Combine(new DirectoryInfo(player.InstallationFolderPath).Parent!.FullName, "The Sims 4 Packs");
+#else
+        player.InstallationFolderPath;
+#endif
+
     public IReadOnlyList<ScanIssue> ScanIssues
     {
         get => scanIssues;
@@ -121,14 +165,18 @@ public partial class SmartSimObserver :
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath)
+    bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath, out bool wasGlobalManifestChange)
     {
         if (modsDirectoryRelativePathPattern.IsMatch(userDataDirectoryRelativePath))
         {
             PutCatalogerToBedIfGameIsRunning();
-            modsDirectoryCataloger.Catalog(userDataDirectoryRelativePath[5..]);
-            return true;
+            var modsDirectoryRelativePath = userDataDirectoryRelativePath[5..];
+            wasGlobalManifestChange = modsDirectoryRelativePath is GlobalModsManifestPackageName;
+            if (!wasGlobalManifestChange)
+                modsDirectoryCataloger.Catalog(modsDirectoryRelativePath);
+            return !wasGlobalManifestChange;
         }
+        wasGlobalManifestChange = false;
         return false;
     }
 
@@ -137,7 +185,7 @@ public partial class SmartSimObserver :
         if (userDataDirectoryRelativePath == "Mods")
         {
             PutCatalogerToBedIfGameIsRunning();
-            modsDirectoryCataloger.Catalog("");
+            modsDirectoryCataloger.Catalog(string.Empty);
             return true;
         }
         return false;
@@ -217,6 +265,23 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
             installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
             installationDirectoryWatcher.EnableRaisingEvents = true;
+            packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
+            {
+                IncludeSubdirectories = true,
+                NotifyFilter =
+                      NotifyFilters.CreationTime
+                    | NotifyFilters.DirectoryName
+                    | NotifyFilters.FileName
+                    | NotifyFilters.LastWrite
+                    | NotifyFilters.Size
+            };
+            packsDirectoryWatcher.Changed += PacksDirectoryFileSystemEntryChangedHandler;
+            packsDirectoryWatcher.Created += PacksDirectoryFileSystemEntryCreatedHandler;
+            packsDirectoryWatcher.Deleted += PacksDirectoryFileSystemEntryDeletedHandler;
+            packsDirectoryWatcher.Error += PacksDirectoryWatcherErrorHandler;
+            packsDirectoryWatcher.Renamed += PacksDirectoryFileSystemEntryRenamedHandler;
+            packsDirectoryWatcher.EnableRaisingEvents = true;
+            ResampleInstalledPackCodes();
             UpdateScanInitializationStatus();
         }
     }
@@ -255,6 +320,7 @@ public partial class SmartSimObserver :
             UpdateScanInitializationStatus();
             PutCatalogerToBedIfGameIsRunning();
             modsDirectoryCataloger.Catalog(string.Empty);
+            FreshenGlobalManifest(force: true);
         }
     }
 
@@ -269,6 +335,16 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Renamed -= InstallationDirectoryFileSystemEntryRenamedHandler;
             installationDirectoryWatcher.Dispose();
             installationDirectoryWatcher = null;
+        }
+        if (packsDirectoryWatcher is not null)
+        {
+            packsDirectoryWatcher.Changed -= PacksDirectoryFileSystemEntryChangedHandler;
+            packsDirectoryWatcher.Created -= PacksDirectoryFileSystemEntryCreatedHandler;
+            packsDirectoryWatcher.Deleted -= PacksDirectoryFileSystemEntryDeletedHandler;
+            packsDirectoryWatcher.Error -= PacksDirectoryWatcherErrorHandler;
+            packsDirectoryWatcher.Renamed -= PacksDirectoryFileSystemEntryRenamedHandler;
+            packsDirectoryWatcher.Dispose();
+            packsDirectoryWatcher = null;
         }
     }
 
@@ -308,6 +384,76 @@ public partial class SmartSimObserver :
         }
     }
 
+    void FreshenGlobalManifest(bool force = false) =>
+        _ = Task.Run(() => FreshenGlobalManifestAsync(force));
+
+    async Task FreshenGlobalManifestAsync(bool force = false)
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        cts.Cancel();
+        var enqueuedFresheningTaskLockPotentiallyHeld = await enqueuedFresheningTaskLock.LockAsync(token).ConfigureAwait(false);
+        if (enqueuedFresheningTaskLockPotentiallyHeld is null)
+            return;
+        using var fresheningTaskLockHeld = await fresheningTaskLock.LockAsync().ConfigureAwait(false);
+        enqueuedFresheningTaskLockPotentiallyHeld.Dispose();
+        var modsDirectory = new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "Mods"));
+        if (!modsDirectory.Exists)
+            return;
+        var globalModsManifestPackageFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, GlobalModsManifestPackageName));
+        if (!force
+            && globalModsManifestPackageFileInfo.Exists
+            && globalModsManifestLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false)))
+            return;
+        var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
+        foreach (var modFileHashElements in await pbDbContext.ModFileHashes
+            .AsSplitQuery()
+            .Where(mfh => mfh.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfh.ModFileManifests!.Any())
+            .Select(mfh => new
+            {
+                Paths = mfh.ModFiles!.Where(mf => mf.Path != null && mf.AbsenceNoticed == null).Select(mf => mf.Path!).ToList(),
+                Manifests = mfh.ModFileManifests!.Select(mfm => new
+                {
+                    mfm.Key,
+                    mfm.TuningName,
+                    CalculatedSha256 = mfm.CalculatedModFileManifestHash!.Sha256,
+                    SubsumedSha256 = mfm.SubsumedHashes!.Select(mfmh => mfmh.Sha256).ToList()
+                }).ToList()
+            })
+            .ToListAsync()
+            .ConfigureAwait(false))
+            foreach (var manifest in modFileHashElements.Manifests)
+            {
+                var hashes = manifest.SubsumedSha256
+                    .Append(manifest.CalculatedSha256)
+                    .Select(byteArray => byteArray.ToImmutableArray())
+                    .Select(ia => ia.ToHexString())
+                    .Distinct()
+                    .Select(hex => hex.ToByteSequence().ToImmutableArray())
+                    .ToImmutableArray();
+                manifestedModFiles.AddRange(modFileHashElements.Paths.Select(path =>
+                {
+                    var manifestedModFile = new GlobalModsManifestModelManifestedModFile
+                    {
+                        ModsFolderPath = path,
+                        ManifestKey = manifest.Key,
+                        ManifestTuningName = manifest.TuningName
+                    };
+                    manifestedModFile.Hashes.UnionWith(hashes);
+                    return manifestedModFile;
+                }));
+            }
+        var model = new GlobalModsManifestModel();
+        foreach (var packCode in InstalledPackCodes)
+            model.InstalledPacks.Add(packCode);
+        foreach (var manifestedModFile in manifestedModFiles.OrderBy(mfm => mfm.ModsFolderPath))
+            model.ManifestedModFiles.Add(manifestedModFile);
+        using var globalManifestPackage = new DataBasePackedFile();
+        await globalManifestPackage.SetAsync(GlobalModsManifestModel.ResourceKey, model).ConfigureAwait(false);
+        await globalManifestPackage.SaveAsAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false);
+        globalModsManifestLastSha256 = await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false);
+    }
+
     string GetRelativePathInUserDataFolder(string fullPath)
     {
         var trimmedLocalPathSegmentsMatch = trimmedLocalPathSegmentsPattern.Match(player.UserDataFolderPath);
@@ -327,7 +473,10 @@ public partial class SmartSimObserver :
     {
         if (e.PropertyName == nameof(IModsDirectoryCataloger.State)
             && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+        {
+            FreshenGlobalManifest(force: true);
             Scan();
+        }
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -418,6 +567,24 @@ public partial class SmartSimObserver :
             if (modsDirectory.Exists)
                 platformFunctions.ViewDirectory(modsDirectory);
         }
+    }
+
+    void PacksDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e) =>
+        ResampleInstalledPackCodes();
+
+    void PacksDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e) =>
+        ResampleInstalledPackCodes();
+
+    void PacksDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e) =>
+        ResampleInstalledPackCodes();
+
+    void PacksDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e) =>
+        ResampleInstalledPackCodes();
+
+    void PacksDirectoryWatcherErrorHandler(object sender, ErrorEventArgs e)
+    {
+        DisconnectFromInstallationDirectoryWatcher();
+        ConnectToInstallationDirectory();
     }
 
     void PutCatalogerToBedIfGameIsRunning()
@@ -516,6 +683,27 @@ public partial class SmartSimObserver :
         return false;
     }
 
+    void ResampleInstalledPackCodes() =>
+        _ = Task.Run(ResampleInstalledPackCodesAsync);
+
+    async Task ResampleInstalledPackCodesAsync()
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        cts.Cancel();
+        var enqueuedResamplingPacksTaskLockPotentiallyHeld = await enqueuedResamplingPacksTaskLock.LockAsync(token).ConfigureAwait(false);
+        if (enqueuedResamplingPacksTaskLockPotentiallyHeld is null)
+            return;
+        using var resamplingPacksTaskLockHeld = await resamplingPacksTaskLock.LockAsync().ConfigureAwait(false);
+        enqueuedResamplingPacksTaskLockPotentiallyHeld.Dispose();
+        if (installedPackCodes.Count is > 0)
+            await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+        var packsDirectory = new DirectoryInfo(PacksDirectoryPath);
+        if (!packsDirectory.Exists)
+            return;
+        InstalledPackCodes = [.. packsDirectory.GetDirectories().Select(directoryInfo => directoryInfo.Name)];
+    }
+
     void Scan() =>
         Task.Run(ScanAsync);
 
@@ -612,8 +800,10 @@ public partial class SmartSimObserver :
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
-        if (CatalogIfInModsDirectory(relativePath))
+        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
             return;
+        if (globalManifestWasOverwritten)
+            FreshenGlobalManifest();
     }
 
     void UserDataDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
@@ -627,9 +817,14 @@ public partial class SmartSimObserver :
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
         if (CatalogIfModsDirectory(relativePath))
+        {
+            FreshenGlobalManifest();
             return;
-        if (CatalogIfInModsDirectory(relativePath))
+        }
+        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
             return;
+        if (globalManifestWasOverwritten)
+            FreshenGlobalManifest();
     }
 
     void UserDataDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e)
@@ -644,9 +839,14 @@ public partial class SmartSimObserver :
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
         if (CatalogIfModsDirectory(relativePath))
+        {
+            FreshenGlobalManifest();
             return;
-        if (CatalogIfInModsDirectory(relativePath))
+        }
+        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasDeleted))
             return;
+        if (globalManifestWasDeleted)
+            FreshenGlobalManifest();
     }
 
     void UserDataDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e)
@@ -656,9 +856,14 @@ public partial class SmartSimObserver :
         if (ResampleGameOptionsIfTheyChanged(oldRelativePath) | ResampleGameOptionsIfTheyChanged(relativePath))
             return;
         if (CatalogIfModsDirectory(oldRelativePath) | CatalogIfModsDirectory(relativePath))
+        {
+            FreshenGlobalManifest();
             return;
-        if (CatalogIfInModsDirectory(oldRelativePath) | CatalogIfInModsDirectory(relativePath))
+        }
+        if (CatalogIfInModsDirectory(oldRelativePath, out var globalManifestWasRenamed) | CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
             return;
+        if (globalManifestWasRenamed || globalManifestWasOverwritten)
+            FreshenGlobalManifest();
     }
 
     void UserDataDirectoryWatcherErrorHandler(object sender, ErrorEventArgs e)

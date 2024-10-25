@@ -8,6 +8,7 @@ global using IniParser.Exceptions;
 global using IniParser.Parser;
 global using LlamaLogic.Packages;
 global using LlamaLogic.Packages.Cryptography;
+global using LlamaLogic.Packages.Models.GlobalManifest;
 global using LlamaLogic.Packages.Models.ModFileManifest;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Rendering;

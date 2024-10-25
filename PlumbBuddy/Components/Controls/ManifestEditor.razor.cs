@@ -309,7 +309,8 @@ partial class ManifestEditor
                     foreach (var manifestResourceKey in (await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false)).Keys)
                         dbpf.Delete(manifestResourceKey); // 😱
                 else if (component.FileObjectModel is ZipArchive zipArchive)
-                    zipArchive.Entries.FirstOrDefault(entry => entry.FullName.Equals("manifest.yml", StringComparison.OrdinalIgnoreCase))?.Delete(); // 😱
+                    while (zipArchive.Entries.FirstOrDefault(entry => entry.FullName.Equals("llamalogic.modfilemanifest.yml", StringComparison.OrdinalIgnoreCase)) is { } entry)
+                        entry.Delete(); // 😱
                 else
                     throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
             }
@@ -462,7 +463,7 @@ partial class ManifestEditor
                     }
                     else if (component.FileObjectModel is ZipArchive zipArchive)
                     {
-                        var manifestEntry = zipArchive.CreateEntry("manifest.yml");
+                        var manifestEntry = zipArchive.CreateEntry("llamalogic.modfilemanifest.yml");
                         using var manifestEntryStream = manifestEntry.Open();
                         using var manifestEntryStreamWriter = new StreamWriter(manifestEntryStream);
                         await manifestEntryStreamWriter.WriteLineAsync(manifest.ToString()).ConfigureAwait(false);

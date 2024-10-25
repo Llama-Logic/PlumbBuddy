@@ -23,8 +23,12 @@ partial class CatalogDisplay
         }
     }
 
-    public void Dispose() =>
+    public void Dispose()
+    {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
+    }
 
     IReadOnlyList<BreadcrumbItem> GetModFileBreadcrumbs(FileInfo modFile)
     {
@@ -46,6 +50,17 @@ partial class CatalogDisplay
     {
         if (e.PropertyName is nameof(IPlayer.UserDataFolderPath))
             modsFolderPath = Path.Combine(Player.UserDataFolderPath);
+    }
+
+    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISmartSimObserver.InstalledPackCodes))
+        {
+            if (Dispatcher.IsDispatchRequired)
+                Dispatcher.Dispatch(StateHasChanged);
+            else
+                StateHasChanged();
+        }
     }
 
     bool IncludeDependency(ModKey key)
@@ -96,6 +111,10 @@ partial class CatalogDisplay
             return true;
         foreach (var (manifest, files, dependencies, dependents) in value)
         {
+            if (manifest.RequiredPacks.Any(rp => rp.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase)))
+                return true;
+            if (manifest.IncompatiblePacks.Any(ip => ip.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase)))
+                return true;
             if (files.Any(file => file.FullName[modsFolderPath.Length..].Contains(modsSearchText, StringComparison.OrdinalIgnoreCase)))
                 return true;
             if (dependencies.Any(dependency => dependency.Name.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase) || (dependency.Creators?.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase) ?? false) || (dependency.Url?.ToString().Contains(modsSearchText, StringComparison.OrdinalIgnoreCase) ?? false)))
@@ -111,6 +130,7 @@ partial class CatalogDisplay
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
+        SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
         modsFolderPath = Path.Combine(Player.UserDataFolderPath, "Mods");
         _ = Task.Run(QueryManifestsAsync);
     }
@@ -131,7 +151,7 @@ partial class CatalogDisplay
             .Include(mfm => mfm.Features)
             .Include(mfm => mfm.HashResourceKeys)
             .Include(mfm => mfm.IncompatiblePacks)
-            .Include(mfm => mfm.CalculatedModFileHash!)
+            .Include(mfm => mfm.CalculatedModFileManifestHash!)
                 .ThenInclude(mfmh => mfmh.Dependents!)
             .Include(mfm => mfm.RequiredMods!)
                 .ThenInclude(rm => rm.Creators)
@@ -158,7 +178,7 @@ partial class CatalogDisplay
                 activeManifest.ToModel(),
                 activeManifest.ModFileHash!.ModFiles!.Where(mf => mf.Path is not null).Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new ModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList(),
-                (activeManifest.CalculatedModFileHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new ModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList()
+                (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new ModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList()
             ));
         }
         var readOnlyMods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<ModKey> dependencies, IReadOnlyList<ModKey> dependents)>)kv.Value.Select(manifestAndFiles => (manifestAndFiles.Manifest, (IReadOnlyList<FileInfo>)[.. manifestAndFiles.Files], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependencies], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependents])).ToImmutableArray());

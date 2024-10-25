@@ -11,7 +11,7 @@ public class ModFileManifestHash
     [SuppressMessage("Performance", "CA1819: Properties should not return arrays")]
     public required byte[] Sha256 { get; set; }
 
-    [InverseProperty(nameof(ModFileManifest.CalculatedModFileHash))]
+    [InverseProperty(nameof(ModFileManifest.CalculatedModFileManifestHash))]
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileManifest>? ManifestsByCalculation { get; set; }
 

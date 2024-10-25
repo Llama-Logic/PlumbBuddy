@@ -21,5 +21,9 @@ public interface IModsDirectoryCataloger :
 
     void GoToSleep();
 
+    Task WaitForBusyAsync(CancellationToken cancellationToken = default);
+
+    Task WaitForIdleAsync(CancellationToken cancellationToken = default);
+
     void WakeUp();
 }

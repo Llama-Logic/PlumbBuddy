@@ -11,20 +11,14 @@ amethyst-lilac:
     mod-health:
       dark: mod-health.png
       light: mod-health.png
+    catalog:
+      dark: catalog.png
+      light: catalog.png
     manifest-editor:
       dark: manifest-editor.png
       light: manifest-editor.png
       repeat: no-repeat
       size: contain
-
-meg:
-  display_name: Meg
-  description: |
-    Behold [beauty](https://www.apple.com/mac/).
-  backgrounded_tabs:
-    mod-health:
-      dark: mod-health.png
-      light: mod-health.png
 
 sim-realist:
   display_name: Sim Realist

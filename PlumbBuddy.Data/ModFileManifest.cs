@@ -31,7 +31,7 @@ public class ModFileManifest
     public long CalculatedModFileManifestHashId { get; set; }
 
     [ForeignKey(nameof(CalculatedModFileManifestHashId))]
-    public ModFileManifestHash? CalculatedModFileHash { get; set; }
+    public ModFileManifestHash? CalculatedModFileManifestHash { get; set; }
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileManifestHash>? SubsumedHashes { get; set; }
@@ -146,12 +146,6 @@ public class ModFileManifest
                 IgnoreIfHashUnavailable = (entity.IgnoreIfHashUnavailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
                 IgnoreIfPackAvailable = entity.IgnoreIfPackAvailable?.Code,
                 IgnoreIfPackUnavailable = entity.IgnoreIfPackUnavailable?.Code,
-                ModManifestKey =
-                    entity.ManifestKeyType is { } type
-                    && entity.ManifestKeyGroup is { } group
-                    && entity.ManifestKeyFullInstance is { } fullInstance
-                    ? new ResourceKey(unchecked((ResourceType)(uint)type), unchecked((uint)group), unchecked((ulong)fullInstance))
-                    : (ResourceKey?)null,
                 Name = entity.Name,
                 RequirementIdentifier = entity.RequirementIdentifier?.Identifier,
                 Url = entity.Url,

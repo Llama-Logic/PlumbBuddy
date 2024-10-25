@@ -3,6 +3,7 @@
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlatformFunctions PlatformFunctions
 @inject IPlayer Player;
+@inject ISmartSimObserver SmartSimObserver
 @inject PbDbContext PbDbContext
 
 <MudGrid Justify="Justify.Center" Class="align-center">
@@ -32,6 +33,9 @@
                 @if (selectedModKey is not null && (mods?.TryGetValue(selectedModKey, out var selectedMod) ?? false))
                 {
                     var version = selectedMod.Select(t => t.manifest.Version).Where(v => !string.IsNullOrWhiteSpace(v)).Cast<string>().GroupBy(v => v).OrderByDescending(g => g.Key)?.FirstOrDefault()?.Key;
+                    var requiredPackCodes = selectedMod.SelectMany(t => t.manifest.RequiredPacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
+                    var incompatiblePackCodes = selectedMod.SelectMany(t => t.manifest.IncompatiblePacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
+                    var installedPackCodes = SmartSimObserver.InstalledPackCodes.ToImmutableHashSet();
                     var creators = selectedMod.SelectMany(t => t.manifest.Creators).Distinct().ToImmutableArray();
                     var files = selectedMod.SelectMany(t => t.files).DistinctBy(fi => fi.FullName).OrderBy(fi => fi.FullName).ToImmutableArray();
                     var dependencies = selectedMod.SelectMany(t => t.dependencies).Distinct().OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
@@ -60,6 +64,26 @@
                                 @foreach (var creator in creators)
                                 {
                                     <MudChip T="string" Text="@creator" Icon="@MaterialDesignIcons.Normal.Account" Color="Color.Primary" />
+                                }
+                            </MudStack>
+                        </MudItem>
+                        <MudFlexBreak />
+                    }
+                    @if (requiredPackCodes.Length is > 0 || incompatiblePackCodes.Length is > 0)
+                    {
+                        <MudItem>
+                            <MudStack Row>
+                                @foreach (var requiredPackCode in requiredPackCodes)
+                                {
+                                    <MudTooltip Arrow Text="@($"{selectedModKey.Name} requires that {requiredPackCode} is installed. You do{(installedPackCodes.Contains(requiredPackCode) ? string.Empty : " NOT")} have {requiredPackCode} installed. Click here to view the store page for {requiredPackCode}.")" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
+                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Href="@($"https://plumbbuddy.app/redirect?purchase-pack={requiredPackCode}")" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
+                                    </MudTooltip>
+                                }
+                                @foreach (var incompatiblePackCode in incompatiblePackCodes)
+                                {
+                                    <MudTooltip Arrow Text="@($"{selectedModKey.Name} requires that {incompatiblePackCode} is NOT installed. You {(installedPackCodes.Contains(incompatiblePackCode) ? "DO" : "do not")} have {incompatiblePackCode} installed. Click here to view information about how to remove or disable packs.")" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
+                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Href="https://jamesturner.yt/disablepacks" Icon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
+                                    </MudTooltip>
                                 }
                             </MudStack>
                         </MudItem>
