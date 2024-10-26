@@ -43,7 +43,7 @@ public abstract class SettingScan :
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
 
-    public override async Task ResolveIssueAsync(object issueData, object resolutionData)
+    public override async Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData)
     {
         if (issueData is string issueDataStr && issueDataStr == undesirableScanIssueData && resolutionData is string resolutionDataStr)
         {

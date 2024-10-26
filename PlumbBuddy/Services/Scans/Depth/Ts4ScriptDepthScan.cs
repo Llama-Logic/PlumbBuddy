@@ -23,7 +23,7 @@ public sealed class Ts4ScriptDepthScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.FolderArrowUpDown,
-            Caption = $"Found Too Deep: {file.Name}",
+            Caption = $"A Mod File Too Deep: {file.Name}",
             Description =
                 $"""
                 I found this script archive too deep in your Mods folder, specifically at this path:

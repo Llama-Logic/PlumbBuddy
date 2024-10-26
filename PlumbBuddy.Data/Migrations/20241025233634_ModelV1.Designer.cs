@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20241025014724_ModelV1")]
+    [Migration("20241025233634_ModelV1")]
     partial class ModelV1
     {
         /// <inheritdoc />
@@ -108,6 +108,21 @@ namespace PlumbBuddy.Data.Migrations
                     b.HasIndex("HashesId");
 
                     b.ToTable("ModFileManifestHashRequiredMod");
+                });
+
+            modelBuilder.Entity("ModFileManifestModFileManifestHash", b =>
+                {
+                    b.Property<long>("ManifestsBySubsumptionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("SubsumedHashesId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ManifestsBySubsumptionId", "SubsumedHashesId");
+
+                    b.HasIndex("SubsumedHashesId");
+
+                    b.ToTable("ModFileManifestModFileManifestHash");
                 });
 
             modelBuilder.Entity("ModFileManifestPackCode", b =>
@@ -372,9 +387,6 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("ModFileManifestId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<byte[]>("Sha256")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -382,8 +394,6 @@ namespace PlumbBuddy.Data.Migrations
                         .IsFixedLength();
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ModFileManifestId");
 
                     b.HasIndex("Sha256")
                         .IsUnique();
@@ -477,7 +487,7 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<long?>("IgnoreIfPackUnavailableId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("ModManfiestId")
+                    b.Property<long>("ModFileManfiestId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -503,7 +513,7 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasIndex("IgnoreIfPackUnavailableId");
 
-                    b.HasIndex("ModManfiestId");
+                    b.HasIndex("ModFileManfiestId");
 
                     b.HasIndex("RequirementIdentifierId");
 
@@ -678,6 +688,21 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ModFileManifestModFileManifestHash", b =>
+                {
+                    b.HasOne("PlumbBuddy.Data.ModFileManifest", null)
+                        .WithMany()
+                        .HasForeignKey("ManifestsBySubsumptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PlumbBuddy.Data.ModFileManifestHash", null)
+                        .WithMany()
+                        .HasForeignKey("SubsumedHashesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ModFileManifestPackCode", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.PackCode", null)
@@ -767,13 +792,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("ModFileHash");
                 });
 
-            modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestHash", b =>
-                {
-                    b.HasOne("PlumbBuddy.Data.ModFileManifest", null)
-                        .WithMany("SubsumedHashes")
-                        .HasForeignKey("ModFileManifestId");
-                });
-
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestResourceKey", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.ModFileManifest", "ModFileManifest")
@@ -816,7 +834,7 @@ namespace PlumbBuddy.Data.Migrations
 
                     b.HasOne("PlumbBuddy.Data.ModFileManifest", "ModFileManifest")
                         .WithMany("RequiredMods")
-                        .HasForeignKey("ModManfiestId")
+                        .HasForeignKey("ModFileManfiestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -869,8 +887,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("HashResourceKeys");
 
                     b.Navigation("RequiredMods");
-
-                    b.Navigation("SubsumedHashes");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestHash", b =>

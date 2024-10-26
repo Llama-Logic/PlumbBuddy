@@ -386,7 +386,6 @@ partial class ManifestEditor
                 addCollectionElements(model.IncompatiblePacks, incompatiblePacks);
                 addTransformedCollectionElements(model.RequiredMods, requiredMods, requiredMod =>
                 {
-                    // TODO: manfiest key
                     var model = new ModFileManifestModelRequiredMod
                     {
                         IgnoreIfHashAvailable = (requiredMod.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
@@ -401,7 +400,7 @@ partial class ManifestEditor
                     addCollectionElements(model.Creators, requiredMod.Creators);
                     foreach (var hash in requiredMod.Hashes)
                         if (hash.TryToByteSequence(out var sequence))
-                            model.Hashes.Add([.. sequence]);
+                            model.Hashes.Add([..sequence]);
                     addCollectionElements(model.RequiredFeatures, requiredMod.RequiredFeatures);
                     return model;
                 });
@@ -514,6 +513,7 @@ partial class ManifestEditor
     {
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
+        GC.SuppressFinalize(this);
     }
 
     async Task HandleAddFilesClickedAsync()
@@ -564,7 +564,7 @@ partial class ManifestEditor
         }
     }
 
-    Task HandleCancelOnClickAsync() =>
+    Task<bool> HandleCancelOnClickAsync() =>
         CancelAtUserRequestAsync();
 
     void HandleComponentPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -595,7 +595,7 @@ partial class ManifestEditor
                     componentToApplySettings.IgnoreIfHashUnavailable = displayedComponent.IgnoreIfHashUnavailable;
                     componentToApplySettings.IgnoreIfPackAvailable = displayedComponent.IgnoreIfPackAvailable;
                     componentToApplySettings.IgnoreIfPackUnavailable = displayedComponent.IgnoreIfPackUnavailable;
-                    componentToApplySettings.Exclusivities = displayedComponent.Exclusivities;
+                    componentToApplySettings.Exclusivities = [..displayedComponent.Exclusivities];
                 }
             }
             finally
@@ -724,9 +724,9 @@ partial class ManifestEditor
                     await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
                         $"""
                         There are only a few reasons this might happen. In any case, you are seen.
-                        1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame).
-                        2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you.
-                        3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***.<br /><br />
+                        1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
+                        2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
+                        3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
                         <iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm">via GIPHY</a></p>
                         """);
                 UpdateComponentsStructure();
@@ -938,6 +938,16 @@ partial class ManifestEditor
                 *Your **{requiredMod.Name}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a player, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.
                 """
             )));
+        if (requiredPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
+            messages.Add
+            ((
+                Severity.Normal,
+                (string?)MaterialDesignIcons.Normal.AccountCash,
+                $"""
+                Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
+                If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).
+                """
+            ));
 
         confirmationStepMessages = [..messages];
     }

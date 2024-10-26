@@ -23,7 +23,7 @@ public sealed class PackageDepthScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.FolderArrowUpDown,
-            Caption = $"Found Too Deep: {file.Name}",
+            Caption = $"A Mod File is Too Deep: {file.Name}",
             Description =
                 $"""
                 I found this package file too deep in your Mods folder, specifically at this path:

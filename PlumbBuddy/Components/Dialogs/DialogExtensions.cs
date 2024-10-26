@@ -58,6 +58,24 @@ static class DialogExtensions
             NoHeader = false
         })).Result;
 
+    public static Task<bool?> ShowQuestionDialogAsync(this IDialogService dialogService, string caption, string text) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<QuestionDialog>(caption, new DialogParameters<QuestionDialog>()
+            {
+                { x => x.Caption, caption },
+                { x => x.Text, text }
+            }, new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small
+            });
+            if (await dialog.Result is { } dialogResult
+                && !dialogResult.Canceled
+                && dialogResult.Data is bool bData)
+                return (bool?)bData;
+            return null;
+        });
+
     public static Task<IReadOnlyList<string>?> ShowSelectFeaturesDialogAsync(this IDialogService dialogService, ModFileManifestModel manifest) =>
         StaticDispatcher.DispatchAsync(async () =>
         {

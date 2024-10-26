@@ -15,7 +15,7 @@ public abstract class Scan :
     public virtual IAsyncEnumerable<ScanIssue> ScanAsync() =>
         AsyncEnumerable.Empty<ScanIssue>();
 
-    public virtual Task ResolveIssueAsync(object issueData, object resolutionData) =>
+    public virtual Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData) =>
         Task.CompletedTask;
 
     protected virtual void Dispose(bool disposing)

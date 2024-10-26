@@ -5,9 +5,9 @@ public class RequiredMod
     [Key]
     public long Id { get; set; }
 
-    public long ModManfiestId { get; set; }
+    public long ModFileManfiestId { get; set; }
 
-    [ForeignKey(nameof(ModManfiestId))]
+    [ForeignKey(nameof(ModFileManfiestId))]
     public ModFileManifest? ModFileManifest { get; set; }
 
     [Required]

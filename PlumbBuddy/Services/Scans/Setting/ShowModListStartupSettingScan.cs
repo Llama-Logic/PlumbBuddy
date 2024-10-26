@@ -23,7 +23,7 @@ public class ShowModListStartupSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.SpeedometerSlow,
-            Caption = "Show Mod List Enabled in Options",
+            Caption = "Show Mod List is Enabled in Options",
             Description = "You have mod packages installed and the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is checked. This can make your game load very slowly, especially on older computers or those with hard disk drives.",
             Origin = this,
             Type = ScanIssueType.Uncomfortable,

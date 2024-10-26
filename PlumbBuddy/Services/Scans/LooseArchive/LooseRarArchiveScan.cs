@@ -23,7 +23,7 @@ public sealed class LooseRarArchiveScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.ZipBox,
-            Caption = $"Found RAR File: {file.Name}",
+            Caption = $"I Found a RAR File: {file.Name}",
             Description =
                 $"""
                 I found this RAR file in your Mods folder, specifically at this path:

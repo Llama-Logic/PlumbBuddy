@@ -3,7 +3,7 @@ namespace PlumbBuddy.Services;
 /// <summary>
 /// Represents the a platform's implementation of interoperation with Valve's Steam client, which way have The Sims 4 installed among its libraries
 /// </summary>
-interface ISteam
+public interface ISteam
 {
     /// <summary>
     /// Gets whether Steam is installed on this computer

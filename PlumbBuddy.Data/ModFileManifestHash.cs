@@ -19,6 +19,10 @@ public class ModFileManifestHash
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileManifest>? ManifestsByInscription { get; set; }
 
+    [InverseProperty(nameof(ModFileManifest.SubsumedHashes))]
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFileManifest>? ManifestsBySubsumption { get; set; }
+
     [InverseProperty(nameof(RequiredMod.Hashes))]
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<RequiredMod>? Dependents { get; set; }

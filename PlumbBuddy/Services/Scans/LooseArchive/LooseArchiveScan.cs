@@ -27,7 +27,7 @@ public abstract class LooseArchiveScan :
 
     protected abstract ScanIssue GenerateUncomfortableScanIssue(FileInfo file, FileOfInterest fileOfInterest);
 
-    public override Task ResolveIssueAsync(object issueData, object resolutionData)
+    public override Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData)
     {
         if (issueData is string looseArchiveRelativePath && resolutionData is string resolutionCmd)
         {

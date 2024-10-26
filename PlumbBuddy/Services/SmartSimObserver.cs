@@ -17,13 +17,14 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, PbDbContext pbDbContext)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, PbDbContext pbDbContext)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(pbDbContext);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
@@ -31,6 +32,7 @@ public partial class SmartSimObserver :
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
+        this.steam = steam;
         this.superSnacks = superSnacks;
         this.pbDbContext = pbDbContext;
         enqueuedScanningTaskLock = new();
@@ -60,11 +62,13 @@ public partial class SmartSimObserver :
     readonly AsyncLock fresheningTaskLock;
     ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
     FileSystemWatcher? installationDirectoryWatcher;
+    IReadOnlyList<string> installedPackCodes = [];
     bool isCurrentlyScanning;
     bool isModsDisabledGameSettingOn;
-    bool isScriptModsEnabledGameSettingOn;
+    bool isScriptModsEnabledGameSettingOn = true;
     bool isShowModListStartupGameSettingOn;
-    IReadOnlyList<string> installedPackCodes = [];
+    bool isSteamInstallation;
+    string lastModHealthStatusSummary = string.Empty;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
@@ -77,8 +81,27 @@ public partial class SmartSimObserver :
     readonly Dictionary<Type, IScan> scanInstances;
     readonly AsyncLock scanInstancesLock;
     readonly AsyncLock scanningTaskLock;
+    readonly ISteam steam;
     readonly ISuperSnacks superSnacks;
     FileSystemWatcher? userDataDirectoryWatcher;
+
+    public IReadOnlyList<string> InstalledPackCodes
+    {
+        get => installedPackCodes;
+        private set
+        {
+            var cleaned = value
+                .Where(code => GetTs4PackCodePattern().IsMatch(code))
+                .Select(code => code.Trim().ToUpperInvariant())
+                .Distinct()
+                .Order();
+            if (installedPackCodes.SequenceEqual(cleaned))
+                return;
+            installedPackCodes = [..cleaned];
+            FreshenGlobalManifest(force: true);
+            OnPropertyChanged();
+        }
+    }
 
     public bool IsCurrentlyScanning
     {
@@ -128,20 +151,14 @@ public partial class SmartSimObserver :
         }
     }
 
-    public IReadOnlyList<string> InstalledPackCodes
+    public bool IsSteamInstallation
     {
-        get => installedPackCodes;
+        get => isSteamInstallation;
         private set
         {
-            var cleaned = value
-                .Where(code => GetTs4PackCodePattern().IsMatch(code))
-                .Select(code => code.Trim().ToUpperInvariant())
-                .Distinct()
-                .Order();
-            if (installedPackCodes.SequenceEqual(cleaned))
+            if (isSteamInstallation == value)
                 return;
-            installedPackCodes = [..cleaned];
-            FreshenGlobalManifest(force: true);
+            isSteamInstallation = value;
             OnPropertyChanged();
         }
     }
@@ -189,6 +206,16 @@ public partial class SmartSimObserver :
             return true;
         }
         return false;
+    }
+
+    void CheckIfSteam() =>
+        _ = Task.Run(CheckIfSteamAsync);
+
+    async Task CheckIfSteamAsync()
+    {
+        IsSteamInstallation =
+            await steam.GetTS4InstallationDirectoryAsync() is { } steamInstallationDirectory
+            && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(player.InstallationFolderPath);
     }
 
     public void ClearCache()
@@ -265,6 +292,7 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
             installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
             installationDirectoryWatcher.EnableRaisingEvents = true;
+            CheckIfSteam();
             packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
             {
                 IncludeSubdirectories = true,
@@ -504,6 +532,33 @@ public partial class SmartSimObserver :
             UpdateScanInitializationStatus();
     }
 
+    public async Task HelpWithPackPurchaseAsync(string packCode, IDialogService dialogService, IReadOnlyList<string>? creators, string? electronicArtsPromoCode)
+    {
+        if (!IsSteamInstallation && creators?.Count is > 0 && electronicArtsPromoCode is not null)
+        {
+            if (await dialogService.ShowQuestionDialogAsync("An Opportunity Has Presented Itself...",
+                    $"""
+                    Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {creators.Humanize()} {(creators.Count is 1 ? "has" : "have")} a Promo Code for this program:
+                    `{electronicArtsPromoCode}`<br />
+                    Since you're interested in **{packCode}** because of how it works with this mod, would you like to support {creators.Humanize()} by entering this Promo Code at check-out?<br />
+                    Doing so **will not cost you any more**, but it will cause {creators.Humanize()} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!
+                    """) is not { } copyToClipboardPreference)
+                return;
+            if (copyToClipboardPreference)
+            {
+                await Clipboard.SetTextAsync(electronicArtsPromoCode);
+                await dialogService.ShowSuccessDialogAsync("Thanks for Supporting Creators! 🥰",
+                    $"""
+                    I've just copied this Promo Code to your computer's clipboard:
+                    `{electronicArtsPromoCode}`<br />                    
+                    You can now just paste it right in to the Promo Code field during check-out and help support {creators.Humanize()}!<br /><br />
+                    <iframe src="https://giphy.com/embed/rlQgaKAzFj21hivpE8" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/blkbok-rlQgaKAzFj21hivpE8">via GIPHY</a></p>
+                    """);
+            }
+        }
+        await Browser.OpenAsync($"https://plumbbuddy.app/redirect?purchase-pack={packCode}{(IsSteamInstallation ? "&from=steam" : string.Empty)}", BrowserLaunchMode.External);
+    }
+
     void InstallationDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e)
     {
         // TODO: Phase 2 PreJector
@@ -736,8 +791,21 @@ public partial class SmartSimObserver :
                 }
             })).ConfigureAwait(false);
         }
-        ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
-        await platformFunctions.SetBadgeNumberAsync(scanIssues.Count(si => si.Type is not ScanIssueType.Healthy)).ConfigureAwait(false);
+        ScanIssues = [.. scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+        var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
+        if (attentionWorthyScanIssues.Length is > 0)
+        {
+            var distinctAttentionWorthyScanIssueCaptions = attentionWorthyScanIssues.Select(si => si.Caption).Distinct().ToImmutableArray();
+            var modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
+            if (modHealthStatusSummary != lastModHealthStatusSummary)
+            {
+                await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
+                lastModHealthStatusSummary = modHealthStatusSummary;
+            }
+        }
+        else
+            lastModHealthStatusSummary = string.Empty;
+        await platformFunctions.SetBadgeNumberAsync(attentionWorthyScanIssues.Length).ConfigureAwait(false);
         IsCurrentlyScanning = false;
     }
 

@@ -1,0 +1,16 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.ProgressQuestion" Color="Color.Primary" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Primary">@Caption</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudMarkdown Value="@Text" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        <MudButton OnClick="NoOnClickHandler">No</MudButton>
+        <MudButton OnClick="YesOnClickHandler" Color="Color.Primary">Yes</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -45,6 +45,6 @@ partial class ScanIssuesDisplay
             && resolution.CautionText is { } text
             && !await DialogService.ShowCautionDialogAsync(caption, text))
             return;
-        await issue.Origin.ResolveIssueAsync(issueData, resolution.Data);
+        await issue.Origin.ResolveIssueAsync(LifetimeScope, issueData, resolution.Data);
     }
 }

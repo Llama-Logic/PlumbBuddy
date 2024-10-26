@@ -23,7 +23,7 @@ public sealed class LooseZipArchiveScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.FolderZip,
-            Caption = $"Found ZIP File: {file.Name}",
+            Caption = $"I Found a ZIP File: {file.Name}",
             Description =
                 $"""
                 I found this ZIP file in your Mods folder, specifically at this path:
