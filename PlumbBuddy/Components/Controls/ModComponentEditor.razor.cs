@@ -2,8 +2,10 @@ namespace PlumbBuddy.Components.Controls;
 
 partial class ModComponentEditor
 {
+    ChipSetField? exclusivitiesField;
     ModComponent? lastModComponent;
     bool requirementIdentifierGuidanceOpen;
+    ChipSetField? subsumedHashesField;
 
     [Parameter]
     public IReadOnlyList<string> Exclusivities { get; set; } = [];
@@ -66,6 +68,17 @@ partial class ModComponentEditor
     public void CloseGuidance() =>
         requirementIdentifierGuidanceOpen = false;
 
+    public async Task CommitPendingEntriesIfEmptyAsync()
+    {
+        if (ModComponent is not null)
+        {
+            if (exclusivitiesField is not null)
+                await exclusivitiesField.CommitPendingEntryIfEmptyAsync();
+            if (subsumedHashesField is not null)
+                await subsumedHashesField.CommitPendingEntryIfEmptyAsync();
+        }
+    }
+
     public void Dispose()
     {
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
@@ -82,7 +95,7 @@ partial class ModComponentEditor
             return;
         var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
-            SubsumedHashes = SubsumedHashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly();
+            HandleSubsumedHashesChanged(SubsumedHashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
     }
 
     async Task HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync()
@@ -158,23 +171,13 @@ partial class ModComponentEditor
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleRequirementIdentifierChanged(string? newValue)
@@ -202,6 +205,7 @@ partial class ModComponentEditor
     {
         if (ModComponent == lastModComponent)
             return;
+        await CommitPendingEntriesIfEmptyAsync();
         lastModComponent = ModComponent;
         await SetParametersAsync(ParameterView.FromDictionary(new Dictionary<string, object?>
         {

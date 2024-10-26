@@ -16,6 +16,9 @@ public class ModRequirement(string? name, string hashes, string requiredFeatures
     string? url = url;
     string? version = version;
 
+    public ChipSetField? HashesField;
+    public ChipSetField? RequiredFeaturesField;
+
     public IReadOnlyList<string> Creators
     {
         get => creators.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -144,6 +147,14 @@ public class ModRequirement(string? name, string hashes, string requiredFeatures
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public async Task CommitPendingEntriesIfEmptyAsync()
+    {
+        if (HashesField is not null)
+            await HashesField.CommitPendingEntryIfEmptyAsync();
+        if (RequiredFeaturesField is not null)
+            await RequiredFeaturesField.CommitPendingEntryIfEmptyAsync();
+    }
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

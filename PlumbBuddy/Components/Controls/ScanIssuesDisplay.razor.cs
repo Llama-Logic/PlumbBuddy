@@ -11,23 +11,13 @@ partial class ScanIssuesDisplay
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISmartSimObserver.ScanIssues))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     protected override void OnInitialized()
@@ -45,6 +35,6 @@ partial class ScanIssuesDisplay
             && resolution.CautionText is { } text
             && !await DialogService.ShowCautionDialogAsync(caption, text))
             return;
-        await issue.Origin.ResolveIssueAsync(LifetimeScope, issueData, resolution.Data);
+        await issue.Origin.ResolveIssueAsync(issueData, resolution.Data);
     }
 }

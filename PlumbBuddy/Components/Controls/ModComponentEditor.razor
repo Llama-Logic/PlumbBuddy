@@ -1,6 +1,5 @@
 @implements IDisposable
 @inject IDialogService DialogService
-@inject IDispatcher Dispatcher
 @inject IPlayer Player
 @inject IPublicCatalogs PublicCatalogs
 @inject PbDbContext PbDbContext
@@ -73,7 +72,7 @@
         </MudItem>
     }
     <MudItem xs="12">
-        <ChipSetField Values="@Exclusivities" ValuesChanged="HandleExclusivitiesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SetLeftRight" ChipIcon="@MaterialDesignIcons.Normal.SetCenter" Label="Exclusivities" HelperText="Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed." Placeholder="Type the name of an exclusivity here and press enter" />
+        <ChipSetField @ref="@exclusivitiesField" Values="@Exclusivities" ValuesChanged="HandleExclusivitiesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SetLeftRight" ChipIcon="@MaterialDesignIcons.Normal.SetCenter" Label="Exclusivities" HelperText="Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed." Placeholder="Type the name of an exclusivity here and press enter" />
         @if (Exclusivities.Count is > 0)
         {
             <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight">
@@ -94,7 +93,7 @@
         </MudItem>
     }
     <MudItem xs="12">
-        <ChipSetField Values="@SubsumedHashes" ValuesChanged="HandleSubsumedHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.History" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Subsumed Hashes" HelperText="These are the hashes of previous version of this mod file. The manifest keeps them so that if I'm checking to see if a player has your mod installed because another mod requires it, the other mod requiring an older version of your mod is not a problem. However, if you make breaking changes in this mod file you should probably clear these out so that it will be obvious that your newer version isn't going to work well with the other mod. Otherwise, it's best to leave this field alone and let me manage it for you." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
+        <ChipSetField @ref="@subsumedHashesField" Values="@SubsumedHashes" ValuesChanged="HandleSubsumedHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.History" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Subsumed Hashes" HelperText="These are the hashes of previous version of this mod file. The manifest keeps them so that if I'm checking to see if a player has your mod installed because another mod requires it, the other mod requiring an older version of your mod is not a problem. However, if you make breaking changes in this mod file you should probably clear these out so that it will be obvious that your newer version isn't going to work well with the other mod. Otherwise, it's best to leave this field alone and let me manage it for you." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
     </MudItem>
     <MudItem>
         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Warning" OnClick="HandleBrowseForAddSubsumedHashOnClickAsync">Add subsumed hash from mod file...</MudButton>

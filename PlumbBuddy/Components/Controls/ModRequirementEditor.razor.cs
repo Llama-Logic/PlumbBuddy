@@ -73,7 +73,7 @@ partial class ModRequirementEditor
             """);
         var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
-            Hashes = Hashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly();
+            HandleHashesChanged(Hashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
     }
 
     async Task HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync()
@@ -104,7 +104,7 @@ partial class ModRequirementEditor
         }
         if (await DialogService.ShowSelectFeaturesDialogAsync(manifest!) is not { } selectedFeatures)
             return;
-        RequiredFeatures = selectedFeatures;
+        HandleRequiredFeaturesChanged(selectedFeatures);
     }
 
     void HandleCreatorsChanged(IReadOnlyList<string> newValue)
@@ -159,23 +159,13 @@ partial class ModRequirementEditor
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleRequiredFeaturesChanged(IReadOnlyList<string> newValue)
@@ -217,6 +207,8 @@ partial class ModRequirementEditor
     {
         if (ModRequirement == lastModRequirement)
             return;
+        if (ModRequirement is { } modRequirement)
+            await modRequirement.CommitPendingEntriesIfEmptyAsync();
         lastModRequirement = ModRequirement;
         await SetParametersAsync(ParameterView.FromDictionary(new Dictionary<string, object?>
         {

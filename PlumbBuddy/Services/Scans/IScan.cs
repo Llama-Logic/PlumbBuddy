@@ -4,5 +4,5 @@ public interface IScan :
     IDisposable
 {
     IAsyncEnumerable<ScanIssue> ScanAsync();
-    Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData);
+    Task ResolveIssueAsync(object issueData, object resolutionData);
 }

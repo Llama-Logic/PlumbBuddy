@@ -32,7 +32,7 @@ public abstract class DepthScan :
 
     protected abstract ScanIssue GenerateSickScanIssue(FileInfo file, ModFile modFile);
 
-    public override Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData)
+    public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
         if (issueData is string modFilePath && resolutionData is string resolutionCmd)
         {

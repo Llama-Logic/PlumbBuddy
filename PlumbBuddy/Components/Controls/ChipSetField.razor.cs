@@ -68,9 +68,9 @@ partial class ChipSetField
             values.Add(entryText);
             Values = values.AsReadOnly();
             await ValuesChanged.InvokeAsync(Values);
-            entryText = string.Empty;
-            StateHasChanged();
         }
+        entryText = string.Empty;
+        StateHasChanged();
     }
 
     async Task HandleChipClosedAsync(MudChip<string> chip)

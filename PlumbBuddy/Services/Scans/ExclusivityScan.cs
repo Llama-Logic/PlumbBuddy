@@ -1,10 +1,10 @@
 namespace PlumbBuddy.Services.Scans;
 
-public sealed class MultipleModVersionsScan :
+public class ExclusivityScan :
     Scan,
-    IMultipleModVersionsScan
+    IExclusivityScan
 {
-    public MultipleModVersionsScan(IPlatformFunctions platformFunctions, IPlayer player, PbDbContext pbDbContext)
+    public ExclusivityScan(IPlatformFunctions platformFunctions, IPlayer player, PbDbContext pbDbContext)
     {
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);

@@ -32,12 +32,7 @@ partial class MainMenu
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task HandleOpenDownloadsFolderOnClickAsync()
@@ -61,12 +56,7 @@ partial class MainMenu
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.CacheStatus))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
         else if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
             StateHasChanged();
     }

@@ -1,5 +1,4 @@
 @inject IDialogService DialogService
-@inject IDispatcher Dispatcher
 @inject IPlayer Player
 @inject IPublicCatalogs PublicCatalogs
 @inject PbDbContext PbDbContext
@@ -15,14 +14,14 @@
         <MudTextField T="string" Value="@Url" ValueChanged="HandleUrlChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Download" Label="Download Page URL" HelperText="If a player installs your mod but does not have this requirement, this is the download page URL I will give to them so that they can go get it to install it." />
     </MudItem>
     <MudItem xs="12">
-        <ChipSetField Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Hashes" HelperText="There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don't worry about the required mod's requirements. It's responsible for those considerations." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
+        <ChipSetField @ref="@(ModRequirement!.HashesField)" Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Hashes" HelperText="There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don't worry about the required mod's requirements. It's responsible for those considerations." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
     </MudItem>
     <MudItem>
         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">Add mod file...</MudButton>
     </MudItem>
     <MudFlexBreak />
     <MudItem xs="12">
-        <ChipSetField Values="@RequiredFeatures" ValuesChanged="HandleRequiredFeaturesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Label="Required Features" HelperText="These are the features the required mod must offer in order for your requirement to be satisfied. This field exists just in case the required mod's creator ever removes a feature, I can guide the player through resolving the issue." Placeholder="Type a feature name here and press enter" />
+        <ChipSetField @ref="@(ModRequirement!.RequiredFeaturesField)" Values="@RequiredFeatures" ValuesChanged="HandleRequiredFeaturesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Label="Required Features" HelperText="These are the features the required mod must offer in order for your requirement to be satisfied. This field exists just in case the required mod's creator ever removes a feature, I can guide the player through resolving the issue." Placeholder="Type a feature name here and press enter" />
     </MudItem>
     <MudItem>
         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync">Select features based on a mod file manifest...</MudButton>

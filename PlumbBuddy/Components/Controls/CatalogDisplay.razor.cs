@@ -55,12 +55,7 @@ partial class CatalogDisplay
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISmartSimObserver.InstalledPackCodes))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     bool IncludeDependency(ModKey key)
@@ -182,7 +177,7 @@ partial class CatalogDisplay
             ));
         }
         var readOnlyMods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<ModKey> dependencies, IReadOnlyList<ModKey> dependents)>)kv.Value.Select(manifestAndFiles => (manifestAndFiles.Manifest, (IReadOnlyList<FileInfo>)[.. manifestAndFiles.Files], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependencies], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependents])).ToImmutableArray());
-        Dispatcher.Dispatch(() =>
+        StaticDispatcher.Dispatch(() =>
         {
             this.mods = readOnlyMods;
             StateHasChanged();

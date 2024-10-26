@@ -23,6 +23,17 @@ static class StaticDispatcher
             action();
     }
 
+    public static async Task DispatchAsync(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        if (dispatcher is null)
+            throw new InvalidOperationException($"{nameof(RegisterDispatcher)} hasn't been called");
+        if (dispatcher.IsDispatchRequired)
+            await dispatcher.DispatchAsync(action);
+        else
+            action();
+    }
+
     public static async Task DispatchAsync(Func<Task> asyncAction)
     {
         ArgumentNullException.ThrowIfNull(asyncAction);

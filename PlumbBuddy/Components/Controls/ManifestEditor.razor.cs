@@ -262,14 +262,14 @@ partial class ManifestEditor
 
     async Task ComposeAsync()
     {
-        await Dispatcher.DispatchAsync(() =>
+        await StaticDispatcher.DispatchAsync(() =>
         {
             isComposing = true;
             StateHasChanged();
         });
 
         Task updateStatusAsync(int compositionStep, string compositionStatus) =>
-            Dispatcher.DispatchAsync(() =>
+            StaticDispatcher.DispatchAsync(() =>
             {
                 this.compositionStep = compositionStep;
                 this.compositionStatus = compositionStatus;
@@ -405,7 +405,8 @@ partial class ManifestEditor
                     return model;
                 });
                 addCollectionElements(model.RequiredPacks, requiredPacks);
-                addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
+                var hexHash = hash.ToHexString();
+                addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Except([hexHash], StringComparer.OrdinalIgnoreCase).Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
                 componentManifests.Add(component, model);
             }
 
@@ -500,7 +501,7 @@ partial class ManifestEditor
         await updateStatusAsync(5, "All component manifests have been updated and scaffolding has been written").ConfigureAwait(false);
         await Task.Delay(5000).ConfigureAwait(false);
 
-        await Dispatcher.DispatchAsync(async () =>
+        await StaticDispatcher.DispatchAsync(async () =>
         {
             isComposing = false;
             await ResetAsync();
@@ -610,12 +611,7 @@ partial class ManifestEditor
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
@@ -741,12 +737,19 @@ partial class ManifestEditor
             if (creatorsChipSetField is not null)
                 await creatorsChipSetField.CommitPendingEntryIfEmptyAsync();
         }
+        if (activeIndex is 2)
+        {
+            if (modComponentEditor is not null)
+                await modComponentEditor.CommitPendingEntriesIfEmptyAsync();
+        }
         if (activeIndex is 3)
         {
             if (requiredPacksChipSetField is not null)
                 await requiredPacksChipSetField.CommitPendingEntryIfEmptyAsync();
             if (incompatibleChipSetField is not null)
                 await incompatibleChipSetField.CommitPendingEntryIfEmptyAsync();
+            foreach (var requiredMod in requiredMods)
+                await requiredMod.CommitPendingEntriesIfEmptyAsync();
         }
         if (activeIndex is 4)
         {
@@ -791,12 +794,7 @@ partial class ManifestEditor
     void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task HandleRemoveFilesClickedAsync()

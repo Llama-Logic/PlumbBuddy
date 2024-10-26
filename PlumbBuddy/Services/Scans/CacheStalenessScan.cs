@@ -15,7 +15,7 @@ public sealed class CacheStalenessScan :
     readonly IPlayer player;
     readonly ISmartSimObserver smartSimObserver;
 
-    public override Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData)
+    public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
         if (issueData is string issueDataStr && issueDataStr is "stale" && resolutionData is string resolutionCmd)
         {

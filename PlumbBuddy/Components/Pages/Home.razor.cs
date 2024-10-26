@@ -8,7 +8,7 @@ partial class Home
     {
         var shouldBeVisible = await PbDbContext.ModFileManifestHashes.AnyAsync(mfmh => mfmh.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))).ConfigureAwait(false);
         if (catalogIsVisible != shouldBeVisible)
-            Dispatcher.Dispatch(() =>
+            StaticDispatcher.Dispatch(() =>
             {
                 catalogIsVisible = shouldBeVisible;
                 StateHasChanged();
@@ -27,10 +27,7 @@ partial class Home
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
         {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
+            StaticDispatcher.Dispatch(StateHasChanged);
             if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
                 _ = Task.Run(CheckCatalogIsVisibleAsync);
         }
@@ -39,12 +36,7 @@ partial class Home
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.Theme))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
-            else
-                _ = SetCustomThemeBackgroundsAsync();
-        }
+            StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
         if (e.PropertyName is nameof(IPlayer.Type))
             StateHasChanged();
     }
@@ -52,12 +44,7 @@ partial class Home
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISmartSimObserver.ScanIssues))
-        {
-            if (Dispatcher.IsDispatchRequired)
-                Dispatcher.Dispatch(StateHasChanged);
-            else
-                StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     /// <inheritdoc />

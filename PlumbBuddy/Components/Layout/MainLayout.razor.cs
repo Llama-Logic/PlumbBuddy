@@ -123,23 +123,13 @@ public partial class MainLayout
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.CacheStatus))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
         else if (e.PropertyName is nameof(IPlayer.ShowThemeManager))
         {
             manualLightDarkModeToggleEnabled = false;
@@ -155,15 +145,8 @@ public partial class MainLayout
         }
     }
 
-    void HandleSuperSnacksRefreshmentsOffered(object? sender, NummyEventArgs e)
-    {
-        void nomNom() =>
-            Snackbar.Add(e.Message, e.Severity, e.Configure, e.Key);
-        if (Dispatcher.IsDispatchRequired)
-            Dispatcher.Dispatch(nomNom);
-        else
-            nomNom();
-    }
+    void HandleSuperSnacksRefreshmentsOffered(object? sender, NummyEventArgs e) =>
+        StaticDispatcher.Dispatch(() => Snackbar.Add(e.Message, e.Severity, e.Configure, e.Key));
 
     [JSInvokable]
     public async Task LaunchExternalUrlAsync(string url)
@@ -195,6 +178,7 @@ public partial class MainLayout
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        BlazorFramework.MainLayoutLifetimeScope = LifetimeScope;
         StaticDispatcher.RegisterDispatcher(Dispatcher);
         if (Application.Current is { } app)
             app.Windows[0].Title = "PlumbBuddy";

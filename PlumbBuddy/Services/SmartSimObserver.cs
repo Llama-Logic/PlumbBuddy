@@ -268,6 +268,7 @@ public partial class SmartSimObserver :
         containerBuilder.RegisterType<BeMissingScan>().As<IBeMissingScan>();
         containerBuilder.RegisterType<ModGuardMissingScan>().As<IModGuardMissingScan>();
         containerBuilder.RegisterType<DependencyScan>().As<IDependencyScan>();
+        containerBuilder.RegisterType<ExclusivityScan>().As<IExclusivityScan>();
         containerBuilder.RegisterType<CacheStalenessScan>().As<ICacheStalenessScan>();
         containerBuilder.RegisterType<MultipleModVersionsScan>().As<IMultipleModVersionsScan>();
     }
@@ -772,6 +773,8 @@ public partial class SmartSimObserver :
             return;
         using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
         enqueuedScanningTaskLockPotentiallyHeld.Dispose();
+        if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle)
+            return;
         using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         IsCurrentlyScanning = true;
         var scanIssues = new ConcurrentBag<ScanIssue>();
@@ -856,6 +859,7 @@ public partial class SmartSimObserver :
             initializationChange |= checkScanInitialization(player.ScanForMissingBe, typeof(IBeMissingScan));
             initializationChange |= checkScanInitialization(player.ScanForMissingModGuard, typeof(IModGuardMissingScan));
             initializationChange |= checkScanInitialization(player.ScanForMissingDependency, typeof(IDependencyScan));
+            initializationChange |= checkScanInitialization(player.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
             initializationChange |= checkScanInitialization(player.ScanForCacheStaleness, typeof(ICacheStalenessScan));
             initializationChange |= checkScanInitialization(player.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
             if (initializationChange)

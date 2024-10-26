@@ -1,10 +1,12 @@
 @inherits LayoutComponentBase
 @implements IDisposable
+@inject IBlazorFramework BlazorFramework
 @inject ICustomThemes CustomThemes
 @inject IDialogService DialogService
 @inject IDispatcher Dispatcher
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IJSRuntime JSRuntime
+@inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver

@@ -25,7 +25,7 @@ public abstract class MissingScan :
 
     protected abstract IReadOnlyList<string>? RequiredScriptArchiveFullNames { get; }
 
-    public override Task ResolveIssueAsync(ILifetimeScope interfaceLifetimeScope, object issueData, object resolutionData)
+    public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
         if (issueData is string issueDataStr && resolutionData is string resolutionCmd)
         {

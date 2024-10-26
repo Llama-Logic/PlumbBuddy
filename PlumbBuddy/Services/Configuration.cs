@@ -4,6 +4,7 @@ static class Configuration
 {
     public static IServiceCollection AddPlumbBuddyServices(this IServiceCollection services)
     {
+        services.AddSingleton<IBlazorFramework, BlazorFramework>();
         services.AddSingleton<ISynchronization, Synchronization>();
         services.AddSingleton<ICustomThemes, CustomThemes>();
         services.AddSingleton<IPlayer, Player>();

@@ -14,12 +14,7 @@ partial class HUD
         if (e.PropertyName is nameof(IModsDirectoryCataloger.PackageCount)
             or nameof(IModsDirectoryCataloger.ScriptArchiveCount)
             or nameof(IModsDirectoryCataloger.State))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -32,12 +27,7 @@ partial class HUD
     {
         if (e.PropertyName is nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
             or nameof(ISmartSimObserver.IsScriptModsEnabledGameSettingOn))
-        {
-            if (!Dispatcher.IsDispatchRequired)
-                StateHasChanged();
-            else
-                Dispatcher.Dispatch(StateHasChanged);
-        }
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     protected override void OnInitialized()
