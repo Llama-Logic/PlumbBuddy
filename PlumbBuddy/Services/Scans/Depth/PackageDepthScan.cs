@@ -44,7 +44,7 @@ public sealed class PackageDepthScan :
                 },
                 new()
                 {
-                    Icon = MaterialDesignIcons.Normal.FolderOpen,
+                    Icon = MaterialDesignIcons.Normal.FileFind,
                     Label = "Show me this package file",
                     Color = MudBlazor.Color.Secondary,
                     Data = "show"

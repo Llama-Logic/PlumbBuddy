@@ -24,15 +24,6 @@
             </div>
         </MudTabPanel>
     }
-    @* <MudTabPanel Text="SimVault" Icon="@MaterialDesignIcons.Normal.ArchiveSync">
-        <div class="simvault-tab-container">
-            <div class="background"></div>
-
-        </div>
-    </MudTabPanel> *@
-    @* <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink">
-        <PreJector />
-    </MudTabPanel> *@
     @if (Player.Type is UserType.Creator)
     {
         <MudTabPanel Text="Manifest Editor" Icon="@MaterialDesignIcons.Normal.TagEdit">
@@ -52,6 +43,15 @@
                 </div>
                 <ManifestEditor />
             </div>
+        </MudTabPanel>
+        <MudTabPanel Text="SimVault" Icon="@MaterialDesignIcons.Normal.ArchiveSync">
+            <div class="simvault-tab-container">
+                <div class="background"></div>
+                <SimVault />
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="PreJector" Icon="@MaterialDesignIcons.Normal.VectorLink">
+            <PreJector />
         </MudTabPanel>
     }
 </MudTabs>

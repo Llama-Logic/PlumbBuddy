@@ -1,4 +1,4 @@
-namespace PlumbBuddy.Components.Pages;
+namespace PlumbBuddy.Components.Controls;
 
 partial class PreJector
 {

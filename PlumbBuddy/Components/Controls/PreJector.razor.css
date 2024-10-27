@@ -1,10 +1,10 @@
 .background {
-    background-image: url(/img/Lot51UndergroundLabBackground.svg);
+    background-image: url(/img/PrejectorBackground.jpg);
     background-position: center;
     background-size: cover;
     height: 100vh;
     left: 0;
-    opacity: 0.2;
+    opacity: .65;
     overflow: hidden;
     position: fixed;
     top: 0;
@@ -76,8 +76,3 @@
         margin-right: calc(0.75rem* var(--tw-space-x-reverse));
         margin-left: calc(0.75rem* calc(1 - var(--tw-space-x-reverse)));
     }
-
-.container {
-    margin: 0 auto;
-    max-width: 1000px;
-}

@@ -44,7 +44,7 @@ public sealed class Ts4ScriptDepthScan :
                 },
                 new()
                 {
-                    Icon = MaterialDesignIcons.Normal.FolderOpen,
+                    Icon = MaterialDesignIcons.Normal.FileFind,
                     Label = "Show me this script archive",
                     Color = MudBlazor.Color.Secondary,
                     Data = "show"

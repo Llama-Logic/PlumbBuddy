@@ -32,7 +32,7 @@ public class ShowModListStartupSettingScan :
             [
                 new()
                 {
-                    Icon = MaterialDesignIcons.Normal.CheckboxBlank,
+                    Icon = MaterialDesignIcons.Normal.AutoFix,
                     Label = "Uncheck the box for me",
                     Color = MudBlazor.Color.Primary,
                     Data = uncomfortableScanIssueFixResolutionData

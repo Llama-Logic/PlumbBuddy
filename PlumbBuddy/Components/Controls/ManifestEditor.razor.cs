@@ -474,7 +474,11 @@ partial class ManifestEditor
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                     component.FileObjectModel.Dispose();
                     await updateStatusAsync(4, $"Creating scaffolding for `{componentRelativePath}`").ConfigureAwait(false);
-                    var scaffolding = new ManifestedModFileScaffolding { HashingLevel = hashingLevel };
+                    var scaffolding = new ManifestedModFileScaffolding
+                    {
+                        IsRequired = component.IsRequired,
+                        HashingLevel = hashingLevel
+                    };
                     foreach (var otherComponent in components.Except([component]))
                     {
                         var referencedModFile = new ManifestedModFileScaffoldingReferencedModFile
@@ -698,6 +702,7 @@ partial class ManifestEditor
                 }
                 if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile) is { } scaffolding)
                 {
+                    components[0].IsRequired = scaffolding.IsRequired;
                     hashingLevel = scaffolding.HashingLevel;
                     foreach (var otherModComponent in scaffolding.OtherModComponents)
                     {
@@ -962,7 +967,7 @@ partial class ManifestEditor
                 if (requiredMod.Hashes.Any(componentHashes.Contains))
                 {
                     wasRequired = true;
-                    requiredMod.Hashes = [.. requiredMod.Hashes.Where(hash => !componentHashes.Contains(hash))];
+                    requiredMod.Hashes = [..requiredMod.Hashes.Where(hash => !componentHashes.Contains(hash))];
                     component.RequirementIdentifier = requiredMod.RequirementIdentifier;
                     component.IgnoreIfPackAvailable = requiredMod.IgnoreIfPackAvailable;
                     component.IgnoreIfPackUnavailable = requiredMod.IgnoreIfPackUnavailable;

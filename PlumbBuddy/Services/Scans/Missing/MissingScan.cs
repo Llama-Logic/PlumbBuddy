@@ -201,7 +201,7 @@ public abstract class MissingScan :
                     [
                         new()
                         {
-                            Icon = MaterialDesignIcons.Normal.Launch,
+                            Icon = MaterialDesignIcons.Normal.Web,
                             Label = $"Go Get {ModName}",
                             Color = MudBlazor.Color.Primary,
                             Data = "get",

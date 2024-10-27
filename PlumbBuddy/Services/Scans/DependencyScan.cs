@@ -227,12 +227,12 @@ public sealed class DependencyScan :
                 (
                     $"A Mod Needs Another Mod Installed",
                     $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you to re-download the original mod before this gets bad. 😨
+                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨
                     """,
                     new()
                     {
                         Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependent",
                         Url = modWithMissingDependencyMod.Url
@@ -247,7 +247,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependent",
                         Url = modWithMissingDependencyMod.Url
@@ -262,7 +262,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Download the Needed Mod",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
@@ -277,7 +277,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Download the Other Mod",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
@@ -292,7 +292,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Download {modWithMissingDependencyMod.DependencyName}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
@@ -307,7 +307,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadComponent",
                         Url = modWithMissingDependencyMod.Url
@@ -322,7 +322,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Go Download {modWithMissingDependencyMod.DependencyName}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
@@ -354,7 +354,7 @@ public sealed class DependencyScan :
                             modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
                             {
                                 Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
-                                Icon = MaterialDesignIcons.Normal.OpenInNew,
+                                Icon = MaterialDesignIcons.Normal.FileFind,
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
                             })
@@ -396,7 +396,7 @@ public sealed class DependencyScan :
                             modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
                             {
                                 Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
-                                Icon = MaterialDesignIcons.Normal.OpenInNew,
+                                Icon = MaterialDesignIcons.Normal.FileFind,
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
                             })

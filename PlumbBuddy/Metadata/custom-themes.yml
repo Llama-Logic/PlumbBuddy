@@ -5,7 +5,8 @@ amethyst-lilac:
   palette_dark:
     Background: '#322d62ff'
     Surface: '#342d6bff'
-    Primary: '#594ae2ff'
+    Primary: '#8c81eeff'
+    TextPrimary: '#b9b3f2ff'
     Tertiary: '#178c42ff'
   backgrounded_tabs:
     mod-health:

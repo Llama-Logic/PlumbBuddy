@@ -1,0 +1,121 @@
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12">
+            <MudPaper Class="pa-4">
+                <MudTextM3 Typo="TypoM3.Headline">
+                    The Game's Save Backup System... Leaves a Bit To Be Desired
+                </MudTextM3>
+                <MudDivider Class="my-2" />
+                <InlineMarkdown>
+                    We're going to take a crack at improving that experience for players by teaching PlumbBuddy to monitor save files like it does mod files now, *but for a somewhat different purpose*. 😏<br />
+                    Since *we are learning* about save files, though, we thought we could benefit from letting the wider creator community know about our intentions here. If any of you know a bit about save files and would like to pitch in or even just offer advice, your contributions are welcome.
+                </InlineMarkdown>
+            </MudPaper>
+        </MudItem>
+        <MudFlexBreak />
+        <MudItem>
+            <MudTextM3 Typo="TypoM3.Title">
+                SimVault Design Goals
+            </MudTextM3>
+        </MudItem>
+        <MudFlexBreak />
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.VectorDifferenceAb" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Space-Saving Tricks**
+                        From diffing to compression, keep a large number of saves on-hand using various storage processing techniques.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.RemoteTv" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Fully Player Customizable**
+                        Empower players to choose how saves are retained, how much space to use, and when and how to make space for more saves.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.FileRestore" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Restoration that's Easy for Players**
+                        Make restoring a save retained by PlumbBuddy snappy and work well with the game's load interface.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.FamilyTree" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Save Lineage Tracking**
+                        Keep tabs on which save file originated from which original new game and make that easy for players to see.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.DatabaseSearch" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Searchable Save Characteristics**
+                        Ingest and categorize the wealth of information in save files and make it possible for players to search their saves for them.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudImage Src="/img/DeaderpoolLogo.svg" Width="32" Height="32" ObjectPosition="ObjectPosition.Center" />
+                    <InlineMarkdown>
+                        **Integration with MC Command Center**
+                        Work well with MCCC's Auto Save feature with awareness of its settings, even denoting for players when a save was made with it.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.ImageEdit" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Custom Save Thumbnails**
+                        Allow players to specify a different image for the game to display when loading saves based on lineage, including stamped analysis results.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4" Style="height: 100%;">
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveAlert" Size="Size.Large" />
+                    <InlineMarkdown>
+                        **Save File Health**
+                        If, in our study, we learn how to correct certain kinds of defects or issues which may arise in save files, offer to do so for the player.
+                    </InlineMarkdown>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudFlexBreak />
+        <MudItem>
+            <MudPaper>
+                <MudAlert Icon="@MaterialDesignIcons.Normal.PencilRuler">
+                    <InlineMarkdown>
+                        Current Status: **Design Phase**
+                    </InlineMarkdown>
+                </MudAlert>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>

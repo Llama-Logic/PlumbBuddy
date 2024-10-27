@@ -50,10 +50,13 @@ public sealed class ManifestedModFileScaffolding :
         return false;
     }
 
-    [YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "this tells me how lenient vs. strict your hashing preference was last")]
+    [YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.Preserve, Description = "this tells me where this mod file is required by your mod")]
+    public bool IsRequired { get; set; }
+
+    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "this tells me how lenient vs. strict your hashing preference was last")]
     public int HashingLevel { get; set; }
 
-    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "these are pointers to the other mod files which are a part of your mod")]
+    [YamlMember(Order = 3, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "these are pointers to the other mod files which are a part of your mod")]
     public Collection<ManifestedModFileScaffoldingReferencedModFile> OtherModComponents { get; private set; } = [];
 
     public async Task CommitForAsync(FileInfo modFile)

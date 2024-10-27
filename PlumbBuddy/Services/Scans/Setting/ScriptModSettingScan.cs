@@ -35,7 +35,7 @@ public sealed class ScriptModSettingScan :
             [
                 new()
                 {
-                    Icon = MaterialDesignIcons.Normal.CheckboxMarked,
+                    Icon = MaterialDesignIcons.Normal.AutoFix,
                     Label = "Check the boxes for me",
                     Color = MudBlazor.Color.Primary,
                     Data = deadScanIssueFixResolutionData

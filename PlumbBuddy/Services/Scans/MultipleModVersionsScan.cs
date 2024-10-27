@@ -55,7 +55,7 @@ public sealed class MultipleModVersionsScan :
                 urlResolutions.Add(new()
                 {
                     Label = $"Go to the Download Page{(distinctNames.Length is 1 ? $" for {distinctNames[0]}" : string.Empty)}",
-                    Icon = MaterialDesignIcons.Normal.OpenInNew,
+                    Icon = MaterialDesignIcons.Normal.Web,
                     Color = MudBlazor.Color.Primary,
                     Data = $"visit-mod-download",
                     Url = distinctUrls[0]
@@ -66,7 +66,7 @@ public sealed class MultipleModVersionsScan :
                     duplicates.Select((duplicate, index) => new ScanIssueResolution()
                     {
                         Label = $"Go to the Download Page for the {(index + 1).ToOrdinalWords()} version",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"visit-mod-{index}",
                         Url = duplicate.Url
@@ -90,7 +90,7 @@ public sealed class MultipleModVersionsScan :
                     ..duplicates.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()
                     {
                         Label = $"Show me the {(index + 1).ToOrdinalWords()} file",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
                     }),

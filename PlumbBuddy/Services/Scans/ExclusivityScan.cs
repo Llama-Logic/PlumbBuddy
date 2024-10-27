@@ -69,7 +69,7 @@ public class ExclusivityScan :
                     ..conflictedMods.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()
                     {
                         Label = $"Show me the {(index + 1).ToOrdinalWords()} file",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
+                        Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
                     }),

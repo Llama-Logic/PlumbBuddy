@@ -171,7 +171,7 @@ div.mud-input-control.no-material-variant .mud-input > * {
 
 .classified-paper {
     backdrop-filter: blur(10px);
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 70%);
     margin-top: 1em;
     padding: 1em;
 }
