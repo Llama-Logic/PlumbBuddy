@@ -28,8 +28,8 @@ sim-realist:
     Background: '#d8d8d8ff'
     Surface: '#ffffffff'
     Primary: '#1986d9ff'
-    Secondary: '#1986d9ff'
-    Tertiary: '#64aa30ff'
+    Secondary: '#ff424dff'
+    Tertiary: '#a0c45bff'
   backgrounded_tabs:
     mod-health:
       dark: mod-health.png

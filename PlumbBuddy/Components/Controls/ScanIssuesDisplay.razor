@@ -25,16 +25,16 @@
                     </MudCardContent>
                     @if (scanIssue.Data is not null && scanIssue.Resolutions is not null && scanIssue.Resolutions.Count > 0)
                     {
-                        <MudCardActions Style="flex-direction: column;">
+                        <MudCardActions Style="flex-direction: column; gap: 6px;">
                             @foreach (var resolution in scanIssue.Resolutions)
                             {
                                 if (resolution.Url is { } url)
                                 {
-                                    <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" Href="@url.ToString()" Target="_blank">@resolution.Label</MudButton>
+                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" Href="@url.ToString()" Target="_blank" Disabled="@resolution.Disabled" Style="width: 100%;">@resolution.Label</MudButton>
                                 }
                                 else
                                 {
-                                    <MudButton StartIcon="@resolution.Icon" IconColor="@resolution.Color" Color="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)">@resolution.Label</MudButton>
+                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)" Disabled="@resolution.Disabled" Style="width: 100%;">@resolution.Label</MudButton>
                                 }
                             }
                         </MudCardActions>

@@ -27,9 +27,7 @@ public sealed class Ts4ScriptDepthScan :
             Description =
                 $"""
                 I found this script archive too deep in your Mods folder, specifically at this path:
-
-                `{file.FullName}`
-
+                `{modFile.Path}`<br />
                 We need to move it closer to the root of your Mods folder so the game can find it.
                 """,
             Origin = this,

@@ -55,7 +55,6 @@ partial class ModFileSelector
             var hash = await ModFileManifestModel.GetFileSha256HashAsync(modFile.FullName);
             var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
             if (await pbDbContext.ModFileHashes
-                .AsSplitQuery()
                 .Where(mfh => mfh.Sha256 == hashArray)
                 .Include(mfh => mfh.ModFileManifests!)
                     .ThenInclude(mfm => mfm.Creators)

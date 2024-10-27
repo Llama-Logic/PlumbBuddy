@@ -56,6 +56,8 @@ public sealed class DependencyScan :
                 await smartSimObserver.HelpWithPackPurchaseAsync(resolutionStr[9..], blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>(), modWithMissingPacks.Creators, modWithMissingPacks.ElectronicArtsPromoCode).ConfigureAwait(false);
             else if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
                 platformFunctions.ViewFile(modFile);
+            else if (resolutionStr is "stopTellingMe")
+                player.ScanForMissingDependency = false;
         }
     }
 
@@ -343,19 +345,29 @@ public sealed class DependencyScan :
                 Origin = this,
                 Data = modWithMissingDependencyMod,
                 Resolutions =
-                    [..(resolution is null
+                [
+                    ..(resolution is null
                         ? Enumerable.Empty<ScanIssueResolution>()
                         : [resolution])
-                    .Concat
-                    (
-                        modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
-                        {
-                            Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
-                            Icon = MaterialDesignIcons.Normal.OpenInNew,
-                            Color = MudBlazor.Color.Default,
-                            Data = $"showfile-{filePath}"
-                        })
-                    )]
+                        .Concat
+                        (
+                            modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
+                            {
+                                Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
+                                Icon = MaterialDesignIcons.Normal.OpenInNew,
+                                Color = MudBlazor.Color.Secondary,
+                                Data = $"showfile-{filePath}"
+                            })
+                        ),
+                    new()
+                    {
+                        Icon = MaterialDesignIcons.Normal.Cancel,
+                        Label = "Stop telling me",
+                        CautionCaption = "Disable this scan?",
+                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Data = "stopTellingMe"
+                    }
+                ]
             };
         }
         foreach (var list in commonRequirementIdentifiersValuesBySolitude[false])
@@ -377,17 +389,27 @@ public sealed class DependencyScan :
                 Origin = this,
                 Data = list,
                 Resolutions =
-                    [..downloadResolutions
-                    .Concat
-                    (
-                        modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
-                        {
-                            Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
-                            Icon = MaterialDesignIcons.Normal.OpenInNew,
-                            Color = MudBlazor.Color.Default,
-                            Data = $"showfile-{filePath}"
-                        })
-                    )]
+                [
+                    ..downloadResolutions
+                        .Concat
+                        (
+                            modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
+                            {
+                                Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
+                                Icon = MaterialDesignIcons.Normal.OpenInNew,
+                                Color = MudBlazor.Color.Secondary,
+                                Data = $"showfile-{filePath}"
+                            })
+                        ),
+                    new()
+                    {
+                        Icon = MaterialDesignIcons.Normal.Cancel,
+                        Label = "Stop telling me",
+                        CautionCaption = "Disable this scan?",
+                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Data = "stopTellingMe"
+                    }
+                ]
             };
         }
     }

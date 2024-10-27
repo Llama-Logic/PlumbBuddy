@@ -187,11 +187,11 @@ div.mud-input-control.no-material-variant .mud-input > * {
     }
 
 .scan-issue-refreshing {
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-primary) 40%);
+    background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-primary) 35%) 40%);
 }
 
 .scan-issue-sleeping {
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-dark) 40%);
+    background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-dark) 35%) 40%);
 }
 
 .scan-issue-Healthy {
@@ -199,15 +199,15 @@ div.mud-input-control.no-material-variant .mud-input > * {
 }
 
 .scan-issue-Uncomfortable {
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-warning) 40%);
+    background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-warning) 35%) 70%);
 }
 
 .scan-issue-Sick {
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-error) 40%);
+    background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-error) 35%) 70%);
 }
 
 .scan-issue-Dead {
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-error) 70%);
+    background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-error) 35%) 85%);
 }
 
 .catalog-note {

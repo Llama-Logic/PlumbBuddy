@@ -27,9 +27,7 @@ public sealed class LooseZipArchiveScan :
             Description =
                 $"""
                 I found this ZIP file in your Mods folder, specifically at this path:
-
-                `{file.FullName}`
-
+                `{fileOfInterest.Path}`<br />
                 You may believe that it's not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be <strong>very bad</strong>. Let's move it to your Downloads folder right away.
                 """,
             Origin = this,

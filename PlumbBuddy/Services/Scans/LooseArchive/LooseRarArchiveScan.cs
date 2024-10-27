@@ -27,9 +27,7 @@ public sealed class LooseRarArchiveScan :
             Description =
                 $"""
                 I found this RAR file in your Mods folder, specifically at this path:
-
-                `{file.FullName}`
-
+                `{fileOfInterest.Path}`<br />
                 While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.
                 """,
             Origin = this,

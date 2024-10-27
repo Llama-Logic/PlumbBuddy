@@ -60,7 +60,7 @@ public static class MauiProgram
         builder.Services.AddDbContext<PbDbContext>
         (
             (serviceProvider, options) => options
-                .UseSqlite($"Data Source={Path.Combine(FileSystem.AppDataDirectory, "PlumbBuddy.sqlite")}")
+                .UseSqlite($"Data Source={Path.Combine(FileSystem.AppDataDirectory, "PlumbBuddy.sqlite")}", options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 #if DEBUG
                 .EnableSensitiveDataLogging()
 #endif

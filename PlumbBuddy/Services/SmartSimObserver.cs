@@ -436,7 +436,6 @@ public partial class SmartSimObserver :
             return;
         var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
         foreach (var modFileHashElements in await pbDbContext.ModFileHashes
-            .AsSplitQuery()
             .Where(mfh => mfh.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfh.ModFileManifests!.Any())
             .Select(mfh => new
             {

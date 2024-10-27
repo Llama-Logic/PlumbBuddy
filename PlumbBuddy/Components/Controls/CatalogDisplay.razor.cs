@@ -135,7 +135,6 @@ partial class CatalogDisplay
         var userDataFolderPath = Player.UserDataFolderPath;
         var mods = new Dictionary<ModKey, List<ModValue>>();
         foreach (var activeManifest in await PbDbContext.ModFileManifestHashes
-            .AsSplitQuery()
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
             .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))
             .Include(mfm => mfm.ModFileHash!)
