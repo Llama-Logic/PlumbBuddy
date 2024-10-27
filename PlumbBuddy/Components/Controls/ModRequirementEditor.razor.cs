@@ -207,8 +207,11 @@ partial class ModRequirementEditor
     {
         if (ModRequirement == lastModRequirement)
             return;
+        var newModRequirement = ModRequirement;
+        ModRequirement = lastModRequirement;
         if (ModRequirement is { } modRequirement)
             await modRequirement.CommitPendingEntriesIfEmptyAsync();
+        ModRequirement = newModRequirement;
         lastModRequirement = ModRequirement;
         await SetParametersAsync(ParameterView.FromDictionary(new Dictionary<string, object?>
         {

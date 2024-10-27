@@ -205,7 +205,10 @@ partial class ModComponentEditor
     {
         if (ModComponent == lastModComponent)
             return;
+        var newModComponent = ModComponent;
+        ModComponent = lastModComponent;
         await CommitPendingEntriesIfEmptyAsync();
+        ModComponent = newModComponent;
         lastModComponent = ModComponent;
         await SetParametersAsync(ParameterView.FromDictionary(new Dictionary<string, object?>
         {

@@ -169,7 +169,7 @@ public sealed class DependencyScan :
             (
                 rm.ModFileManfiestId,
                 rm.RequirementIdentifier == null ? null : rm.RequirementIdentifier.Identifier,
-                rm.ModFileManifest!.RequiredMods!.Count(orm => orm.RequirementIdentifier == rm.RequirementIdentifier),
+                rm.ModFileManifest!.RequiredMods!.Count(orm => orm.RequirementIdentifierId == rm.RequirementIdentifierId),
                 rm.ModFileManifest!.Name,
                 rm.ModFileManifest!.Creators!.Select(c => c.Name).ToList(),
                 rm.ModFileManifest!.Url,
@@ -361,19 +361,23 @@ public sealed class DependencyScan :
         foreach (var list in commonRequirementIdentifiersValuesBySolitude[false])
         {
             var modWithMissingDependencyMod = list.First();
+            var downloadResolutions = list
+                .DistinctBy(modWithMissingDependencyMod => modWithMissingDependencyMod.DependencyUrl)
+                .Select(modWithMissingDependencyMod => getResolution(modWithMissingDependencyMod).resolution)
+                .ToImmutableArray();
             yield return new()
             {
                 Caption = $"{modWithMissingDependencyMod.Name} has an Unmet Requirement",
                 Description =
                     $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which has an unmet requirement which it calls "{modWithMissingDependencyMod.RequirementIdentifier}". But, you know, it's kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷
+                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which has an unmet requirement which it calls "{modWithMissingDependencyMod.RequirementIdentifier}". {(downloadResolutions.Length is 1 ? $"Since all your options here involve going to the same website, I'm guessing maybe you forgot to pick and install a multiple-choice package for \"{modWithMissingDependencyMod.RequirementIdentifier}\" from the original download when setting this up." : "But, you know, it's kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷")}
                     """,
                 Icon = MaterialDesignIcons.Outline.PuzzleRemove,
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = list,
                 Resolutions =
-                    [..list.Select(modWithMissingDependencyMod => getResolution(modWithMissingDependencyMod).resolution)
+                    [..downloadResolutions
                     .Concat
                     (
                         modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
