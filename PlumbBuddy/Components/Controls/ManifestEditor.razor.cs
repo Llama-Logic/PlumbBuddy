@@ -476,7 +476,9 @@ partial class ManifestEditor
                     await updateStatusAsync(4, $"Creating scaffolding for `{componentRelativePath}`").ConfigureAwait(false);
                     var scaffolding = new ManifestedModFileScaffolding
                     {
+                        ModName = name.Trim(),
                         IsRequired = component.IsRequired,
+                        ComponentName = (component.Name ?? string.Empty).Trim(),
                         HashingLevel = hashingLevel
                     };
                     foreach (var otherComponent in components.Except([component]))
@@ -703,16 +705,20 @@ partial class ManifestEditor
                 if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile) is { } scaffolding)
                 {
                     components[0].IsRequired = scaffolding.IsRequired;
+                    components[0].Name = string.IsNullOrWhiteSpace(scaffolding.ComponentName)
+                        ? null
+                        : scaffolding.ComponentName;
                     hashingLevel = scaffolding.HashingLevel;
                     foreach (var otherModComponent in scaffolding.OtherModComponents)
                     {
                         var addScaffoldedComponentResult = AddFileResult.NonExistent;
+                        FileInfo? otherFileInfo = null;
                         if (otherModComponent.LocalRelativePath is { } localRelativePath
                             && !string.IsNullOrWhiteSpace(localRelativePath))
-                            addScaffoldedComponentResult = await AddFileAsync(new FileInfo(Path.Combine(selectStepFile.DirectoryName!, localRelativePath)));
+                            addScaffoldedComponentResult = await AddFileAsync(otherFileInfo = new FileInfo(Path.Combine(selectStepFile.DirectoryName!, localRelativePath)));
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent
                             && !string.IsNullOrWhiteSpace(otherModComponent.LocalAbsolutePath))
-                            addScaffoldedComponentResult = await AddFileAsync(new FileInfo(otherModComponent.LocalAbsolutePath));
+                            addScaffoldedComponentResult = await AddFileAsync(otherFileInfo = new FileInfo(otherModComponent.LocalAbsolutePath));
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent)
                             await DialogService.ShowErrorDialogAsync("Scaffolding points to missing file",
                                 $"""
@@ -720,8 +726,15 @@ partial class ManifestEditor
                                 `{otherModComponent.LocalAbsolutePath}`<br /><br />
                                 <iframe src="https://giphy.com/embed/6uGhT1O4sxpi8" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8">via GIPHY</a></p>
                                 """);
-                        RemoveComponentFromRequiredMods(components[^1], addScaffoldedComponentResult);
+                        var otherComponent = components[^1];
+                        RemoveComponentFromRequiredMods(otherComponent, addScaffoldedComponentResult);
+                        if (otherFileInfo is not null && await ManifestedModFileScaffolding.TryLoadForAsync(otherFileInfo) is { } otherScaffolding)
+                            otherComponent.Name = string.IsNullOrWhiteSpace(otherScaffolding.ComponentName)
+                                ? null
+                                : otherScaffolding.ComponentName;
                     }
+                    if (!string.IsNullOrWhiteSpace(scaffolding.ModName))
+                        name = scaffolding.ModName.Trim();
                 }
                 else if (selectStepFileAddResult is AddFileResult.SucceededManifested)
                     await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
