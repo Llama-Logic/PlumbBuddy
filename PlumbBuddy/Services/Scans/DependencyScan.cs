@@ -100,10 +100,18 @@ public sealed class DependencyScan :
                     ..modWithMissingPacks.FilePaths.Select(filePath => new ScanIssueResolution
                     {
                         Label = $"Show me the file for {(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "the mod" : modWithMissingPacks.Name)}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
-                        Color = MudBlazor.Color.Default,
+                        Icon = MaterialDesignIcons.Normal.FileFind,
+                        Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
-                    })
+                    }),
+                    new()
+                    {
+                        Icon = MaterialDesignIcons.Normal.Cancel,
+                        Label = "Stop telling me",
+                        CautionCaption = "Disable this scan?",
+                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Data = "stopTellingMe"
+                    }
                 ]
             };
         }
@@ -132,7 +140,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = $"Help me Disable or Remove Packs",
-                        Icon = MaterialDesignIcons.Normal.BagPersonalOff,
+                        Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = $"remove-packs",
                         Url = new("https://jamesturner.yt/disablepacks", UriKind.Absolute)
@@ -140,10 +148,18 @@ public sealed class DependencyScan :
                     ..modWithIncompatiblePacks.FilePaths.Select(filePath => new ScanIssueResolution
                     {
                         Label = $"Show me the file for {(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "the mod" : modWithIncompatiblePacks.Name)}",
-                        Icon = MaterialDesignIcons.Normal.OpenInNew,
-                        Color = MudBlazor.Color.Default,
+                        Icon = MaterialDesignIcons.Normal.FileFind,
+                        Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
-                    })
+                    }),
+                    new()
+                    {
+                        Icon = MaterialDesignIcons.Normal.Cancel,
+                        Label = "Stop telling me",
+                        CautionCaption = "Disable this scan?",
+                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Data = "stopTellingMe"
+                    }
                 ]
             };
         var modsWithMissingDependencyMod = new List<ModWithMissingDependencyMod>();
