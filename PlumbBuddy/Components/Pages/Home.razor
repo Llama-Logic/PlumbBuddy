@@ -15,15 +15,12 @@
             <ScanIssuesDisplay />
         </div>
     </MudTabPanel>
-    @if (catalogIsVisible)
-    {
-        <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
-            <div class="catalog-tab-container">
-                <div class="background"></div>
-                <CatalogDisplay />
-            </div>
-        </MudTabPanel>
-    }
+    <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
+        <div class="catalog-tab-container">
+            <div class="background"></div>
+            <CatalogDisplay />
+        </div>
+    </MudTabPanel>
     @if (Player.Type is UserType.Creator)
     {
         <MudTabPanel Text="Manifest Editor" Icon="@MaterialDesignIcons.Normal.TagEdit">

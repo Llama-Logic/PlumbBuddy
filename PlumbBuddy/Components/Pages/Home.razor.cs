@@ -2,19 +2,6 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
-    bool catalogIsVisible;
-
-    async Task CheckCatalogIsVisibleAsync()
-    {
-        var shouldBeVisible = await PbDbContext.ModFileManifestHashes.AnyAsync(mfmh => mfmh.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))).ConfigureAwait(false);
-        if (catalogIsVisible != shouldBeVisible)
-            StaticDispatcher.Dispatch(() =>
-            {
-                catalogIsVisible = shouldBeVisible;
-                StateHasChanged();
-            });
-    }
-
     /// <inheritdoc />
     public void Dispose()
     {
@@ -26,11 +13,7 @@ partial class Home
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-        {
             StaticDispatcher.Dispatch(StateHasChanged);
-            if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
-                _ = Task.Run(CheckCatalogIsVisibleAsync);
-        }
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -54,7 +37,6 @@ partial class Home
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Player.PropertyChanged += HandlePlayerPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
-        _ = Task.Run(CheckCatalogIsVisibleAsync);
     }
 
     protected override async Task OnInitializedAsync()
