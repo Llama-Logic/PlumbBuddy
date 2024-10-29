@@ -42,6 +42,8 @@ class AppLifecycleManager :
     public Task UiReleaseSignal =>
         startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
 
+    public event EventHandler? ShuttingDown;
+
     public void Dispose()
     {
         Dispose(true);
@@ -73,7 +75,9 @@ class AppLifecycleManager :
             sender.Hide();
             e.Cancel = true;
             SaveWindowPlacement();
+            return;
         }
+        ShuttingDown?.Invoke(this, new());
     }
 
     void HandleWindowActivated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs e) =>
@@ -126,6 +130,9 @@ class AppLifecycleManager :
             xamlWindow.Activate();
         }
     }
+
+    public void SignalShuttingDown() =>
+        ShuttingDown?.Invoke(this, new());
 
     public void WindowFirstShown(Window window)
     {

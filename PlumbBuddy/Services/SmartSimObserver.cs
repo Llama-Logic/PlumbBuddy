@@ -17,11 +17,12 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, PbDbContext pbDbContext)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, PbDbContext pbDbContext)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
+        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
@@ -30,6 +31,7 @@ public partial class SmartSimObserver :
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
+        this.appLifecycleManager = appLifecycleManager;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
@@ -45,6 +47,7 @@ public partial class SmartSimObserver :
         scanIssues = [];
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
+        this.appLifecycleManager.ShuttingDown += HandleAppLifecycleManagerShuttingDown;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         this.player.PropertyChanged += HandlePlayerPropertyChanged;
         ConnectToInstallationDirectory();
@@ -54,6 +57,7 @@ public partial class SmartSimObserver :
     ~SmartSimObserver() =>
         Dispose(false);
 
+    readonly IAppLifecycleManager appLifecycleManager;
     ImmutableArray<FileSystemInfo> cacheComponents;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
@@ -381,6 +385,7 @@ public partial class SmartSimObserver :
     {
         if (userDataDirectoryWatcher is not null)
         {
+            var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
             userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
             userDataDirectoryWatcher.Created -= UserDataDirectoryFileSystemEntryCreatedHandler;
             userDataDirectoryWatcher.Deleted -= UserDataDirectoryFileSystemEntryDeletedHandler;
@@ -388,10 +393,15 @@ public partial class SmartSimObserver :
             userDataDirectoryWatcher.Renamed -= UserDataDirectoryFileSystemEntryRenamedHandler;
             userDataDirectoryWatcher.Dispose();
             userDataDirectoryWatcher = null;
+            if (globalModsManifestPackageFile.Exists)
+            {
+                globalModsManifestPackageFile.Delete();
+                globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+            }
             cacheComponents = [];
-            IsModsDisabledGameSettingOn = true;
-            IsScriptModsEnabledGameSettingOn = false;
-            IsShowModListStartupGameSettingOn = true;
+            IsModsDisabledGameSettingOn = false;
+            IsScriptModsEnabledGameSettingOn = true;
+            IsShowModListStartupGameSettingOn = false;
         }
     }
 
@@ -407,6 +417,7 @@ public partial class SmartSimObserver :
         {
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
+            appLifecycleManager.ShuttingDown -= HandleAppLifecycleManagerShuttingDown;
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
             player.PropertyChanged -= HandlePlayerPropertyChanged;
             lifetimeScope.Dispose();
@@ -495,6 +506,12 @@ public partial class SmartSimObserver :
         {
             throw new ArgumentException("Path is not valid or not within the user data folder", nameof(fullPath), ex);
         }
+    }
+
+    void HandleAppLifecycleManagerShuttingDown(object? sender, EventArgs e)
+    {
+        DisconnectFromInstallationDirectoryWatcher();
+        DisconnectFromUserDataDirectoryWatcher();
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)

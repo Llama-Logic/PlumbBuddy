@@ -15,6 +15,8 @@ public class AppLifecycleManager :
     public Task UiReleaseSignal =>
         Task.CompletedTask;
 
+    public event EventHandler? ShuttingDown;
+
     public void HideWindow()
     {
     }
@@ -22,6 +24,9 @@ public class AppLifecycleManager :
     public void ShowWindow()
     {
     }
+
+    public void SignalShuttingDown() =>
+        ShuttingDown?.Invoke(this, new());
 
     public void WindowFirstShown(Window window)
     {
