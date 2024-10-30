@@ -1,0 +1,46 @@
+@inject IDialogService DialogService
+@inject IPlatformFunctions PlatformFunctions
+@inject IPlayer Player
+
+<MudDialog Class="content-is-vertical-stepper">
+    <TitleContent>
+        <MudStack Row Class="align-center">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">@SupportDiscordName Guided Support Session</MudTextM3>
+            <MudSpacer />
+            <MudTooltip Arrow Text="End the Guided Support Session">
+                <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" OnClick="CloseOnClickHandler" />
+            </MudTooltip>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStepperExtended Color="Color.Info" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled" Vertical Class="mud-width-full mb-3">
+            <ChildContent>
+                @foreach (var step in (ErrorFile is null ? SupportDiscord!.AskForHelpSteps : SupportDiscord!.TextFileSubmissionSteps).GetLanguageOptimalValue())
+                {
+                    <MudStepExtended Icon="@(typeof(MaterialDesignIcons.Normal).GetField(step.Icon, BindingFlags.Public | BindingFlags.Static)?.GetValue(null) is string iconSvg ? iconSvg : MaterialDesignIcons.Normal.TextBox)" Title="@step.Label">
+                        <MudGrid Justify="Justify.FlexStart">
+                            <MudItem>
+                                <MudMarkdown Value="@step.Content" />
+                            </MudItem>
+                            @if (step.ShowGameVersionFileHighlighter)
+                            {
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowGameVersionFileOnClickAsync">Show me my game version file</MudButton>
+                                </MudItem>
+                            }
+                            @if (step.ShowTextFileHighlighter)
+                            {
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowErrorFileOnClickAsync">Show me the error file</MudButton>
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    </MudStepExtended>
+                }
+            </ChildContent>
+        </MudStepperExtended>
+    </DialogContent>
+</MudDialog>

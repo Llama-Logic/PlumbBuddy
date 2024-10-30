@@ -58,6 +58,10 @@ div.mud-input-control.no-material-variant .mud-input > * {
     background-color: color-mix(in srgb, var(--mud-palette-background), var(--mud-palette-tertiary) 10%);
 }
 
+div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:first-child > div:first-child {
+    white-space: nowrap;
+}
+
 .main-menu {
     height: calc(100vh - 331px);
     overflow-y: auto;

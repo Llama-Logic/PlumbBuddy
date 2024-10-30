@@ -14,6 +14,12 @@ partial class MainMenu
         Player.PropertyChanged -= HandlePlayerPropertyChanged;
     }
 
+    async Task HandleAskForHelpOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        await DialogService.AskForHelpAsync(Logger, PublicCatalogs);
+    }
+
     async Task HandleClearCacheOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();

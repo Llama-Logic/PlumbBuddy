@@ -17,7 +17,7 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, PbDbContext pbDbContext)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -27,7 +27,6 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
@@ -36,7 +35,6 @@ public partial class SmartSimObserver :
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
         this.superSnacks = superSnacks;
-        this.pbDbContext = pbDbContext;
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
@@ -77,7 +75,6 @@ public partial class SmartSimObserver :
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     FileSystemWatcher? packsDirectoryWatcher;
-    readonly PbDbContext pbDbContext;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly AsyncLock resamplingPacksTaskLock;
@@ -201,6 +198,22 @@ public partial class SmartSimObserver :
         return false;
     }
 
+    ModsDirectoryFileType CatalogIfLikelyErrorOrTraceLogInRoot(string userDataDirectoryRelativePath)
+    {
+        if (userDataDirectoryRelativePath.Contains(Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            return ModsDirectoryFileType.Ignored;
+        if (!userDataDirectoryRelativePath.Contains("exception", StringComparison.OrdinalIgnoreCase)
+            && !userDataDirectoryRelativePath.Contains("crash", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.Ignored;
+        if (userDataDirectoryRelativePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
+            || userDataDirectoryRelativePath.EndsWith(".log", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.TextFile;
+        if (userDataDirectoryRelativePath.EndsWith(".html", StringComparison.OrdinalIgnoreCase)
+            || userDataDirectoryRelativePath.EndsWith(".htm", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.HtmlFile;
+        return ModsDirectoryFileType.Ignored;
+    }
+
     bool CatalogIfModsDirectory(string userDataDirectoryRelativePath)
     {
         if (userDataDirectoryRelativePath == "Mods")
@@ -319,11 +332,11 @@ public partial class SmartSimObserver :
         }
     }
 
-    void ConnectToUserDataDirectory()
+    async void ConnectToUserDataDirectory()
     {
         if (player.Onboarded && Directory.Exists(player.UserDataFolderPath))
         {
-            Task.Run(ResampleGameOptionsAsync);
+            _ = Task.Run(ResampleGameOptionsAsync);
             cacheComponents =
             [
                 new FileInfo(Path.Combine(player.UserDataFolderPath, "avatarcache.package")),
@@ -334,6 +347,41 @@ public partial class SmartSimObserver :
                 new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "onlinethumbnailcache"))
             ];
             ResampleCacheClarity();
+            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            var userDataFolderTextAndHtmlFiles = new DirectoryInfo(player.UserDataFolderPath)
+                .GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                .Where(f => (f.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase)
+                    || f.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase)
+                    || f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase)
+                    || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase))
+                    && (f.Name.Contains("exception", StringComparison.OrdinalIgnoreCase)
+                    || f.Name.Contains("crash", StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+            var userDataFolderTextAndHtmlFilesOfInterest = await pbDbContext.FilesOfInterest
+                .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty) == foi.Path
+                    && (foi.Path.ToUpper().Replace("EXCEPTION", string.Empty) != foi.Path.ToUpper()
+                    || foi.Path.ToUpper().Replace("CRASH", string.Empty) != foi.Path.ToUpper())
+                    && (foi.FileType == ModsDirectoryFileType.TextFile || foi.FileType == ModsDirectoryFileType.HtmlFile))
+                .ToListAsync().ConfigureAwait(false);
+            await pbDbContext.FilesOfInterest.AddRangeAsync(userDataFolderTextAndHtmlFiles
+                .Where(f => !userDataFolderTextAndHtmlFilesOfInterest.Any(foi => foi.Path == f.Name))
+                .Select(f =>
+                    new FileOfInterest
+                    {
+                        Path = f.Name,
+                        FileType = f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase) || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase)
+                        ? ModsDirectoryFileType.HtmlFile
+                        : ModsDirectoryFileType.TextFile
+                    })).ConfigureAwait(false);
+            await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            var existingFileOfInterestPaths = userDataFolderTextAndHtmlFiles
+                .Select(f => f.Name)
+                .ToList();
+            await pbDbContext.FilesOfInterest
+                .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty).Length == foi.Path.Length
+                    && !Enumerable.Contains(existingFileOfInterestPaths, foi.Path))
+                .ExecuteDeleteAsync().ConfigureAwait(false);
             userDataDirectoryWatcher = new FileSystemWatcher(player.UserDataFolderPath)
             {
                 IncludeSubdirectories = true,
@@ -446,6 +494,7 @@ public partial class SmartSimObserver :
             && globalModsManifestLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false)))
             return;
         var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
+        using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
         foreach (var modFileHashElements in await pbDbContext.ModFileHashes
             .Where(mfh => mfh.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfh.ModFileManifests!.Any())
             .Select(mfh => new
@@ -904,6 +953,20 @@ public partial class SmartSimObserver :
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
+        var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
+        if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
+        {
+            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            pbDbContext.FilesOfInterest.Add(new()
+            {
+                Path = relativePath,
+                FileType = errorOrTraceLogInRootType
+            });
+            pbDbContext.SaveChanges();
+            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+                Scan();
+            return;
+        }
         if (CatalogIfModsDirectory(relativePath))
         {
             FreshenGlobalManifest();
@@ -926,6 +989,16 @@ public partial class SmartSimObserver :
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
+        var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
+        if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
+        {
+            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            var relativePathToLower = relativePath.ToUpperInvariant();
+            pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == relativePathToLower).ExecuteDelete();
+            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+                Scan();
+            return;
+        }
         if (CatalogIfModsDirectory(relativePath))
         {
             FreshenGlobalManifest();
@@ -943,6 +1016,27 @@ public partial class SmartSimObserver :
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
         if (ResampleGameOptionsIfTheyChanged(oldRelativePath) | ResampleGameOptionsIfTheyChanged(relativePath))
             return;
+        var oldErrorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(oldRelativePath);
+        if (oldErrorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
+        {
+            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            var oldRelativePathToLower = relativePath.ToUpperInvariant();
+            pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == oldRelativePathToLower).ExecuteDelete();
+        }
+        var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
+        if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
+        {
+            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            pbDbContext.FilesOfInterest.Add(new()
+            {
+                Path = relativePath,
+                FileType = errorOrTraceLogInRootType
+            });
+            pbDbContext.SaveChanges();
+        }
+        if ((oldErrorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored || errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
+            && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+            Scan();
         if (CatalogIfModsDirectory(oldRelativePath) | CatalogIfModsDirectory(relativePath))
         {
             FreshenGlobalManifest();

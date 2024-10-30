@@ -33,6 +33,17 @@ public class PublicCatalogs :
         }
     }
 
+    public TimeSpan? SupportDiscordsCacheTTL
+    {
+        get
+        {
+            var supportDiscordsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "support-discords.yml"));
+            if (!supportDiscordsCachedFile.Exists)
+                return null;
+            return TimeSpan.FromDays(1) - (DateTime.UtcNow - supportDiscordsCachedFile.LastWriteTimeUtc);
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Dispose()
@@ -54,27 +65,48 @@ public class PublicCatalogs :
     {
         try
         {
-            string packsYaml;
             var packsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "packs.yml"));
             if (!force && packsCachedFile.Exists && packsCachedFile.LastWriteTimeUtc.AddDays(7) > DateTime.UtcNow)
-                packsYaml = await File.ReadAllTextAsync(packsCachedFile.FullName).ConfigureAwait(false);
+                PackCatalog = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, PackDescription>>(await File.ReadAllTextAsync(packsCachedFile.FullName).ConfigureAwait(false));
             else
             {
                 var responseMessage = await client.GetAsync("packs.yml").ConfigureAwait(false);
                 responseMessage.EnsureSuccessStatusCode();
-                packsYaml = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var packsYaml = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var packs = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, PackDescription>>(packsYaml);
                 using var packsCachedFileStream = File.Open(packsCachedFile.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
                 using var packsCachedFileStreamWriter = new StreamWriter(packsCachedFileStream);
                 await packsCachedFileStreamWriter.WriteAsync(packsYaml).ConfigureAwait(false);
                 await packsCachedFileStreamWriter.FlushAsync();
+                PackCatalog = packs;
             }
-            PackCatalog = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, PackDescription>>(packsYaml);
+            throw new FileNotFoundException();
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to fetch pack catalog with force = {Force}", force);
             player.UsePublicPackCatalog = false;
         }
+    }
+
+    public async Task<IReadOnlyDictionary<string, SupportDiscord>> GetSupportDiscordsAsync(bool? useCache = null)
+    {
+        var supportDiscordsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "support-discords.yml"));
+        if (useCache is null or true && supportDiscordsCachedFile.Exists && supportDiscordsCachedFile.LastWriteTimeUtc.AddDays(1) > DateTime.UtcNow)
+            return Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, SupportDiscord>>(await File.ReadAllTextAsync(supportDiscordsCachedFile.FullName).ConfigureAwait(false));
+        else if (useCache is null or false)
+        {
+            var responseMessage = await client.GetAsync("support-discords.yml").ConfigureAwait(false);
+            responseMessage.EnsureSuccessStatusCode();
+            var supportDiscordsYaml = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var supportDiscords = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, SupportDiscord>>(supportDiscordsYaml);
+            using var packsCachedFileStream = File.Open(supportDiscordsCachedFile.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var packsCachedFileStreamWriter = new StreamWriter(packsCachedFileStream);
+            await packsCachedFileStreamWriter.WriteAsync(supportDiscordsYaml).ConfigureAwait(false);
+            await packsCachedFileStreamWriter.FlushAsync();
+            return supportDiscords;
+        }
+        throw new FileNotFoundException();
     }
 
     void HandlerPlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)

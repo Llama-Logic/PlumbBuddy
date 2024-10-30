@@ -9,6 +9,7 @@
 @inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
 @inject IPlayer Player
+@inject IPublicCatalogs PublicCatalogs
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
@@ -136,7 +137,7 @@
             </MudTooltip>
             <MudTooltip Arrow="true" Color="Color.Info">
                 <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" OnClick="HandleAskForHelpOnClickAsync" />
                 </ChildContent>
                 <TooltipContent>
                     <MudStack Row="true">

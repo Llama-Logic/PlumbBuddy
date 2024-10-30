@@ -120,6 +120,9 @@ public partial class MainLayout
         return null;
     }
 
+    async Task HandleAskForHelpOnClickAsync() =>
+        await DialogService.AskForHelpAsync(Logger, PublicCatalogs);
+
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))

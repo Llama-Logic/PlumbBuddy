@@ -33,7 +33,7 @@ public abstract class LooseArchiveScan :
         {
             if (resolutionCmd is "moveToDownloads")
             {
-                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", looseArchiveRelativePath));
+                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, looseArchiveRelativePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -88,11 +88,12 @@ public abstract class LooseArchiveScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
+        var prefix = $"Mods{Path.DirectorySeparatorChar}";
         var foundNaughtyLooseArchives = false;
-        await foreach (var naughtyLooseArchive in pbDbContext.FilesOfInterest.Where(foi => foi.FileType == modDirectoryFileType).AsAsyncEnumerable())
+        await foreach (var naughtyLooseArchive in pbDbContext.FilesOfInterest.Where(foi => foi.FileType == modDirectoryFileType && foi.Path.StartsWith(prefix)).AsAsyncEnumerable())
         {
             foundNaughtyLooseArchives = true;
-            yield return GenerateUncomfortableScanIssue(new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", naughtyLooseArchive.Path)), naughtyLooseArchive);
+            yield return GenerateUncomfortableScanIssue(new FileInfo(Path.Combine(player.UserDataFolderPath, naughtyLooseArchive.Path)), naughtyLooseArchive);
         }
         if (!foundNaughtyLooseArchives)
             yield return GenerateHealthyScanIssue();

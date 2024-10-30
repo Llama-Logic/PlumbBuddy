@@ -1,0 +1,52 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">Select a Support Discord</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStack>
+            <MudMarkdown Value="@description" />
+            <MudPaper Elevation="0" Outlined Class="mud-background pa-4 rounded">
+                <MudGrid Justify="Justify.Center">
+                    @if (relevantSupportDiscords is not null && relevantSupportDiscords.Count is > 0)
+                    {
+                        @foreach (var (supportDiscordName, supportDiscord) in relevantSupportDiscords)
+                        {
+                            <MudItem xs="12" md="6" lg="4">
+                                <MudPaper>
+                                    <MudCard Style="height: 100%;">
+                                        <MudCardMedia Image="@supportDiscord.LogoMedia!.ToString()" Height="150" />
+                                        <MudCardHeader>
+                                            <MudTextM3 Typo="TypoM3.Title">@supportDiscordName</MudTextM3>
+                                        </MudCardHeader>
+                                        <MudCardContent>
+                                            <MudMarkdown Value="@supportDiscord.Description.GetLanguageOptimalValue()" />
+                                        </MudCardContent>
+                                        <MudCardActions>
+                                            <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName))">Pick this Discord</MudButton>
+                                        </MudCardActions>
+                                    </MudCard>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    }
+                    else
+                    {
+                        <MudItem>
+                            <MudPaper Class="rounded">
+                                <MudAlert Severity="Severity.Error" Icon="@MaterialDesignIcons.Normal.ServerOff">
+                                    Whoops, sorry, I couldn't find any Community Support Discord servers prepared to deal with this issue.
+                                </MudAlert>
+                            </MudPaper>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>

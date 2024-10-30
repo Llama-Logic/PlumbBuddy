@@ -13,6 +13,11 @@ public interface IAppLifecycleManager
     Task UiReleaseSignal { get; }
 
     /// <summary>
+    /// Occurs when the app is about to shut down
+    /// </summary>
+    event EventHandler? ShuttingDown;
+
+    /// <summary>
     /// Called when the main window should be hidden
     /// </summary>
     void HideWindow();
@@ -21,6 +26,11 @@ public interface IAppLifecycleManager
     /// Called when the main window should be shown
     /// </summary>
     void ShowWindow();
+
+    /// <summary>
+    /// Called when the app is deliberately stopping
+    /// </summary>
+    void SignalShuttingDown();
 
     /// <summary>
     /// Called when the first launched instance of the app first shows its window

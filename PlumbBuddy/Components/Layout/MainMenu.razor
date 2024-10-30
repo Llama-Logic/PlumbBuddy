@@ -1,9 +1,11 @@
 @implements IDisposable
 @inject IAppLifecycleManager AppLifecycleManager
 @inject IDialogService DialogService
+@inject ILogger<MainMenu> Logger
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlatformFunctions PlatformFunctions
 @inject IPlayer Player
+@inject IPublicCatalogs PublicCatalogs
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
 
@@ -26,7 +28,7 @@
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">Open Downloads Folder</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="HandleOpenModsFolderOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" IconColor="Color.Info">Ask for Help</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">Ask for Help</MudNavLink>
         <MudDivider Class="my-2" />
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">Settings</MudNavLink>
         @if (Player.DevToolsUnlocked)

@@ -447,9 +447,10 @@ public class ModsDirectoryCataloger :
             }
             State = ModsDirectoryCatalogerState.Cataloging;
             using var nestedScope = lifetimeScope.BeginLifetimeScope();
-            var pbDbContext = nestedScope.Resolve<PbDbContext>();
+            using var pbDbContext = nestedScope.Resolve<PbDbContext>();
             while (nomNom.TryDequeue(out var path))
             {
+                var filesOfInterestPath = Path.Combine("Mods", path);
                 var modsDirectoryPath = Path.Combine(player.UserDataFolderPath, "Mods");
                 var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
                 var fullPath = Path.Combine(modsDirectoryPath, path);
@@ -477,7 +478,7 @@ public class ModsDirectoryCataloger :
                                 if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
                                     preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
                                 else if (fileType is not ModsDirectoryFileType.Ignored)
-                                    preservedFileOfInterestPaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                                    preservedFileOfInterestPaths.Add(Path.Combine("Mods", fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
                             }
                             finally
                             {
@@ -497,7 +498,7 @@ public class ModsDirectoryCataloger :
                         )
                         .ConfigureAwait(false);
                     await pbDbContext.FilesOfInterest
-                        .Where(foi => foi.Path.StartsWith(path) && !preservedFileOfInterestPaths.Contains(foi.Path))
+                        .Where(foi => foi.Path.StartsWith(filesOfInterestPath) && !preservedFileOfInterestPaths.Contains(foi.Path))
                         .ExecuteDeleteAsync()
                         .ConfigureAwait(false);
                 }
@@ -510,7 +511,7 @@ public class ModsDirectoryCataloger :
                         .ConfigureAwait(false);
                     modFilesRemoved.ToString();
                     await pbDbContext.FilesOfInterest
-                        .Where(foi => foi.Path.StartsWith(path))
+                        .Where(foi => foi.Path.StartsWith(filesOfInterestPath))
                         .ExecuteDeleteAsync()
                         .ConfigureAwait(false);
                 }
@@ -588,12 +589,13 @@ public class ModsDirectoryCataloger :
         if (fileType is ModsDirectoryFileType.Ignored)
             return;
         var path = fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..];
+        var filesOfInterestPath = Path.Combine("Mods", path);
         if (path is SmartSimObserver.GlobalModsManifestPackageName)
             return;
         try
         {
             using var nestedScope = lifetimeScope.BeginLifetimeScope();
-            var pbDbContext = nestedScope.Resolve<PbDbContext>();
+            using var pbDbContext = nestedScope.Resolve<PbDbContext>();
             if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
             {
                 ModFile? modFile = null;
@@ -787,12 +789,12 @@ public class ModsDirectoryCataloger :
                     await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
                 }
             }
-            else if (fileType is not ModsDirectoryFileType.Ignored && !await pbDbContext.FilesOfInterest.AnyAsync(foi => foi.Path == path).ConfigureAwait(false))
+            else if (fileType is not ModsDirectoryFileType.Ignored && !await pbDbContext.FilesOfInterest.AnyAsync(foi => foi.Path == filesOfInterestPath).ConfigureAwait(false))
             {
                 pbDbContext.FilesOfInterest.Add(new FileOfInterest
                 {
                     FileType = fileType,
-                    Path = path
+                    Path = filesOfInterestPath
                 });
                 using var heldSaveChangesLock = await saveChangesLock.LockAsync().ConfigureAwait(false);
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -822,7 +824,7 @@ public class ModsDirectoryCataloger :
     async Task UpdateAggregatePropertiesAsync()
     {
         using var nestedScope = lifetimeScope.BeginLifetimeScope();
-        var pbDbContext = nestedScope.Resolve<PbDbContext>();
+        using var pbDbContext = nestedScope.Resolve<PbDbContext>();
         await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
     }
 

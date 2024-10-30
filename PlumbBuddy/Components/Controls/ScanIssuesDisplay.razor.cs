@@ -31,9 +31,9 @@ partial class ScanIssuesDisplay
     {
         if (issue.Data is not { } issueData)
             return;
-        if (resolution.CautionCaption is { } caption
-            && resolution.CautionText is { } text
-            && !await DialogService.ShowCautionDialogAsync(caption, text))
+        if (resolution.CautionCaption is { } cautionCaption
+            && resolution.CautionText is { } cautionText
+            && !await DialogService.ShowCautionDialogAsync(cautionCaption, cautionText))
             return;
         await issue.Origin.ResolveIssueAsync(issueData, resolution.Data);
     }
