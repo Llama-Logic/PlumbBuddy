@@ -175,7 +175,7 @@ partial class OnboardingDialog
     }
 
     void HandleUserPreferencesChanged(object? sender, PropertyChangedEventArgs e) =>
-        StateHasChanged();
+        StaticDispatcher.Dispatch(StateHasChanged);
 
     /// <inheritdoc />
     protected override void OnInitialized()

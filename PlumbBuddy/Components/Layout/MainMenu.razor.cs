@@ -74,7 +74,7 @@ partial class MainMenu
         if (e.PropertyName is nameof(IPlayer.CacheStatus))
             StaticDispatcher.Dispatch(StateHasChanged);
         else if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
-            StateHasChanged();
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task HandleReonboardOnClickAsync()

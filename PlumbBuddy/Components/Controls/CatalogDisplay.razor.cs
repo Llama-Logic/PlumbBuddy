@@ -49,7 +49,7 @@ partial class CatalogDisplay
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.UserDataFolderPath))
-            modsFolderPath = Path.Combine(Player.UserDataFolderPath);
+            StaticDispatcher.Dispatch(() => modsFolderPath = Path.Combine(Player.UserDataFolderPath));
     }
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -21,7 +21,7 @@ partial class Home
         if (e.PropertyName is nameof(IPlayer.Theme))
             StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
         if (e.PropertyName is nameof(IPlayer.Type))
-            StateHasChanged();
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)

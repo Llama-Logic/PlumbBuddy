@@ -134,18 +134,20 @@ public partial class MainLayout
         if (e.PropertyName is nameof(IPlayer.CacheStatus))
             StaticDispatcher.Dispatch(StateHasChanged);
         else if (e.PropertyName is nameof(IPlayer.ShowThemeManager))
-        {
-            manualLightDarkModeToggleEnabled = false;
-            manualLightDarkModeToggle = null;
-            if (Application.Current is { } app)
-                SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
-            StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(() =>
+            {
+                manualLightDarkModeToggleEnabled = false;
+                manualLightDarkModeToggle = null;
+                if (Application.Current is { } app)
+                    SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
+                StateHasChanged();
+            });
         else if (e.PropertyName is nameof(IPlayer.Theme))
-        {
-            SetPreferredColorScheme(GetPlayerSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
-            StateHasChanged();
-        }
+            StaticDispatcher.Dispatch(() =>
+            {
+                SetPreferredColorScheme(GetPlayerSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
+                StateHasChanged();
+            });
     }
 
     void HandleSuperSnacksRefreshmentsOffered(object? sender, NummyEventArgs e) =>

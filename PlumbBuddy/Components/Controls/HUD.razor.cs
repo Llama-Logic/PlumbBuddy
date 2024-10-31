@@ -20,7 +20,7 @@ partial class HUD
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IPlayer.Type))
-            StateHasChanged();
+            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -2,7 +2,7 @@ using Octokit;
 
 namespace PlumbBuddy.Services;
 
-public class UpdateManager :
+public sealed class UpdateManager :
     IUpdateManager
 {
     public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
@@ -24,6 +24,9 @@ public class UpdateManager :
         player.VersionAtLastStartup = CurrentVersion;
         ScheduleAutomaticUpdateCheck();
     }
+
+    ~UpdateManager() =>
+        Dispose(false);
 
     readonly AsyncLock automaticLock;
     readonly IBlazorFramework blazorFramework;
@@ -116,6 +119,18 @@ public class UpdateManager :
             logger.LogWarning(ex, "checking for an update failed");
             return (null, null, null);
         }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    void Dispose(bool disposing)
+    {
+        if (disposing)
+            player.PropertyChanged -= HandlePlayerPropertyChanged;
     }
 
     void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
