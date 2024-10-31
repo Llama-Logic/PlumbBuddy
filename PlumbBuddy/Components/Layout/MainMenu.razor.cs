@@ -20,6 +20,16 @@ partial class MainMenu
         await DialogService.AskForHelpAsync(Logger, PublicCatalogs);
     }
 
+    async Task HandleCheckForUpdateAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        var (version, releaseNotes, downloadUrl) = await UpdateManager.CheckForUpdateAsync();
+        if (version is not null)
+            await UpdateManager.PresentUpdateAsync(version, releaseNotes, downloadUrl);
+        else
+            await DialogService.ShowInfoDialogAsync("PlumbBuddy is Up to Date", "You're running the most current stable version. 😁");
+    }
+
     async Task HandleClearCacheOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();

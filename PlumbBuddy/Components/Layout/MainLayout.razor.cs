@@ -172,6 +172,7 @@ public partial class MainLayout
         if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("registerExternalLinkHandler", javaScriptThis);
+            SuperSnacks.StopHoarding();
             if (!Player.Onboarded)
                 await DialogService.ShowOnboardingDialogAsync();
         }

@@ -6,6 +6,8 @@ partial class SettingsDialog
     MudTabs? tabs;
     ThemeSelector? themeSelector;
 
+    bool AutomaticallyCheckForUpdates { get; set; }
+
     string InstallationFolderPath { get; set; } = string.Empty;
 
     [CascadingParameter]
@@ -62,6 +64,7 @@ partial class SettingsDialog
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        AutomaticallyCheckForUpdates = Player.AutomaticallyCheckForUpdates;
         ScanForCacheStaleness = Player.ScanForCacheStaleness;
         ScanForErrorLogs = Player.ScanForErrorLogs;
         ScanForInvalidModSubdirectoryDepth = Player.ScanForInvalidModSubdirectoryDepth;
@@ -98,6 +101,7 @@ partial class SettingsDialog
                 return;
             }
         }
+        Player.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
         Player.InstallationFolderPath = InstallationFolderPath;
         Player.ScanForCacheStaleness = ScanForCacheStaleness;
         Player.ScanForErrorLogs = ScanForErrorLogs;

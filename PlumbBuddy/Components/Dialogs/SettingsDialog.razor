@@ -27,11 +27,14 @@
 <MudStack>
     <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer="true" KeepPanelsAlive="true" PanelClass="pa-6" SliderAnimation="false">
         <MudTabPanel Text="General" Icon="@MaterialDesignIcons.Normal.Cog">
-            <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="@UserType.Casual">Casual Player</MudSelectItem>
-                <MudSelectItem Value="@UserType.Enthusiast">Enthusiast Player</MudSelectItem>
-                <MudSelectItem Value="@UserType.Creator">Mod Creator</MudSelectItem>
-            </MudSelect>
+            <MudStack>
+                <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@UserType.Casual">Casual Player</MudSelectItem>
+                    <MudSelectItem Value="@UserType.Enthusiast">Enthusiast Player</MudSelectItem>
+                    <MudSelectItem Value="@UserType.Creator">Mod Creator</MudSelectItem>
+                </MudSelect>
+                <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
+            </MudStack>
         </MudTabPanel>
         <MudTabPanel Text="Theme" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
             <div class="mx-n6 my-n2 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 210px);">

@@ -74,7 +74,7 @@
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.CubeScan" Title="Scans">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" Title="Mod Health" Optional="false">
                         <ChildContent>
                             @if (Player.Type is UserType.Casual)
                             {
@@ -145,6 +145,25 @@
                                     </MudItem>
                                 </MudGrid>
                             }
+                        </ChildContent>
+                    </MudStepExtended>
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HeartSettings" Title="PlumbBuddy">
+                        <ChildContent>
+                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+                                😁 Well, this is it. The last page. After this you'll be fully on board!
+                            </MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+                                ✔️ Do you want to change any of my default behaviors? ❌
+                            </MudTextM3>
+                            <MudGrid Justify="Justify.Center" Class="my-8">
+                                <MudItem>
+                                    <MudStack>
+                                        <MudTooltip Arrow Color="Color.Primary" Text="Don't worry, I won't download or install anything without your consent. I'll just let you know when an update for me is available.">
+                                            <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
+                                        </MudTooltip>
+                                    </MudStack>
+                                </MudItem>
+                            </MudGrid>
                         </ChildContent>
                     </MudStepExtended>
                 </ChildContent>

@@ -13,6 +13,7 @@ static class Configuration
         services.AddSingleton<ISmartSimObserver, SmartSimObserver>();
         services.AddSingleton<ISuperSnacks, SuperSnacks>();
         services.AddSingleton<IGlobalExceptionCatcher, GlobalExceptionCatcher>();
+        services.AddSingleton<IUpdateManager, UpdateManager>();
         return services;
     }
 }

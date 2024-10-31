@@ -8,6 +8,7 @@
 @inject IPublicCatalogs PublicCatalogs
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
+@inject IUpdateManager UpdateManager
 
 <style>
     nav.main-menu div.mud-nav-item a:not(:hover) {
@@ -22,7 +23,7 @@
     <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" Style="position: absolute; top: 0; right: 0;" OnClick="HandleCloseMenuOnClickAsync" />
     <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">PlumbBuddy</MudTextM3>
     <MudTextM3 Typo="TypoM3.Body" Size="Size.Small" Align="Align.Center">The friendly helper for Sims 4 mods</MudTextM3>
-    <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">(Version @AppInfo.VersionString)</MudTextM3>
+    <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">(Version @(UpdateManager.CurrentVersion))</MudTextM3>
     <MudDivider Class="my-2" />
     <MudNavMenu Class="main-menu">
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">Open Downloads Folder</MudNavLink>
@@ -30,6 +31,7 @@
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">Ask for Help</MudNavLink>
         <MudDivider Class="my-2" />
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Update" IconColor="Color.Info" OnClick="HandleCheckForUpdateAsync">Check for Update</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">Settings</MudNavLink>
         @if (Player.DevToolsUnlocked)
         {

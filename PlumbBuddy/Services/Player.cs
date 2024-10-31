@@ -8,6 +8,18 @@ class Player :
 
     readonly IPreferences preferences;
 
+    public bool AutomaticallyCheckForUpdates
+    {
+        get => preferences.Get(nameof(AutomaticallyCheckForUpdates), false);
+        set
+        {
+            if (AutomaticallyCheckForUpdates == value)
+                return;
+            preferences.Set(nameof(AutomaticallyCheckForUpdates), value);
+            OnPropertyChanged();
+        }
+    }
+
     public SmartSimCacheStatus CacheStatus
     {
         get => Get(nameof(CacheStatus), SmartSimCacheStatus.Clear);
@@ -40,6 +52,18 @@ class Player :
             if (InstallationFolderPath == value)
                 return;
             preferences.Set(nameof(InstallationFolderPath), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTimeOffset? LastCheckForUpdate
+    {
+        get => Get<DateTimeOffset>(nameof(LastCheckForUpdate), out var dto) ? dto : null;
+        set
+        {
+            if (LastCheckForUpdate == value)
+                return;
+            preferences.Set(nameof(LastCheckForUpdate), value?.ToString());
             OnPropertyChanged();
         }
     }
@@ -318,19 +342,49 @@ class Player :
         }
     }
 
+    public Version? VersionAtLastStartup
+    {
+        get => preferences.Get(nameof(VersionAtLastStartup), (string?)null) is string versionStr
+            && Version.TryParse(versionStr, out var version)
+            ? version
+            : null;
+        set
+        {
+            if (VersionAtLastStartup == value)
+                return;
+            preferences.Set(nameof(VersionAtLastStartup), value?.ToString());
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Forget()
     {
         var showThemeManager = ShowThemeManager;
+        var versionAtLastStartup = VersionAtLastStartup;
         Type = UserType.Casual;
         preferences.Clear();
         ShowThemeManager = showThemeManager;
+        VersionAtLastStartup = versionAtLastStartup;
     }
 
     TEnum Get<TEnum>(string key, TEnum defaultValue)
         where TEnum : struct, Enum =>
         Enum.TryParse<TEnum>(preferences.Get(key, defaultValue.ToString()), out var value) ? value : defaultValue;
+
+    bool Get<TParsable>(string key, [NotNullWhen(true)] out TParsable parsable)
+        where TParsable : IParsable<TParsable>
+    {
+        if (preferences.Get(key, (string?)null) is string valueStr
+            && TParsable.TryParse(valueStr, null, out var value))
+        {
+            parsable = value;
+            return true;
+        }
+        parsable = default!;
+        return false;
+    }
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

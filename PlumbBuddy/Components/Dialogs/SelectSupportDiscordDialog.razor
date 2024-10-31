@@ -15,9 +15,9 @@
                         @foreach (var (supportDiscordName, supportDiscord) in relevantSupportDiscords)
                         {
                             <MudItem xs="12" md="6" lg="4">
-                                <MudPaper>
-                                    <MudCard Style="height: 100%;">
-                                        <MudCardMedia Image="@supportDiscord.LogoMedia!.ToString()" Height="150" />
+                                <MudPaper Elevation="5" Style="height: 100%;">
+                                    <MudCard Elevation="0" Style="height: 100%;">
+                                        <MudCardMedia Image="@supportDiscord.LogoMedia!.ToString()" Height="250" Style="background-size: contain;" />
                                         <MudCardHeader>
                                             <MudTextM3 Typo="TypoM3.Title">@supportDiscordName</MudTextM3>
                                         </MudCardHeader>

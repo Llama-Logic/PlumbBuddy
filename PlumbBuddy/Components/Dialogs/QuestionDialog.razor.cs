@@ -11,6 +11,9 @@ partial class QuestionDialog
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
+    [Parameter]
+    public bool UserCanCancel { get; set; }
+
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());
 

@@ -6,6 +6,12 @@ partial class OnboardingDialog
     bool isLoading;
     string? loadingText;
 
+    bool AutomaticallyCheckForUpdates
+    {
+        get => Player.AutomaticallyCheckForUpdates;
+        set => Player.AutomaticallyCheckForUpdates = value;
+    }
+
     string InstallationFolderPath
     {
         get => Player.InstallationFolderPath;
@@ -133,7 +139,7 @@ partial class OnboardingDialog
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
-        if (targetIndex is >= 5)
+        if (targetIndex is >= 6)
         {
             if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
             {

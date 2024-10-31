@@ -294,39 +294,45 @@ public partial class SmartSimObserver :
     {
         if (player.Onboarded && Directory.Exists(player.InstallationFolderPath))
         {
-            installationDirectoryWatcher = new FileSystemWatcher(player.InstallationFolderPath)
+            if (installationDirectoryWatcher is null)
             {
-                IncludeSubdirectories = true,
-                NotifyFilter =
-                      NotifyFilters.CreationTime
-                    | NotifyFilters.DirectoryName
-                    | NotifyFilters.FileName
-                    | NotifyFilters.LastWrite
-                    | NotifyFilters.Size
-            };
-            installationDirectoryWatcher.Changed += InstallationDirectoryFileSystemEntryChangedHandler;
-            installationDirectoryWatcher.Created += InstallationDirectoryFileSystemEntryCreatedHandler;
-            installationDirectoryWatcher.Deleted += InstallationDirectoryFileSystemEntryDeletedHandler;
-            installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
-            installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
-            installationDirectoryWatcher.EnableRaisingEvents = true;
+                installationDirectoryWatcher = new FileSystemWatcher(player.InstallationFolderPath)
+                {
+                    IncludeSubdirectories = true,
+                    NotifyFilter =
+                          NotifyFilters.CreationTime
+                        | NotifyFilters.DirectoryName
+                        | NotifyFilters.FileName
+                        | NotifyFilters.LastWrite
+                        | NotifyFilters.Size
+                };
+                installationDirectoryWatcher.Changed += InstallationDirectoryFileSystemEntryChangedHandler;
+                installationDirectoryWatcher.Created += InstallationDirectoryFileSystemEntryCreatedHandler;
+                installationDirectoryWatcher.Deleted += InstallationDirectoryFileSystemEntryDeletedHandler;
+                installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
+                installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
+                installationDirectoryWatcher.EnableRaisingEvents = true;
+            }
             CheckIfSteam();
-            packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
+            if (packsDirectoryWatcher is null)
             {
-                IncludeSubdirectories = true,
-                NotifyFilter =
-                      NotifyFilters.CreationTime
-                    | NotifyFilters.DirectoryName
-                    | NotifyFilters.FileName
-                    | NotifyFilters.LastWrite
-                    | NotifyFilters.Size
-            };
-            packsDirectoryWatcher.Changed += PacksDirectoryFileSystemEntryChangedHandler;
-            packsDirectoryWatcher.Created += PacksDirectoryFileSystemEntryCreatedHandler;
-            packsDirectoryWatcher.Deleted += PacksDirectoryFileSystemEntryDeletedHandler;
-            packsDirectoryWatcher.Error += PacksDirectoryWatcherErrorHandler;
-            packsDirectoryWatcher.Renamed += PacksDirectoryFileSystemEntryRenamedHandler;
-            packsDirectoryWatcher.EnableRaisingEvents = true;
+                packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
+                {
+                    IncludeSubdirectories = true,
+                    NotifyFilter =
+                          NotifyFilters.CreationTime
+                        | NotifyFilters.DirectoryName
+                        | NotifyFilters.FileName
+                        | NotifyFilters.LastWrite
+                        | NotifyFilters.Size
+                };
+                packsDirectoryWatcher.Changed += PacksDirectoryFileSystemEntryChangedHandler;
+                packsDirectoryWatcher.Created += PacksDirectoryFileSystemEntryCreatedHandler;
+                packsDirectoryWatcher.Deleted += PacksDirectoryFileSystemEntryDeletedHandler;
+                packsDirectoryWatcher.Error += PacksDirectoryWatcherErrorHandler;
+                packsDirectoryWatcher.Renamed += PacksDirectoryFileSystemEntryRenamedHandler;
+                packsDirectoryWatcher.EnableRaisingEvents = true;
+            }
             ResampleInstalledPackCodes();
             UpdateScanInitializationStatus();
         }
@@ -382,6 +388,8 @@ public partial class SmartSimObserver :
                 .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty).Length == foi.Path.Length
                     && !Enumerable.Contains(existingFileOfInterestPaths, foi.Path))
                 .ExecuteDeleteAsync().ConfigureAwait(false);
+            if (userDataDirectoryWatcher is not null)
+                return;
             userDataDirectoryWatcher = new FileSystemWatcher(player.UserDataFolderPath)
             {
                 IncludeSubdirectories = true,
@@ -407,7 +415,7 @@ public partial class SmartSimObserver :
 
     void DisconnectFromInstallationDirectoryWatcher()
     {
-        if (installationDirectoryWatcher is not null)
+        if (this.installationDirectoryWatcher is { } installationDirectoryWatcher)
         {
             installationDirectoryWatcher.Changed -= InstallationDirectoryFileSystemEntryChangedHandler;
             installationDirectoryWatcher.Created -= InstallationDirectoryFileSystemEntryCreatedHandler;
@@ -417,7 +425,7 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Dispose();
             installationDirectoryWatcher = null;
         }
-        if (packsDirectoryWatcher is not null)
+        if (this.packsDirectoryWatcher is { } packsDirectoryWatcher)
         {
             packsDirectoryWatcher.Changed -= PacksDirectoryFileSystemEntryChangedHandler;
             packsDirectoryWatcher.Created -= PacksDirectoryFileSystemEntryCreatedHandler;
@@ -431,7 +439,7 @@ public partial class SmartSimObserver :
 
     void DisconnectFromUserDataDirectoryWatcher()
     {
-        if (userDataDirectoryWatcher is not null)
+        if (this.userDataDirectoryWatcher is { } userDataDirectoryWatcher)
         {
             var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
             userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
@@ -443,7 +451,13 @@ public partial class SmartSimObserver :
             userDataDirectoryWatcher = null;
             if (globalModsManifestPackageFile.Exists)
             {
-                globalModsManifestPackageFile.Delete();
+                try
+                {
+                    globalModsManifestPackageFile.Delete();
+                }
+                catch (IOException)
+                {
+                }
                 globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
             }
             cacheComponents = [];
@@ -594,7 +608,7 @@ public partial class SmartSimObserver :
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToUserDataDirectory();
         }
-        else if (e.PropertyName?.StartsWith("Scan", StringComparison.OrdinalIgnoreCase) ?? false)
+        else if ((e.PropertyName?.StartsWith("Scan", StringComparison.OrdinalIgnoreCase) ?? false) && player.Onboarded)
             UpdateScanInitializationStatus();
     }
 
@@ -608,7 +622,8 @@ public partial class SmartSimObserver :
                     `{electronicArtsPromoCode}`<br />
                     Since you're interested in **{packCode}** because of how it works with this mod, would you like to support {creators.Humanize()} by entering this Promo Code at check-out?<br />
                     Doing so **will not cost you any more**, but it will cause {creators.Humanize()} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!
-                    """) is not { } copyToClipboardPreference)
+                    """,
+                    true) is not { } copyToClipboardPreference)
                 return;
             if (copyToClipboardPreference)
             {
@@ -962,7 +977,14 @@ public partial class SmartSimObserver :
                 Path = relativePath,
                 FileType = errorOrTraceLogInRootType
             });
-            pbDbContext.SaveChanges();
+            try
+            {
+                pbDbContext.SaveChanges();
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                // do nothing, it's already there
+            }
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
                 Scan();
             return;
@@ -1032,7 +1054,14 @@ public partial class SmartSimObserver :
                 Path = relativePath,
                 FileType = errorOrTraceLogInRootType
             });
-            pbDbContext.SaveChanges();
+            try
+            {
+                pbDbContext.SaveChanges();
+            }
+            catch (DbUpdateException dbUpdateEx) when (dbUpdateEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
+            {
+                // do nothing, it's already there
+            }
         }
         if ((oldErrorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored || errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
             && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)

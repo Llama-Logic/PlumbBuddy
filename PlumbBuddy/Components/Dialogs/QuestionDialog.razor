@@ -9,7 +9,10 @@
         <MudMarkdown Value="@Text" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        @if (UserCanCancel)
+        {
+            <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        }
         <MudButton OnClick="NoOnClickHandler">No</MudButton>
         <MudButton OnClick="YesOnClickHandler" Color="Color.Primary">Yes</MudButton>
     </DialogActions>

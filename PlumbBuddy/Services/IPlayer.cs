@@ -3,9 +3,11 @@ namespace PlumbBuddy.Services;
 public interface IPlayer :
     INotifyPropertyChanged
 {
+    bool AutomaticallyCheckForUpdates { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
     bool DevToolsUnlocked { get; set; }
     string InstallationFolderPath { get; set; }
+    DateTimeOffset? LastCheckForUpdate { get; set; }
     bool Onboarded { get; set; }
     bool ScanForCacheStaleness { get; set; }
     bool ScanForErrorLogs { get; set; }
@@ -28,6 +30,7 @@ public interface IPlayer :
     UserType Type { get; set; }
     bool UsePublicPackCatalog { get; set; }
     string UserDataFolderPath { get; set; }
+    Version? VersionAtLastStartup { get; set; }
 
     void Forget();
 }

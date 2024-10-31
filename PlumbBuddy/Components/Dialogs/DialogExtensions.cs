@@ -5,7 +5,7 @@ static class DialogExtensions
     public static Task AskForHelpAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, FileInfo? errorFile = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !await ShowCautionDialogAsync(dialogService, "I need to talk to the PlumbBuddy website", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that."))
+            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
                 return;
             IReadOnlyDictionary<string, SupportDiscord> supportDiscords;
             try
@@ -79,16 +79,18 @@ static class DialogExtensions
             NoHeader = false
         })).Result;
 
-    public static Task<bool?> ShowQuestionDialogAsync(this IDialogService dialogService, string caption, string text) =>
+    public static Task<bool?> ShowQuestionDialogAsync(this IDialogService dialogService, string caption, string text, bool userCanCancel = false, bool big = false) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             var dialog = await dialogService.ShowAsync<QuestionDialog>(caption, new DialogParameters<QuestionDialog>()
             {
                 { x => x.Caption, caption },
-                { x => x.Text, text }
+                { x => x.Text, text },
+                { x => x.UserCanCancel, userCanCancel }
             }, new DialogOptions
             {
-                MaxWidth = MaxWidth.Small
+                FullWidth = big,
+                MaxWidth = big ? MaxWidth.Large : MaxWidth.Small
             });
             if (await dialog.Result is { } dialogResult
                 && !dialogResult.Canceled
