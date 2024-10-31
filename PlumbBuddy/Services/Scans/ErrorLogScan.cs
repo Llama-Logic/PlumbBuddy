@@ -72,7 +72,7 @@ public sealed class ErrorLogScan :
             {
                 Caption = player.Type is UserType.Casual
                     ? "The Game or one of Your Mods is Calling for Help!"
-                    : "Likely Error or Trace Log File Found",
+                    : "A File Likely Containing an Error Has Been Found",
                 Description =
                     player.Type is UserType.Casual
                     ?
