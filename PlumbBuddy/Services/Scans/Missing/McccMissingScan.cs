@@ -4,8 +4,8 @@ public sealed class McccMissingScan :
     MissingScan,
     IMcccMissingScan
 {
-    public McccMissingScan(PbDbContext pbDbContext, IPlayer player) :
-        base(pbDbContext, player)
+    public McccMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player) :
+        base(pbDbContextFactory, player)
     {
     }
 

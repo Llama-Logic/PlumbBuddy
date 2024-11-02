@@ -4,8 +4,8 @@ public sealed class LooseRarArchiveScan :
     LooseArchiveScan,
     ILooseRarArchiveScan
 {
-    public LooseRarArchiveScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, ISuperSnacks superSnacks) :
-        base(platformFunctions, pbDbContext, player, superSnacks, ModsDirectoryFileType.RarArchive)
+    public LooseRarArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, player, superSnacks, ModsDirectoryFileType.RarArchive)
     {
     }
 

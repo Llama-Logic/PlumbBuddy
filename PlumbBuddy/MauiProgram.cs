@@ -57,16 +57,13 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(Preferences.Default);
 
-        builder.Services.AddDbContext<PbDbContext>
+        builder.Services.AddDbContextFactory<PbDbContext>
         (
-            (serviceProvider, options) => options
+            (options) => options
                 .UseSqlite($"Data Source={Path.Combine(FileSystem.AppDataDirectory, "PlumbBuddy.sqlite")}", options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 #if DEBUG
                 .EnableSensitiveDataLogging()
 #endif
-                ,
-            ServiceLifetime.Transient,
-            ServiceLifetime.Transient
         );
 
         builder.Services.AddPlumbBuddyServices();

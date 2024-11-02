@@ -5,10 +5,11 @@ public partial class App :
 {
     //const string packCodesModelMigration = "20241015012905_ModelV1";
 
-    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, PbDbContext pbDbContext, IAppLifecycleManager appLifecycleManager)
+    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager)
     {
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        using var pbDbContext = pbDbContextFactory.CreateDbContext();
         var allMigrations = pbDbContext.Database.GetMigrations();
         //if (!allMigrations.Contains(packCodesModelMigration))
         //    throw new InvalidOperationException("The pack codes model migration was removed. This logic needs to be refactored.");

@@ -4,9 +4,9 @@ public abstract class SettingScan :
     Scan,
     ISettingScan
 {
-    protected SettingScan(PbDbContext pbDbContext, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
+    protected SettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
     {
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
@@ -14,7 +14,7 @@ public abstract class SettingScan :
         ArgumentException.ThrowIfNullOrWhiteSpace(undesirableScanIssueData);
         ArgumentException.ThrowIfNullOrWhiteSpace(undesirableScanIssueFixResolutionData);
         ArgumentException.ThrowIfNullOrWhiteSpace(undesirableScanIssueStopResolutionData);
-        this.pbDbContext = pbDbContext;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.player = player;
         this.smartSimObserver = smartSimObserver;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
@@ -27,7 +27,7 @@ public abstract class SettingScan :
 
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly ModsDirectoryFileType modDirectoryFileType;
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlayer player;
     readonly ISmartSimObserver smartSimObserver;
     readonly ISuperSnacks superSnacks;
@@ -77,6 +77,7 @@ public abstract class SettingScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         if (await pbDbContext.ModFiles.AnyAsync(mf => mf.Path != null && mf.FileType == modDirectoryFileType).ConfigureAwait(false)
             && AreGameOptionsUndesirable(smartSimObserver))
             yield return GenerateUndesirableScanIssue();

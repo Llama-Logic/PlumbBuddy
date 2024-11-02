@@ -4,17 +4,17 @@ public sealed class MultipleModVersionsScan :
     Scan,
     IMultipleModVersionsScan
 {
-    public MultipleModVersionsScan(IPlatformFunctions platformFunctions, IPlayer player, PbDbContext pbDbContext)
+    public MultipleModVersionsScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.player = player;
-        this.pbDbContext = pbDbContext;
     }
 
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
 
@@ -32,6 +32,7 @@ public sealed class MultipleModVersionsScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var modFileManfiestHashId in await pbDbContext.ModFileManifestHashes
             .Where(mfmh => mfmh.ManifestsByCalculation!.Concat(mfmh.ManifestsBySubsumption!).Distinct().Sum(mfm => mfm.ModFileHash!.ModFiles!.Count(mf => mf.Path != null && mf.AbsenceNoticed == null)) > 1)
             .Select(mfmh => mfmh.Id)

@@ -4,8 +4,8 @@ public sealed class BeMissingScan :
     MissingScan,
     IBeMissingScan
 {
-    public BeMissingScan(PbDbContext pbDbContext, IPlayer player) :
-        base(pbDbContext, player)
+    public BeMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player) :
+        base(pbDbContextFactory, player)
     {
     }
 

@@ -8,16 +8,22 @@ public class ShowModListStartupSettingScan :
     const string uncomfortableScanIssueFixResolutionData = "disableShowAtStartup";
     const string uncomfortableScanIssueStopResolutionData = "stopScanning";
 
-    public ShowModListStartupSettingScan(PbDbContext pbDbContext, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(pbDbContext, player, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, uncomfortableScanIssueData, uncomfortableScanIssueFixResolutionData, uncomfortableScanIssueStopResolutionData)
+    public ShowModListStartupSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, player, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, uncomfortableScanIssueData, uncomfortableScanIssueFixResolutionData, uncomfortableScanIssueStopResolutionData)
     {
     }
 
-    protected override bool AreGameOptionsUndesirable(ISmartSimObserver smartSimObserver) =>
-        smartSimObserver.IsShowModListStartupGameSettingOn;
+    protected override bool AreGameOptionsUndesirable(ISmartSimObserver smartSimObserver)
+    {
+        ArgumentNullException.ThrowIfNull(smartSimObserver);
+        return smartSimObserver.IsShowModListStartupGameSettingOn;
+    }
 
-    protected override void CorrectIniOptions(IniParser.Model.KeyDataCollection options) =>
+    protected override void CorrectIniOptions(IniParser.Model.KeyDataCollection options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
         options["showmodliststartup"] = "0";
+    }
 
     protected override ScanIssue GenerateUndesirableScanIssue() =>
         new()

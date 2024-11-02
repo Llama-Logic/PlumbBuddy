@@ -4,17 +4,17 @@ public class ExclusivityScan :
     Scan,
     IExclusivityScan
 {
-    public ExclusivityScan(IPlatformFunctions platformFunctions, IPlayer player, PbDbContext pbDbContext)
+    public ExclusivityScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.player = player;
-        this.pbDbContext = pbDbContext;
     }
 
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
 
@@ -32,6 +32,7 @@ public class ExclusivityScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var (exclusivity, conflictedMods) in pbDbContext.ModExclusivities
             .Where(me => me.SpecifiedByModFileManifests!.Count(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null)) > 1)
             .Select(me => ValueTuple.Create

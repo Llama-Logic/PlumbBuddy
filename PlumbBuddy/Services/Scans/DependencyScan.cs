@@ -28,22 +28,22 @@ public sealed class DependencyScan :
     record ModWithMissingDependencyMod(long ModManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
     record ModWithMissingPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
 
-    public DependencyScan(IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, IPlayer player, ISmartSimObserver smartSimObserver, PbDbContext pbDbContext)
+    public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, IPlayer player, ISmartSimObserver smartSimObserver)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.blazorFramework = blazorFramework;
         this.player = player;
         this.smartSimObserver = smartSimObserver;
-        this.pbDbContext = pbDbContext;
     }
 
     readonly IBlazorFramework blazorFramework;
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly ISmartSimObserver smartSimObserver;
@@ -64,6 +64,7 @@ public sealed class DependencyScan :
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         var installedPackCodes = smartSimObserver.InstalledPackCodes;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modWithMissingPacks in pbDbContext.ModFileManifests
             .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfm.RequiredPacks!.Any(pc => !installedPackCodes.Contains(pc.Code.ToUpper())))
             .Select(mfm => new ModWithMissingPacks

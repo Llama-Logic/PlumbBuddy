@@ -93,21 +93,24 @@ partial class ModComponentEditor
             <iframe src="https://giphy.com/embed/4DvP1HK8UviaOuRcCY" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/SPTV-be-careful-cordell-walker-texas-ranger-4DvP1HK8UviaOuRcCY">via GIPHY</a></p>
             """))
             return;
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleSubsumedHashesChanged(SubsumedHashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
     }
 
     async Task HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync()
     {
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
     }
 
     async Task HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync()
     {
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
     }

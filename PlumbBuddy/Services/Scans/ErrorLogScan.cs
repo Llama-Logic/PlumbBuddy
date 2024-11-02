@@ -4,25 +4,25 @@ public sealed class ErrorLogScan :
     Scan,
     IErrorLogScan
 {
-    public ErrorLogScan(ILogger<ErrorLogScan> logger, IPlatformFunctions platformFunctions, IPlayer player, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework, PbDbContext pbDbContext)
+    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(publicCatalogs);
         ArgumentNullException.ThrowIfNull(blazorFramework);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
         this.logger = logger;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.publicCatalogs = publicCatalogs;
         this.blazorFramework = blazorFramework;
-        this.pbDbContext = pbDbContext;
     }
 
     readonly IBlazorFramework blazorFramework;
     readonly ILogger<ErrorLogScan> logger;
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly IPublicCatalogs publicCatalogs;
@@ -63,6 +63,7 @@ public sealed class ErrorLogScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var errorFilePath in pbDbContext.FilesOfInterest
             .Where(foi => (foi.FileType == ModsDirectoryFileType.TextFile || foi.FileType == ModsDirectoryFileType.HtmlFile)
                 && (foi.Path.ToLower().Contains("exception") || foi.Path.ToLower().Contains("crash")))

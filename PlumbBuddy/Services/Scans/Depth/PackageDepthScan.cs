@@ -4,8 +4,8 @@ public sealed class PackageDepthScan :
     DepthScan,
     IPackageDepthScan
 {
-    public PackageDepthScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(platformFunctions, pbDbContext, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, 5)
+    public PackageDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, 5)
     {
     }
 

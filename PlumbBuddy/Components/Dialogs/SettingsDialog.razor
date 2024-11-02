@@ -27,7 +27,7 @@
 <MudStack>
     <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer="true" KeepPanelsAlive="true" PanelClass="pa-6" SliderAnimation="false">
         <MudTabPanel Text="General" Icon="@MaterialDesignIcons.Normal.Cog">
-            <MudStack>
+            <MudStack Class="ma-4">
                 <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
                     <MudSelectItem Value="@UserType.Casual">Casual Player</MudSelectItem>
                     <MudSelectItem Value="@UserType.Enthusiast">Enthusiast Player</MudSelectItem>

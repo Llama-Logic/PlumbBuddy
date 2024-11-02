@@ -4,15 +4,15 @@ public abstract class DepthScan :
     Scan,
     IDepthScan
 {
-    protected DepthScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
+    protected DepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.pbDbContext = pbDbContext;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
@@ -23,7 +23,7 @@ public abstract class DepthScan :
     readonly int maximumDepth;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly ModsDirectoryFileType modsDirectoryFileType;
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly ISuperSnacks superSnacks;
@@ -182,6 +182,7 @@ public abstract class DepthScan :
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         var anyLostInTheAbyss = false;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var offendingModFile in pbDbContext.ModFiles.Where(mf => mf.Path != null && mf.FileType == modsDirectoryFileType && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length > maximumDepth).AsAsyncEnumerable())
         {
             anyLostInTheAbyss = true;

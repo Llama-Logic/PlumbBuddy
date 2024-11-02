@@ -4,8 +4,8 @@ public sealed class Ts4ScriptDepthScan :
     DepthScan,
     ITs4ScriptDepthScan
 {
-    public Ts4ScriptDepthScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(platformFunctions, pbDbContext, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, 1)
+    public Ts4ScriptDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, 1)
     {
     }
 

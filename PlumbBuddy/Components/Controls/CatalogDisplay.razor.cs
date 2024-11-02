@@ -134,7 +134,8 @@ partial class CatalogDisplay
     {
         var userDataFolderPath = Player.UserDataFolderPath;
         var mods = new Dictionary<ModKey, List<ModValue>>();
-        foreach (var activeManifest in await PbDbContext.ModFileManifestHashes
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
             .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))
             .Include(mfm => mfm.ModFileHash!)
@@ -170,12 +171,12 @@ partial class CatalogDisplay
             values.Add(new
             (
                 activeManifest.ToModel(),
-                activeManifest.ModFileHash!.ModFiles!.Where(mf => mf.Path is not null).Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList(),
+                activeManifest.ModFileHash!.ModFiles!.Where(mf => mf.Path is not null && mf.AbsenceNoticed is null).Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new ModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList(),
                 (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new ModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList()
             ));
         }
-        var readOnlyMods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<ModKey> dependencies, IReadOnlyList<ModKey> dependents)>)kv.Value.Select(manifestAndFiles => (manifestAndFiles.Manifest, (IReadOnlyList<FileInfo>)[.. manifestAndFiles.Files], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependencies], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependents])).ToImmutableArray());
+        var readOnlyMods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<ModKey> dependencies, IReadOnlyList<ModKey> dependents)>)kv.Value.Select(manifestAndFiles => (manifestAndFiles.Manifest, (IReadOnlyList<FileInfo>)[.. manifestAndFiles.Files], (IReadOnlyList<ModKey>)[.. manifestAndFiles.Dependencies], (IReadOnlyList<ModKey>)[..manifestAndFiles.Dependents])).ToImmutableArray());
         StaticDispatcher.Dispatch(() =>
         {
             this.mods = readOnlyMods;

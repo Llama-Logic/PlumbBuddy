@@ -4,21 +4,21 @@ public abstract class LooseArchiveScan :
     Scan,
     ILooseArchiveScan
 {
-    protected LooseArchiveScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
+    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.pbDbContext = pbDbContext;
         this.player = player;
         this.superSnacks = superSnacks;
         this.modDirectoryFileType = modDirectoryFileType;
     }
 
     readonly ModsDirectoryFileType modDirectoryFileType;
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly ISuperSnacks superSnacks;
@@ -90,6 +90,7 @@ public abstract class LooseArchiveScan :
     {
         var prefix = $"Mods{Path.DirectorySeparatorChar}";
         var foundNaughtyLooseArchives = false;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var naughtyLooseArchive in pbDbContext.FilesOfInterest.Where(foi => foi.FileType == modDirectoryFileType && foi.Path.StartsWith(prefix)).AsAsyncEnumerable())
         {
             foundNaughtyLooseArchives = true;

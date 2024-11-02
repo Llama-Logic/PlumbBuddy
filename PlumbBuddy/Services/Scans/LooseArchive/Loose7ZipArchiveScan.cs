@@ -4,8 +4,8 @@ public sealed class Loose7ZipArchiveScan :
     LooseArchiveScan,
     ILoose7ZipArchiveScan
 {
-    public Loose7ZipArchiveScan(IPlatformFunctions platformFunctions, PbDbContext pbDbContext, IPlayer player, ISuperSnacks superSnacks) :
-        base(platformFunctions, pbDbContext, player, superSnacks, ModsDirectoryFileType.SevenZipArchive)
+    public Loose7ZipArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, player, superSnacks, ModsDirectoryFileType.SevenZipArchive)
     {
     }
 

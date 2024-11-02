@@ -4,8 +4,8 @@ public sealed class ModGuardMissingScan :
     MissingScan,
     IModGuardMissingScan
 {
-    public ModGuardMissingScan(PbDbContext pbDbContext, IPlayer player) :
-        base(pbDbContext, player)
+    public ModGuardMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player) :
+        base(pbDbContextFactory, player)
     {
     }
 

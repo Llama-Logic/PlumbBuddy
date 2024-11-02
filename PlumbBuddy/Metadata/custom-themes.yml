@@ -20,6 +20,10 @@ amethyst-lilac:
       light: manifest-editor.png
       repeat: no-repeat
       size: contain
+    simvault:
+      dark: simvault.png
+      light: simvault.png
+      size: initial
 
 sim-realist:
   display_name: Sim Realist

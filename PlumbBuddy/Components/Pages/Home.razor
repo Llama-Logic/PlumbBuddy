@@ -3,9 +3,9 @@
 @inject ICustomThemes CustomThemes
 @inject IJSRuntime JSRuntime
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlayer Player
 @inject ISmartSimObserver SmartSimObserver
-@inject PbDbContext PbDbContext
 
 <div class="main-tabs-backdrop"></div>
 <MudTabs Centered="true" MinimumTabWidth="200px" KeepPanelsAlive Class="main-tabs">

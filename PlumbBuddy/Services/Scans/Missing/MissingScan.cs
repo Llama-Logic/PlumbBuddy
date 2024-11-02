@@ -4,15 +4,15 @@ public abstract class MissingScan :
     Scan,
     IMissingScan
 {
-    public MissingScan(PbDbContext pbDbContext, IPlayer player)
+    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player)
     {
-        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(player);
-        this.pbDbContext = pbDbContext;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.player = player;
     }
 
-    readonly PbDbContext pbDbContext;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlayer player;
 
     protected abstract string ModName { get; }
@@ -166,6 +166,7 @@ public abstract class MissingScan :
             };
         else
         {
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var requiredElementMissing = false;
             if (RequiredPackageKeys is { } keys)
                 foreach (var key in keys)

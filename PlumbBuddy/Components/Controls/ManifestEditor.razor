@@ -2,10 +2,10 @@
 @inject IDialogService DialogService
 @inject IJSRuntime JSRuntime
 @inject ILogger<ManifestEditor> Logger
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
 @inject IPlayer Player
 @inject IPublicCatalogs PublicCatalogs
-@inject PbDbContext PbDbContext
 
 <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
     <MudStepperExtended @ref="stepper" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%;" PreventStepChangeAsync="HandlePreventStepChangeAsync">

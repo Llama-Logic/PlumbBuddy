@@ -1,10 +1,10 @@
 @implements IDisposable
 @inject IDialogService DialogService
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
 @inject IPlayer Player;
 @inject ISmartSimObserver SmartSimObserver
-@inject PbDbContext PbDbContext
 
 <MudGrid Justify="Justify.Center" Class="align-center">
     <MudItem Class="flex-grow-1">

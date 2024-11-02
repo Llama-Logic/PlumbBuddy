@@ -267,16 +267,16 @@ public class ModsDirectoryCataloger :
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
     static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
 
-    public ModsDirectoryCataloger(ILifetimeScope lifetimeScope, ILogger<IModsDirectoryCataloger> logger, IPlatformFunctions platformFunctions, ISynchronization synchronization, IPlayer player, ISuperSnacks superSnacks)
+    public ModsDirectoryCataloger(ILogger<IModsDirectoryCataloger> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISynchronization synchronization, IPlayer player, ISuperSnacks superSnacks)
     {
-        ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(synchronization);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(superSnacks);
-        this.lifetimeScope = lifetimeScope;
         this.logger = logger;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.superSnacks = superSnacks;
@@ -293,10 +293,10 @@ public class ModsDirectoryCataloger :
     readonly AsyncManualResetEvent busyManualResetEvent;
     TimeSpan? estimatedStateTimeRemaining;
     readonly AsyncManualResetEvent idleManualResetEvent;
-    readonly ILifetimeScope lifetimeScope;
     readonly ILogger<IModsDirectoryCataloger> logger;
     int packageCount;
     readonly AsyncProducerConsumerQueue<string> pathsProcessingQueue;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     int pythonByteCodeFileCount;
@@ -443,8 +443,7 @@ public class ModsDirectoryCataloger :
                 }
             }
             State = ModsDirectoryCatalogerState.Cataloging;
-            using var nestedScope = lifetimeScope.BeginLifetimeScope();
-            using var pbDbContext = nestedScope.Resolve<PbDbContext>();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             while (nomNom.TryDequeue(out var path))
             {
                 var filesOfInterestPath = Path.Combine("Mods", path);
@@ -591,8 +590,7 @@ public class ModsDirectoryCataloger :
             return;
         try
         {
-            using var nestedScope = lifetimeScope.BeginLifetimeScope();
-            using var pbDbContext = nestedScope.Resolve<PbDbContext>();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
             {
                 ModFile? modFile = null;
@@ -820,8 +818,7 @@ public class ModsDirectoryCataloger :
 
     async Task UpdateAggregatePropertiesAsync()
     {
-        using var nestedScope = lifetimeScope.BeginLifetimeScope();
-        using var pbDbContext = nestedScope.Resolve<PbDbContext>();
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
     }
 

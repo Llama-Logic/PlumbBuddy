@@ -542,7 +542,8 @@ partial class ManifestEditor
 
     async Task HandleAddRequiredModOnClickedAsync()
     {
-        if (await ModFileSelector.SelectAModFileManifestAsync(PbDbContext, DialogService) is { } manifest)
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService) is { } manifest)
         {
             var requiredFeatures = string.Empty;
             if (manifest.Features.Count is > 0)

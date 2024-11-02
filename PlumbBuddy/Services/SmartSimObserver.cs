@@ -17,10 +17,11 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
@@ -28,6 +29,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
@@ -75,6 +77,7 @@ public partial class SmartSimObserver :
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? packsDirectoryWatcher;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
     readonly AsyncLock resamplingPacksTaskLock;
@@ -360,7 +363,7 @@ public partial class SmartSimObserver :
                 new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "onlinethumbnailcache"))
             ];
             ResampleCacheClarity();
-            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             var userDataFolderTextAndHtmlFiles = new DirectoryInfo(player.UserDataFolderPath)
                 .GetFiles("*.*", SearchOption.TopDirectoryOnly)
@@ -517,7 +520,7 @@ public partial class SmartSimObserver :
             && globalModsManifestLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false)))
             return;
         var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
-        using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var modFileHashElements in await pbDbContext.ModFileHashes
             .Where(mfh => mfh.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfh.ModFileManifests!.Any())
             .Select(mfh => new
@@ -968,7 +971,7 @@ public partial class SmartSimObserver :
         var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
         if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
         {
-            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            using var pbDbContext = pbDbContextFactory.CreateDbContext();
             pbDbContext.FilesOfInterest.Add(new()
             {
                 Path = relativePath,
@@ -1011,7 +1014,7 @@ public partial class SmartSimObserver :
         var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
         if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
         {
-            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            using var pbDbContext = pbDbContextFactory.CreateDbContext();
             var relativePathToLower = relativePath.ToUpperInvariant();
             pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == relativePathToLower).ExecuteDelete();
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
@@ -1038,14 +1041,14 @@ public partial class SmartSimObserver :
         var oldErrorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(oldRelativePath);
         if (oldErrorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
         {
-            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            using var pbDbContext = pbDbContextFactory.CreateDbContext();
             var oldRelativePathToLower = relativePath.ToUpperInvariant();
             pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == oldRelativePathToLower).ExecuteDelete();
         }
         var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
         if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
         {
-            using var pbDbContext = lifetimeScope.Resolve<PbDbContext>();
+            using var pbDbContext = pbDbContextFactory.CreateDbContext();
             pbDbContext.FilesOfInterest.Add(new()
             {
                 Path = relativePath,

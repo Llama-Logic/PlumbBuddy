@@ -71,28 +71,32 @@ partial class ModRequirementEditor
             Only pick another mod file in this mod if you're certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod's requirements.<br /><br />
             <iframe src="https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc" width="270" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc">via GIPHY</a></p>
             """);
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleHashesChanged(Hashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
     }
 
     async Task HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync()
     {
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
     }
 
     async Task HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync()
     {
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
     }
 
     async Task HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync()
     {
-        var manifest = await ModFileSelector.SelectAModFileManifestAsync(PbDbContext, DialogService);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var manifest = await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService);
         if ((manifest?.Features.Count ?? 0) is 0)
         {
             await DialogService.ShowErrorDialogAsync("Whoops, this mod file has no offered features",

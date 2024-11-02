@@ -2,7 +2,7 @@
 @inject IDialogService DialogService
 @inject IPlayer Player
 @inject IPublicCatalogs PublicCatalogs
-@inject PbDbContext PbDbContext
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
 
 <MudGrid Justify="Justify.Center" Spacing="4">
     <MudItem xs="12">
