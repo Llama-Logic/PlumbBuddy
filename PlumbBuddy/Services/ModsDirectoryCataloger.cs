@@ -401,9 +401,6 @@ public class ModsDirectoryCataloger :
 
     async Task ProcessPathsQueueAsync()
     {
-        using var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        cts.Cancel();
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
             idleManualResetEvent.Reset();
@@ -423,7 +420,7 @@ public class ModsDirectoryCataloger :
                 State = ModsDirectoryCatalogerState.Debouncing;
                 try
                 {
-                    if (!await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
+                    if (!await pathsProcessingQueue.OutputAvailableAsync(new CancellationToken(true)).ConfigureAwait(false))
                         break;
                 }
                 catch (OperationCanceledException) // this was OutputAvailableAsync -- usually Mr. Cleary documents his throws 🙄
@@ -433,7 +430,7 @@ public class ModsDirectoryCataloger :
                 }
                 try
                 {
-                    while (await pathsProcessingQueue.OutputAvailableAsync(token).ConfigureAwait(false))
+                    while (await pathsProcessingQueue.OutputAvailableAsync(new CancellationToken(true)).ConfigureAwait(false))
                     {
                         var path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
                         if (!nomNom.Contains(path))

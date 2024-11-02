@@ -39,9 +39,7 @@ public sealed class UpdateManager :
 
     async Task AutomaticUpdateCheckAsync()
     {
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-        var heldAutomaticLock = await automaticLock.LockAsync(cts.Token).ConfigureAwait(false);
+        var heldAutomaticLock = await automaticLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (heldAutomaticLock is null)
             return;
         try

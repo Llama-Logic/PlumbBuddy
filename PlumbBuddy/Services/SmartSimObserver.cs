@@ -17,12 +17,11 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
@@ -30,7 +29,6 @@ public partial class SmartSimObserver :
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
-        this.appLifecycleManager = appLifecycleManager;
         this.player = player;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
@@ -38,6 +36,7 @@ public partial class SmartSimObserver :
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
+        fileSystemWatcherConnectionLock = new();
         fresheningTaskLock = new();
         resamplingPacksTaskLock = new();
         scanInstances = [];
@@ -45,7 +44,6 @@ public partial class SmartSimObserver :
         scanIssues = [];
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
-        this.appLifecycleManager.ShuttingDown += HandleAppLifecycleManagerShuttingDown;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         this.player.PropertyChanged += HandlePlayerPropertyChanged;
         ConnectToInstallationDirectory();
@@ -55,14 +53,15 @@ public partial class SmartSimObserver :
     ~SmartSimObserver() =>
         Dispose(false);
 
-    readonly IAppLifecycleManager appLifecycleManager;
     ImmutableArray<FileSystemInfo> cacheComponents;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
     readonly AsyncLock enqueuedScanningTaskLock;
     readonly StringComparison fileSystemStringComparison;
+    readonly AsyncLock fileSystemWatcherConnectionLock;
     readonly AsyncLock fresheningTaskLock;
     ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+    [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? installationDirectoryWatcher;
     IReadOnlyList<string> installedPackCodes = [];
     bool isCurrentlyScanning;
@@ -74,6 +73,7 @@ public partial class SmartSimObserver :
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
+    [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? packsDirectoryWatcher;
     readonly IPlatformFunctions platformFunctions;
     readonly IPlayer player;
@@ -84,6 +84,7 @@ public partial class SmartSimObserver :
     readonly AsyncLock scanningTaskLock;
     readonly ISteam steam;
     readonly ISuperSnacks superSnacks;
+    [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? userDataDirectoryWatcher;
 
     public IReadOnlyList<string> InstalledPackCodes
@@ -292,6 +293,9 @@ public partial class SmartSimObserver :
 
     void ConnectToInstallationDirectory()
     {
+        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+        if (fileSystemWatcherConnectionLockHeld is null)
+            return;
         if (player.Onboarded && Directory.Exists(player.InstallationFolderPath))
         {
             if (installationDirectoryWatcher is null)
@@ -340,6 +344,9 @@ public partial class SmartSimObserver :
 
     async void ConnectToUserDataDirectory()
     {
+        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+        if (fileSystemWatcherConnectionLockHeld is null)
+            return;
         if (player.Onboarded && Directory.Exists(player.UserDataFolderPath))
         {
             _ = Task.Run(ResampleGameOptionsAsync);
@@ -415,7 +422,10 @@ public partial class SmartSimObserver :
 
     void DisconnectFromInstallationDirectoryWatcher()
     {
-        if (this.installationDirectoryWatcher is { } installationDirectoryWatcher)
+        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+        if (fileSystemWatcherConnectionLockHeld is null)
+            return;
+        if (installationDirectoryWatcher is not null)
         {
             installationDirectoryWatcher.Changed -= InstallationDirectoryFileSystemEntryChangedHandler;
             installationDirectoryWatcher.Created -= InstallationDirectoryFileSystemEntryCreatedHandler;
@@ -425,7 +435,7 @@ public partial class SmartSimObserver :
             installationDirectoryWatcher.Dispose();
             installationDirectoryWatcher = null;
         }
-        if (this.packsDirectoryWatcher is { } packsDirectoryWatcher)
+        if (packsDirectoryWatcher is not null)
         {
             packsDirectoryWatcher.Changed -= PacksDirectoryFileSystemEntryChangedHandler;
             packsDirectoryWatcher.Created -= PacksDirectoryFileSystemEntryCreatedHandler;
@@ -439,7 +449,10 @@ public partial class SmartSimObserver :
 
     void DisconnectFromUserDataDirectoryWatcher()
     {
-        if (this.userDataDirectoryWatcher is { } userDataDirectoryWatcher)
+        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+        if (fileSystemWatcherConnectionLockHeld is null)
+            return;
+        if (userDataDirectoryWatcher is not null)
         {
             var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
             userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
@@ -479,7 +492,6 @@ public partial class SmartSimObserver :
         {
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
-            appLifecycleManager.ShuttingDown -= HandleAppLifecycleManagerShuttingDown;
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
             player.PropertyChanged -= HandlePlayerPropertyChanged;
             lifetimeScope.Dispose();
@@ -491,10 +503,7 @@ public partial class SmartSimObserver :
 
     async Task FreshenGlobalManifestAsync(bool force = false)
     {
-        using var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        cts.Cancel();
-        var enqueuedFresheningTaskLockPotentiallyHeld = await enqueuedFresheningTaskLock.LockAsync(token).ConfigureAwait(false);
+        var enqueuedFresheningTaskLockPotentiallyHeld = await enqueuedFresheningTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedFresheningTaskLockPotentiallyHeld is null)
             return;
         using var fresheningTaskLockHeld = await fresheningTaskLock.LockAsync().ConfigureAwait(false);
@@ -569,12 +578,6 @@ public partial class SmartSimObserver :
         {
             throw new ArgumentException("Path is not valid or not within the user data folder", nameof(fullPath), ex);
         }
-    }
-
-    void HandleAppLifecycleManagerShuttingDown(object? sender, EventArgs e)
-    {
-        DisconnectFromInstallationDirectoryWatcher();
-        DisconnectFromUserDataDirectoryWatcher();
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -824,10 +827,7 @@ public partial class SmartSimObserver :
 
     async Task ResampleInstalledPackCodesAsync()
     {
-        using var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        cts.Cancel();
-        var enqueuedResamplingPacksTaskLockPotentiallyHeld = await enqueuedResamplingPacksTaskLock.LockAsync(token).ConfigureAwait(false);
+        var enqueuedResamplingPacksTaskLockPotentiallyHeld = await enqueuedResamplingPacksTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedResamplingPacksTaskLockPotentiallyHeld is null)
             return;
         using var resamplingPacksTaskLockHeld = await resamplingPacksTaskLock.LockAsync().ConfigureAwait(false);
@@ -845,10 +845,7 @@ public partial class SmartSimObserver :
 
     async Task ScanAsync()
     {
-        using var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        cts.Cancel();
-        var enqueuedScanningTaskLockPotentiallyHeld = await enqueuedScanningTaskLock.LockAsync(token).ConfigureAwait(false);
+        var enqueuedScanningTaskLockPotentiallyHeld = await enqueuedScanningTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedScanningTaskLockPotentiallyHeld is null)
             return;
         using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
