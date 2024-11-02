@@ -47,7 +47,7 @@ partial class SelectSupportDiscordDialog
         }
         else
         {
-            description = "Here are the Community Support Discord servers prepared to offer general support.";
+            description = "Here are the Community Support Discord servers prepared to offer general support. If you're looking for help with *me* instead of with the game or with a mod, [click here](https://plumbbuddy.app/redirect?to=PlumbBuddyDiscord).";
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.AskForHelpSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, discord: kv.Value))

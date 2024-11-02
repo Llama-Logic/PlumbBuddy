@@ -1,12 +1,16 @@
 <MudDialog>
     <TitleContent>
-        <MudStack Row="true">
+        <MudStack Row Class="align-center">
             <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
             <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">Select a Support Discord</MudTextM3>
+            <MudSpacer />
+            <MudTooltip Arrow Text="End the Guided Support Session">
+                <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" OnClick="CancelOnClickHandler" />
+            </MudTooltip>
         </MudStack>
     </TitleContent>
     <DialogContent>
-        <MudStack>
+        <MudStack Class="mb-4">
             <MudMarkdown Value="@description" />
             <MudPaper Elevation="0" Outlined Class="mud-background pa-4 rounded">
                 <MudGrid Justify="Justify.Center">
@@ -46,7 +50,4 @@
             </MudPaper>
         </MudStack>
     </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
-    </DialogActions>
 </MudDialog>
