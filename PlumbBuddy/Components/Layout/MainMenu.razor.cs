@@ -99,7 +99,6 @@ partial class MainMenu
         if (Application.Current is { } app
             && await DialogService.ShowCautionDialogAsync("Are You Sure?", "I can't monitor your Mods folder while I'm shut down. You won't receive any alerts about potential problems until you start me up again."))
         {
-            AppLifecycleManager.SignalShuttingDown();
             AppLifecycleManager.PreventCasualClosing = false;
             app.CloseWindow(app.Windows[0]);
         }
