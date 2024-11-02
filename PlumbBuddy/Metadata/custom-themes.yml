@@ -23,7 +23,7 @@ amethyst-lilac:
     simvault:
       dark: simvault.png
       light: simvault.png
-      size: initial
+      size: contain
 
 sim-realist:
   display_name: Sim Realist
