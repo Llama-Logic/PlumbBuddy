@@ -79,7 +79,7 @@ public sealed class DependencyScan :
         {
             yield return new ScanIssue
             {
-                Caption = $"{(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "A Mod" : modWithMissingPacks.Name)} is Missing {"Pack".ToQuantity(modWithMissingPacks.MissingPackCodes.Count, ShowQuantityAs.Words)}",
+                Caption = $"{(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "A Mod" : modWithMissingPacks.Name)} is Missing {"Pack".ToQuantity(modWithMissingPacks.MissingPackCodes.Count, formatProvider: new CultureInfo("en-US"))}",
                 Description =
                     $"""
                     **{(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "A Mod" : modWithMissingPacks.Name)}** requires **{modWithMissingPacks.MissingPackCodes.Humanize()}**, which {(modWithMissingPacks.MissingPackCodes.Count is 1 ? "is" : "are")} purchasable downloadable content for The Sims 4 from Electronic Arts which you do not have installed.<br />
@@ -127,7 +127,7 @@ public sealed class DependencyScan :
             .AsAsyncEnumerable())
             yield return new ScanIssue
             {
-                Caption = $"{(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "A Mod" : modWithIncompatiblePacks.Name)} is Incompatible with {"Installed Pack".ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count, ShowQuantityAs.Words)}",
+                Caption = $"{(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "A Mod" : modWithIncompatiblePacks.Name)} is Incompatible with {"Installed Pack".ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count, formatProvider: new CultureInfo("en-US"))}",
                 Description =
                     $"""
                     **{(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "A Mod" : modWithIncompatiblePacks.Name)}** is incompatible with **{modWithIncompatiblePacks.IncompatiblePackCodes.Humanize()}**, which {(modWithIncompatiblePacks.IncompatiblePackCodes.Count is 1 ? "is" : "are")} purchasable downloadable content for The Sims 4 from Electronic Arts which you have installed.
@@ -236,7 +236,7 @@ public sealed class DependencyScan :
                 (
                     $"A Mod Needs Another Mod Installed",
                     $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱
+                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱
                     """,
                     null
                 ),
@@ -244,7 +244,7 @@ public sealed class DependencyScan :
                 (
                     $"A Mod Needs Another Mod Installed",
                     $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨
+                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨
                     """,
                     new()
                     {
@@ -274,7 +274,7 @@ public sealed class DependencyScan :
                 (
                     "A Mod Needs Another Mod Installed",
                     $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed. I'm sorry that I can't tell you what either of these mods is called, but I can assure you that this is a problem. 😭
+                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed. I'm sorry that I can't tell you what either of these mods is called, but I can assure you that this is a problem. 😭
                     """,
                     new()
                     {
@@ -304,7 +304,7 @@ public sealed class DependencyScan :
                 (
                     $"Some Mods Need {modWithMissingDependencyMod.DependencyName} Installed",
                     $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, ShowQuantityAs.Words)} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have **{modWithMissingDependencyMod.DependencyName}**{getByLine(modWithMissingDependencyMod.DependencyCreators)} installed, and unfortunately... I can't find it. 🤷
+                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have **{modWithMissingDependencyMod.DependencyName}**{getByLine(modWithMissingDependencyMod.DependencyCreators)} installed, and unfortunately... I can't find it. 🤷
                     """,
                     new()
                     {

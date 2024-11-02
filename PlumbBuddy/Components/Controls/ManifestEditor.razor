@@ -354,7 +354,7 @@
                                 📃 If I had any notes or concerns, I put them below. If the area's blank then... 🤷 no notes.
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                Click <MudChip T="string" Label="true" Color="Color.Tertiary" Size="Size.Large">FINISH</MudChip> to update the manifest in your @("mod file".ToQuantity(components.Count, ShowQuantityAs.Words)) and they'll be ready to go. 🚀
+                                Click <MudChip T="string" Label="true" Color="Color.Tertiary" Size="Size.Large">FINISH</MudChip> to update the manifest in your @("mod file".ToQuantity(components.Count, formatProvider: new CultureInfo("en-US"))) and they'll be ready to go. 🚀
                             </MudTextM3>
                         }
                         <MudGrid Justify="Justify.Center" Class="my-4">

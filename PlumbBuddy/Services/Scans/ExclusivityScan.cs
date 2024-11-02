@@ -53,12 +53,12 @@ public class ExclusivityScan :
             .AsAsyncEnumerable())
             yield return new()
             {
-                Caption = $"There's a Hissy Fit Over \"{exclusivity}\"",
+                Caption = $"Multiple Mods Claim \"{exclusivity}\"",
                 Description =
                     $"""
-                    "{exclusivity}" is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you've installed multiple contenders making the attempt. It would be best to remove all but one of the whole mods containing these combatants, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.<br />
-                    *Note: Some mods may be listed as dependents of two or more of these mods having a fight. This **usually** means that they only need one of them, so you don't have to worry about an impossible choice in their case.*<br />
-                    All the bachelors vying for your only rose:
+                    "{exclusivity}" is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you've installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.<br />
+                    *Note: Some mods may be listed as dependents of two or more of these mods in this execlusivity conflict. This **usually** means that they will be okay with just one of them, so you don't have to worry about an impossible choice in their case.*<br />
+                    Here are the mod files each claiming \"{exclusivity}\":
                     {string.Join(Environment.NewLine, conflictedMods.Select(mod => $"* **{mod.Name ?? "Some Mod"}**{(mod.Creators.Any() ? $" by {mod.Creators.Humanize()}" : string.Empty)} located at {mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}"))}
                     """,
                 Icon = MaterialDesignIcons.Normal.Fencing,
@@ -69,7 +69,7 @@ public class ExclusivityScan :
                 [
                     ..conflictedMods.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()
                     {
-                        Label = $"Show me the {(index + 1).ToOrdinalWords()} file",
+                        Label = $"Show me the {(index + 1).ToOrdinalWords(new CultureInfo("en-US"))} file",
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"

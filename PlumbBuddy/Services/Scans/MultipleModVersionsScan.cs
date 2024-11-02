@@ -66,7 +66,7 @@ public sealed class MultipleModVersionsScan :
                 (
                     duplicates.Select((duplicate, index) => new ScanIssueResolution()
                     {
-                        Label = $"Go to the Download Page for the {(index + 1).ToOrdinalWords()} version",
+                        Label = $"Go to the Download Page for the {(index + 1).ToOrdinalWords(new CultureInfo("en-US"))} version",
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"visit-mod-{index}",
@@ -78,7 +78,7 @@ public sealed class MultipleModVersionsScan :
                 Caption = $"I Found Multiple Versions of {(distinctNames.Length is 1 ? distinctNames[0] : "the Same Mod")} Installed",
                 Description =
                     $"""
-                    *First rule of government spending: why have one when you could have two at twice the price, eh?* Well, in this case, the price is **a broken mod**. I don't mean to be pushy, but you need to remove all but one of these.<br /><br />
+                    I don't mean to be pushy, but you need to remove all but one of these.<br /><br />
                     {string.Join(Environment.NewLine, duplicates.Select(mod => $"* **{mod.Name ?? "Some Mod"}**{(string.IsNullOrWhiteSpace(mod.Version) ? string.Empty : $" ({mod.Version})")}{(mod.Creators.Any() ? $" by {mod.Creators.Humanize()}" : string.Empty)} located at {mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}"))}
                     """,
                 Icon = MaterialDesignIcons.Normal.TimelineAlert,
@@ -90,7 +90,7 @@ public sealed class MultipleModVersionsScan :
                     ..urlResolutions,
                     ..duplicates.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()
                     {
-                        Label = $"Show me the {(index + 1).ToOrdinalWords()} file",
+                        Label = $"Show me the {(index + 1).ToOrdinalWords(new CultureInfo("en-US"))} file",
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
