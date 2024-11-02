@@ -115,9 +115,9 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-light", $"url('/img/custom-themes/{customThemeName}/catalog-light.png')");
                 }
                 if ((simVault?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", repeat);
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-repeat", repeat);
                 if ((simVault?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", size);
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-simvault-size", size);
             }
             if (backgroundedTabs.TryGetValue("manifest-editor", out var manifestEditor))
             {
