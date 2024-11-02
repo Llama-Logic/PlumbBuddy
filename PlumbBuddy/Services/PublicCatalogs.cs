@@ -80,7 +80,6 @@ public class PublicCatalogs :
                 await packsCachedFileStreamWriter.FlushAsync();
                 PackCatalog = packs;
             }
-            throw new FileNotFoundException();
         }
         catch (Exception ex)
         {
