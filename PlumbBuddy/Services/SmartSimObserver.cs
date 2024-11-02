@@ -42,7 +42,6 @@ public partial class SmartSimObserver :
         fresheningTaskLock = new();
         resamplingPacksTaskLock = new();
         scanInstances = [];
-        scanInstancesLock = new();
         scanIssues = [];
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
@@ -82,8 +81,7 @@ public partial class SmartSimObserver :
     readonly IPlayer player;
     readonly AsyncLock resamplingPacksTaskLock;
     IReadOnlyList<ScanIssue> scanIssues;
-    readonly Dictionary<Type, IScan> scanInstances;
-    readonly AsyncLock scanInstancesLock;
+    readonly ConcurrentDictionary<Type, IScan> scanInstances;
     readonly AsyncLock scanningTaskLock;
     readonly ISteam steam;
     readonly ISuperSnacks superSnacks;
@@ -855,7 +853,6 @@ public partial class SmartSimObserver :
         enqueuedScanningTaskLockPotentiallyHeld.Dispose();
         if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle)
             return;
-        using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         IsCurrentlyScanning = true;
         var scanIssues = new ConcurrentBag<ScanIssue>();
         using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
@@ -893,33 +890,33 @@ public partial class SmartSimObserver :
     }
 
     void UpdateScanInitializationStatus() =>
-        Task.Run(UpdateScanInitializationStatusAsync);
+        Task.Run(UpdateScanInitializationStatusWork);
 
-    async Task UpdateScanInitializationStatusAsync()
+    void UpdateScanInitializationStatusWork()
     {
-        using var scanInstancesLockHeld = await scanInstancesLock.LockAsync();
         var fullyConnectedToGame = installationDirectoryWatcher is not null && userDataDirectoryWatcher is not null;
         var scansInitialized = scanInstances.Count > 0;
         if (!fullyConnectedToGame && scansInitialized)
         {
-            foreach (var scan in scanInstances.Values)
-                scan.Dispose();
-            scanInstances.Clear();
-            scanInstances.TrimExcess();
+            while (scanInstances.Keys.FirstOrDefault() is { } key)
+                if (scanInstances.TryRemove(key, out var scan))
+                    scan.Dispose();
             ScanIssues = [];
             return;
         }
         if (fullyConnectedToGame)
         {
+            var asshole = lifetimeScope.Resolve(typeof(IErrorLogScan));
+            asshole.ToString();
             var initializationChange = false;
             bool checkScanInitialization(bool playerHasScanEnabled, Type scanInterface)
             {
                 if (playerHasScanEnabled && !scanInstances.ContainsKey(scanInterface))
                 {
-                    scanInstances.Add(scanInterface, (IScan)lifetimeScope.Resolve(scanInterface));
+                    scanInstances.AddOrUpdate(scanInterface, AddScanInstancesValueFactory, UpdateScanInstancesValueFactory);
                     return true;
                 }
-                if (!playerHasScanEnabled && scanInstances.Remove(scanInterface, out var scanInstance))
+                if (!playerHasScanEnabled && scanInstances.TryRemove(scanInterface, out var scanInstance))
                 {
                     scanInstance.Dispose();
                     return true;
@@ -946,6 +943,12 @@ public partial class SmartSimObserver :
                 Scan();
         }
     }
+
+    IScan AddScanInstancesValueFactory(Type key) =>
+        (IScan)lifetimeScope.Resolve(key);
+
+    IScan UpdateScanInstancesValueFactory(Type key, IScan currentValue) =>
+        currentValue;
 
     void UserDataDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e)
     {

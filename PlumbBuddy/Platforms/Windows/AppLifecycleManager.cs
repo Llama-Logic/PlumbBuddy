@@ -16,7 +16,10 @@ class AppLifecycleManager :
     public AppLifecycleManager(ExtendedActivationKind extendedActivationKind)
     {
         if (extendedActivationKind is ExtendedActivationKind.StartupTask)
+        {
+            HideMainWindowAtLaunch = true;
             startupTaskTrap = new(false);
+        }
     }
 
     ~AppLifecycleManager() =>
@@ -27,6 +30,8 @@ class AppLifecycleManager :
     bool preventCasualClosing = true;
     readonly AsyncManualResetEvent? startupTaskTrap;
     Microsoft.UI.Xaml.Window? xamlWindow;
+
+    public bool HideMainWindowAtLaunch { get; }
 
     public bool PreventCasualClosing
     {

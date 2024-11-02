@@ -10,6 +10,8 @@ namespace PlumbBuddy.Platforms.MacCatalyst;
 public class AppLifecycleManager :
     IAppLifecycleManager
 {
+    public bool HideMainWindowAtLaunch { get; } = false;
+
     public bool PreventCasualClosing { get; set; }
 
     public Task UiReleaseSignal =>

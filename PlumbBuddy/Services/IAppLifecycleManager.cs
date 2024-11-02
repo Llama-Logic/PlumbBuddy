@@ -3,6 +3,11 @@ namespace PlumbBuddy.Services;
 public interface IAppLifecycleManager
 {
     /// <summary>
+    /// Gets whether to hide the main window at launch
+    /// </summary>
+    bool HideMainWindowAtLaunch { get; }
+
+    /// <summary>
     /// Gets/sets whether the app should prevent casual closing (default is <see langword="true"/>)
     /// </summary>
     bool PreventCasualClosing { get; set; }

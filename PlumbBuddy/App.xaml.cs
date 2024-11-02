@@ -94,7 +94,6 @@ public partial class App :
         // I didn't inject you directly so that I could make sure I migrated before I woke you up
         // but guess what, it's time for school
         lifetimeScope.Resolve<ISmartSimObserver>();
-        appLifecycleManager.UiReleaseSignal.Wait();
         InitializeComponent();
         MainPage = new MainPage(appLifecycleManager);
     }
