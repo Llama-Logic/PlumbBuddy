@@ -1,6 +1,3 @@
-using LlamaLogic.Packages.Cryptography;
-using System.Security.Cryptography;
-
 namespace PlumbBuddy.Components.Controls;
 
 partial class ModFileSelector
@@ -121,48 +118,11 @@ partial class ModFileSelector
                 {
                 }
             }
-            //Memory<byte> hash1 = new byte[32];
-            //Memory<byte> hash2 = new byte[32];
-            //Memory<byte> hash3 = new byte[32];
-            //using (var rng = RandomNumberGenerator.Create())
-            //{
-            //    rng.GetBytes(hash1.Span);
-            //    rng.GetBytes(hash2.Span);
-            //    rng.GetBytes(hash3.Span);
-            //}
-            //manifests = new Dictionary<ResourceKey, ModFileManifestModel>
-            //{
-            //    { $"{(uint)ResourceType.SnippetTuning:x8}:80000000:{Fnv64.GetHash("creator:manifest_ThisModA"):x16}", new() { Name = "This Mod A", TuningName = "creator:manifest_ThisModA", Hash = [..hash1.Span] } },
-            //    { $"{(uint)ResourceType.SnippetTuning:x8}:80000000:{Fnv64.GetHash("creator:manifest_SomeModB"):x16}", new() { Name = "Some Mod B", TuningName = "creator:manifest_SomeModB", Hash = [..hash2.Span] } },
-            //    { $"{(uint)ResourceType.SnippetTuning:x8}:80000000:{Fnv64.GetHash("creator:manifest_SomeOtherModC"):x16}", new() { Name = "Some Other Mod C", TuningName = "creator:manifest_SomeOtherModC", Hash = [..hash3.Span] } },
-            //};
-            //Memory<byte> hash = new byte[32];
-            //using (var rng = RandomNumberGenerator.Create())
-            //    rng.GetBytes(hash.Span);
-            //ResourceKey resourceKey = $"{(uint)ResourceType.SnippetTuning:x8}:80000000:{Fnv64.GetHash("lot51:manifest_CoreLibrary"):x16}";
-            //manifests = new Dictionary<ResourceKey, ModFileManifestModel>
-            //{
-            //    { resourceKey, new()
-            //    {
-            //        Name = "Core Library",
-            //        Hash = [..hash.Span],
-            //        TuningName = "lot51:manifest_CoreLibrary",
-            //        Url = new("https://lot51.cc/core", UriKind.Absolute),
-            //        Version = "1.25.1"
-            //    } }
-            //};
-            //manifests[resourceKey].Creators.Add("Lot 51");
-            //manifests[resourceKey].Features.Add("Tuning Injector Tunable Snippet");
-            //manifests[resourceKey].Features.Add("Purchase Picker Tunable Snippet");
-            //manifests[resourceKey].Features.Add("Lot51 Core Loot Actions Tunable Snippet");
-            //manifests[resourceKey].Features.Add("Affordance Lock-Out Snippet");
-            //manifests[resourceKey].Features.Add("lot51_core.open_url Command");
-            //manifests[resourceKey].Features.Add("purchase_picker.refresh Command");
             if (manifests?.Count is 0)
             {
                 await dialogService.ShowErrorDialogAsync("Mod file contains no manifests",
                     $"""
-                    I'm sorry, but the mod file you selected doesn't contain any manifests. For technical reasons, it simply isn't safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release.
+                    I'm sorry, but the mod file you selected doesn't contain any manifests. For technical reasons, it simply isn't safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.
                     `{modFile.FullName}`<br /><br />
                     <iframe src="https://giphy.com/embed/3oEjI8D0T5KXgPZrTW" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/summerbreak-summer-break-sb3-3oEjI8D0T5KXgPZrTW">via GIPHY</a></p>
                     """).ConfigureAwait(false);

@@ -97,7 +97,9 @@ partial class ModRequirementEditor
     {
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var manifest = await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService);
-        if ((manifest?.Features.Count ?? 0) is 0)
+        if (manifest is null)
+            return;
+        if (manifest.Features.Count is 0)
         {
             await DialogService.ShowErrorDialogAsync("Whoops, this mod file has no offered features",
                 """
