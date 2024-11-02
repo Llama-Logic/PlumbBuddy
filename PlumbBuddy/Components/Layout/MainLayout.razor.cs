@@ -7,16 +7,14 @@ public partial class MainLayout
         {
             PaletteLight = new PaletteLight()
             {
-                //Error = "#ab273dff",
-                Primary = "#594ae2ff",
-                Tertiary = "#7bb56bff",
+                Primary = "#00a2ffff",
+                Tertiary = "#74c044ff",
                 Warning = "#d98806ff"
             },
             PaletteDark = new PaletteDark()
             {
-                //Error = "#ab273dff",
                 Primary = "#00a2ffff",
-                Tertiary = "#7bb56bff",
+                Tertiary = "#74c044ff",
                 Warning = "#d98806ff"
             }
         };
