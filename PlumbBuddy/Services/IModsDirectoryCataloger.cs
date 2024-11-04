@@ -7,6 +7,10 @@ public interface IModsDirectoryCataloger :
 
     int PackageCount { get; }
 
+    int? ProgressMax { get; }
+
+    int ProgressValue { get; }
+
     int PythonByteCodeFileCount { get; }
 
     int PythonScriptCount { get; }
