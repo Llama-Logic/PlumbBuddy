@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace PlumbBuddy.Data;
 
 public class PbDbContext :
@@ -17,7 +15,6 @@ public class PbDbContext :
 
     public DbSet<ElectronicArtsPromoCode> ElectronicArtsPromoCodes { get; set; }
     public DbSet<FileOfInterest> FilesOfInterest { get; set; }
-    public DbSet<ForeignPlatformFileSystemEntry> ForeignPlatformFileSystemEntries { get; set; }
     public DbSet<ModCreator> ModCreators { get; set; }
     public DbSet<ModExclusivity> ModExclusivities { get; set; }
     public DbSet<ModFeature> ModFeatures { get; set; }
