@@ -21,6 +21,13 @@ public sealed class UpdateManager :
         this.player.PropertyChanged += HandlePlayerPropertyChanged;
         var mauiVersion = AppInfo.Version;
         CurrentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
+        if (CurrentVersion != player.VersionAtLastStartup)
+        {
+            if (player.VersionAtLastStartup is { } lastVersion)
+                logger.LogInformation("This is the first time starting after the upgrade from {LastVersion}.", lastVersion);
+            else
+                logger.LogInformation("This is the first time this installation is starting.");
+        }
         player.VersionAtLastStartup = CurrentVersion;
         ScheduleAutomaticUpdateCheck();
     }
