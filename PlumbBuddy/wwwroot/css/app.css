@@ -16,6 +16,7 @@
     --plumbbuddy-tab-background-manifest-editor-light: url('/img/ManifestEditorBackgroundLight.png');
     --plumbbuddy-tab-background-manifest-editor-repeat: unset;
     --plumbbuddy-tab-background-manifest-editor-size: cover;
+    --plumbbuddy-tab-background-manifest-editor-animation-display: initial;
 }
 
 html {

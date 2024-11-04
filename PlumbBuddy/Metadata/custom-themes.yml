@@ -25,6 +25,63 @@ amethyst-lilac:
       light: simvault.png
       size: contain
 
+little-ms-sam:
+  display_name: LittleMsSam
+  description: |
+    Visit my [website](https://www.lms-mods.com/)!
+  default_border_radius: 8px
+  font: Ubuntu
+  palette_light:
+    Primary: '#4087b2ff'
+    Secondary: '#B26B40ff'
+    Tertiary: '#5D9EC5ff'
+    Info: '#4087b2ff'
+    Success: '#24bf50ff'
+    Warning: '#FA871Dff'
+    Error: '#d82613ff'
+    Dark: '#4d4d4dff'
+    AppbarText: '#ffffffff'
+    AppbarBackground: '#4087b2ff'
+    DrawerText: '#4087b2ff'
+    DrawerIcons: '#4087b2ff'
+    DrawerBackground: '#e5e5e5ff'
+    Surface: '#e5e5e5ff'
+    Background: '#ffffffff'
+    BackgroundGray: '#F1F1F1ff'
+  palette_dark:
+    Primary: '#4087b2ff'
+    Secondary: '#B26B40ff'
+    Tertiary: '#5D9EC5ff'
+    Info: '#4087b2ff'
+    Success: '#24bf50ff'
+    Warning: '#FA871Dff'
+    Error: '#d82613ff'
+    Dark: '#4d4d4dff'
+    AppbarText: '#F1F1F1ff'
+    AppbarBackground: '#4087b2ff'
+    DrawerText: '#F1F1F1ff'
+    DrawerIcons: '#F1F1F1ff'
+    DrawerBackground: '#3b3b3bff'
+    Surface: '#3b3b3bff'
+    Background: '#242424ff'
+    BackgroundGray: '#3d3d3dff'
+    TextPrimary: '#F1F1F1ff'
+    ActionDefault: '#F1F1F1ff'
+  backgrounded_tabs:
+    mod-health:
+      dark: none.png
+      light: none.png
+    catalog:
+      dark: none.png
+      light: none.png
+    manifest-editor:
+      dark: none.png
+      light: none.png
+      animation_display: none
+    simvault:
+      dark: none.png
+      light: none.png
+
 sim-realist:
   display_name: Sim Realist
   description: |
