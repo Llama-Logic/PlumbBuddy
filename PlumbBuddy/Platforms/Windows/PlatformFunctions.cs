@@ -5,6 +5,8 @@ namespace PlumbBuddy.Platforms.Windows;
 partial class PlatformFunctions :
     IPlatformFunctions
 {
+    #region Domestic Patterns
+
     [GeneratedRegex(@"^desktop\.ini$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
     private static partial Regex GetDesktopDotIniPattern();
 
@@ -13,6 +15,24 @@ partial class PlatformFunctions :
 
     [GeneratedRegex(@"^thumbs\.db$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
     private static partial Regex GetThumbsDotDbPattern();
+
+    #endregion
+
+    #region Foreign Patterns
+
+    [GeneratedRegex(@"^\.DS_Store$", RegexOptions.Singleline)]
+    private static partial Regex GetDotDsUnderscoreStorePattern();
+
+    [GeneratedRegex(@"^\.fseventsd$", RegexOptions.Singleline)]
+    private static partial Regex GetDotFsEventsDPattern();
+
+    [GeneratedRegex(@"^\.localized$", RegexOptions.Singleline)]
+    private static partial Regex GetDotLocalizedPattern();
+
+    [GeneratedRegex(@"^\.TemporaryItems$", RegexOptions.Singleline)]
+    private static partial Regex GetDotTemporaryItemsPattern();
+
+    #endregion
 
     public PlatformFunctions(ILifetimeScope lifetimeScope)
     {
@@ -39,6 +59,18 @@ partial class PlatformFunctions :
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.OrdinalIgnoreCase;
+
+    public IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; } =
+    [
+        GetDotTemporaryItemsPattern(),
+        GetDotFsEventsDPattern()
+    ];
+
+    public IReadOnlyList<Regex> ForeignFileNamePatterns { get; } =
+    [
+        GetDotDsUnderscoreStorePattern(),
+        GetDotLocalizedPattern()
+    ];
 
     public Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {

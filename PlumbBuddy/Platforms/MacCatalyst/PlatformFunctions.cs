@@ -8,6 +8,8 @@ partial class PlatformFunctions :
 {
     static readonly TimeSpan gameProcessScanGracePeriod = TimeSpan.FromSeconds(5);
 
+    #region Domestic Patterns
+
     [GeneratedRegex(@"^\.DS_Store$", RegexOptions.Singleline)]
     private static partial Regex GetDotDsUnderscoreStorePattern();
 
@@ -19,6 +21,21 @@ partial class PlatformFunctions :
 
     [GeneratedRegex(@"^\.TemporaryItems$", RegexOptions.Singleline)]
     private static partial Regex GetDotTemporaryItemsPattern();
+
+    #endregion
+
+    #region Foreign Patterns
+
+    [GeneratedRegex(@"^desktop\.ini$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetDesktopDotIniPattern();
+
+    [GeneratedRegex(@"^iconcache.*\.db$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetIconCacheDotDbPattern();
+
+    [GeneratedRegex(@"^thumbs\.db$", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetThumbsDotDbPattern();
+
+    #endregion
 
     public PlatformFunctions()
     {
@@ -44,6 +61,17 @@ partial class PlatformFunctions :
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.Ordinal;
+
+    public IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; } =
+    [
+    ];
+
+    public IReadOnlyList<Regex> ForeignFileNamePatterns { get; } =
+    [
+        GetDesktopDotIniPattern(),
+        GetIconCacheDotDbPattern(),
+        GetThumbsDotDbPattern()
+    ];
 
     public async Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
