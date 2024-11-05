@@ -4,7 +4,7 @@
 @inject ILogger<MainMenu> Logger
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlatformFunctions PlatformFunctions
-@inject IPlayer Player
+@inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
@@ -28,12 +28,12 @@
     <MudNavMenu Class="main-menu">
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">Open Downloads Folder</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="HandleOpenModsFolderOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">Ask for Help</MudNavLink>
         <MudDivider Class="my-2" />
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Update" IconColor="Color.Info" OnClick="HandleCheckForUpdateAsync">Check for Update</MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">Settings</MudNavLink>
-        @if (Player.DevToolsUnlocked)
+        @if (Settings.DevToolsUnlocked)
         {
             <MudNavGroup Icon="@MaterialDesignIcons.Normal.Tools" IconColor="Color.Warning" Title="Dev Tools">
                 <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderCog" OnClick="HandleOpenPlumbBuddyStorageOnClickAsync">Open Local Storage</MudNavLink>

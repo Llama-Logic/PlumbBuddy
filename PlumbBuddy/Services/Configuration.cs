@@ -6,7 +6,7 @@ static class Configuration
     {
         services.AddSingleton<IBlazorFramework, BlazorFramework>();
         services.AddSingleton<ICustomThemes, CustomThemes>();
-        services.AddSingleton<IPlayer, Player>();
+        services.AddSingleton<ISettings, Settings>();
         services.AddSingleton<IPublicCatalogs, PublicCatalogs>();
         services.AddSingleton<IModsDirectoryCataloger, ModsDirectoryCataloger>();
         services.AddSingleton<ISmartSimObserver, SmartSimObserver>();

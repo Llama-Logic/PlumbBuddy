@@ -1,9 +1,9 @@
 @inject ICustomThemes CustomThemes
-@inject IPlayer Player
+@inject ISettings Settings
 
 <MudGrid Justify="Justify.Center">
     <MudItem xs="3">
-        <MudCard Elevation="5" Class="@(string.IsNullOrWhiteSpace(Player.Theme) ? "mud-background-primary-selected" : "mud-background")">
+        <MudCard Elevation="5" Class="@(string.IsNullOrWhiteSpace(Settings.Theme) ? "mud-background-primary-selected" : "mud-background")">
             <MudCardMedia Image="/img/PlumbBuddyLogo.svg" Height="160" />
             <MudCardContent>
                 <MudStack Spacing="0" Class="align-center">
@@ -13,14 +13,14 @@
                 </MudStack>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Text" StartIcon="@(string.IsNullOrWhiteSpace(Player.Theme) ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(null))" Disabled="@string.IsNullOrWhiteSpace(Player.Theme)">Select</MudButton>
+                <MudButton Variant="Variant.Text" StartIcon="@(string.IsNullOrWhiteSpace(Settings.Theme) ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(null))" Disabled="@string.IsNullOrWhiteSpace(Settings.Theme)">Select</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
     @foreach (var (slug, customTheme) in CustomThemes.Themes.OrderBy(kv => kv.Key))
     {
         <MudItem xs="3">
-            <MudCard Elevation="5" Class="@(Player.Theme == slug ? "mud-background-primary-selected" : "mud-background")">
+            <MudCard Elevation="5" Class="@(Settings.Theme == slug ? "mud-background-primary-selected" : "mud-background")">
                 <MudCardMedia Image="@($"/img/custom-themes/{slug}/logo.png")" Height="160" />
                 <MudCardContent>
                     <MudStack Spacing="0" Class="align-center">
@@ -41,7 +41,7 @@
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" StartIcon="@(Player.Theme == slug ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Player.Theme == slug)">Select</MudButton>
+                    <MudButton Variant="Variant.Text" StartIcon="@(Settings.Theme == slug ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.Theme == slug)">Select</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>

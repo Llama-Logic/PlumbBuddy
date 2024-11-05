@@ -3,7 +3,7 @@ namespace PlumbBuddy.Services;
 public class PublicCatalogs :
     IPublicCatalogs
 {
-    public PublicCatalogs(ILogger<PublicCatalogs> logger, IPlayer player)
+    public PublicCatalogs(ILogger<PublicCatalogs> logger, ISettings player)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(player);
@@ -18,7 +18,7 @@ public class PublicCatalogs :
     readonly HttpClient client;
     readonly ILogger<PublicCatalogs> logger;
     IReadOnlyDictionary<string, PackDescription>? packCatalog;
-    readonly IPlayer player;
+    readonly ISettings player;
 
     ~PublicCatalogs() =>
         Dispose(false);
@@ -110,7 +110,7 @@ public class PublicCatalogs :
 
     void HandlerPlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
+        if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))
         {
             if (player.UsePublicPackCatalog && PackCatalog is null)
                 Task.Run(() => FetchPackCatalogAsync(true));

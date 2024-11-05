@@ -4,7 +4,7 @@ public abstract class DepthScan :
     Scan,
     IDepthScan
 {
-    protected DepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
+    protected DepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -25,7 +25,7 @@ public abstract class DepthScan :
     readonly ModsDirectoryFileType modsDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
@@ -192,5 +192,5 @@ public abstract class DepthScan :
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(IPlayer player);
+    protected abstract void StopScanning(ISettings player);
 }

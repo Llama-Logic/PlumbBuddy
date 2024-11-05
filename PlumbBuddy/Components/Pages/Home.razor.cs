@@ -6,7 +6,7 @@ partial class Home
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
     }
 
@@ -16,11 +16,11 @@ partial class Home
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.Theme))
+        if (e.PropertyName is nameof(ISettings.Theme))
             StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
-        if (e.PropertyName is nameof(IPlayer.Type))
+        if (e.PropertyName is nameof(ISettings.Type))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
@@ -35,7 +35,7 @@ partial class Home
     {
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
     }
 
@@ -64,7 +64,7 @@ partial class Home
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-size", "cover");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-animation-display", "initial");
-        if (Player.Theme is { } customThemeName
+        if (Settings.Theme is { } customThemeName
             && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme)
             && customTheme.BackgroundedTabs is { } backgroundedTabs
             && backgroundedTabs.Count is > 0)

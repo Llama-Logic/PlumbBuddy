@@ -4,7 +4,7 @@ public sealed class ErrorLogScan :
     Scan,
     IErrorLogScan
 {
-    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
+    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
@@ -24,7 +24,7 @@ public sealed class ErrorLogScan :
     readonly ILogger<ErrorLogScan> logger;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly IPublicCatalogs publicCatalogs;
 
     public override async Task ResolveIssueAsync(object issueData, object resolutionData)

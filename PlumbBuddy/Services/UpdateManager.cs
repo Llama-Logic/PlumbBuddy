@@ -5,7 +5,7 @@ namespace PlumbBuddy.Services;
 public sealed class UpdateManager :
     IUpdateManager
 {
-    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -18,7 +18,7 @@ public sealed class UpdateManager :
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
         automaticLock = new();
-        this.player.PropertyChanged += HandlePlayerPropertyChanged;
+        this.player.PropertyChanged += HandleSettingsPropertyChanged;
         var mauiVersion = AppInfo.Version;
         CurrentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
         if (CurrentVersion != player.VersionAtLastStartup)
@@ -39,7 +39,7 @@ public sealed class UpdateManager :
     readonly IBlazorFramework blazorFramework;
     readonly ILogger<UpdateManager> logger;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly ISuperSnacks superSnacks;
 
     public Version CurrentVersion { get; }
@@ -135,12 +135,12 @@ public sealed class UpdateManager :
     void Dispose(bool disposing)
     {
         if (disposing)
-            player.PropertyChanged -= HandlePlayerPropertyChanged;
+            player.PropertyChanged -= HandleSettingsPropertyChanged;
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.AutomaticallyCheckForUpdates))
+        if (e.PropertyName is nameof(ISettings.AutomaticallyCheckForUpdates))
             ScheduleAutomaticUpdateCheck();
     }
 

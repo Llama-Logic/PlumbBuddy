@@ -26,7 +26,7 @@ partial class CatalogDisplay
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
     }
 
@@ -46,10 +46,10 @@ partial class CatalogDisplay
             _ = Task.Run(QueryManifestsAsync);
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.UserDataFolderPath))
-            StaticDispatcher.Dispatch(() => modsFolderPath = Path.Combine(Player.UserDataFolderPath));
+        if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
+            StaticDispatcher.Dispatch(() => modsFolderPath = Path.Combine(Settings.UserDataFolderPath));
     }
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -124,15 +124,15 @@ partial class CatalogDisplay
     {
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
-        modsFolderPath = Path.Combine(Player.UserDataFolderPath, "Mods");
+        modsFolderPath = Path.Combine(Settings.UserDataFolderPath, "Mods");
         _ = Task.Run(QueryManifestsAsync);
     }
 
     async Task QueryManifestsAsync()
     {
-        var userDataFolderPath = Player.UserDataFolderPath;
+        var userDataFolderPath = Settings.UserDataFolderPath;
         var mods = new Dictionary<ModKey, List<ModValue>>();
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes

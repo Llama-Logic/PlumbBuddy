@@ -4,7 +4,7 @@ public class ExclusivityScan :
     Scan,
     IExclusivityScan
 {
-    public ExclusivityScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player)
+    public ExclusivityScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -16,7 +16,7 @@ public class ExclusivityScan :
 
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {

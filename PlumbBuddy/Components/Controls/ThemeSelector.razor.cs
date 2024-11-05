@@ -5,17 +5,17 @@ partial class ThemeSelector
     string? originalTheme;
 
     public void Cancel() =>
-        Player.Theme = originalTheme;
+        Settings.Theme = originalTheme;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        originalTheme = Player.Theme;
+        originalTheme = Settings.Theme;
     }
 
     void SelectTheme(string? theme)
     {
-        Player.Theme = theme;
+        Settings.Theme = theme;
         StateHasChanged();
     }
 }

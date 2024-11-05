@@ -81,7 +81,7 @@ partial class ModComponentEditor
 
     public void Dispose()
     {
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
     }
 
@@ -171,9 +171,9 @@ partial class ModComponentEditor
             modComponent.Name = newValue;
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
+        if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
@@ -200,7 +200,7 @@ partial class ModComponentEditor
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
     }
 

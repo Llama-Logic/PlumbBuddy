@@ -4,7 +4,7 @@ public sealed class MultipleModVersionsScan :
     Scan,
     IMultipleModVersionsScan
 {
-    public MultipleModVersionsScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player)
+    public MultipleModVersionsScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -16,7 +16,7 @@ public sealed class MultipleModVersionsScan :
 
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {

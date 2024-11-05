@@ -8,7 +8,7 @@ public sealed class ModSettingScan :
     const string deadScanIssueFixResolutionData = "enableMods";
     const string deadScanIssueStopResolutionData = "stopScanning";
 
-    public ModSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+    public ModSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
         base(pbDbContextFactory, player, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, deadScanIssueData, deadScanIssueFixResolutionData, deadScanIssueStopResolutionData)
     {
     }
@@ -58,6 +58,6 @@ public sealed class ModSettingScan :
             Type = ScanIssueType.Healthy
         };
 
-    protected override void StopScanning(IPlayer player) =>
+    protected override void StopScanning(ISettings player) =>
         player.ScanForModsDisabled = false;
 }

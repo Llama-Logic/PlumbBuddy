@@ -1,9 +1,9 @@
 @implements IDisposable
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
-@inject IPlayer Player
+@inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
 
-@if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
+@if (Settings.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
 {
     <MudTooltip Arrow="true">
         <ChildContent>
@@ -28,7 +28,7 @@
         </TooltipContent>
     </MudTooltip>
 }
-@if (Player.Type is UserType.Creator && ModsDirectoryCataloger.ResourceCount > 0)
+@if (Settings.Type is UserType.Creator && ModsDirectoryCataloger.ResourceCount > 0)
 {
     <MudTooltip Arrow="true">
         <ChildContent>
@@ -57,7 +57,7 @@
         </TooltipContent>
     </MudTooltip>
 }
-@if (Player.Type is not UserType.Casual && ModsDirectoryCataloger.ScriptArchiveCount > 0)
+@if (Settings.Type is not UserType.Casual && ModsDirectoryCataloger.ScriptArchiveCount > 0)
 {
     <MudTooltip Arrow="true">
         <ChildContent>
@@ -82,7 +82,7 @@
         </TooltipContent>
     </MudTooltip>
 }
-@if (Player.Type is UserType.Creator && ModsDirectoryCataloger.PythonScriptCount > 0)
+@if (Settings.Type is UserType.Creator && ModsDirectoryCataloger.PythonScriptCount > 0)
 {
     <MudTooltip Arrow="true" Color="Color.Warning">
         <ChildContent>
@@ -109,7 +109,7 @@
         </TooltipContent>
     </MudTooltip>
 }
-@if (Player.Type is UserType.Creator && ModsDirectoryCataloger.PythonByteCodeFileCount > 0)
+@if (Settings.Type is UserType.Creator && ModsDirectoryCataloger.PythonByteCodeFileCount > 0)
 {
     <MudTooltip Arrow="true">
         <ChildContent>

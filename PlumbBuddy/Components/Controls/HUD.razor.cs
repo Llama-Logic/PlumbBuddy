@@ -5,7 +5,7 @@ partial class HUD
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
     }
 
@@ -17,9 +17,9 @@ partial class HUD
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.Type))
+        if (e.PropertyName is nameof(ISettings.Type))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
@@ -34,7 +34,7 @@ partial class HUD
     {
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
     }
 }

@@ -26,7 +26,7 @@ partial class SupportDiscordStepsDialog
 
     async Task HandleShowGameVersionFileOnClickAsync()
     {
-        var gameVersionFile = new FileInfo(Path.Combine(Player.UserDataFolderPath, "GameVersion.txt"));
+        var gameVersionFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "GameVersion.txt"));
         if (!gameVersionFile.Exists)
         {
             await DialogService.ShowErrorDialogAsync("I Couldn't Find Your Game Version File", "It looks like you need to launch The Sims 4 so that it will write that file. Once you've done that, come back here and click this button again.");

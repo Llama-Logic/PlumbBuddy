@@ -4,7 +4,7 @@ public sealed class BeMissingScan :
     MissingScan,
     IBeMissingScan
 {
-    public BeMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player) :
+    public BeMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player) :
         base(pbDbContextFactory, player)
     {
     }
@@ -25,6 +25,6 @@ public sealed class BeMissingScan :
         "tmex_BetterExceptions.pyc"
     ];
 
-    protected override void StopScanning(IPlayer player) =>
+    protected override void StopScanning(ISettings player) =>
         player.ScanForMissingBe = false;
 }

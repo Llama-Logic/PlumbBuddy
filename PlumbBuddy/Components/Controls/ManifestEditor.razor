@@ -4,7 +4,7 @@
 @inject ILogger<ManifestEditor> Logger
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
-@inject IPlayer Player
+@inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
 
 <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>

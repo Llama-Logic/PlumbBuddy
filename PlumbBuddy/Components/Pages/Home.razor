@@ -4,7 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
-@inject IPlayer Player
+@inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
 
 <div class="main-tabs-backdrop"></div>
@@ -21,7 +21,7 @@
             <CatalogDisplay />
         </div>
     </MudTabPanel>
-    @if (Player.Type is UserType.Creator)
+    @if (Settings.Type is UserType.Creator)
     {
         <MudTabPanel Text="Manifest Editor" Icon="@MaterialDesignIcons.Normal.TagEdit">
             <div class="manifest-editor-tab-container">

@@ -4,7 +4,7 @@ public abstract class MissingScan :
     Scan,
     IMissingScan
 {
-    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player)
+    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(player);
@@ -13,7 +13,7 @@ public abstract class MissingScan :
     }
 
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly IPlayer player;
+    readonly ISettings player;
 
     protected abstract string ModName { get; }
 
@@ -230,5 +230,5 @@ public abstract class MissingScan :
         }
     }
 
-    protected abstract void StopScanning(IPlayer player);
+    protected abstract void StopScanning(ISettings player);
 }

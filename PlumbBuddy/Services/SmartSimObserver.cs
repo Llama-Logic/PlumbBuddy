@@ -17,7 +17,7 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -46,7 +46,7 @@ public partial class SmartSimObserver :
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        this.player.PropertyChanged += HandlePlayerPropertyChanged;
+        this.player.PropertyChanged += HandleSettingsPropertyChanged;
         ConnectToInstallationDirectory();
         ConnectToUserDataDirectory();
     }
@@ -78,7 +78,7 @@ public partial class SmartSimObserver :
     FileSystemWatcher? packsDirectoryWatcher;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly AsyncLock resamplingPacksTaskLock;
     IReadOnlyList<ScanIssue> scanIssues;
     readonly ConcurrentDictionary<Type, IScan> scanInstances;
@@ -494,7 +494,7 @@ public partial class SmartSimObserver :
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-            player.PropertyChanged -= HandlePlayerPropertyChanged;
+            player.PropertyChanged -= HandleSettingsPropertyChanged;
             lifetimeScope.Dispose();
         }
     }
@@ -591,23 +591,23 @@ public partial class SmartSimObserver :
         }
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.CacheStatus) or nameof(IPlayer.Type))
+        if (e.PropertyName is nameof(ISettings.CacheStatus) or nameof(ISettings.Type))
             Scan();
-        else if (e.PropertyName == nameof(IPlayer.InstallationFolderPath))
+        else if (e.PropertyName == nameof(ISettings.InstallationFolderPath))
         {
             DisconnectFromInstallationDirectoryWatcher();
             ConnectToInstallationDirectory();
         }
-        else if (e.PropertyName == nameof(IPlayer.Onboarded))
+        else if (e.PropertyName == nameof(ISettings.Onboarded))
         {
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToInstallationDirectory();
             ConnectToUserDataDirectory();
         }
-        else if (e.PropertyName == nameof(IPlayer.UserDataFolderPath))
+        else if (e.PropertyName == nameof(ISettings.UserDataFolderPath))
         {
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToUserDataDirectory();

@@ -4,7 +4,7 @@ public abstract class LooseArchiveScan :
     Scan,
     ILooseArchiveScan
 {
-    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IPlayer player, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
+    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -20,7 +20,7 @@ public abstract class LooseArchiveScan :
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
@@ -100,5 +100,5 @@ public abstract class LooseArchiveScan :
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(IPlayer player);
+    protected abstract void StopScanning(ISettings player);
 }

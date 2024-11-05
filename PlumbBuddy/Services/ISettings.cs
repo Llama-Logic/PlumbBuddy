@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Services;
 
-public interface IPlayer :
+public interface ISettings :
     INotifyPropertyChanged
 {
     bool AutomaticallyCheckForUpdates { get; set; }

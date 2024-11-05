@@ -4,7 +4,7 @@ public sealed class ModGuardMissingScan :
     MissingScan,
     IModGuardMissingScan
 {
-    public ModGuardMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player) :
+    public ModGuardMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player) :
         base(pbDbContextFactory, player)
     {
     }
@@ -26,6 +26,6 @@ public sealed class ModGuardMissingScan :
         "tmex-ModGuard.pyc"
     ];
 
-    protected override void StopScanning(IPlayer player) =>
+    protected override void StopScanning(ISettings player) =>
         player.ScanForMissingModGuard = false;
 }

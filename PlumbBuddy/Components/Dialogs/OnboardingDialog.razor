@@ -1,6 +1,6 @@
 @implements IDisposable
 @inject IDialogService DialogService
-@inject IPlayer Player
+@inject ISettings Settings
 
 <MudLoading @bind-Loading="@isLoading" @bind-Text="@loadingText" Color="Color.Primary" LoaderType="LoaderType.Linear" Overlap>
     <MudDialog>
@@ -51,7 +51,7 @@
                     <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="Introductions">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                In order to serve you best, it helps me to know what kind of player you are.
+                                In order to serve you best, it helps me to know what kind of Settings you are.
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
                                 Use the colored circles or arrows below to choose.
@@ -76,7 +76,7 @@
                     </MudStepExtended>
                     <MudStepExtended Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" Title="Mod Health" Optional="false">
                         <ChildContent>
-                            @if (Player.Type is UserType.Casual)
+                            @if (Settings.Type is UserType.Casual)
                             {
                                 <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
                                     Alrighty! You're almost all set, bud. 👍 Just a few more preferences...

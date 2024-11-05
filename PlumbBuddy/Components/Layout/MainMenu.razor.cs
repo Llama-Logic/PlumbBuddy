@@ -11,7 +11,7 @@ partial class MainMenu
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
     }
 
     async Task HandleAskForHelpOnClickAsync()
@@ -69,11 +69,11 @@ partial class MainMenu
         PlatformFunctions.ViewDirectory(new DirectoryInfo(FileSystem.AppDataDirectory));
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.CacheStatus))
+        if (e.PropertyName is nameof(ISettings.CacheStatus))
             StaticDispatcher.Dispatch(StateHasChanged);
-        else if (e.PropertyName == nameof(IPlayer.DevToolsUnlocked))
+        else if (e.PropertyName == nameof(ISettings.DevToolsUnlocked))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
@@ -82,7 +82,7 @@ partial class MainMenu
         await CloseDrawer.InvokeAsync();
         if (await DialogService.ShowCautionDialogAsync("Get Reacquainted?", "Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we'll have to get to know each other all over again. Be sure that's what you want before you continue."))
         {
-            Player.Forget(); // goodbye 😭
+            Settings.Forget(); // goodbye 😭
             await DialogService.ShowOnboardingDialogAsync();
         }
     }
@@ -107,18 +107,18 @@ partial class MainMenu
     async Task HandleToggleThemeManagerOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        if (Player.ShowThemeManager)
-            Player.ShowThemeManager = false;
+        if (Settings.ShowThemeManager)
+            Settings.ShowThemeManager = false;
         else if (await DialogService.ShowCautionDialogAsync("Toggle Theme Manager?", "Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒."))
-            Player.ShowThemeManager = true;
+            Settings.ShowThemeManager = true;
     }
 
     void HandleVersionOnClick()
     {
-        if (Player.DevToolsUnlocked)
+        if (Settings.DevToolsUnlocked)
         {
-            Player.DevToolsUnlocked = false;
-            Player.ShowThemeManager = false;
+            Settings.DevToolsUnlocked = false;
+            Settings.ShowThemeManager = false;
             Snackbar.Add("Dev Tools locked. 🔒 I'll still help you with your mods, but please don't play with my heart. 🥲", Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartBroken);
         }
         else
@@ -135,7 +135,7 @@ partial class MainMenu
             }
             else if (devToolsUnlockProgress == 0)
             {
-                Player.DevToolsUnlocked = true;
+                Settings.DevToolsUnlocked = true;
                 devToolsUnlockProgressBadgeVisible = false;
                 devToolsUnlockProgress = 10;
                 Snackbar.Add("Marry me, you beautiful human. Dev Tools unlocked! 🔓", Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.Heart);
@@ -148,6 +148,6 @@ partial class MainMenu
     {
         base.OnInitialized();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
     }
 }

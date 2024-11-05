@@ -4,7 +4,7 @@ public abstract class SettingScan :
     Scan,
     ISettingScan
 {
-    protected SettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlayer player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
+    protected SettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(player);
@@ -28,7 +28,7 @@ public abstract class SettingScan :
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly ISmartSimObserver smartSimObserver;
     readonly ISuperSnacks superSnacks;
     readonly string undesirableScanIssueData;
@@ -85,5 +85,5 @@ public abstract class SettingScan :
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(IPlayer player);
+    protected abstract void StopScanning(ISettings player);
 }

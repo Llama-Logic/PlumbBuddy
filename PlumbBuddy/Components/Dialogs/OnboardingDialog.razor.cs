@@ -8,14 +8,14 @@ partial class OnboardingDialog
 
     bool AutomaticallyCheckForUpdates
     {
-        get => Player.AutomaticallyCheckForUpdates;
-        set => Player.AutomaticallyCheckForUpdates = value;
+        get => Settings.AutomaticallyCheckForUpdates;
+        set => Settings.AutomaticallyCheckForUpdates = value;
     }
 
     string InstallationFolderPath
     {
-        get => Player.InstallationFolderPath;
-        set => Player.InstallationFolderPath = value;
+        get => Settings.InstallationFolderPath;
+        set => Settings.InstallationFolderPath = value;
     }
 
     [CascadingParameter]
@@ -23,119 +23,119 @@ partial class OnboardingDialog
 
     bool ScanForCacheStaleness
     {
-        get => Player.ScanForCacheStaleness;
-        set => Player.ScanForCacheStaleness = value;
+        get => Settings.ScanForCacheStaleness;
+        set => Settings.ScanForCacheStaleness = value;
     }
 
     bool ScanForErrorLogs
     {
-        get => Player.ScanForErrorLogs;
-        set => Player.ScanForErrorLogs = value;
+        get => Settings.ScanForErrorLogs;
+        set => Settings.ScanForErrorLogs = value;
     }
 
     bool ScanForInvalidModSubdirectoryDepth
     {
-        get => Player.ScanForInvalidModSubdirectoryDepth;
-        set => Player.ScanForInvalidModSubdirectoryDepth = value;
+        get => Settings.ScanForInvalidModSubdirectoryDepth;
+        set => Settings.ScanForInvalidModSubdirectoryDepth = value;
     }
 
     bool ScanForInvalidScriptModSubdirectoryDepth
     {
-        get => Player.ScanForInvalidScriptModSubdirectoryDepth;
-        set => Player.ScanForInvalidScriptModSubdirectoryDepth = value;
+        get => Settings.ScanForInvalidScriptModSubdirectoryDepth;
+        set => Settings.ScanForInvalidScriptModSubdirectoryDepth = value;
     }
 
     bool ScanForLoose7ZipArchives
     {
-        get => Player.ScanForLoose7ZipArchives;
-        set => Player.ScanForLoose7ZipArchives = value;
+        get => Settings.ScanForLoose7ZipArchives;
+        set => Settings.ScanForLoose7ZipArchives = value;
     }
 
     bool ScanForLooseRarArchives
     {
-        get => Player.ScanForLooseRarArchives;
-        set => Player.ScanForLooseRarArchives = value;
+        get => Settings.ScanForLooseRarArchives;
+        set => Settings.ScanForLooseRarArchives = value;
     }
 
     bool ScanForLooseZipArchives
     {
-        get => Player.ScanForLooseZipArchives;
-        set => Player.ScanForLooseZipArchives = value;
+        get => Settings.ScanForLooseZipArchives;
+        set => Settings.ScanForLooseZipArchives = value;
     }
 
     bool ScanForMissingBe
     {
-        get => Player.ScanForMissingBe;
-        set => Player.ScanForMissingBe = value;
+        get => Settings.ScanForMissingBe;
+        set => Settings.ScanForMissingBe = value;
     }
 
     bool ScanForMissingDependency
     {
-        get => Player.ScanForMissingDependency;
-        set => Player.ScanForMissingDependency = value;
+        get => Settings.ScanForMissingDependency;
+        set => Settings.ScanForMissingDependency = value;
     }
 
     bool ScanForMissingMccc
     {
-        get => Player.ScanForMissingMccc;
-        set => Player.ScanForMissingMccc = value;
+        get => Settings.ScanForMissingMccc;
+        set => Settings.ScanForMissingMccc = value;
     }
 
     bool ScanForMissingModGuard
     {
-        get => Player.ScanForMissingModGuard;
-        set => Player.ScanForMissingModGuard = value;
+        get => Settings.ScanForMissingModGuard;
+        set => Settings.ScanForMissingModGuard = value;
     }
 
     bool ScanForMultipleModVersions
     {
-        get => Player.ScanForMultipleModVersions;
-        set => Player.ScanForMultipleModVersions = value;
+        get => Settings.ScanForMultipleModVersions;
+        set => Settings.ScanForMultipleModVersions = value;
     }
 
     bool ScanForMutuallyExclusiveMods
     {
-        get => Player.ScanForMutuallyExclusiveMods;
-        set => Player.ScanForMutuallyExclusiveMods = value;
+        get => Settings.ScanForMutuallyExclusiveMods;
+        set => Settings.ScanForMutuallyExclusiveMods = value;
     }
 
     bool ScanForModsDisabled
     {
-        get => Player.ScanForModsDisabled;
-        set => Player.ScanForModsDisabled = value;
+        get => Settings.ScanForModsDisabled;
+        set => Settings.ScanForModsDisabled = value;
     }
 
     bool ScanForScriptModsDisabled
     {
-        get => Player.ScanForScriptModsDisabled;
-        set => Player.ScanForScriptModsDisabled = value;
+        get => Settings.ScanForScriptModsDisabled;
+        set => Settings.ScanForScriptModsDisabled = value;
     }
 
     bool ScanForShowModsListAtStartupEnabled
     {
-        get => Player.ScanForShowModsListAtStartupEnabled;
-        set => Player.ScanForShowModsListAtStartupEnabled = value;
+        get => Settings.ScanForShowModsListAtStartupEnabled;
+        set => Settings.ScanForShowModsListAtStartupEnabled = value;
     }
 
     UserType Type
     {
-        get => Player.Type;
+        get => Settings.Type;
         set
         {
-            Player.Type = value;
+            Settings.Type = value;
             SetDefaultScansForUserType(value);
         }
     }
 
     string UserDataFolderPath
     {
-        get => Player.UserDataFolderPath;
-        set => Player.UserDataFolderPath = value;
+        get => Settings.UserDataFolderPath;
+        set => Settings.UserDataFolderPath = value;
     }
 
     /// <inheritdoc />
     public void Dispose() =>
-        Player.PropertyChanged -= HandleUserPreferencesChanged;
+        Settings.PropertyChanged -= HandleUserPreferencesChanged;
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
@@ -151,7 +151,7 @@ partial class OnboardingDialog
                     """))
                     return true;
             }
-            Player.Onboarded = true;
+            Settings.Onboarded = true;
             MudDialog?.Close(DialogResult.Ok(true));
             return false;
         }
@@ -181,8 +181,8 @@ partial class OnboardingDialog
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Player.PropertyChanged += HandleUserPreferencesChanged;
-        SetDefaultScansForUserType(Player.Type);
+        Settings.PropertyChanged += HandleUserPreferencesChanged;
+        SetDefaultScansForUserType(Settings.Type);
     }
 
     async Task ScanForFoldersAsync()
@@ -203,40 +203,40 @@ partial class OnboardingDialog
         switch (value)
         {
             case UserType.Creator:
-                Player.ScanForModsDisabled = false;
-                Player.ScanForScriptModsDisabled = false;
-                Player.ScanForInvalidModSubdirectoryDepth = false;
-                Player.ScanForInvalidScriptModSubdirectoryDepth = false;
-                Player.ScanForLooseZipArchives = false;
-                Player.ScanForLooseRarArchives = false;
-                Player.ScanForLoose7ZipArchives = false;
-                Player.ScanForErrorLogs = false;
-                Player.ScanForMissingMccc = false;
-                Player.ScanForMissingBe = false;
-                Player.ScanForMissingModGuard = false;
-                Player.ScanForMissingDependency = false;
-                Player.ScanForCacheStaleness = false;
-                Player.ScanForMultipleModVersions = false;
-                Player.ScanForMutuallyExclusiveMods = false;
-                Player.ScanForShowModsListAtStartupEnabled = false;
+                Settings.ScanForModsDisabled = false;
+                Settings.ScanForScriptModsDisabled = false;
+                Settings.ScanForInvalidModSubdirectoryDepth = false;
+                Settings.ScanForInvalidScriptModSubdirectoryDepth = false;
+                Settings.ScanForLooseZipArchives = false;
+                Settings.ScanForLooseRarArchives = false;
+                Settings.ScanForLoose7ZipArchives = false;
+                Settings.ScanForErrorLogs = false;
+                Settings.ScanForMissingMccc = false;
+                Settings.ScanForMissingBe = false;
+                Settings.ScanForMissingModGuard = false;
+                Settings.ScanForMissingDependency = false;
+                Settings.ScanForCacheStaleness = false;
+                Settings.ScanForMultipleModVersions = false;
+                Settings.ScanForMutuallyExclusiveMods = false;
+                Settings.ScanForShowModsListAtStartupEnabled = false;
                 break;
             default:
-                Player.ScanForModsDisabled = ScanAttribute.Get(typeof(IModSettingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForInvalidModSubdirectoryDepth = ScanAttribute.Get(typeof(IPackageDepthScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForInvalidScriptModSubdirectoryDepth = ScanAttribute.Get(typeof(ITs4ScriptDepthScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForLooseZipArchives = ScanAttribute.Get(typeof(ILooseZipArchiveScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForLooseRarArchives = ScanAttribute.Get(typeof(ILooseRarArchiveScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForLoose7ZipArchives = ScanAttribute.Get(typeof(ILoose7ZipArchiveScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForErrorLogs = ScanAttribute.Get(typeof(IErrorLogScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
-                Player.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForModsDisabled = ScanAttribute.Get(typeof(IModSettingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForInvalidModSubdirectoryDepth = ScanAttribute.Get(typeof(IPackageDepthScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForInvalidScriptModSubdirectoryDepth = ScanAttribute.Get(typeof(ITs4ScriptDepthScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForLooseZipArchives = ScanAttribute.Get(typeof(ILooseZipArchiveScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForLooseRarArchives = ScanAttribute.Get(typeof(ILooseRarArchiveScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForLoose7ZipArchives = ScanAttribute.Get(typeof(ILoose7ZipArchiveScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForErrorLogs = ScanAttribute.Get(typeof(IErrorLogScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
                 break;
         }
     }

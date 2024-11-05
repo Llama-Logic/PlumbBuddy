@@ -8,14 +8,14 @@
 @inject IJSRuntime JSRuntime
 @inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
-@inject IPlayer Player
+@inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
 
 <MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@Theme" />
-@if (Player.ShowThemeManager)
+@if (Settings.ShowThemeManager)
 {
     <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
     <MudThemeManager Open="@themeManagerOpen" IsDarkMode="@isDarkMode" OpenChanged="OpenThemeManager" Theme="@themeManagerTheme" ThemeChanged="UpdateTheme" />
@@ -36,7 +36,7 @@
     <MudAppBar>
         <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
         <MudImage Src="/img/PlumbBuddyLogo.svg" Elevation="2" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
-        @if (Player.ShowThemeManager)
+        @if (Settings.ShowThemeManager)
         {
             if (@manualLightDarkModeToggleEnabled)
             {
@@ -90,7 +90,7 @@
             </MudTooltip>
             <MudTooltip Arrow="true">
                 <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Player.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="SmartSimObserver.ClearCache" Disabled="@(Player.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="SmartSimObserver.ClearCache" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
                 </ChildContent>
                 <TooltipContent>
                     <MudStack Row="true">
@@ -109,14 +109,14 @@
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
                             Click here to clear the game's cache files.
                         </MudTextM3>
-                        @if (Player.CacheStatus is SmartSimCacheStatus.Clear)
+                        @if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
                                 I'd like to help you, but there simply aren't any cache files to clear at the moment.
                             </MudTextM3>
                         }
-                        @if (Player.CacheStatus is SmartSimCacheStatus.Normal)
+                        @if (Settings.CacheStatus is SmartSimCacheStatus.Normal)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
@@ -124,7 +124,7 @@
                                 I'll change the color of this button when it's important that we clear the cache.
                             </MudTextM3>
                         }
-                        @if (Player.CacheStatus is SmartSimCacheStatus.Stale)
+                        @if (Settings.CacheStatus is SmartSimCacheStatus.Stale)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">

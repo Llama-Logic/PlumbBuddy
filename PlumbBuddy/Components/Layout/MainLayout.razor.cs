@@ -36,10 +36,10 @@ public partial class MainLayout
     {
         get
         {
-            if (Player.ShowThemeManager)
+            if (Settings.ShowThemeManager)
                 return themeManagerTheme.Theme;
             var factory = CreatePlumbBuddyFactoryTheme();
-            ApplyPlayerSelectedTheme(factory);
+            ApplySettingsSelectedTheme(factory);
             return factory;
         }
     }
@@ -78,9 +78,9 @@ public partial class MainLayout
         return Task.CompletedTask;
     }
 
-    void ApplyPlayerSelectedTheme(MudTheme theme)
+    void ApplySettingsSelectedTheme(MudTheme theme)
     {
-        if (Player.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
+        if (Settings.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
         {
             if (!string.IsNullOrWhiteSpace(customTheme.DefaultBorderRadius))
                 theme.LayoutProperties.DefaultBorderRadius = customTheme.DefaultBorderRadius;
@@ -119,14 +119,14 @@ public partial class MainLayout
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
         javaScriptThis?.Dispose();
     }
 
-    bool? GetPlayerSelectedThemeIsDarkMode()
+    bool? GetSettingsSelectedThemeIsDarkMode()
     {
-        if (Player.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
+        if (Settings.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
         {
             var noLightPalette = customTheme.PaletteLight is null;
             var noDarkPalette = customTheme.PaletteDark is null;
@@ -149,11 +149,11 @@ public partial class MainLayout
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.CacheStatus))
+        if (e.PropertyName is nameof(ISettings.CacheStatus))
             StaticDispatcher.Dispatch(StateHasChanged);
-        else if (e.PropertyName is nameof(IPlayer.ShowThemeManager))
+        else if (e.PropertyName is nameof(ISettings.ShowThemeManager))
             StaticDispatcher.Dispatch(() =>
             {
                 manualLightDarkModeToggleEnabled = false;
@@ -162,10 +162,10 @@ public partial class MainLayout
                     SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
                 StateHasChanged();
             });
-        else if (e.PropertyName is nameof(IPlayer.Theme))
+        else if (e.PropertyName is nameof(ISettings.Theme))
             StaticDispatcher.Dispatch(() =>
             {
-                SetPreferredColorScheme(GetPlayerSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
+                SetPreferredColorScheme(GetSettingsSelectedThemeIsDarkMode() is { } themeIsDarkMode ? (themeIsDarkMode ? "dark" : "light") : Application.Current is { } app ? (app.RequestedTheme is AppTheme.Dark ? "dark" : "light") : string.Empty);
                 StateHasChanged();
             });
     }
@@ -195,7 +195,7 @@ public partial class MainLayout
         {
             await JSRuntime.InvokeVoidAsync("registerExternalLinkHandler", javaScriptThis);
             SuperSnacks.StopHoarding();
-            if (!Player.Onboarded)
+            if (!Settings.Onboarded)
                 await DialogService.ShowOnboardingDialogAsync();
         }
     }
@@ -208,10 +208,10 @@ public partial class MainLayout
         StaticDispatcher.RegisterDispatcher(Dispatcher);
         if (Application.Current is { } app)
             app.Windows[0].Title = "PlumbBuddy";
-        if (Player.ShowThemeManager)
+        if (Settings.ShowThemeManager)
             StateHasChanged();
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SuperSnacks.RefreshmentsOffered += HandleSuperSnacksRefreshmentsOffered;
         packageCount = ModsDirectoryCataloger.PackageCount;
         scriptArchiveCount = ModsDirectoryCataloger.ScriptArchiveCount;
@@ -234,7 +234,7 @@ public partial class MainLayout
         themeManagerOpen = value;
 
     void SetPreferredColorScheme(string colorScheme) =>
-        isDarkMode = manualLightDarkModeToggle ?? GetPlayerSelectedThemeIsDarkMode() ?? colorScheme == "dark";
+        isDarkMode = manualLightDarkModeToggle ?? GetSettingsSelectedThemeIsDarkMode() ?? colorScheme == "dark";
 
     /// <inheritdoc/>
     [JSInvokable]

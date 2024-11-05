@@ -55,8 +55,8 @@ partial class SettingsDialog
         if (firstRender && foldersSelector is not null)
         {
             await foldersSelector.ScanForFoldersAsync();
-            InstallationFolderPath = Player.InstallationFolderPath;
-            UserDataFolderPath = Player.UserDataFolderPath;
+            InstallationFolderPath = Settings.InstallationFolderPath;
+            UserDataFolderPath = Settings.UserDataFolderPath;
         }
     }
 
@@ -64,24 +64,24 @@ partial class SettingsDialog
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        AutomaticallyCheckForUpdates = Player.AutomaticallyCheckForUpdates;
-        ScanForCacheStaleness = Player.ScanForCacheStaleness;
-        ScanForErrorLogs = Player.ScanForErrorLogs;
-        ScanForInvalidModSubdirectoryDepth = Player.ScanForInvalidModSubdirectoryDepth;
-        ScanForInvalidScriptModSubdirectoryDepth = Player.ScanForInvalidScriptModSubdirectoryDepth;
-        ScanForLoose7ZipArchives = Player.ScanForLoose7ZipArchives;
-        ScanForLooseRarArchives = Player.ScanForLooseRarArchives;
-        ScanForLooseZipArchives = Player.ScanForLooseZipArchives;
-        ScanForMissingBe = Player.ScanForMissingBe;
-        ScanForMissingDependency = Player.ScanForMissingDependency;
-        ScanForMissingMccc = Player.ScanForMissingMccc;
-        ScanForMissingModGuard = Player.ScanForMissingModGuard;
-        ScanForModsDisabled = Player.ScanForModsDisabled;
-        ScanForMultipleModVersions = Player.ScanForMultipleModVersions;
-        ScanForMutuallyExclusiveMods = Player.ScanForMutuallyExclusiveMods;
-        ScanForScriptModsDisabled = Player.ScanForScriptModsDisabled;
-        ScanForShowModsListAtStartupEnabled = Player.ScanForShowModsListAtStartupEnabled;
-        Type = Player.Type;
+        AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
+        ScanForCacheStaleness = Settings.ScanForCacheStaleness;
+        ScanForErrorLogs = Settings.ScanForErrorLogs;
+        ScanForInvalidModSubdirectoryDepth = Settings.ScanForInvalidModSubdirectoryDepth;
+        ScanForInvalidScriptModSubdirectoryDepth = Settings.ScanForInvalidScriptModSubdirectoryDepth;
+        ScanForLoose7ZipArchives = Settings.ScanForLoose7ZipArchives;
+        ScanForLooseRarArchives = Settings.ScanForLooseRarArchives;
+        ScanForLooseZipArchives = Settings.ScanForLooseZipArchives;
+        ScanForMissingBe = Settings.ScanForMissingBe;
+        ScanForMissingDependency = Settings.ScanForMissingDependency;
+        ScanForMissingMccc = Settings.ScanForMissingMccc;
+        ScanForMissingModGuard = Settings.ScanForMissingModGuard;
+        ScanForModsDisabled = Settings.ScanForModsDisabled;
+        ScanForMultipleModVersions = Settings.ScanForMultipleModVersions;
+        ScanForMutuallyExclusiveMods = Settings.ScanForMutuallyExclusiveMods;
+        ScanForScriptModsDisabled = Settings.ScanForScriptModsDisabled;
+        ScanForShowModsListAtStartupEnabled = Settings.ScanForShowModsListAtStartupEnabled;
+        Type = Settings.Type;
     }
 
     void CancelOnClickHandler()
@@ -101,26 +101,26 @@ partial class SettingsDialog
                 return;
             }
         }
-        Player.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
-        Player.InstallationFolderPath = InstallationFolderPath;
-        Player.ScanForCacheStaleness = ScanForCacheStaleness;
-        Player.ScanForErrorLogs = ScanForErrorLogs;
-        Player.ScanForInvalidModSubdirectoryDepth = ScanForInvalidModSubdirectoryDepth;
-        Player.ScanForInvalidScriptModSubdirectoryDepth = ScanForInvalidScriptModSubdirectoryDepth;
-        Player.ScanForLoose7ZipArchives = ScanForLoose7ZipArchives;
-        Player.ScanForLooseRarArchives = ScanForLooseRarArchives;
-        Player.ScanForLooseZipArchives = ScanForLooseZipArchives;
-        Player.ScanForMissingBe = ScanForMissingBe;
-        Player.ScanForMissingDependency = ScanForMissingDependency;
-        Player.ScanForMissingMccc = ScanForMissingMccc;
-        Player.ScanForMissingModGuard = ScanForMissingModGuard;
-        Player.ScanForModsDisabled = ScanForModsDisabled;
-        Player.ScanForMultipleModVersions = ScanForMultipleModVersions;
-        Player.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
-        Player.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
-        Player.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
-        Player.Type = Type;
-        Player.UserDataFolderPath = UserDataFolderPath;
+        Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
+        Settings.InstallationFolderPath = InstallationFolderPath;
+        Settings.ScanForCacheStaleness = ScanForCacheStaleness;
+        Settings.ScanForErrorLogs = ScanForErrorLogs;
+        Settings.ScanForInvalidModSubdirectoryDepth = ScanForInvalidModSubdirectoryDepth;
+        Settings.ScanForInvalidScriptModSubdirectoryDepth = ScanForInvalidScriptModSubdirectoryDepth;
+        Settings.ScanForLoose7ZipArchives = ScanForLoose7ZipArchives;
+        Settings.ScanForLooseRarArchives = ScanForLooseRarArchives;
+        Settings.ScanForLooseZipArchives = ScanForLooseZipArchives;
+        Settings.ScanForMissingBe = ScanForMissingBe;
+        Settings.ScanForMissingDependency = ScanForMissingDependency;
+        Settings.ScanForMissingMccc = ScanForMissingMccc;
+        Settings.ScanForMissingModGuard = ScanForMissingModGuard;
+        Settings.ScanForModsDisabled = ScanForModsDisabled;
+        Settings.ScanForMultipleModVersions = ScanForMultipleModVersions;
+        Settings.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
+        Settings.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
+        Settings.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
+        Settings.Type = Type;
+        Settings.UserDataFolderPath = UserDataFolderPath;
         MudDialog?.Close(DialogResult.Ok(true));
     }
 }

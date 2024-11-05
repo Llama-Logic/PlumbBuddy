@@ -1,9 +1,9 @@
 namespace PlumbBuddy.Services;
 
-class Player :
-    IPlayer
+class Settings :
+    ISettings
 {
-    public Player(IPreferences preferences) =>
+    public Settings(IPreferences preferences) =>
         this.preferences = preferences;
 
     readonly IPreferences preferences;

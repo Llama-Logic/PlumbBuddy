@@ -134,8 +134,8 @@ partial class ManifestEditor
 
     public bool UsePublicPackCatalog
     {
-        get => Player.UsePublicPackCatalog;
-        set => Player.UsePublicPackCatalog = value;
+        get => Settings.UsePublicPackCatalog;
+        set => Settings.UsePublicPackCatalog = value;
     }
 
     async Task<AddFileResult> AddFileAsync(FileInfo modFile)
@@ -518,7 +518,7 @@ partial class ManifestEditor
 
     public void Dispose()
     {
-        Player.PropertyChanged -= HandlePlayerPropertyChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
         GC.SuppressFinalize(this);
     }
@@ -617,9 +617,9 @@ partial class ManifestEditor
         }
     }
 
-    void HandlePlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPlayer.UsePublicPackCatalog))
+        if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
@@ -743,7 +743,7 @@ partial class ManifestEditor
                         There are only a few reasons this might happen. In any case, you are seen.
                         1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
                         2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
-                        3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
+                        3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
                         <iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm">via GIPHY</a></p>
                         """);
                 UpdateComponentsStructure();
@@ -875,7 +875,7 @@ partial class ManifestEditor
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Player.PropertyChanged += HandlePlayerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
     }
 
@@ -912,8 +912,8 @@ partial class ManifestEditor
                 (string?)MaterialDesignIcons.Normal.TagSearch,
                 $"""
                 *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:
-                * If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have to refer to file names when I could be using a more familiar name.
-                * If your mod is ever referenced as a dependency and then a player doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.
+                * If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have to refer to file names when I could be using a more familiar name.
+                * If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.
                 """
             ));
         if (creators.Count is 0)
@@ -932,8 +932,8 @@ partial class ManifestEditor
                 (string?)MaterialDesignIcons.Normal.CloudSearch,
                 $"""
                 *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:
-                * If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.
-                * If your mod is ever referenced as a dependency and then a player doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔
+                * If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.
+                * If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔
                 """
             ));
         messages.AddRange(requiredMods
@@ -944,7 +944,7 @@ partial class ManifestEditor
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
                 $"""
-                *Your {(t.index + 1).Ordinalize()} required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a player, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***
+                *Your {(t.index + 1).Ordinalize()} required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a Settings, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***
                 """
             )));
         messages.AddRange(requiredMods
@@ -954,7 +954,7 @@ partial class ManifestEditor
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
                 $"""
-                *Your **{requiredMod.Name}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a player, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.
+                *Your **{requiredMod.Name}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.
                 """
             )));
         if (requiredPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
@@ -963,7 +963,7 @@ partial class ManifestEditor
                 Severity.Normal,
                 (string?)MaterialDesignIcons.Normal.AccountCash,
                 $"""
-                Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
+                Your mod requires packs which some Settingss may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
                 If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).
                 """
             ));

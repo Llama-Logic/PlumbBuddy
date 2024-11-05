@@ -4,7 +4,7 @@ public sealed class CacheStalenessScan :
     Scan,
     ICacheStalenessScan
 {
-    public CacheStalenessScan(IPlayer player, ISmartSimObserver smartSimObserver)
+    public CacheStalenessScan(ISettings player, ISmartSimObserver smartSimObserver)
     {
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
@@ -12,7 +12,7 @@ public sealed class CacheStalenessScan :
         this.smartSimObserver = smartSimObserver;
     }
 
-    readonly IPlayer player;
+    readonly ISettings player;
     readonly ISmartSimObserver smartSimObserver;
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
