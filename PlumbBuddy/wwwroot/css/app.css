@@ -74,7 +74,7 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
 }
 
 .user-type-carousel {
-    border-radius: 5px;
+    border-radius: var(--mud-default-borderradius);
     height: 600px;
 }
 
