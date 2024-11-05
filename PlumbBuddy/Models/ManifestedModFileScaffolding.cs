@@ -53,7 +53,7 @@ public sealed class ManifestedModFileScaffolding :
     [YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults, Description = "this tells me what this mod name is")]
     public string ModName { get; set; } = string.Empty;
 
-    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.Preserve, Description = "this tells me where this mod file is required by your mod")]
+    [YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.Preserve, Description = "this tells me whether this mod file is required by your mod")]
     public bool IsRequired { get; set; }
 
     [YamlMember(Order = 3, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults, Description = "this tells me what this mod file's special component name is")]
