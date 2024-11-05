@@ -2,6 +2,16 @@ amethyst-lilac:
   display_name: Amethyst Lilac
   description: |
     Visit on [Patreon](https://www.patreon.com/amethystlilac)!
+  palette_light:
+    Primary: '#6f62efff'
+    Secondary: '#b32da1ff'
+    Tertiary: '#10a452ff'
+    Info: '#109bfeff'
+    Warning: '#c55408ff'
+    Surface: '#ccb3fbff'
+    Background: '#c2a0fbff'
+    TextPrimary: '#2a1f4eff'
+    TextSecondary: '#584a86ff'
   palette_dark:
     Background: '#322d62ff'
     Surface: '#342d6bff'
@@ -13,16 +23,16 @@ amethyst-lilac:
       dark: mod-health.png
       light: mod-health.png
     catalog:
-      dark: catalog.png
-      light: catalog.png
+      dark: catalog-dark.png
+      light: catalog-light.png
     manifest-editor:
-      dark: manifest-editor.png
-      light: manifest-editor.png
+      dark: manifest-editor-dark.png
+      light: manifest-editor-light.png
       repeat: no-repeat
       size: contain
     simvault:
-      dark: simvault.png
-      light: simvault.png
+      dark: simvault-dark.png
+      light: simvault-light.png
       size: contain
 
 little-ms-sam:
