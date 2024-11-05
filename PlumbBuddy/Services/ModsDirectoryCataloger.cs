@@ -223,12 +223,6 @@ public class ModsDirectoryCataloger :
         var entityType = pbDbContext.Model.FindEntityType(typeof(TNormalizedEntity))
             ?? throw new InvalidOperationException($"could not find entity type for {typeof(TNormalizedEntity)}");
         var tableName = entityType.GetTableMappings().Select(tableMapping => tableMapping.Table.Name).Distinct().Single();
-        //var tableName = tableNameByNormalizedEntityType.GetOrAdd(typeof(TNormalizedEntity), normalizedEntityType =>
-        //{
-        //    var entityType = pbDbContext.Model.FindEntityType(typeof(TNormalizedEntity))
-        //        ?? throw new InvalidOperationException($"could not find entity type for {typeof(TNormalizedEntity)}");
-        //    return entityType.GetTableMappings().Select(tableMapping => tableMapping.Table.Name).Distinct().Single();
-        //});
         foreach (var value in values)
         {
             if (value is null)
@@ -238,7 +232,6 @@ public class ModsDirectoryCataloger :
         }
     }
 
-    static readonly ConcurrentDictionary<Type, string> tableNameByNormalizedEntityType = [];
     static readonly PropertyChangedEventArgs estimatedStateTimeRemainingPropertyChangedEventArgs = new(nameof(EstimatedStateTimeRemaining));
     static readonly PropertyChangedEventArgs packageCountPropertyChangedEventArgs = new(nameof(PackageCount));
     static readonly PropertyChangedEventArgs progressMaxPropertyChangedEventArgs = new(nameof(ProgressMax));

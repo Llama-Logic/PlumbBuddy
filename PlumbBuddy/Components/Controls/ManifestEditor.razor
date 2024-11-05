@@ -33,6 +33,12 @@
                                     <ModFileSelector Label="Any File from Your Mod" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
                                 </MudForm>
                             </MudItem>
+                            <MudFlexBreak />
+                            <MudItem>
+                                <MudTooltip Color="Color.Tertiary" Arrow Text="I'll check in both places either way, but you can use this switch to control where I look first.">
+                                    <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">Check for scaffolding in a "PlumbBuddy" subfolder first.</MudSwitchM3>
+                                </MudTooltip>
+                            </MudItem>
                         </MudGrid>
                     </div>
                 </ChildContent>
@@ -358,6 +364,12 @@
                             </MudTextM3>
                         }
                         <MudGrid Justify="Justify.Center" Class="my-4">
+                            <MudItem>
+                                <MudTooltip Color="Color.Tertiary" Arrow Text="I'll clean up any old, unneeded scaffolding files left behind if you change this setting.">
+                                    <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">Write scaffolding in a "PlumbBuddy" subfolder to keep my mod files' folder more orderly.</MudSwitchM3>
+                                </MudTooltip>
+                            </MudItem>
+                            <MudFlexBreak />
                             @foreach (var severityGroup in confirmationStepMessages.GroupBy(csm => csm.severity).OrderByDescending(g => g.Key))
                             {
                                 var severity = severityGroup.Key;

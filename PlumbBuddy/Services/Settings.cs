@@ -357,6 +357,18 @@ class Settings :
         }
     }
 
+    public bool WriteScaffoldingToSubdirectory
+    {
+        get => preferences.Get(nameof(WriteScaffoldingToSubdirectory), true);
+        set
+        {
+            if (WriteScaffoldingToSubdirectory == value)
+                return;
+            preferences.Set(nameof(WriteScaffoldingToSubdirectory), value);
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Forget()

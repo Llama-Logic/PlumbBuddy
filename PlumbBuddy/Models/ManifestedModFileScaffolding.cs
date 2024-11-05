@@ -1,10 +1,17 @@
+using Windows.Devices.AllJoyn;
+
 namespace PlumbBuddy.Models;
 
 public sealed class ManifestedModFileScaffolding :
     IParsable<ManifestedModFileScaffolding>
 {
-    static string GetScaffoldingPath(FileInfo modFile) =>
-        $"{modFile.FullName}.manifest_scaffolding.yml";
+    static string GetScaffoldingPath(FileInfo modFile, bool useScaffoldingSubdirectory)
+    {
+        var fileName = $"{modFile.Name}.manifest_scaffolding.yml";
+        if (useScaffoldingSubdirectory)
+            return Path.Combine(modFile.DirectoryName!, "PlumbBuddy", fileName);
+        return Path.Combine(modFile.DirectoryName!, fileName);
+    }
 
     public static ManifestedModFileScaffolding Parse(string s) =>
         Parse(s, null);
@@ -16,22 +23,40 @@ public sealed class ManifestedModFileScaffolding :
         throw new FormatException($"Unable to parse '{s}' as {nameof(ManifestedModFileScaffolding)}.");
     }
 
-    public static async Task<ManifestedModFileScaffolding?> TryLoadForAsync(FileInfo modFile)
+    public static async Task<ManifestedModFileScaffolding?> TryLoadForAsync(FileInfo modFile, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(modFile);
+        ArgumentNullException.ThrowIfNull(settings);
         modFile.Refresh();
         if (!modFile.Exists)
             return null;
-        var scaffoldingPath = GetScaffoldingPath(modFile);
-        if (!File.Exists(scaffoldingPath))
-            return null;
-        try
+        var scaffoldingPath = GetScaffoldingPath(modFile, settings.WriteScaffoldingToSubdirectory);
+        if (File.Exists(scaffoldingPath))
         {
-            if (TryParse(await File.ReadAllTextAsync(scaffoldingPath).ConfigureAwait(false), out var scaffolding))
-                return scaffolding;
+            try
+            {
+                using var scaffoldingStream = new FileStream(scaffoldingPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var scaffoldingStreamReader = new StreamReader(scaffoldingStream);
+                if (TryParse(await scaffoldingStreamReader.ReadToEndAsync().ConfigureAwait(false), out var scaffolding))
+                    return scaffolding;
+            }
+            catch
+            {
+            }
         }
-        catch
+        scaffoldingPath = GetScaffoldingPath(modFile, !settings.WriteScaffoldingToSubdirectory);
+        if (File.Exists(scaffoldingPath))
         {
+            try
+            {
+                using var scaffoldingStream = new FileStream(scaffoldingPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var scaffoldingStreamReader = new StreamReader(scaffoldingStream);
+                if (TryParse(await scaffoldingStreamReader.ReadToEndAsync().ConfigureAwait(false), out var scaffolding))
+                    return scaffolding;
+            }
+            catch
+            {
+            }
         }
         return null;
     }
@@ -65,10 +90,17 @@ public sealed class ManifestedModFileScaffolding :
     [YamlMember(Order = 5, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "these are pointers to the other mod files which are a part of your mod")]
     public Collection<ManifestedModFileScaffoldingReferencedModFile> OtherModComponents { get; private set; } = [];
 
-    public async Task CommitForAsync(FileInfo modFile)
+    public async Task CommitForAsync(FileInfo modFile, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(modFile);
-        var scaffoldingPath = GetScaffoldingPath(modFile);
+        ArgumentNullException.ThrowIfNull(settings);
+        var scaffoldingSubdirectory = new DirectoryInfo(Path.Combine(modFile.DirectoryName!, "PlumbBuddy"));
+        if (settings.WriteScaffoldingToSubdirectory && !scaffoldingSubdirectory.Exists)
+        {
+            scaffoldingSubdirectory.Create();
+            scaffoldingSubdirectory.Refresh();
+        }
+        var scaffoldingPath = GetScaffoldingPath(modFile, settings.WriteScaffoldingToSubdirectory);
         using var scaffoldingStream = File.Open(scaffoldingPath, FileMode.Create);
         using var scaffoldingStreamWriter = new StreamWriter(scaffoldingStream);
         await scaffoldingStreamWriter.WriteAsync
@@ -86,6 +118,32 @@ public sealed class ManifestedModFileScaffolding :
             {ToString()}
             """
         ).ConfigureAwait(false);
+        await scaffoldingStreamWriter.FlushAsync().ConfigureAwait(false);
+        var otherPotentialScaffoldingFile = new FileInfo(GetScaffoldingPath(modFile, !settings.WriteScaffoldingToSubdirectory));
+        if (otherPotentialScaffoldingFile.Exists)
+        {
+            try
+            {
+                otherPotentialScaffoldingFile.Delete();
+            }
+            catch
+            {
+                // just trying to help... 😟
+            }
+        }
+        if (!settings.WriteScaffoldingToSubdirectory
+            && scaffoldingSubdirectory.Exists
+            && scaffoldingSubdirectory.GetFileSystemInfos("*.*", SearchOption.TopDirectoryOnly).Length is 0)
+        {
+            try
+            {
+                scaffoldingSubdirectory.Delete(true);
+            }
+            catch
+            {
+                // just trying to help... 😟
+            }
+        }
     }
 
     public override string ToString() =>

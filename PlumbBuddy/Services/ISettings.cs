@@ -31,6 +31,7 @@ public interface ISettings :
     bool UsePublicPackCatalog { get; set; }
     string UserDataFolderPath { get; set; }
     Version? VersionAtLastStartup { get; set; }
+    bool WriteScaffoldingToSubdirectory { get; set; }
 
     void Forget();
 }

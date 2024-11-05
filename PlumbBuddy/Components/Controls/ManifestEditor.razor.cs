@@ -138,6 +138,12 @@ partial class ManifestEditor
         set => Settings.UsePublicPackCatalog = value;
     }
 
+    public bool WriteScaffoldingToSubdirectory
+    {
+        get => Settings.WriteScaffoldingToSubdirectory;
+        set => Settings.WriteScaffoldingToSubdirectory = value;
+    }
+
     async Task<AddFileResult> AddFileAsync(FileInfo modFile)
     {
         modFile.Refresh();
@@ -492,7 +498,7 @@ partial class ManifestEditor
                             referencedModFile.LocalRelativePath = relativePath;
                         scaffolding.OtherModComponents.Add(referencedModFile);
                     }
-                    await scaffolding.CommitForAsync(component.File).ConfigureAwait(false);
+                    await scaffolding.CommitForAsync(component.File, Settings).ConfigureAwait(false);
                 }
             }
         }
@@ -703,7 +709,7 @@ partial class ManifestEditor
                     versionEnabled = !string.IsNullOrWhiteSpace(version);
                     features = manifests.SelectMany(manifest => manifest.Features).Distinct().ToList().AsReadOnly();
                 }
-                if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile) is { } scaffolding)
+                if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings) is { } scaffolding)
                 {
                     components[0].IsRequired = scaffolding.IsRequired;
                     components[0].Name = string.IsNullOrWhiteSpace(scaffolding.ComponentName)
@@ -729,7 +735,7 @@ partial class ManifestEditor
                                 """);
                         var otherComponent = components[^1];
                         RemoveComponentFromRequiredMods(otherComponent, addScaffoldedComponentResult);
-                        if (otherFileInfo is not null && await ManifestedModFileScaffolding.TryLoadForAsync(otherFileInfo) is { } otherScaffolding)
+                        if (otherFileInfo is not null && await ManifestedModFileScaffolding.TryLoadForAsync(otherFileInfo, Settings) is { } otherScaffolding)
                             otherComponent.Name = string.IsNullOrWhiteSpace(otherScaffolding.ComponentName)
                                 ? null
                                 : otherScaffolding.ComponentName;
