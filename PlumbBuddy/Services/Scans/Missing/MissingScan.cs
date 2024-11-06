@@ -4,16 +4,16 @@ public abstract class MissingScan :
     Scan,
     IMissingScan
 {
-    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player)
+    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         this.pbDbContextFactory = pbDbContextFactory;
-        this.player = player;
+        this.settings = settings;
     }
 
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly ISettings player;
+    readonly ISettings settings;
 
     protected abstract string ModName { get; }
 
@@ -32,18 +32,18 @@ public abstract class MissingScan :
             if (resolutionCmd is "enable")
             {
                 if (issueDataStr is "modsGameOptionScanDisabled")
-                    player.ScanForModsDisabled = true;
+                    settings.ScanForModsDisabled = true;
                 else if (issueDataStr is "scriptModsGameOptionScanDisabled")
-                    player.ScanForScriptModsDisabled = true;
+                    settings.ScanForScriptModsDisabled = true;
                 else if (issueDataStr is "packageDepthScanDisabled")
-                    player.ScanForInvalidModSubdirectoryDepth = true;
+                    settings.ScanForInvalidModSubdirectoryDepth = true;
                 else if (issueDataStr is "ts4scriptDepthScanDisabled")
-                    player.ScanForInvalidScriptModSubdirectoryDepth = true;
+                    settings.ScanForInvalidScriptModSubdirectoryDepth = true;
                 return Task.CompletedTask;
             }
             if (resolutionCmd is "stopTellingMe")
             {
-                StopScanning(player);
+                StopScanning(settings);
                 return Task.CompletedTask;
             }
         }
@@ -52,7 +52,7 @@ public abstract class MissingScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
-        if (RequiredPackageKeys?.Count > 0 && !player.ScanForModsDisabled)
+        if (RequiredPackageKeys?.Count > 0 && !settings.ScanForModsDisabled)
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
@@ -80,7 +80,7 @@ public abstract class MissingScan :
                     }
                 ]
             };
-        else if (RequiredScriptArchiveFullNames?.Count > 0 && !player.ScanForScriptModsDisabled)
+        else if (RequiredScriptArchiveFullNames?.Count > 0 && !settings.ScanForScriptModsDisabled)
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
@@ -108,7 +108,7 @@ public abstract class MissingScan :
                     }
                 ]
             };
-        else if (RequiredPackageKeys?.Count > 0 && !player.ScanForInvalidModSubdirectoryDepth)
+        else if (RequiredPackageKeys?.Count > 0 && !settings.ScanForInvalidModSubdirectoryDepth)
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
@@ -136,7 +136,7 @@ public abstract class MissingScan :
                     }
                 ]
             };
-        else if (RequiredScriptArchiveFullNames?.Count > 0 && !player.ScanForInvalidScriptModSubdirectoryDepth)
+        else if (RequiredScriptArchiveFullNames?.Count > 0 && !settings.ScanForInvalidScriptModSubdirectoryDepth)
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
@@ -230,5 +230,5 @@ public abstract class MissingScan :
         }
     }
 
-    protected abstract void StopScanning(ISettings player);
+    protected abstract void StopScanning(ISettings settings);
 }

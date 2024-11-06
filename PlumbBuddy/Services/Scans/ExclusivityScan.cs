@@ -4,28 +4,28 @@ public class ExclusivityScan :
     Scan,
     IExclusivityScan
 {
-    public ExclusivityScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player)
+    public ExclusivityScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
     }
 
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
         if (resolutionData is string resolutionStr)
         {
-            if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
+            if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
                 platformFunctions.ViewFile(modFile);
             else if (resolutionStr is "stopTellingMe")
-                player.ScanForMutuallyExclusiveMods = false;
+                settings.ScanForMutuallyExclusiveMods = false;
         }
         return Task.CompletedTask;
     }

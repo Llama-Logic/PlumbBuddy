@@ -4,8 +4,8 @@ public sealed class McccMissingScan :
     MissingScan,
     IMcccMissingScan
 {
-    public McccMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player) :
-        base(pbDbContextFactory, player)
+    public McccMissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings) :
+        base(pbDbContextFactory, settings)
     {
     }
 
@@ -28,6 +28,6 @@ public sealed class McccMissingScan :
         "mc_cmd_center.pyc"
     ];
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForMissingMccc = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForMissingMccc = false;
 }

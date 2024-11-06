@@ -8,8 +8,8 @@ public class ShowModListStartupSettingScan :
     const string uncomfortableScanIssueFixResolutionData = "disableShowAtStartup";
     const string uncomfortableScanIssueStopResolutionData = "stopScanning";
 
-    public ShowModListStartupSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, player, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, uncomfortableScanIssueData, uncomfortableScanIssueFixResolutionData, uncomfortableScanIssueStopResolutionData)
+    public ShowModListStartupSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, settings, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, uncomfortableScanIssueData, uncomfortableScanIssueFixResolutionData, uncomfortableScanIssueStopResolutionData)
     {
     }
 
@@ -64,6 +64,6 @@ public class ShowModListStartupSettingScan :
             Type = ScanIssueType.Healthy
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForShowModsListAtStartupEnabled = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForShowModsListAtStartupEnabled = false;
 }

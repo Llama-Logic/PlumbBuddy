@@ -28,24 +28,24 @@ public sealed class DependencyScan :
     record ModWithMissingDependencyMod(long ModManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
     record ModWithMissingPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
 
-    public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings player, ISmartSimObserver smartSimObserver)
+    public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings settings, ISmartSimObserver smartSimObserver)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(blazorFramework);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.blazorFramework = blazorFramework;
-        this.player = player;
+        this.settings = settings;
         this.smartSimObserver = smartSimObserver;
     }
 
     readonly IBlazorFramework blazorFramework;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
 
     public override async Task ResolveIssueAsync(object issueData, object resolutionData)
@@ -54,10 +54,10 @@ public sealed class DependencyScan :
         {
             if (issueData is ModWithMissingPacks modWithMissingPacks && resolutionStr.StartsWith("purchase-"))
                 await smartSimObserver.HelpWithPackPurchaseAsync(resolutionStr[9..], blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>(), modWithMissingPacks.Creators, modWithMissingPacks.ElectronicArtsPromoCode).ConfigureAwait(false);
-            else if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
+            else if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
                 platformFunctions.ViewFile(modFile);
             else if (resolutionStr is "stopTellingMe")
-                player.ScanForMissingDependency = false;
+                settings.ScanForMissingDependency = false;
         }
     }
 

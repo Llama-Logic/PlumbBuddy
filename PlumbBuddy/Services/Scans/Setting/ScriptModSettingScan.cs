@@ -8,8 +8,8 @@ public sealed class ScriptModSettingScan :
     const string deadScanIssueFixResolutionData = "enableScriptMods";
     const string deadScanIssueStopResolutionData = "stopScanning";
 
-    public ScriptModSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, player, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, deadScanIssueData, deadScanIssueFixResolutionData, deadScanIssueStopResolutionData)
+    public ScriptModSettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, settings, smartSimObserver, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, deadScanIssueData, deadScanIssueFixResolutionData, deadScanIssueStopResolutionData)
     {
     }
 
@@ -61,6 +61,6 @@ public sealed class ScriptModSettingScan :
             Type = ScanIssueType.Healthy
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForScriptModsDisabled = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForScriptModsDisabled = false;
 }

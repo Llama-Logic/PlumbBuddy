@@ -4,15 +4,15 @@ public abstract class LooseArchiveScan :
     Scan,
     ILooseArchiveScan
 {
-    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
+    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.superSnacks = superSnacks;
         this.modDirectoryFileType = modDirectoryFileType;
     }
@@ -20,7 +20,7 @@ public abstract class LooseArchiveScan :
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
@@ -33,7 +33,7 @@ public abstract class LooseArchiveScan :
         {
             if (resolutionCmd is "moveToDownloads")
             {
-                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, looseArchiveRelativePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, looseArchiveRelativePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -79,7 +79,7 @@ public abstract class LooseArchiveScan :
             }
             if (resolutionCmd is "stopTellingMe")
             {
-                StopScanning(player);
+                StopScanning(settings);
                 return Task.CompletedTask;
             }
         }
@@ -94,11 +94,11 @@ public abstract class LooseArchiveScan :
         await foreach (var naughtyLooseArchive in pbDbContext.FilesOfInterest.Where(foi => foi.FileType == modDirectoryFileType && foi.Path.StartsWith(prefix)).AsAsyncEnumerable())
         {
             foundNaughtyLooseArchives = true;
-            yield return GenerateUncomfortableScanIssue(new FileInfo(Path.Combine(player.UserDataFolderPath, naughtyLooseArchive.Path)), naughtyLooseArchive);
+            yield return GenerateUncomfortableScanIssue(new FileInfo(Path.Combine(settings.UserDataFolderPath, naughtyLooseArchive.Path)), naughtyLooseArchive);
         }
         if (!foundNaughtyLooseArchives)
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(ISettings player);
+    protected abstract void StopScanning(ISettings settings);
 }

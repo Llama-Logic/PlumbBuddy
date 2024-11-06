@@ -4,8 +4,8 @@ public sealed class PackageDepthScan :
     DepthScan,
     IPackageDepthScan
 {
-    public PackageDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, platformFunctions, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, 5)
+    public PackageDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, settings, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.Package, 5)
     {
     }
 
@@ -60,6 +60,6 @@ public sealed class PackageDepthScan :
             ]
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForInvalidModSubdirectoryDepth = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForInvalidModSubdirectoryDepth = false;
 }

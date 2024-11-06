@@ -3,14 +3,14 @@ namespace PlumbBuddy.Services;
 public class PublicCatalogs :
     IPublicCatalogs
 {
-    public PublicCatalogs(ILogger<PublicCatalogs> logger, ISettings player)
+    public PublicCatalogs(ILogger<PublicCatalogs> logger, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         this.logger = logger;
-        this.player = player;
-        this.player.PropertyChanged += HandlerPlayerPropertyChanged;
-        if (this.player.UsePublicPackCatalog)
+        this.settings = settings;
+        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
+        if (this.settings.UsePublicPackCatalog)
             Task.Run(() => FetchPackCatalogAsync());
         client = new() { BaseAddress = new("https://plumbbuddy.app/community-data/") };
     }
@@ -18,7 +18,7 @@ public class PublicCatalogs :
     readonly HttpClient client;
     readonly ILogger<PublicCatalogs> logger;
     IReadOnlyDictionary<string, PackDescription>? packCatalog;
-    readonly ISettings player;
+    readonly ISettings settings;
 
     ~PublicCatalogs() =>
         Dispose(false);
@@ -56,7 +56,7 @@ public class PublicCatalogs :
     {
         if (disposing)
         {
-            player.PropertyChanged -= HandlerPlayerPropertyChanged;
+            settings.PropertyChanged -= HandleSettingsPropertyChanged;
             client.Dispose();
         }
     }
@@ -84,7 +84,7 @@ public class PublicCatalogs :
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to fetch pack catalog with force = {Force}", force);
-            player.UsePublicPackCatalog = false;
+            settings.UsePublicPackCatalog = false;
         }
     }
 
@@ -99,20 +99,20 @@ public class PublicCatalogs :
             responseMessage.EnsureSuccessStatusCode();
             var supportDiscordsYaml = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             var supportDiscords = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, SupportDiscord>>(supportDiscordsYaml);
-            using var packsCachedFileStream = File.Open(supportDiscordsCachedFile.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
-            using var packsCachedFileStreamWriter = new StreamWriter(packsCachedFileStream);
-            await packsCachedFileStreamWriter.WriteAsync(supportDiscordsYaml).ConfigureAwait(false);
-            await packsCachedFileStreamWriter.FlushAsync();
+            using var supportDiscordsCachedFileStream = File.Open(supportDiscordsCachedFile.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var supportDiscordsCachedFileStreamWriter = new StreamWriter(supportDiscordsCachedFileStream);
+            await supportDiscordsCachedFileStreamWriter.WriteAsync(supportDiscordsYaml).ConfigureAwait(false);
+            await supportDiscordsCachedFileStreamWriter.FlushAsync();
             return supportDiscords;
         }
         throw new FileNotFoundException();
     }
 
-    void HandlerPlayerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))
         {
-            if (player.UsePublicPackCatalog && PackCatalog is null)
+            if (settings.UsePublicPackCatalog && PackCatalog is null)
                 Task.Run(() => FetchPackCatalogAsync(true));
             else
                 PackCatalog = null;

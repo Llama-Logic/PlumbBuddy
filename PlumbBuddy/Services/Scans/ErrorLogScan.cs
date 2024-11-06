@@ -4,18 +4,18 @@ public sealed class ErrorLogScan :
     Scan,
     IErrorLogScan
 {
-    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
+    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(publicCatalogs);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.publicCatalogs = publicCatalogs;
         this.blazorFramework = blazorFramework;
     }
@@ -24,7 +24,7 @@ public sealed class ErrorLogScan :
     readonly ILogger<ErrorLogScan> logger;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly IPublicCatalogs publicCatalogs;
 
     public override async Task ResolveIssueAsync(object issueData, object resolutionData)
@@ -33,12 +33,12 @@ public sealed class ErrorLogScan :
         {
             if (command is "stopTellingMe")
             {
-                player.ScanForErrorLogs = false;
+                settings.ScanForErrorLogs = false;
                 return;
             }
             if (issueData is string userDataRelativePath)
             {
-                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, userDataRelativePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, userDataRelativePath));
                 if (file.Exists)
                 {
                     if (command is "delete")
@@ -71,11 +71,11 @@ public sealed class ErrorLogScan :
             .AsAsyncEnumerable())
             yield return new()
             {
-                Caption = player.Type is UserType.Casual
+                Caption = settings.Type is UserType.Casual
                     ? "The Game or one of Your Mods is Calling for Help!"
                     : "A File Likely Containing an Error Has Been Found",
                 Description =
-                    player.Type is UserType.Casual
+                    settings.Type is UserType.Casual
                     ?
                     $"""
                     I found this file in your User Data folder and its presence is a signal that something went wrong.<br />

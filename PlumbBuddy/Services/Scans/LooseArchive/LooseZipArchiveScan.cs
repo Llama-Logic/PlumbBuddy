@@ -4,8 +4,8 @@ public sealed class LooseZipArchiveScan :
     LooseArchiveScan,
     ILooseZipArchiveScan
 {
-    public LooseZipArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, platformFunctions, player, superSnacks, ModsDirectoryFileType.ZipArchive)
+    public LooseZipArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, settings, superSnacks, ModsDirectoryFileType.ZipArchive)
     {
     }
 
@@ -53,6 +53,6 @@ public sealed class LooseZipArchiveScan :
             ]
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForLooseZipArchives = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForLooseZipArchives = false;
 }

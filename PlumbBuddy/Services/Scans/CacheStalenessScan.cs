@@ -4,15 +4,15 @@ public sealed class CacheStalenessScan :
     Scan,
     ICacheStalenessScan
 {
-    public CacheStalenessScan(ISettings player, ISmartSimObserver smartSimObserver)
+    public CacheStalenessScan(ISettings settings, ISmartSimObserver smartSimObserver)
     {
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
-        this.player = player;
+        this.settings = settings;
         this.smartSimObserver = smartSimObserver;
     }
 
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
@@ -26,7 +26,7 @@ public sealed class CacheStalenessScan :
             }
             if (resolutionCmd is "stopTellingMe")
             {
-                player.ScanForCacheStaleness = false;
+                settings.ScanForCacheStaleness = false;
                 return Task.CompletedTask;
             }
         }
@@ -34,13 +34,13 @@ public sealed class CacheStalenessScan :
     }
 
     public override IAsyncEnumerable<ScanIssue> ScanAsync() =>
-        AsyncEnumerable.Empty<ScanIssue>().Append(player.CacheStatus switch
+        AsyncEnumerable.Empty<ScanIssue>().Append(settings.CacheStatus switch
         {
             SmartSimCacheStatus.Stale => new()
             {
                 Icon = MaterialDesignIcons.Normal.FridgeAlert,
                 Caption = "The Cache is Stale",
-                Description = player.Type is UserType.Casual
+                Description = settings.Type is UserType.Casual
                     ? "Uhh, these cache files might be like the kids from that Offspring song — as in \"not alright\". We need to see to this and soon."
                     : "The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed.",
                 Origin = this,
@@ -69,7 +69,7 @@ public sealed class CacheStalenessScan :
             {
                 Icon = MaterialDesignIcons.Normal.Fridge,
                 Caption = "The Cache is Fine",
-                Description = player.Type is UserType.Casual
+                Description = settings.Type is UserType.Casual
                     ? "There are cache files at the moment. They look fine to me, as cache files go. A little ordinary, but that's what you want in cache files!"
                     : "The cache files exist on disk in a normal state.",
                 Origin = this
@@ -78,7 +78,7 @@ public sealed class CacheStalenessScan :
             {
                 Icon = MaterialDesignIcons.Outline.Fridge,
                 Caption = "The Cache is Clear",
-                Description = player.Type is UserType.Casual
+                Description = settings.Type is UserType.Casual
                     ? "There are no cache files at the moment. I mean... that's fine. The game's gonna load a little slower next time, but it's okay."
                     : "There are currently no cache files on disk.",
                 Origin = this

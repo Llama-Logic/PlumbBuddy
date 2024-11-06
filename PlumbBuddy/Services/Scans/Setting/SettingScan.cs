@@ -4,10 +4,10 @@ public abstract class SettingScan :
     Scan,
     ISettingScan
 {
-    protected SettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings player, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
+    protected SettingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType, string undesirableScanIssueData, string undesirableScanIssueFixResolutionData, string undesirableScanIssueStopResolutionData)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(superSnacks);
@@ -15,7 +15,7 @@ public abstract class SettingScan :
         ArgumentException.ThrowIfNullOrWhiteSpace(undesirableScanIssueFixResolutionData);
         ArgumentException.ThrowIfNullOrWhiteSpace(undesirableScanIssueStopResolutionData);
         this.pbDbContextFactory = pbDbContextFactory;
-        this.player = player;
+        this.settings = settings;
         this.smartSimObserver = smartSimObserver;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
@@ -28,7 +28,7 @@ public abstract class SettingScan :
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
     readonly ISuperSnacks superSnacks;
     readonly string undesirableScanIssueData;
@@ -49,7 +49,7 @@ public abstract class SettingScan :
         {
             if (resolutionDataStr == undesirableScanIssueFixResolutionData)
             {
-                var optionsIniFile = new FileInfo(Path.Combine(player.UserDataFolderPath, "Options.ini"));
+                var optionsIniFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Options.ini"));
                 if (!optionsIniFile.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because your Game Options file is missing. You need to launch the game, close it, and check back here."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
@@ -69,7 +69,7 @@ public abstract class SettingScan :
             }
             if (resolutionDataStr == undesirableScanIssueStopResolutionData)
             {
-                StopScanning(player);
+                StopScanning(settings);
                 return;
             }
         }
@@ -85,5 +85,5 @@ public abstract class SettingScan :
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(ISettings player);
+    protected abstract void StopScanning(ISettings settings);
 }

@@ -4,8 +4,8 @@ public sealed class Ts4ScriptDepthScan :
     DepthScan,
     ITs4ScriptDepthScan
 {
-    public Ts4ScriptDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, platformFunctions, player, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, 1)
+    public Ts4ScriptDepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, settings, modsDirectoryCataloger, superSnacks, ModsDirectoryFileType.ScriptArchive, 1)
     {
     }
 
@@ -60,6 +60,6 @@ public sealed class Ts4ScriptDepthScan :
             ]
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForInvalidScriptModSubdirectoryDepth = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForInvalidScriptModSubdirectoryDepth = false;
 }

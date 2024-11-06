@@ -5,30 +5,30 @@ namespace PlumbBuddy.Services;
 public sealed class UpdateManager :
     IUpdateManager
 {
-    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
         automaticLock = new();
-        this.player.PropertyChanged += HandleSettingsPropertyChanged;
+        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         var mauiVersion = AppInfo.Version;
         CurrentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
-        if (CurrentVersion != player.VersionAtLastStartup)
+        if (CurrentVersion != settings.VersionAtLastStartup)
         {
-            if (player.VersionAtLastStartup is { } lastVersion)
+            if (settings.VersionAtLastStartup is { } lastVersion)
                 logger.LogInformation("This is the first time starting after the upgrade from {LastVersion}.", lastVersion);
             else
                 logger.LogInformation("This is the first time this installation is starting.");
         }
-        player.VersionAtLastStartup = CurrentVersion;
+        settings.VersionAtLastStartup = CurrentVersion;
         ScheduleAutomaticUpdateCheck();
     }
 
@@ -39,7 +39,7 @@ public sealed class UpdateManager :
     readonly IBlazorFramework blazorFramework;
     readonly ILogger<UpdateManager> logger;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
 
     public Version CurrentVersion { get; }
@@ -51,12 +51,12 @@ public sealed class UpdateManager :
             return;
         try
         {
-            if (player.LastCheckForUpdate is { } lastCheckForUpdate)
+            if (settings.LastCheckForUpdate is { } lastCheckForUpdate)
             {
                 var delay = lastCheckForUpdate + TimeSpan.FromDays(1) - DateTimeOffset.Now;
                 if (delay > TimeSpan.Zero)
                     await Task.Delay(delay).ConfigureAwait(false);
-                if (player.LastCheckForUpdate is { } lastCheckForUpdateRevisited && lastCheckForUpdateRevisited != lastCheckForUpdate || !player.AutomaticallyCheckForUpdates)
+                if (settings.LastCheckForUpdate is { } lastCheckForUpdateRevisited && lastCheckForUpdateRevisited != lastCheckForUpdate || !settings.AutomaticallyCheckForUpdates)
                     return;
             }
             var (version, releaseNotes, downloadUrl) = await CheckForUpdateAsync().ConfigureAwait(false);
@@ -94,7 +94,7 @@ public sealed class UpdateManager :
                 })
                 .ThenByDescending(release => release.PublishedAt ?? release.CreatedAt)
                 .FirstOrDefault();
-            player.LastCheckForUpdate = DateTimeOffset.Now;
+            settings.LastCheckForUpdate = DateTimeOffset.Now;
             if (latestMostStableRelease is null
                 || latestMostStableRelease.TagName[(latestMostStableRelease.TagName.IndexOf('/', StringComparison.Ordinal) + 1)..] is not string versionStr
                 || !Version.TryParse(versionStr, out var version)
@@ -120,7 +120,7 @@ public sealed class UpdateManager :
         }
         catch (Exception ex)
         {
-            player.LastCheckForUpdate = DateTimeOffset.Now;
+            settings.LastCheckForUpdate = DateTimeOffset.Now;
             logger.LogWarning(ex, "checking for an update failed");
             return (null, null, null);
         }
@@ -135,7 +135,7 @@ public sealed class UpdateManager :
     void Dispose(bool disposing)
     {
         if (disposing)
-            player.PropertyChanged -= HandleSettingsPropertyChanged;
+            settings.PropertyChanged -= HandleSettingsPropertyChanged;
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -193,7 +193,7 @@ public sealed class UpdateManager :
 
     void ScheduleAutomaticUpdateCheck()
     {
-        if (player.AutomaticallyCheckForUpdates)
+        if (settings.AutomaticallyCheckForUpdates)
             _ = Task.Run(AutomaticUpdateCheckAsync);
     }
 }

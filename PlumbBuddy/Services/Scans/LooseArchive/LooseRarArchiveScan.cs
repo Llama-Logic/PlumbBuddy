@@ -4,8 +4,8 @@ public sealed class LooseRarArchiveScan :
     LooseArchiveScan,
     ILooseRarArchiveScan
 {
-    public LooseRarArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks) :
-        base(pbDbContextFactory, platformFunctions, player, superSnacks, ModsDirectoryFileType.RarArchive)
+    public LooseRarArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks) :
+        base(pbDbContextFactory, platformFunctions, settings, superSnacks, ModsDirectoryFileType.RarArchive)
     {
     }
 
@@ -53,6 +53,6 @@ public sealed class LooseRarArchiveScan :
             ]
         };
 
-    protected override void StopScanning(ISettings player) =>
-        player.ScanForLooseRarArchives = false;
+    protected override void StopScanning(ISettings settings) =>
+        settings.ScanForLooseRarArchives = false;
 }

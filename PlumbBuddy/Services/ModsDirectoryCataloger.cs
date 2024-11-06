@@ -243,17 +243,17 @@ public class ModsDirectoryCataloger :
     static readonly PropertyChangedEventArgs statePropertyChangedEventArgs = new(nameof(State));
     static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
 
-    public ModsDirectoryCataloger(ILogger<IModsDirectoryCataloger> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, ISuperSnacks superSnacks)
+    public ModsDirectoryCataloger(ILogger<IModsDirectoryCataloger> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.superSnacks = superSnacks;
         awakeManualResetEvent = new(true);
         busyManualResetEvent = new(true);
@@ -272,7 +272,7 @@ public class ModsDirectoryCataloger :
     readonly AsyncProducerConsumerQueue<string> pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     int? progressMax;
     int progressValue;
     int pythonByteCodeFileCount;
@@ -446,7 +446,7 @@ public class ModsDirectoryCataloger :
             while (nomNom.TryDequeue(out var path))
             {
                 var filesOfInterestPath = Path.Combine("Mods", path);
-                var modsDirectoryPath = Path.Combine(player.UserDataFolderPath, "Mods");
+                var modsDirectoryPath = Path.Combine(settings.UserDataFolderPath, "Mods");
                 var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
                 var fullPath = Path.Combine(modsDirectoryPath, path);
                 if (File.Exists(fullPath))
@@ -569,8 +569,8 @@ public class ModsDirectoryCataloger :
                 await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
             }
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection
-            if (resourceWasRemovedOrReplaced && player.CacheStatus is SmartSimCacheStatus.Normal)
-                player.CacheStatus = SmartSimCacheStatus.Stale;
+            if (resourceWasRemovedOrReplaced && settings.CacheStatus is SmartSimCacheStatus.Normal)
+                settings.CacheStatus = SmartSimCacheStatus.Stale;
             State = ModsDirectoryCatalogerState.Idle;
             busyManualResetEvent.Reset();
             idleManualResetEvent.Set();

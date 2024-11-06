@@ -17,13 +17,13 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
@@ -31,7 +31,7 @@ public partial class SmartSimObserver :
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
         this.superSnacks = superSnacks;
@@ -46,7 +46,7 @@ public partial class SmartSimObserver :
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        this.player.PropertyChanged += HandleSettingsPropertyChanged;
+        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         ConnectToInstallationDirectory();
         ConnectToUserDataDirectory();
     }
@@ -78,7 +78,7 @@ public partial class SmartSimObserver :
     FileSystemWatcher? packsDirectoryWatcher;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly AsyncLock resamplingPacksTaskLock;
     IReadOnlyList<ScanIssue> scanIssues;
     readonly ConcurrentDictionary<Type, IScan> scanInstances;
@@ -170,7 +170,7 @@ public partial class SmartSimObserver :
 #if MACCATALYST
         Path.Combine(new DirectoryInfo(player.InstallationFolderPath).Parent!.FullName, "The Sims 4 Packs");
 #else
-        player.InstallationFolderPath;
+        settings.InstallationFolderPath;
 #endif
 
     public IReadOnlyList<ScanIssue> ScanIssues
@@ -234,7 +234,7 @@ public partial class SmartSimObserver :
     {
         IsSteamInstallation =
             await steam.GetTS4InstallationDirectoryAsync() is { } steamInstallationDirectory
-            && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(player.InstallationFolderPath);
+            && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(settings.InstallationFolderPath);
     }
 
     public void ClearCache()
@@ -297,11 +297,11 @@ public partial class SmartSimObserver :
         using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
         if (fileSystemWatcherConnectionLockHeld is null)
             return;
-        if (player.Onboarded && Directory.Exists(player.InstallationFolderPath))
+        if (settings.Onboarded && Directory.Exists(settings.InstallationFolderPath))
         {
             if (installationDirectoryWatcher is null)
             {
-                installationDirectoryWatcher = new FileSystemWatcher(player.InstallationFolderPath)
+                installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
                 {
                     IncludeSubdirectories = true,
                     NotifyFilter =
@@ -348,22 +348,22 @@ public partial class SmartSimObserver :
         using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
         if (fileSystemWatcherConnectionLockHeld is null)
             return;
-        if (player.Onboarded && Directory.Exists(player.UserDataFolderPath))
+        if (settings.Onboarded && Directory.Exists(settings.UserDataFolderPath))
         {
             _ = Task.Run(ResampleGameOptionsAsync);
             cacheComponents =
             [
-                new FileInfo(Path.Combine(player.UserDataFolderPath, "avatarcache.package")),
-                new FileInfo(Path.Combine(player.UserDataFolderPath, "clientDB.package")),
-                new FileInfo(Path.Combine(player.UserDataFolderPath, "houseDescription-client.package")),
-                new FileInfo(Path.Combine(player.UserDataFolderPath, "localthumbcache.package")),
-                new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "cachestr")),
-                new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "onlinethumbnailcache"))
+                new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
+                new FileInfo(Path.Combine(settings.UserDataFolderPath, "clientDB.package")),
+                new FileInfo(Path.Combine(settings.UserDataFolderPath, "houseDescription-client.package")),
+                new FileInfo(Path.Combine(settings.UserDataFolderPath, "localthumbcache.package")),
+                new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "cachestr")),
+                new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "onlinethumbnailcache"))
             ];
             ResampleCacheClarity();
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-            var userDataFolderTextAndHtmlFiles = new DirectoryInfo(player.UserDataFolderPath)
+            var userDataFolderTextAndHtmlFiles = new DirectoryInfo(settings.UserDataFolderPath)
                 .GetFiles("*.*", SearchOption.TopDirectoryOnly)
                 .Where(f => (f.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase)
                     || f.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase)
@@ -398,7 +398,7 @@ public partial class SmartSimObserver :
                 .ExecuteDeleteAsync().ConfigureAwait(false);
             if (userDataDirectoryWatcher is not null)
                 return;
-            userDataDirectoryWatcher = new FileSystemWatcher(player.UserDataFolderPath)
+            userDataDirectoryWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
             {
                 IncludeSubdirectories = true,
                 NotifyFilter =
@@ -494,7 +494,7 @@ public partial class SmartSimObserver :
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-            player.PropertyChanged -= HandleSettingsPropertyChanged;
+            settings.PropertyChanged -= HandleSettingsPropertyChanged;
             lifetimeScope.Dispose();
         }
     }
@@ -509,7 +509,7 @@ public partial class SmartSimObserver :
             return;
         using var fresheningTaskLockHeld = await fresheningTaskLock.LockAsync().ConfigureAwait(false);
         enqueuedFresheningTaskLockPotentiallyHeld.Dispose();
-        var modsDirectory = new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "Mods"));
+        var modsDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Mods"));
         if (!modsDirectory.Exists)
             return;
         var globalModsManifestPackageFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, GlobalModsManifestPackageName));
@@ -568,7 +568,7 @@ public partial class SmartSimObserver :
 
     string GetRelativePathInUserDataFolder(string fullPath)
     {
-        var trimmedLocalPathSegmentsMatch = trimmedLocalPathSegmentsPattern.Match(player.UserDataFolderPath);
+        var trimmedLocalPathSegmentsMatch = trimmedLocalPathSegmentsPattern.Match(settings.UserDataFolderPath);
         if (!trimmedLocalPathSegmentsMatch.Success)
             throw new InvalidOperationException("User data folder path is not a valid path");
         try
@@ -612,7 +612,7 @@ public partial class SmartSimObserver :
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToUserDataDirectory();
         }
-        else if ((e.PropertyName?.StartsWith("Scan", StringComparison.OrdinalIgnoreCase) ?? false) && player.Onboarded)
+        else if ((e.PropertyName?.StartsWith("Scan", StringComparison.OrdinalIgnoreCase) ?? false) && settings.Onboarded)
             UpdateScanInitializationStatus();
     }
 
@@ -701,9 +701,9 @@ public partial class SmartSimObserver :
 
     public void OpenModsFolder()
     {
-        if (player.Onboarded)
+        if (settings.Onboarded)
         {
-            var modsDirectory = new DirectoryInfo(Path.Combine(player.UserDataFolderPath, "Mods"));
+            var modsDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Mods"));
             if (modsDirectory.Exists)
                 platformFunctions.ViewDirectory(modsDirectory);
         }
@@ -737,7 +737,7 @@ public partial class SmartSimObserver :
 
     async Task PutCatalogerToBedWhileGameIsRunningAsync()
     {
-        if (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(player.InstallationFolderPath)).ConfigureAwait(false) is { } ts4Process)
+        if (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is { } ts4Process)
         {
             modsDirectoryCataloger.GoToSleep();
             await ts4Process.WaitForExitAsync().ConfigureAwait(false);
@@ -751,13 +751,13 @@ public partial class SmartSimObserver :
         foreach (var cacheComponent in cacheComponents)
             cacheComponent.Refresh();
         var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce.Exists);
-        if (player.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
+        if (settings.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
         {
-            player.CacheStatus = SmartSimCacheStatus.Normal;
+            settings.CacheStatus = SmartSimCacheStatus.Normal;
             PutCatalogerToBedIfGameIsRunning();
         }
-        else if (player.CacheStatus is not SmartSimCacheStatus.Clear && !anyCacheComponentsExistOnDisk)
-            player.CacheStatus = SmartSimCacheStatus.Clear;
+        else if (settings.CacheStatus is not SmartSimCacheStatus.Clear && !anyCacheComponentsExistOnDisk)
+            settings.CacheStatus = SmartSimCacheStatus.Clear;
     }
 
     async Task ResampleGameOptionsAsync()
@@ -767,7 +767,7 @@ public partial class SmartSimObserver :
         var previousIsScriptModsEnabledGameSettingOn = IsScriptModsEnabledGameSettingOn;
         var previousIsShowModListStartupGameSettingOn = IsShowModListStartupGameSettingOn;
         var parsedSuccessfully = false;
-        var optionsIniFile = new FileInfo(Path.Combine(player.UserDataFolderPath, "Options.ini"));
+        var optionsIniFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Options.ini"));
         if (optionsIniFile.Exists)
         {
             try
@@ -923,22 +923,22 @@ public partial class SmartSimObserver :
                 }
                 return false;
             }
-            initializationChange |= checkScanInitialization(player.ScanForModsDisabled, typeof(IModSettingScan));
-            initializationChange |= checkScanInitialization(player.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
-            initializationChange |= checkScanInitialization(player.ScanForShowModsListAtStartupEnabled, typeof(IShowModListStartupSettingScan));
-            initializationChange |= checkScanInitialization(player.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
-            initializationChange |= checkScanInitialization(player.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
-            initializationChange |= checkScanInitialization(player.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
-            initializationChange |= checkScanInitialization(player.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
-            initializationChange |= checkScanInitialization(player.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
-            initializationChange |= checkScanInitialization(player.ScanForErrorLogs, typeof(IErrorLogScan));
-            initializationChange |= checkScanInitialization(player.ScanForMissingMccc, typeof(IMcccMissingScan));
-            initializationChange |= checkScanInitialization(player.ScanForMissingBe, typeof(IBeMissingScan));
-            initializationChange |= checkScanInitialization(player.ScanForMissingModGuard, typeof(IModGuardMissingScan));
-            initializationChange |= checkScanInitialization(player.ScanForMissingDependency, typeof(IDependencyScan));
-            initializationChange |= checkScanInitialization(player.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
-            initializationChange |= checkScanInitialization(player.ScanForCacheStaleness, typeof(ICacheStalenessScan));
-            initializationChange |= checkScanInitialization(player.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
+            initializationChange |= checkScanInitialization(settings.ScanForModsDisabled, typeof(IModSettingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForShowModsListAtStartupEnabled, typeof(IShowModListStartupSettingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
+            initializationChange |= checkScanInitialization(settings.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
+            initializationChange |= checkScanInitialization(settings.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
+            initializationChange |= checkScanInitialization(settings.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
+            initializationChange |= checkScanInitialization(settings.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
+            initializationChange |= checkScanInitialization(settings.ScanForErrorLogs, typeof(IErrorLogScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMissingMccc, typeof(IMcccMissingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMissingBe, typeof(IBeMissingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMissingModGuard, typeof(IModGuardMissingScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMissingDependency, typeof(IDependencyScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
+            initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
+            initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
             if (initializationChange)
                 Scan();
         }
@@ -963,9 +963,9 @@ public partial class SmartSimObserver :
 
     void UserDataDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
     {
-        if (player.CacheStatus is SmartSimCacheStatus.Clear && cacheComponents.Any(cc => e.FullPath.StartsWith(cc.FullName, fileSystemStringComparison)))
+        if (settings.CacheStatus is SmartSimCacheStatus.Clear && cacheComponents.Any(cc => e.FullPath.StartsWith(cc.FullName, fileSystemStringComparison)))
         {
-            player.CacheStatus = SmartSimCacheStatus.Normal;
+            settings.CacheStatus = SmartSimCacheStatus.Normal;
             return;
         }
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
@@ -1006,7 +1006,7 @@ public partial class SmartSimObserver :
     void UserDataDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e)
     {
         var fullPath = Path.GetFullPath(e.FullPath);
-        if (player.CacheStatus is not SmartSimCacheStatus.Clear && cacheComponents.Any(cc => Path.GetFullPath(cc.FullName).Equals(fullPath, fileSystemStringComparison)))
+        if (settings.CacheStatus is not SmartSimCacheStatus.Clear && cacheComponents.Any(cc => Path.GetFullPath(cc.FullName).Equals(fullPath, fileSystemStringComparison)))
         {
             ResampleCacheClarity();
             return;

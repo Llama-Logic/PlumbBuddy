@@ -4,16 +4,16 @@ public abstract class DepthScan :
     Scan,
     IDepthScan
 {
-    protected DepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings player, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
+    protected DepthScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
-        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
-        this.player = player;
+        this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
         this.modsDirectoryFileType = modsDirectoryFileType;
@@ -25,7 +25,7 @@ public abstract class DepthScan :
     readonly ModsDirectoryFileType modsDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings player;
+    readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
@@ -43,7 +43,7 @@ public abstract class DepthScan :
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FolderLock);
                     return Task.CompletedTask;
                 }
-                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", modFilePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -161,7 +161,7 @@ public abstract class DepthScan :
             }
             if (resolutionCmd is "show")
             {
-                var file = new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", modFilePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -172,7 +172,7 @@ public abstract class DepthScan :
             }
             if (resolutionCmd is "stopTellingMe")
             {
-                StopScanning(player);
+                StopScanning(settings);
                 return Task.CompletedTask;
             }
         }
@@ -186,11 +186,11 @@ public abstract class DepthScan :
         await foreach (var offendingModFile in pbDbContext.ModFiles.Where(mf => mf.Path != null && mf.FileType == modsDirectoryFileType && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length > maximumDepth).AsAsyncEnumerable())
         {
             anyLostInTheAbyss = true;
-            yield return GenerateSickScanIssue(new FileInfo(Path.Combine(player.UserDataFolderPath, "Mods", offendingModFile.Path!)), offendingModFile);
+            yield return GenerateSickScanIssue(new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", offendingModFile.Path!)), offendingModFile);
         }
         if (!anyLostInTheAbyss)
             yield return GenerateHealthyScanIssue();
     }
 
-    protected abstract void StopScanning(ISettings player);
+    protected abstract void StopScanning(ISettings settings);
 }
