@@ -89,7 +89,7 @@ public static class MauiProgram
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
 #else
-        if (Preferences.Default.Get(nameof(IPlayer.DevToolsUnlocked), false))
+        if (Preferences.Default.Get(nameof(ISettings.DevToolsUnlocked), false))
             builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
