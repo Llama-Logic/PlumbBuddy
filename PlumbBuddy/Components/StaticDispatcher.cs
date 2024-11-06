@@ -4,6 +4,9 @@ static class StaticDispatcher
 {
     static IDispatcher? dispatcher;
 
+    public static bool IsDispatcherSet =>
+        dispatcher is not null;
+
     public static void RegisterDispatcher(IDispatcher dispatcher)
     {
         if (StaticDispatcher.dispatcher is not null)

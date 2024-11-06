@@ -48,7 +48,7 @@
                 <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
             </MudTooltip>
         }
-        <MudPaper Style="border-radius: 30px; margin: 0 15px; padding: 0 5px;">
+        <MudPaper Elevation="0" Outlined Class="rounded-pill mx-4" Style="padding: 0 5px;">
             <MudTooltip Arrow="true">
                 <ChildContent>
                     <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolder" />

@@ -63,7 +63,6 @@ partial class Home
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", "url('/img/ManifestEditorBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-size", "cover");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-animation-display", "initial");
         if (Settings.Theme is { } customThemeName
             && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme)
             && customTheme.BackgroundedTabs is { } backgroundedTabs
@@ -136,8 +135,6 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-repeat", repeat);
                 if ((manifestEditor?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-size", size);
-                if ((manifestEditor?.TryGetValue("animation_display", out var animationDisplay) ?? false) && !string.IsNullOrWhiteSpace(animationDisplay))
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-animation-display", animationDisplay);
             }
         }
     }

@@ -8,13 +8,13 @@ amethyst-lilac:
     Tertiary: '#10a452ff'
     Info: '#109bfeff'
     Warning: '#c55408ff'
-    Surface: '#ccb3fbff'
+    Surface: '#ccb3fb80'
     Background: '#c2a0fbff'
     TextPrimary: '#2a1f4eff'
     TextSecondary: '#584a86ff'
   palette_dark:
     Background: '#322d62ff'
-    Surface: '#342d6bff'
+    Surface: '#342d6b80'
     Primary: '#8c81eeff'
     TextPrimary: '#b9b3f2ff'
     Tertiary: '#178c42ff'
@@ -98,7 +98,7 @@ sim-realist:
     Visit our [website](https://www.simrealist.com/)!
   palette_light:
     Background: '#d8d8d8ff'
-    Surface: '#ffffffff'
+    Surface: '#ffffff80'
     Primary: '#1986d9ff'
     Secondary: '#ff424dff'
     Tertiary: '#a0c45bff'

@@ -10,13 +10,7 @@
 @inject ISnackbar Snackbar
 @inject IUpdateManager UpdateManager
 
-<style>
-    nav.main-menu div.mud-nav-item a:not(:hover) {
-        background: transparent !important;
-    }
-</style>
-
-<MudPaper Style="height: 100vh; position: fixed;">
+<div style="height: 100vh; position: fixed;">
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
         <MudImage Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>
@@ -48,4 +42,4 @@
             <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="HandleShutdownPlumbBuddyOnClickAsync">Shutdown PlumbBuddy</MudNavLink>
         }
     </MudNavMenu>
-</MudPaper>
+</div>

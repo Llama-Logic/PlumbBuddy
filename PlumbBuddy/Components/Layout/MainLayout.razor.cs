@@ -7,13 +7,19 @@ public partial class MainLayout
         {
             PaletteLight = new PaletteLight()
             {
+                AppbarBackground = "rgba(89,74,226,.5)",
+                DrawerBackground = "rgba(255,255,255,.5)",
                 Primary = "#00a2ffff",
+                Surface = "rgba(255,255,255,.5)",
                 Tertiary = "#74c044ff",
                 Warning = "#d98806ff"
             },
             PaletteDark = new PaletteDark()
             {
+                AppbarBackground = "rgba(39,39,47,.5)",
+                DrawerBackground = "rgba(39,39,47,.5)",
                 Primary = "#00a2ffff",
+                Surface = "rgba(55,55,64,.5)",
                 Tertiary = "#74c044ff",
                 Warning = "#d98806ff"
             }
@@ -205,7 +211,8 @@ public partial class MainLayout
     {
         base.OnInitialized();
         BlazorFramework.MainLayoutLifetimeScope = LifetimeScope;
-        StaticDispatcher.RegisterDispatcher(Dispatcher);
+        if (!StaticDispatcher.IsDispatcherSet)
+            StaticDispatcher.RegisterDispatcher(Dispatcher);
         if (Application.Current is { } app)
             app.Windows[0].Title = "PlumbBuddy";
         if (Settings.ShowThemeManager)
