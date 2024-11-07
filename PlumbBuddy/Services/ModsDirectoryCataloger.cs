@@ -792,6 +792,16 @@ public class ModsDirectoryCataloger :
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
             }
         }
+        catch (DirectoryNotFoundException)
+        {
+            // if this happens we really don't care because whatever enqueued paths are next will clear it up
+            return;
+        }
+        catch (FileNotFoundException)
+        {
+            // if this happens we really don't care because whatever enqueued paths are next will clear it up
+            return;
+        }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", path);
