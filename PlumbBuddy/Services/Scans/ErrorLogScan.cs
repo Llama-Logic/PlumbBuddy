@@ -4,7 +4,7 @@ public sealed class ErrorLogScan :
     Scan,
     IErrorLogScan
 {
-    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework)
+    public ErrorLogScan(ILogger<ErrorLogScan> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IPublicCatalogs publicCatalogs, IBlazorFramework blazorFramework, ISmartSimObserver smartSimObserver)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
@@ -12,12 +12,14 @@ public sealed class ErrorLogScan :
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(publicCatalogs);
         ArgumentNullException.ThrowIfNull(blazorFramework);
+        ArgumentNullException.ThrowIfNull(smartSimObserver);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.publicCatalogs = publicCatalogs;
         this.blazorFramework = blazorFramework;
+        this.smartSimObserver = smartSimObserver;
     }
 
     readonly IBlazorFramework blazorFramework;
@@ -26,6 +28,7 @@ public sealed class ErrorLogScan :
     readonly IPlatformFunctions platformFunctions;
     readonly ISettings settings;
     readonly IPublicCatalogs publicCatalogs;
+    readonly ISmartSimObserver smartSimObserver;
 
     public override async Task ResolveIssueAsync(object issueData, object resolutionData)
     {
@@ -43,7 +46,34 @@ public sealed class ErrorLogScan :
                 {
                     if (command is "delete")
                     {
-                        file.Delete();
+                        var dialogService = blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>();
+                        var foundErrorLogs = smartSimObserver.ScanIssues
+                            .Where(si => si.Origin is IErrorLogScan && si.Data is string)
+                            .Select(si => (string)si.Data!)
+                            .ToImmutableArray();
+                        if (foundErrorLogs.Length is 1)
+                        {
+                            if (await dialogService.ShowCautionDialogAsync("Are you sure?", "This file may contain important information about a problem with your Sims 4 setup, and it might even contain something critical which would help others, too. Once I delete it, all that potential will be gone forever.").ConfigureAwait(false))
+                                file.Delete();
+                            return;
+                        }
+                        if (await dialogService.ShowDeleteErrorLogsDialogAsync(foundErrorLogs, [userDataRelativePath]).ConfigureAwait(false) is { } deleteErrorLogsPaths)
+                        {
+                            foreach (var deleteErrorLogsPath in deleteErrorLogsPaths)
+                            {
+                                var deleteErrorLog = new FileInfo(Path.Combine(settings.UserDataFolderPath, deleteErrorLogsPath));
+                                if (deleteErrorLog.Exists)
+                                {
+                                    try
+                                    {
+                                        deleteErrorLog.Delete();
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                            }
+                        }
                         return;
                     }
                     if (command is "discord")
@@ -102,18 +132,16 @@ public sealed class ErrorLogScan :
                     },
                     new()
                     {
-                        Label = "Show me the file",
+                        Label = "Show me this file",
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Data = "show"
                     },
                     new()
                     {
-                        Label = "Delete the file",
+                        Label = "Delete error files",
                         Icon = MaterialDesignIcons.Normal.FileCancel,
                         Color = MudBlazor.Color.Warning,
-                        Data = "delete",
-                        CautionCaption = "Are you sure?",
-                        CautionText = "This file may contain important information about a problem with your Sims 4 setup, and it might even contain something critical which would help others, too. Once I delete it, all that potential will be gone forever."
+                        Data = "delete"
                     },
                     new()
                     {

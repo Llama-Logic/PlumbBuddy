@@ -41,6 +41,24 @@ static class DialogExtensions
             return false;
         });
 
+    public static Task<IReadOnlyList<string>> ShowDeleteErrorLogsDialogAsync(this IDialogService dialogService, IReadOnlyList<string> filePaths, IEnumerable<string> preselectedFilePaths) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<DeleteErrorLogsDialog>("Delete Error Logs", new DialogParameters<DeleteErrorLogsDialog>()
+            {
+                { x => x.FilePaths, filePaths },
+                { x => x.SelectedFilePaths, preselectedFilePaths }
+            }, new DialogOptions
+            {
+                MaxWidth = MaxWidth.Medium
+            });
+            if (await dialog.Result is { } dialogResult
+                && !dialogResult.Canceled
+                && dialogResult.Data is IEnumerable<string> selectedFilePaths)
+                return selectedFilePaths.ToImmutableArray();
+            return (IReadOnlyList<string>)[];
+        });
+
     public static Task ShowErrorDialogAsync(this IDialogService dialogService, string caption, string text) =>
         StaticDispatcher.DispatchAsync(async () =>
         {

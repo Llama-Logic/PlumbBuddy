@@ -1,0 +1,28 @@
+<MudDialog>
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.FileCancel" Color="Color.Warning" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Warning">Delete Error Logs</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudStack>
+            <MudTextM3>
+                You actually have a number of pending error logs.
+                Would you like to delete more than one?
+            </MudTextM3>
+            <MudComboBox T="string" @bind-SelectedValues="@SelectedFilePaths" Label="Error Logs to Delete" AdornmentIcon="@MaterialDesignIcons.Normal.DeleteForever" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
+                <ChildContent>
+                    @foreach (var filePath in FilePaths ?? Enumerable.Empty<string>())
+                    {
+                        <MudComboBoxItem T="string" Text="@filePath" Value="@filePath">@filePath</MudComboBoxItem>
+                    }
+                </ChildContent>
+            </MudComboBox>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
+        <MudButton Color="Color.Warning" OnClick="OkOnClickHandler" Disabled="@((SelectedFilePaths?.Count() ?? 0) is 0)">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
