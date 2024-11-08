@@ -17,7 +17,7 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -25,6 +25,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        ArgumentNullException.ThrowIfNull(electronicArtsApp);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
@@ -34,6 +35,7 @@ public partial class SmartSimObserver :
         this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
+        this.electronicArtsApp = electronicArtsApp;
         this.steam = steam;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
@@ -42,6 +44,7 @@ public partial class SmartSimObserver :
         enqueuedFresheningTaskLock = new();
         fileSystemWatcherConnectionLock = new();
         fresheningTaskLock = new();
+        resampleGameVersionDebouncer = new(ResampleGameVersionAsync, TimeSpan.FromSeconds(3));
         resamplingPacksTaskLock = new();
         scanInstances = [];
         scanIssues = [];
@@ -58,17 +61,19 @@ public partial class SmartSimObserver :
 
     readonly IBlazorFramework blazorFramework;
     ImmutableArray<FileSystemInfo> cacheComponents;
+    readonly IElectronicArtsApp electronicArtsApp;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
     readonly AsyncLock enqueuedScanningTaskLock;
     readonly StringComparison fileSystemStringComparison;
     readonly AsyncLock fileSystemWatcherConnectionLock;
     readonly AsyncLock fresheningTaskLock;
+    Version? gameVersion;
     ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? installationDirectoryWatcher;
     IReadOnlyList<string> installedPackCodes = [];
-    bool isCurrentlyScanning;
+    bool isScanning;
     bool isModsDisabledGameSettingOn;
     bool isScriptModsEnabledGameSettingOn = true;
     bool isShowModListStartupGameSettingOn;
@@ -82,6 +87,7 @@ public partial class SmartSimObserver :
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly ISettings settings;
+    readonly AsyncDebouncer resampleGameVersionDebouncer;
     readonly AsyncLock resamplingPacksTaskLock;
     IReadOnlyList<ScanIssue> scanIssues;
     readonly ConcurrentDictionary<Type, IScan> scanInstances;
@@ -90,6 +96,18 @@ public partial class SmartSimObserver :
     readonly ISuperSnacks superSnacks;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? userDataDirectoryWatcher;
+
+    public Version? GameVersion
+    {
+        get => gameVersion;
+        private set
+        {
+            if (EqualityComparer<Version>.Default.Equals(gameVersion, value))
+                return;
+            gameVersion = value;
+            OnPropertyChanged();
+        }
+    }
 
     public IReadOnlyList<string> InstalledPackCodes
     {
@@ -109,14 +127,14 @@ public partial class SmartSimObserver :
         }
     }
 
-    public bool IsCurrentlyScanning
+    public bool IsScanning
     {
-        get => isCurrentlyScanning;
+        get => isScanning;
         private set
         {
-            if (isCurrentlyScanning == value)
+            if (isScanning == value)
                 return;
-            isCurrentlyScanning = value;
+            isScanning = value;
             OnPropertyChanged();
         }
     }
@@ -304,6 +322,7 @@ public partial class SmartSimObserver :
         {
             if (installationDirectoryWatcher is null)
             {
+                ResampleGameVersion();
                 installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
                 {
                     IncludeSubdirectories = true,
@@ -353,7 +372,7 @@ public partial class SmartSimObserver :
             return;
         if (settings.Onboarded && Directory.Exists(settings.UserDataFolderPath))
         {
-            _ = Task.Run(ResampleGameOptionsAsync);
+            ResampleGameOptions();
             cacheComponents =
             [
                 new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
@@ -647,25 +666,17 @@ public partial class SmartSimObserver :
         await Browser.OpenAsync($"https://plumbbuddy.app/redirect?purchase-pack={packCode}{(IsSteamInstallation ? "&from=steam" : string.Empty)}", BrowserLaunchMode.External);
     }
 
-    void InstallationDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e)
-    {
-        // TODO: Phase 2 PreJector
-    }
+    void InstallationDirectoryFileSystemEntryChangedHandler(object sender, FileSystemEventArgs e) =>
+        resampleGameVersionDebouncer.Execute();
 
-    void InstallationDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
-    {
-        // TODO: Phase 2 PreJector
-    }
+    void InstallationDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e) =>
+        resampleGameVersionDebouncer.Execute();
 
-    void InstallationDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e)
-    {
-        // TODO: Phase 2 PreJector
-    }
+    void InstallationDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e) =>
+        resampleGameVersionDebouncer.Execute();
 
-    void InstallationDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e)
-    {
-        // TODO: Phase 2 PreJector
-    }
+    void InstallationDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e) =>
+        resampleGameVersionDebouncer.Execute();
 
     void InstallationDirectoryWatcherErrorHandler(object sender, ErrorEventArgs e)
     {
@@ -776,6 +787,9 @@ public partial class SmartSimObserver :
             settings.CacheStatus = SmartSimCacheStatus.Clear;
     }
 
+    void ResampleGameOptions() =>
+        _ = Task.Run(ResampleGameOptionsAsync);
+
     async Task ResampleGameOptionsAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
@@ -829,6 +843,29 @@ public partial class SmartSimObserver :
             Scan();
     }
 
+    void ResampleGameVersion() =>
+        _ = Task.Run(ResampleGameVersionAsync);
+
+    async Task ResampleGameVersionAsync()
+    {
+        var normalizedInstallationDirectoryPath = Path.GetFullPath(settings.InstallationFolderPath);
+        if (!Directory.Exists(normalizedInstallationDirectoryPath))
+            return;
+        if (await electronicArtsApp.GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is { } eaInstallationDirectory
+            && normalizedInstallationDirectoryPath == Path.GetFullPath(eaInstallationDirectory.FullName))
+        {
+            GameVersion = await electronicArtsApp.GetTS4InstallationVersionAsync().ConfigureAwait(false);
+            return;
+        }
+        if (await steam.GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is { } steamInstallationDirectory
+            && normalizedInstallationDirectoryPath == Path.GetFullPath(steamInstallationDirectory.FullName))
+        {
+            GameVersion = await steam.GetTS4InstallationVersionAsync().ConfigureAwait(false);
+            return;
+        }
+        GameVersion = null;
+    }
+
     bool ResampleGameOptionsIfTheyChanged(string relativePath)
     {
         if (relativePath.Equals("Options.ini", fileSystemStringComparison))
@@ -865,44 +902,69 @@ public partial class SmartSimObserver :
         var enqueuedScanningTaskLockPotentiallyHeld = await enqueuedScanningTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedScanningTaskLockPotentiallyHeld is null)
             return;
-        using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
-        enqueuedScanningTaskLockPotentiallyHeld.Dispose();
-        if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle)
-            return;
-        IsCurrentlyScanning = true;
-        var scanIssues = new ConcurrentBag<ScanIssue>();
-        using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
+        try
         {
-            await Task.WhenAll(scanInstances.Values.Select(async scanInstance =>
+            using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
+            enqueuedScanningTaskLockPotentiallyHeld.Dispose();
+            if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle)
+                return;
+            IsScanning = true;
+            var scanIssues = new ConcurrentBag<ScanIssue>();
+            using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
             {
-                await semaphore.WaitAsync().ConfigureAwait(false);
-                try
+                await Task.WhenAll(scanInstances.Values.Select(async scanInstance =>
                 {
-                    await foreach (var scanIssue in scanInstance.ScanAsync())
-                        scanIssues.Add(scanIssue);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            })).ConfigureAwait(false);
-        }
-        ScanIssues = [.. scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
-        var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
-        if (attentionWorthyScanIssues.Length is > 0)
-        {
-            var distinctAttentionWorthyScanIssueCaptions = attentionWorthyScanIssues.Select(si => si.Caption).Distinct().ToImmutableArray();
-            var modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
-            if (modHealthStatusSummary != lastModHealthStatusSummary)
-            {
-                await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
-                lastModHealthStatusSummary = modHealthStatusSummary;
+                    await semaphore.WaitAsync().ConfigureAwait(false);
+                    try
+                    {
+                        await foreach (var scanIssue in scanInstance.ScanAsync())
+                            scanIssues.Add(scanIssue);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                })).ConfigureAwait(false);
             }
+            ScanIssues = [.. scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+            var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
+            if (attentionWorthyScanIssues.Length is > 0)
+            {
+                var distinctAttentionWorthyScanIssueCaptions = attentionWorthyScanIssues.Select(si => si.Caption).Distinct().ToImmutableArray();
+                var modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
+                if (modHealthStatusSummary != lastModHealthStatusSummary)
+                {
+                    await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
+                    lastModHealthStatusSummary = modHealthStatusSummary;
+                }
+            }
+            else
+                lastModHealthStatusSummary = string.Empty;
+            await platformFunctions.SetBadgeNumberAsync(attentionWorthyScanIssues.Length).ConfigureAwait(false);
         }
-        else
-            lastModHealthStatusSummary = string.Empty;
-        await platformFunctions.SetBadgeNumberAsync(attentionWorthyScanIssues.Length).ConfigureAwait(false);
-        IsCurrentlyScanning = false;
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "unexpected exception encountered while scanning");
+            superSnacks.OfferRefreshments(new MarkupString(
+                $"""
+                <h3>Whoops!</h3>
+                I ran into a show-stopping problem while trying to check the health of your Mods folder.<br />
+                <br />
+                Brief technical details:<br />
+                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
+                <br />
+                More detailed technical information is available in my log.
+                """), Severity.Error, options =>
+                {
+                    options.RequireInteraction = true;
+                    options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+                });
+            await platformFunctions.SetBadgeNumberAsync(0).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsScanning = false;
+        }
     }
 
     void UpdateScanInitializationStatus() =>
@@ -910,53 +972,73 @@ public partial class SmartSimObserver :
 
     void UpdateScanInitializationStatusWork()
     {
-        var fullyConnectedToGame = installationDirectoryWatcher is not null && userDataDirectoryWatcher is not null;
-        var scansInitialized = scanInstances.Count > 0;
-        if (!fullyConnectedToGame && scansInitialized)
+        try
         {
-            while (scanInstances.Keys.FirstOrDefault() is { } key)
-                if (scanInstances.TryRemove(key, out var scan))
-                    scan.Dispose();
-            ScanIssues = [];
-            return;
-        }
-        if (fullyConnectedToGame)
-        {
-            var asshole = lifetimeScope.Resolve(typeof(IErrorLogScan));
-            asshole.ToString();
-            var initializationChange = false;
-            bool checkScanInitialization(bool playerHasScanEnabled, Type scanInterface)
+            var fullyConnectedToGame = installationDirectoryWatcher is not null && userDataDirectoryWatcher is not null;
+            var scansInitialized = scanInstances.Count > 0;
+            if (!fullyConnectedToGame && scansInitialized)
             {
-                if (playerHasScanEnabled && !scanInstances.ContainsKey(scanInterface))
-                {
-                    scanInstances.AddOrUpdate(scanInterface, AddScanInstancesValueFactory, UpdateScanInstancesValueFactory);
-                    return true;
-                }
-                if (!playerHasScanEnabled && scanInstances.TryRemove(scanInterface, out var scanInstance))
-                {
-                    scanInstance.Dispose();
-                    return true;
-                }
-                return false;
+                while (scanInstances.Keys.FirstOrDefault() is { } key)
+                    if (scanInstances.TryRemove(key, out var scan))
+                        scan.Dispose();
+                ScanIssues = [];
+                return;
             }
-            initializationChange |= checkScanInitialization(settings.ScanForModsDisabled, typeof(IModSettingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForShowModsListAtStartupEnabled, typeof(IShowModListStartupSettingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
-            initializationChange |= checkScanInitialization(settings.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
-            initializationChange |= checkScanInitialization(settings.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
-            initializationChange |= checkScanInitialization(settings.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
-            initializationChange |= checkScanInitialization(settings.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
-            initializationChange |= checkScanInitialization(settings.ScanForErrorLogs, typeof(IErrorLogScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMissingMccc, typeof(IMcccMissingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMissingBe, typeof(IBeMissingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMissingModGuard, typeof(IModGuardMissingScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMissingDependency, typeof(IDependencyScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
-            initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
-            initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
-            if (initializationChange)
-                Scan();
+            if (fullyConnectedToGame)
+            {
+                var initializationChange = false;
+                bool checkScanInitialization(bool playerHasScanEnabled, Type scanInterface)
+                {
+                    if (playerHasScanEnabled && !scanInstances.ContainsKey(scanInterface))
+                    {
+                        scanInstances.AddOrUpdate(scanInterface, AddScanInstancesValueFactory, UpdateScanInstancesValueFactory);
+                        return true;
+                    }
+                    if (!playerHasScanEnabled && scanInstances.TryRemove(scanInterface, out var scanInstance))
+                    {
+                        scanInstance.Dispose();
+                        return true;
+                    }
+                    return false;
+                }
+                initializationChange |= checkScanInitialization(settings.ScanForModsDisabled, typeof(IModSettingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForScriptModsDisabled, typeof(IScriptModSettingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForShowModsListAtStartupEnabled, typeof(IShowModListStartupSettingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForInvalidModSubdirectoryDepth, typeof(IPackageDepthScan));
+                initializationChange |= checkScanInitialization(settings.ScanForInvalidScriptModSubdirectoryDepth, typeof(ITs4ScriptDepthScan));
+                initializationChange |= checkScanInitialization(settings.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
+                initializationChange |= checkScanInitialization(settings.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
+                initializationChange |= checkScanInitialization(settings.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
+                initializationChange |= checkScanInitialization(settings.ScanForErrorLogs, typeof(IErrorLogScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMissingMccc, typeof(IMcccMissingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMissingBe, typeof(IBeMissingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMissingModGuard, typeof(IModGuardMissingScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMissingDependency, typeof(IDependencyScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
+                initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
+                if (initializationChange)
+                    Scan();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "unexpected exception encountered while initializing scans");
+            superSnacks.OfferRefreshments(new MarkupString(
+                $"""
+                <h3>Whoops!</h3>
+                I ran into a show-stopping problem while trying to check the health of your Mods folder.<br />
+                <br />
+                Brief technical details:<br />
+                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
+                <br />
+                More detailed technical information is available in my log.
+                """), Severity.Error, options =>
+                {
+                    options.RequireInteraction = true;
+                    options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+                });
+            platformFunctions.SetBadgeNumberAsync(0).Wait();
         }
     }
 

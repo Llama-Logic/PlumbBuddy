@@ -3,6 +3,25 @@
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
 
+@if (Settings.Type is not UserType.Casual && SmartSimObserver.GameVersion is { } gameVersion)
+{
+    gameVersion = new Version(gameVersion.Major, gameVersion.Minor, gameVersion.Build);
+    <MudTooltip Arrow="true">
+        <ChildContent>
+            <MudChip T="Version" Icon="@MaterialDesignIcons.Normal.TimelineCheck" Value="@gameVersion" />
+        </ChildContent>
+        <TooltipContent>
+            <MudStack Row="true">
+                <MudIcon Icon="@MaterialDesignIcons.Normal.TimelineCheck" />
+                <MudTextM3 Typo="TypoM3.Title">Game Version</MudTextM3>
+            </MudStack>
+            <MudDivider />
+            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                This is the current version of The Sims 4 you have installed.
+            </MudTextM3>
+        </TooltipContent>
+    </MudTooltip>
+}
 @if (Settings.Type is not UserType.Casual && ModsDirectoryCataloger.PackageCount > 0)
 {
     <MudTooltip Arrow="true">

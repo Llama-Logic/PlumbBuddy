@@ -34,4 +34,20 @@ class Steam :
 
     protected override FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory) =>
         new FileInfo(Path.Combine(installationDirectory.FullName, "Game", "Bin", "TS4_x64.exe"));
+
+    public override async Task<Version?> GetTS4InstallationVersionAsync()
+    {
+        if (await GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is not { } installationDirectory
+            || !installationDirectory.Exists)
+            return null;
+        if (GetTS4Executable(installationDirectory) is not FileInfo executable ||
+            !executable.Exists)
+            return null;
+        var versionInfo = FileVersionInfo.GetVersionInfo(executable.FullName);
+        if (versionInfo.FileVersion is { } fileVersion
+            && !string.IsNullOrWhiteSpace(fileVersion)
+            && Version.TryParse(fileVersion, out var version))
+            return version;
+        return null;
+    }
 }

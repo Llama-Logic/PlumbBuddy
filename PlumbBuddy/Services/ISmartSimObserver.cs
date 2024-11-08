@@ -4,9 +4,10 @@ public interface ISmartSimObserver :
     IDisposable,
     INotifyPropertyChanged
 {
+    Version? GameVersion { get; }
     IReadOnlyList<string> InstalledPackCodes { get; }
-    bool IsCurrentlyScanning { get; }
     bool IsModsDisabledGameSettingOn { get; }
+    bool IsScanning { get; }
     bool IsScriptModsEnabledGameSettingOn { get; }
     bool IsShowModListStartupGameSettingOn { get; }
     bool IsSteamInstallation { get; }

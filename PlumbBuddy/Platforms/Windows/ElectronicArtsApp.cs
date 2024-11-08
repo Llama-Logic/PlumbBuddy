@@ -41,37 +41,57 @@ class ElectronicArtsApp :
         }
     }
 
-    public Task<DirectoryInfo?> GetTS4InstallationDirectoryAsync()
+    FileInfo? GetTS4InstallationExecutableBinary()
     {
         try
         {
             if (Registry.LocalMachine.OpenSubKey(ts4SubKeyName) is not { } ts4SubKey)
-                return Task.FromResult<DirectoryInfo?>(null);
+                return null;
             var kind = ts4SubKey.GetValueKind(ts4InstallDirValueName);
             if (kind is not RegistryValueKind.String and not RegistryValueKind.ExpandString)
-                return Task.FromResult<DirectoryInfo?>(null);
+                return null;
             if (ts4SubKey.GetValue(ts4InstallDirValueName) is not string path)
-                return Task.FromResult<DirectoryInfo?>(null);
+                return null;
             if (kind is RegistryValueKind.ExpandString)
                 path = Environment.ExpandEnvironmentVariables(path);
             var directoryInfo = new DirectoryInfo(path);
             if (!directoryInfo.Exists)
-                return Task.FromResult<DirectoryInfo?>(null);
-            if (File.Exists(Path.Combine(directoryInfo.FullName, "Game", "Bin", "TS4_x64.exe")))
-                return Task.FromResult<DirectoryInfo?>(directoryInfo);
-            return Task.FromResult<DirectoryInfo?>(null);
+                return null;
+            return new FileInfo(Path.Combine(directoryInfo.FullName, "Game", "Bin", "TS4_x64.exe"));
         }
         catch (IOException)
         {
-            return Task.FromResult<DirectoryInfo?>(null);
+            return null;
         }
         catch (SecurityException)
         {
-            return Task.FromResult<DirectoryInfo?>(null);
+            return null;
         }
         catch (UnauthorizedAccessException)
         {
-            return Task.FromResult<DirectoryInfo?>(null);
+            return null;
         }
+    }
+
+    public Task<DirectoryInfo?> GetTS4InstallationDirectoryAsync()
+    {
+        if (GetTS4InstallationExecutableBinary() is not { } executable)
+            return Task.FromResult<DirectoryInfo?>(null);
+        if (executable.Exists)
+            return Task.FromResult<DirectoryInfo?>(executable.Directory!.Parent!.Parent!);
+        return Task.FromResult<DirectoryInfo?>(null);
+    }
+
+    public Task<Version?> GetTS4InstallationVersionAsync()
+    {
+        if (GetTS4InstallationExecutableBinary() is not { } executable ||
+            !executable.Exists)
+            return Task.FromResult<Version?>(null);
+        var versionInfo = FileVersionInfo.GetVersionInfo(executable.FullName);
+        if (versionInfo.FileVersion is { } fileVersion
+            && !string.IsNullOrWhiteSpace(fileVersion)
+            && Version.TryParse(fileVersion, out var version))
+            return Task.FromResult<Version?>(version);
+        return Task.FromResult<Version?>(null);
     }
 }

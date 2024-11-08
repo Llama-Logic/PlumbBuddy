@@ -25,7 +25,8 @@ partial class HUD
 
     void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
+        if (e.PropertyName is nameof(ISmartSimObserver.GameVersion)
+            or nameof(ISmartSimObserver.IsModsDisabledGameSettingOn)
             or nameof(ISmartSimObserver.IsScriptModsEnabledGameSettingOn))
             StaticDispatcher.Dispatch(StateHasChanged);
     }

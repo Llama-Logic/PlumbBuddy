@@ -63,4 +63,6 @@ abstract class SteamBase :
         }
         return null; // sigh, ran all out of Steam libraries and no TS4 to be found 😔
     }
+
+    public abstract Task<Version?> GetTS4InstallationVersionAsync();
 }
