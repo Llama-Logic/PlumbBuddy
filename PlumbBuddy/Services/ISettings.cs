@@ -10,6 +10,7 @@ public interface ISettings :
     string DownloadsFolderPath { get; set; }
     string InstallationFolderPath { get; set; }
     DateTimeOffset? LastCheckForUpdate { get; set; }
+    Version? LastGameVersion { get; set; }
     bool Onboarded { get; set; }
     bool ScanForCacheStaleness { get; set; }
     bool ScanForErrorLogs { get; set; }

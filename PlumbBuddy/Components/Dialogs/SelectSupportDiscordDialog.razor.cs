@@ -8,6 +8,9 @@ partial class SelectSupportDiscordDialog
     [Parameter]
     public FileInfo? ErrorFile { get; set; }
 
+    [Parameter]
+    public bool IsPatchDay { get; set; }
+
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
@@ -44,6 +47,16 @@ partial class SelectSupportDiscordDialog
                 .OrderByDescending(t => t.recommendationWeight)
                 .Select(t => (t.name, t.discord))
                 .ToImmutableArray();
+        }
+        else if (IsPatchDay)
+        {
+            description = "Here are the Community Support Discord servers which announce mod updates.";
+            var discordsToUseList = discordsToUse
+                .Where(kv => kv.Value.PatchDayHelpSteps.Count is > 0)
+                .Select(kv => (name: kv.Key, discord: kv.Value))
+                .ToList();
+            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(discordsToUseList));
+            relevantSupportDiscords = discordsToUseList.ToImmutableArray();
         }
         else
         {

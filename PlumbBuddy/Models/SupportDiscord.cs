@@ -22,4 +22,10 @@ public class SupportDiscord
 
     [YamlMember(Order = 7, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections)]
     public Dictionary<string, Collection<SupportDiscordStep>> TextFileSubmissionSteps { get; private set; } = [];
+
+    [YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections)]
+    public Dictionary<string, Collection<SupportDiscordStep>> PatchDayHelpSteps { get; private set; } = [];
+
+    [YamlMember(Order = 9, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections)]
+    public Dictionary<string, SupportDiscordCreatorSpecific> SpecificCreators { get; private set; } = [];
 }

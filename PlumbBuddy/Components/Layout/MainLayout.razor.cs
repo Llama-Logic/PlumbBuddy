@@ -147,7 +147,7 @@ public partial class MainLayout
     }
 
     async Task HandleAskForHelpOnClickAsync() =>
-        await DialogService.AskForHelpAsync(Logger, PublicCatalogs);
+        await DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs);
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

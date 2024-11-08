@@ -17,7 +17,7 @@ partial class MainMenu
     async Task HandleAskForHelpOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        await DialogService.AskForHelpAsync(Logger, PublicCatalogs);
+        await DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs);
     }
 
     async Task HandleCheckForUpdateAsync()

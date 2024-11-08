@@ -92,6 +92,21 @@ class Settings :
         }
     }
 
+    public Version? LastGameVersion
+    {
+        get => preferences.Get(nameof(LastGameVersion), (string?)null) is string versionStr
+            && Version.TryParse(versionStr, out var version)
+            ? version
+            : null;
+        set
+        {
+            if (LastGameVersion == value)
+                return;
+            preferences.Set(nameof(LastGameVersion), value?.ToString());
+            OnPropertyChanged();
+        }
+    }
+
     public bool Onboarded
     {
         get => preferences.Get(nameof(Onboarded), false);

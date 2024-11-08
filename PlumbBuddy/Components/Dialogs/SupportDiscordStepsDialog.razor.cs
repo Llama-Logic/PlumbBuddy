@@ -5,6 +5,9 @@ partial class SupportDiscordStepsDialog
     [Parameter]
     public FileInfo? ErrorFile { get; set; }
 
+    [Parameter]
+    public bool IsPatchDay { get; set; }
+
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
@@ -19,7 +22,7 @@ partial class SupportDiscordStepsDialog
 
     Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
-        if (targetIndex == (ErrorFile is null ? SupportDiscord!.AskForHelpSteps : SupportDiscord!.TextFileSubmissionSteps).GetLanguageOptimalValue().Count)
+        if (targetIndex == (IsPatchDay ? SupportDiscord!.PatchDayHelpSteps : ErrorFile is not null ? SupportDiscord!.TextFileSubmissionSteps : SupportDiscord!.AskForHelpSteps).GetLanguageOptimalValue().Count)
             MudDialog?.Close();
         return Task.FromResult(false);
     }

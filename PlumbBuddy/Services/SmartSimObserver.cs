@@ -3,6 +3,27 @@ namespace PlumbBuddy.Services;
 public partial class SmartSimObserver :
     ISmartSimObserver
 {
+    static readonly Regex modsDirectoryRelativePathPattern = GetModsDirectoryRelativePathPattern();
+    static readonly Regex trimmedLocalPathSegmentsPattern = GetTrimmedLocalPathSegmentsPattern();
+
+    public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
+
+    static ModsDirectoryFileType CatalogIfLikelyErrorOrTraceLogInRoot(string userDataDirectoryRelativePath)
+    {
+        if (userDataDirectoryRelativePath.Contains(Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            return ModsDirectoryFileType.Ignored;
+        if (!userDataDirectoryRelativePath.Contains("exception", StringComparison.OrdinalIgnoreCase)
+            && !userDataDirectoryRelativePath.Contains("crash", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.Ignored;
+        if (userDataDirectoryRelativePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
+            || userDataDirectoryRelativePath.EndsWith(".log", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.TextFile;
+        if (userDataDirectoryRelativePath.EndsWith(".html", StringComparison.OrdinalIgnoreCase)
+            || userDataDirectoryRelativePath.EndsWith(".htm", StringComparison.OrdinalIgnoreCase))
+            return ModsDirectoryFileType.HtmlFile;
+        return ModsDirectoryFileType.Ignored;
+    }
+
     [GeneratedRegex(@"^Mods[\\/].+$")]
     private static partial Regex GetModsDirectoryRelativePathPattern();
 
@@ -11,11 +32,6 @@ public partial class SmartSimObserver :
 
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
-
-    static readonly Regex modsDirectoryRelativePathPattern = GetModsDirectoryRelativePathPattern();
-    static readonly Regex trimmedLocalPathSegmentsPattern = GetTrimmedLocalPathSegmentsPattern();
-
-    public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
     public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
@@ -105,6 +121,36 @@ public partial class SmartSimObserver :
             if (EqualityComparer<Version>.Default.Equals(gameVersion, value))
                 return;
             gameVersion = value;
+            if (settings.LastGameVersion is { } lastGameVersion
+                && gameVersion is not null)
+            {
+                var truncatedLastGameVersion = new Version(lastGameVersion.Major, lastGameVersion.Minor);
+                var truncatedGameVersion = new Version(gameVersion.Major, gameVersion.Minor);
+                if (!EqualityComparer<Version>.Default.Equals(truncatedLastGameVersion, truncatedGameVersion))
+                {
+                    using var pbDbContext = pbDbContextFactory.CreateDbContext();
+                    if (!IsModsDisabledGameSettingOn
+                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.Package && mf.Path != null && mf.AbsenceNoticed == null)
+                        || IsScriptModsEnabledGameSettingOn
+                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.ScriptArchive && mf.Path != null && mf.AbsenceNoticed == null))
+                    {
+                        superSnacks.OfferRefreshments(new MarkupString(
+                            $"""
+                            You just successfully upgraded The Sims 4 from {truncatedLastGameVersion} to {truncatedGameVersion}! Well done! Would you like help joining a Discord server which announces updates for mods? There are probably at least a few important updates headed your way from creators.
+                            """), Severity.Success, options =>
+                            {
+                                options.Icon = MaterialDesignIcons.Normal.TimelineCheck;
+                                options.RequireInteraction = true;
+                                var lifetimeScope = blazorFramework.MainLayoutLifetimeScope!;
+                                var dialogService = lifetimeScope.Resolve<IDialogService>();
+                                var publicCatalogs = lifetimeScope.Resolve<IPublicCatalogs>();
+                                options.Onclick = async _ => await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, isPatchDay: true);
+                            });
+                        _ = Task.Run(async () => await platformFunctions.SendLocalNotificationAsync("Major Game Update Detected", "Please click here if you're interested in updating your mods for the new patch!"));
+                    }
+                }
+            }
+            settings.LastGameVersion = gameVersion;
             OnPropertyChanged();
         }
     }
@@ -219,22 +265,6 @@ public partial class SmartSimObserver :
         }
         wasGlobalManifestChange = false;
         return false;
-    }
-
-    ModsDirectoryFileType CatalogIfLikelyErrorOrTraceLogInRoot(string userDataDirectoryRelativePath)
-    {
-        if (userDataDirectoryRelativePath.Contains(Path.DirectorySeparatorChar, StringComparison.Ordinal))
-            return ModsDirectoryFileType.Ignored;
-        if (!userDataDirectoryRelativePath.Contains("exception", StringComparison.OrdinalIgnoreCase)
-            && !userDataDirectoryRelativePath.Contains("crash", StringComparison.OrdinalIgnoreCase))
-            return ModsDirectoryFileType.Ignored;
-        if (userDataDirectoryRelativePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
-            || userDataDirectoryRelativePath.EndsWith(".log", StringComparison.OrdinalIgnoreCase))
-            return ModsDirectoryFileType.TextFile;
-        if (userDataDirectoryRelativePath.EndsWith(".html", StringComparison.OrdinalIgnoreCase)
-            || userDataDirectoryRelativePath.EndsWith(".htm", StringComparison.OrdinalIgnoreCase))
-            return ModsDirectoryFileType.HtmlFile;
-        return ModsDirectoryFileType.Ignored;
     }
 
     bool CatalogIfModsDirectory(string userDataDirectoryRelativePath)

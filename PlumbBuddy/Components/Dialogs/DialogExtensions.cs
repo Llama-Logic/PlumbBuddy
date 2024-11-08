@@ -2,7 +2,7 @@ namespace PlumbBuddy.Components.Dialogs;
 
 static class DialogExtensions
 {
-    public static Task AskForHelpAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, FileInfo? errorFile = null) =>
+    public static Task ShowAskForHelpDialogAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, FileInfo? errorFile = null, bool isPatchDay = false) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
@@ -18,9 +18,9 @@ static class DialogExtensions
                 await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
                 return;
             }
-            if (await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile) is not { } selectedSupportDiscordName)
+            if (await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile, isPatchDay) is not { } selectedSupportDiscordName)
                 return;
-            await ShowSupportDiscordStepsDialogAsync(dialogService, selectedSupportDiscordName, supportDiscords[selectedSupportDiscordName], errorFile);
+            await ShowSupportDiscordStepsDialogAsync(dialogService, selectedSupportDiscordName, supportDiscords[selectedSupportDiscordName], errorFile, isPatchDay);
         });
 
     public static Task<bool> ShowCautionDialogAsync(this IDialogService dialogService, string caption, string text) =>
@@ -174,12 +174,13 @@ static class DialogExtensions
             await dialog.Result;
         });
 
-    public static Task<string?> ShowSelectSupportDiscordDialogAsync(this IDialogService dialogService, IReadOnlyDictionary<string, SupportDiscord> supportDiscords, FileInfo? errorFile = null) =>
+    public static Task<string?> ShowSelectSupportDiscordDialogAsync(this IDialogService dialogService, IReadOnlyDictionary<string, SupportDiscord> supportDiscords, FileInfo? errorFile = null, bool isPatchDay = false) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             var dialog = await dialogService.ShowAsync<SelectSupportDiscordDialog>("Select a Support Discord", new DialogParameters<SelectSupportDiscordDialog>()
             {
                 { x => x.ErrorFile, errorFile },
+                { x => x.IsPatchDay, isPatchDay },
                 { x => x.SupportDiscords, supportDiscords }
             }, new DialogOptions
             {
@@ -193,12 +194,13 @@ static class DialogExtensions
             return null;
         });
 
-    public static Task ShowSupportDiscordStepsDialogAsync(this IDialogService dialogService, string supportDiscordName, SupportDiscord supportDiscord, FileInfo? errorFile = null) =>
+    public static Task ShowSupportDiscordStepsDialogAsync(this IDialogService dialogService, string supportDiscordName, SupportDiscord supportDiscord, FileInfo? errorFile = null, bool isPatchDay = false) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             var dialog = await dialogService.ShowAsync<SupportDiscordStepsDialog>(supportDiscordName, new DialogParameters<SupportDiscordStepsDialog>()
             {
                 { x => x.ErrorFile, errorFile },
+                { x => x.IsPatchDay, isPatchDay },
                 { x => x.SupportDiscord, supportDiscord },
                 { x => x.SupportDiscordName, supportDiscordName }
             }, new DialogOptions

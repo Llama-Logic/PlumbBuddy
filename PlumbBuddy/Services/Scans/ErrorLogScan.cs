@@ -78,7 +78,7 @@ public sealed class ErrorLogScan :
                     }
                     if (command is "discord")
                     {
-                        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().AskForHelpAsync(logger, publicCatalogs, file).ConfigureAwait(false);
+                        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowAskForHelpDialogAsync(logger, publicCatalogs, file).ConfigureAwait(false);
                         return;
                     }
                     if (command is "show")
