@@ -3,10 +3,16 @@ namespace PlumbBuddy.Components.Dialogs;
 partial class SelectSupportDiscordDialog
 {
     string description = string.Empty;
-    IReadOnlyList<(string name, SupportDiscord discord)>? relevantSupportDiscords;
+    IReadOnlyList<(string name, string creatorName, SupportDiscord discord)>? relevantSupportDiscords;
 
     [Parameter]
     public FileInfo? ErrorFile { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string>? ForCreators { get; set; }
+
+    [Parameter]
+    public string? ForManifestHashHex { get; set; }
 
     [Parameter]
     public bool IsPatchDay { get; set; }
@@ -34,7 +40,24 @@ partial class SelectSupportDiscordDialog
 #else
             .Where(kv => true);
 #endif
-        if (ErrorFile is { } errorFile)
+        if (ForCreators is { } forCreators && ForManifestHashHex is { } forManifestHashHex)
+        {
+            var forCreatorsHashSet = forCreators.ToImmutableHashSet();
+            var forManifestHash = forManifestHashHex.ToByteSequence().ToImmutableArray();
+            description = "Here are the Community Support Discord servers which may offer support for this mod.";
+            var specificDiscordsToUseList = discordsToUse
+                .Where(kv => kv.Value.SpecificCreators.Any(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))))
+                .Select(kv => (name: kv.Key, creator: kv.Value.SpecificCreators.First(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))).Key, discord: kv.Value))
+                .ToList();
+            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(specificDiscordsToUseList));
+            var discordsToUseList = discordsToUse
+                .Where(kv => kv.Value.AskForHelpSteps.Count is > 0)
+                .Select(kv => (name: kv.Key, creator: string.Empty, discord: kv.Value))
+                .ToList();
+            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(discordsToUseList));
+            relevantSupportDiscords = specificDiscordsToUseList.Concat(discordsToUseList).DistinctBy(discord => discord.name).ToImmutableArray();
+        }
+        else if (ErrorFile is { } errorFile)
         {
             description = $"Here are the Community Support Discord servers I could find to help us with: `{errorFile.Name}`";
             var discordsToUseWeightedList = discordsToUse
@@ -45,7 +68,7 @@ partial class SelectSupportDiscordDialog
             relevantSupportDiscords = discordsToUseWeightedList
                 .Where(t => t.recommendationWeight is > 0D)
                 .OrderByDescending(t => t.recommendationWeight)
-                .Select(t => (t.name, t.discord))
+                .Select(t => (t.name, string.Empty, t.discord))
                 .ToImmutableArray();
         }
         else if (IsPatchDay)
@@ -53,7 +76,7 @@ partial class SelectSupportDiscordDialog
             description = "Here are the Community Support Discord servers which announce mod updates.";
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.PatchDayHelpSteps.Count is > 0)
-                .Select(kv => (name: kv.Key, discord: kv.Value))
+                .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))
                 .ToList();
             Random.Shared.Shuffle(CollectionsMarshal.AsSpan(discordsToUseList));
             relevantSupportDiscords = discordsToUseList.ToImmutableArray();
@@ -63,7 +86,7 @@ partial class SelectSupportDiscordDialog
             description = "Here are the Community Support Discord servers prepared to offer general support. If you're looking for help with *me* instead of with the game or with a mod, [click here](https://plumbbuddy.app/redirect?to=PlumbBuddyDiscord).";
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.AskForHelpSteps.Count is > 0)
-                .Select(kv => (name: kv.Key, discord: kv.Value))
+                .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))
                 .ToList();
             Random.Shared.Shuffle(CollectionsMarshal.AsSpan(discordsToUseList));
             relevantSupportDiscords = discordsToUseList.ToImmutableArray();
@@ -71,6 +94,6 @@ partial class SelectSupportDiscordDialog
         StateHasChanged();
     }
 
-    void SelectSupportDiscord(string supportDiscordName) =>
-        MudDialog?.Close(DialogResult.Ok(supportDiscordName));
+    void SelectSupportDiscord(string supportDiscordName, string creatorName) =>
+        MudDialog?.Close(DialogResult.Ok((discord: supportDiscordName, creator: creatorName)));
 }

@@ -3,6 +3,9 @@ namespace PlumbBuddy.Components.Dialogs;
 partial class SupportDiscordStepsDialog
 {
     [Parameter]
+    public string? CreatorName { get; set; }
+
+    [Parameter]
     public FileInfo? ErrorFile { get; set; }
 
     [Parameter]

@@ -16,7 +16,7 @@
                 <MudGrid Justify="Justify.Center">
                     @if (relevantSupportDiscords is not null && relevantSupportDiscords.Count is > 0)
                     {
-                        @foreach (var (supportDiscordName, supportDiscord) in relevantSupportDiscords)
+                        @foreach (var (supportDiscordName, creatorName, supportDiscord) in relevantSupportDiscords)
                         {
                             <MudItem xs="12" md="6" lg="4">
                                 <MudPaper Elevation="5" Style="height: 100%;">
@@ -29,7 +29,7 @@
                                             <MudMarkdown Value="@supportDiscord.Description.GetLanguageOptimalValue()" />
                                         </MudCardContent>
                                         <MudCardActions>
-                                            <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName))">Pick this Discord</MudButton>
+                                            <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName, creatorName))">Pick this Discord</MudButton>
                                         </MudCardActions>
                                     </MudCard>
                                 </MudPaper>
