@@ -51,6 +51,38 @@ div.mud-input-control.no-material-variant .mud-input > * {
     -webkit-backdrop-filter: blur(10px);
 }
 
+.mud-dialog {
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+.primary-dialog {
+    border-color: var(--mud-palette-primary);
+}
+
+.secondary-dialog {
+    border-color: var(--mud-palette-secondary);
+}
+
+.tertiary-dialog {
+    border-color: var(--mud-palette-tertiary);
+}
+
+.info-dialog {
+    border-color: var(--mud-palette-info);
+}
+
+.success-dialog {
+    border-color: var(--mud-palette-success);
+}
+
+.warning-dialog {
+    border-color: var(--mud-palette-warning);
+}
+
+.error-dialog {
+    border-color: var(--mud-palette-error);
+}
+
 .mud-background-primary-selected {
     background-color: color-mix(in srgb, var(--mud-palette-background), var(--mud-palette-primary) 10%);
 }
