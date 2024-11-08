@@ -62,33 +62,40 @@
                                             <MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
                                         </AdornmentStart>
                                         <AdornmentEnd>
-                                            <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
-                                            <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                                                <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
-                                                    <InlineMarkdown>
-                                                        Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
-                                                        * your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);
-                                                        * your Patreon feed (as opposed to a Patreon post devoted to this mod);
-                                                        * your Mod the Sims, CurseForge, or The Sims Resource profile; or,
-                                                        * any other page which does not feature a one-click step to downloading your mod's files.
-                                                    </InlineMarkdown>
-                                                    <InlineMarkdown>
-                                                        If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs.
-                                                    </InlineMarkdown>
-                                                </MudAlert>
-                                            </MudPopover>
-                                            <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
-                                            <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                                                <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
-                                                    <InlineMarkdown>
-                                                        It is completely okay if on this same page you *also*:
-                                                        * feature your other modding content;
-                                                        * feature links to other creators;
-                                                        * display ads to the player; and,
-                                                        * solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts' Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/).
-                                                    </InlineMarkdown>
-                                                </MudAlert>
-                                            </MudPopover>
+                                            <MudTooltip Arrow Color="Color.Info" Text="Open in Web Browser">
+                                                <MudIconButton Icon="@MaterialDesignIcons.Normal.Web" Color="Color.Info" OnClick="HandleOpenDownloadPageUrlInBrowserAsync" />
+                                            </MudTooltip>
+                                            <MudTooltip Arrow Color="Color.Warning" Text="See Things Not To Do">
+                                                <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
+                                                <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
+                                                    <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
+                                                        <InlineMarkdown>
+                                                            Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
+                                                            * your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);
+                                                            * your Patreon feed (as opposed to a Patreon post devoted to this mod);
+                                                            * your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,
+                                                            * any other page which does not feature a one-click step to downloading your mod's files.
+                                                        </InlineMarkdown>
+                                                        <InlineMarkdown>
+                                                            If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs.
+                                                        </InlineMarkdown>
+                                                    </MudAlert>
+                                                </MudPopover>
+                                            </MudTooltip>
+                                            <MudTooltip Arrow Color="Color.Success" Text="See Things To Do">
+                                                <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
+                                                <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
+                                                    <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
+                                                        <InlineMarkdown>
+                                                            It is completely okay if on this same page you *also*:
+                                                            * feature your other modding content;
+                                                            * feature links to other creators;
+                                                            * display ads to the player; and,
+                                                            * solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts' Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/).
+                                                        </InlineMarkdown>
+                                                    </MudAlert>
+                                                </MudPopover>
+                                            </MudTooltip>
                                         </AdornmentEnd>
                                     </MudTextFieldExtended>
                                 </MudForm>

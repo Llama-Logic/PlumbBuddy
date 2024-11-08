@@ -5,6 +5,7 @@ public interface ISettings :
 {
     bool AutomaticallyCheckForUpdates { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
+    string DefaultCreatorsList { get; set; }
     bool DevToolsUnlocked { get; set; }
     string DownloadsFolderPath { get; set; }
     string InstallationFolderPath { get; set; }

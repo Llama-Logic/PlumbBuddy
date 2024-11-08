@@ -3,7 +3,6 @@ namespace PlumbBuddy.Components.Controls;
 partial class ModRequirementEditor
 {
     ModRequirement? lastModRequirement;
-    bool requirementIdentifierGuidanceOpen;
 
     [Parameter]
     public IReadOnlyList<string> Creators { get; set; } = [];
@@ -63,9 +62,6 @@ partial class ModRequirementEditor
 
     [Parameter]
     public string? Version { get; set; }
-
-    public void CloseGuidance() =>
-        requirementIdentifierGuidanceOpen = false;
 
     async Task HandleBrowseForAddModFileOnClickAsync()
     {

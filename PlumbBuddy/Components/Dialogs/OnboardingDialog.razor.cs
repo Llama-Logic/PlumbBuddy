@@ -2,6 +2,8 @@ namespace PlumbBuddy.Components.Dialogs;
 
 partial class OnboardingDialog
 {
+    IReadOnlyList<string> defaultCreators = [];
+    ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
     bool isLoading;
     string? loadingText;
@@ -157,6 +159,9 @@ partial class OnboardingDialog
                     """))
                     return true;
             }
+            if (defaultCreatorsChipSetField is not null)
+                await defaultCreatorsChipSetField.CommitPendingEntryIfEmptyAsync();
+            Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
             Settings.Onboarded = true;
             MudDialog?.Close(DialogResult.Ok(true));
             return false;

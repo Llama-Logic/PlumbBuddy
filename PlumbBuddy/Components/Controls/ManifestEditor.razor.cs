@@ -637,9 +637,7 @@ partial class ManifestEditor
             return true;
         }
         var activeIndex = stepper?.GetActiveIndex();
-        if (activeIndex is 1)
-            modComponentEditor?.CloseGuidance();
-        else if (activeIndex is 2)
+        if (activeIndex is 2)
         {
             UrlProhibitiveGuidanceOpen = false;
             UrlEncouragingGuidanceOpen = false;
@@ -709,6 +707,8 @@ partial class ManifestEditor
                     versionEnabled = !string.IsNullOrWhiteSpace(version);
                     features = manifests.SelectMany(manifest => manifest.Features).Distinct().ToList().AsReadOnly();
                 }
+                else
+                    creators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
                 if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings) is { } scaffolding)
                 {
                     components[0].IsRequired = scaffolding.IsRequired;
@@ -828,6 +828,17 @@ partial class ManifestEditor
     {
         if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
             StaticDispatcher.Dispatch(StateHasChanged);
+    }
+
+    async Task HandleOpenDownloadPageUrlInBrowserAsync()
+    {
+        try
+        {
+            await Browser.OpenAsync(url, BrowserLaunchMode.External);
+        }
+        catch
+        {
+        }
     }
 
     async Task HandleRemoveFilesClickedAsync()

@@ -4,7 +4,6 @@ partial class ModComponentEditor
 {
     ChipSetField? exclusivitiesField;
     ModComponent? lastModComponent;
-    bool requirementIdentifierGuidanceOpen;
     ChipSetField? subsumedHashesField;
 
     [Parameter]
@@ -64,9 +63,6 @@ partial class ModComponentEditor
 
     [Parameter]
     public IReadOnlyList<string> SubsumedHashes { get; set; } = [];
-
-    public void CloseGuidance() =>
-        requirementIdentifierGuidanceOpen = false;
 
     public async Task CommitPendingEntriesIfEmptyAsync()
     {

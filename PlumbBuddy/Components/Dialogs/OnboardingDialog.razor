@@ -156,12 +156,17 @@
                                 ✔️ Do you want to change any of my default behaviors? ❌
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="my-8">
+                                @if (Type is UserType.Creator)
+                                {
+                                    <MudItem xs="12">
+                                        <ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="Default Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="This is the creators list I will pre-fill-in for you when you're manifesting a mod for the first time." />
+                                    </MudItem>
+                                    <MudFlexBreak />
+                                }
                                 <MudItem>
-                                    <MudStack>
-                                        <MudTooltip Arrow Color="Color.Primary" Text="Don't worry, I won't download or install anything without your consent. I'll just let you know when an update for me is available.">
-                                            <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
-                                        </MudTooltip>
-                                    </MudStack>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="Don't worry, I won't download or install anything without your consent. I'll just let you know when an update for me is available.">
+                                        <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
+                                    </MudTooltip>
                                 </MudItem>
                             </MudGrid>
                         </ChildContent>

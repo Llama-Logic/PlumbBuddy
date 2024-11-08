@@ -2,6 +2,8 @@ namespace PlumbBuddy.Components.Dialogs;
 
 partial class SettingsDialog
 {
+    IReadOnlyList<string> defaultCreators = [];
+    ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
     MudTabs? tabs;
     ThemeSelector? themeSelector;
@@ -54,12 +56,16 @@ partial class SettingsDialog
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && foldersSelector is not null)
+        if (firstRender)
         {
-            await foldersSelector.ScanForFoldersAsync();
-            DownloadsFolderPath = Settings.DownloadsFolderPath;
-            InstallationFolderPath = Settings.InstallationFolderPath;
-            UserDataFolderPath = Settings.UserDataFolderPath;
+            defaultCreators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            if (foldersSelector is not null)
+            {
+                await foldersSelector.ScanForFoldersAsync();
+                DownloadsFolderPath = Settings.DownloadsFolderPath;
+                InstallationFolderPath = Settings.InstallationFolderPath;
+                UserDataFolderPath = Settings.UserDataFolderPath;
+            }
         }
     }
 
@@ -104,7 +110,10 @@ partial class SettingsDialog
                 return;
             }
         }
+        if (defaultCreatorsChipSetField is not null)
+            await defaultCreatorsChipSetField.CommitPendingEntryIfEmptyAsync();
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
+        Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;

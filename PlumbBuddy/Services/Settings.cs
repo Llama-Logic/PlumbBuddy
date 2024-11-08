@@ -32,6 +32,18 @@ class Settings :
         }
     }
 
+    public string DefaultCreatorsList
+    {
+        get => preferences.Get(nameof(DefaultCreatorsList), string.Empty);
+        set
+        {
+            if (DefaultCreatorsList == value)
+                return;
+            preferences.Set(nameof(DefaultCreatorsList), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool DevToolsUnlocked
     {
         get => preferences.Get(nameof(DevToolsUnlocked), false);
