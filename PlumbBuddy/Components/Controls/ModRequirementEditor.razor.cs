@@ -64,6 +64,9 @@ partial class ModRequirementEditor
     [Parameter]
     public string? Version { get; set; }
 
+    public void CloseGuidance() =>
+        requirementIdentifierGuidanceOpen = false;
+
     async Task HandleBrowseForAddModFileOnClickAsync()
     {
         await DialogService.ShowInfoDialogAsync("Please keep in mind ☝️",

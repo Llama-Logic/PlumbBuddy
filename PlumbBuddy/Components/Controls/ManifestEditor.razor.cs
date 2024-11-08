@@ -763,6 +763,10 @@ partial class ManifestEditor
         {
             if (creatorsChipSetField is not null)
                 await creatorsChipSetField.CommitPendingEntryIfEmptyAsync();
+            if (urlProhibitiveGuidanceOpen)
+                urlProhibitiveGuidanceOpen = false;
+            if (urlEncouragingGuidanceOpen)
+                urlEncouragingGuidanceOpen = false;
         }
         if (activeIndex is 2)
         {
@@ -775,6 +779,8 @@ partial class ManifestEditor
                 await requiredPacksChipSetField.CommitPendingEntryIfEmptyAsync();
             if (incompatibleChipSetField is not null)
                 await incompatibleChipSetField.CommitPendingEntryIfEmptyAsync();
+            if (addRequiredModGuidanceOpen)
+                addRequiredModGuidanceOpen = false;
             foreach (var requiredMod in requiredMods)
                 await requiredMod.CommitPendingEntriesIfEmptyAsync();
         }

@@ -14,21 +14,7 @@
     @if (IsRequired)
     {
         <MudItem md="12">
-            <MudTextFieldExtended T="string" Text="@RequirementIdentifier" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="Requirement Identifier" HelperText="If set, the player must have at least one file using this requirement identifier." Placeholder="(currently independently required)">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" Color="Color.Tertiary" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudToggleIconButton @bind-Toggled="@requirementIdentifierGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
-                    <MudPopover Open="@requirementIdentifierGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                        <MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" Style="max-width: 525px;">
-                            <InlineMarkdown>
-                                **Requirement Identifiers** are scoped only to your mod. You don't need to worry about making them globally unique.
-                            </InlineMarkdown>
-                        </MudAlert>
-                    </MudPopover>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
+            <MudTextField T="string" Text="@RequirementIdentifier" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" AdornmentColor="Color.Tertiary" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="Requirement Identifier" HelperText="If set, the player must have at least one file using this requirement identifier. Requirement Identifiers are scoped only to your mod. You don't need to worry about making them globally unique." Placeholder="(currently independently required)" />
         </MudItem>
         <MudItem xs="12" lg="6">
             @if (PublicCatalogs.PackCatalog is { } packCatalog)
