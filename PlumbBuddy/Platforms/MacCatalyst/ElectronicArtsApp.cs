@@ -64,7 +64,7 @@ class ElectronicArtsApp :
         var data = parser.Parse(await File.ReadAllTextAsync(defaultIni.FullName).ConfigureAwait(false));
         var versionData = data["Version"];
         if (versionData["gameversion"] is { } gameVersion
-            && string.IsNullOrWhiteSpace(gameVersion)
+            && !string.IsNullOrWhiteSpace(gameVersion)
             && Version.TryParse(gameVersion, out var version))
             return version;
         return null;

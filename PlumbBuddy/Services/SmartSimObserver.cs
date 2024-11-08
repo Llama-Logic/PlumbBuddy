@@ -189,7 +189,7 @@ public partial class SmartSimObserver :
 
     string PacksDirectoryPath =>
 #if MACCATALYST
-        Path.Combine(new DirectoryInfo(player.InstallationFolderPath).Parent!.FullName, "The Sims 4 Packs");
+        Path.Combine(new DirectoryInfo(settings.InstallationFolderPath).Parent!.FullName, "The Sims 4 Packs");
 #else
         settings.InstallationFolderPath;
 #endif
