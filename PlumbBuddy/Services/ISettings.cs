@@ -6,6 +6,7 @@ public interface ISettings :
     bool AutomaticallyCheckForUpdates { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
     bool DevToolsUnlocked { get; set; }
+    string DownloadsFolderPath { get; set; }
     string InstallationFolderPath { get; set; }
     DateTimeOffset? LastCheckForUpdate { get; set; }
     bool Onboarded { get; set; }

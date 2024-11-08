@@ -17,7 +17,7 @@ public partial class SmartSimObserver :
 
     public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -27,6 +27,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        ArgumentNullException.ThrowIfNull(blazorFramework);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
@@ -35,6 +36,7 @@ public partial class SmartSimObserver :
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
         this.superSnacks = superSnacks;
+        this.blazorFramework = blazorFramework;
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
@@ -54,6 +56,7 @@ public partial class SmartSimObserver :
     ~SmartSimObserver() =>
         Dispose(false);
 
+    readonly IBlazorFramework blazorFramework;
     ImmutableArray<FileSystemInfo> cacheComponents;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
@@ -696,8 +699,21 @@ public partial class SmartSimObserver :
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
-    public void OpenDownloadsFolder() =>
-        platformFunctions.ViewDirectory(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")));
+    public async Task OpenDownloadsFolderAsync()
+    {
+        var downloadsFolder = new DirectoryInfo(settings.DownloadsFolderPath);
+        if (downloadsFolder.Exists)
+        {
+            platformFunctions.ViewDirectory(downloadsFolder);
+            return;
+        }
+        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowErrorDialogAsync("Umm, Whoops",
+            $"""
+            The Downloads folder I have on file for you does not exist:<br />
+            `{settings.DownloadsFolderPath}`<br /><br />
+            You may want to go into Settings and change that.
+            """).ConfigureAwait(false);
+    }
 
     public void OpenModsFolder()
     {

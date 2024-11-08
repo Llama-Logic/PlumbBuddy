@@ -54,7 +54,7 @@ partial class MainMenu
     async Task HandleOpenDownloadsFolderOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        SmartSimObserver.OpenDownloadsFolder();
+        await SmartSimObserver.OpenDownloadsFolderAsync();
     }
 
     async Task HandleOpenModsFolderOnClickAsync()

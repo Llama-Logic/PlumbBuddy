@@ -12,6 +12,12 @@ partial class OnboardingDialog
         set => Settings.AutomaticallyCheckForUpdates = value;
     }
 
+    string DownloadsFolderPath
+    {
+        get => Settings.DownloadsFolderPath;
+        set => Settings.DownloadsFolderPath = value;
+    }
+
     string InstallationFolderPath
     {
         get => Settings.InstallationFolderPath;

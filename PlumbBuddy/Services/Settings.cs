@@ -44,6 +44,18 @@ class Settings :
         }
     }
 
+    public string DownloadsFolderPath
+    {
+        get => preferences.Get(nameof(DownloadsFolderPath), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
+        set
+        {
+            if (DownloadsFolderPath == value)
+                return;
+            preferences.Set(nameof(DownloadsFolderPath), value);
+            OnPropertyChanged();
+        }
+    }
+
     public string InstallationFolderPath
     {
         get => preferences.Get(nameof(InstallationFolderPath), string.Empty);

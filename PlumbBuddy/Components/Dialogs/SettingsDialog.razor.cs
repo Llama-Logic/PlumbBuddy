@@ -8,6 +8,8 @@ partial class SettingsDialog
 
     bool AutomaticallyCheckForUpdates { get; set; }
 
+    string DownloadsFolderPath { get; set; } = string.Empty;
+
     string InstallationFolderPath { get; set; } = string.Empty;
 
     [CascadingParameter]
@@ -55,6 +57,7 @@ partial class SettingsDialog
         if (firstRender && foldersSelector is not null)
         {
             await foldersSelector.ScanForFoldersAsync();
+            DownloadsFolderPath = Settings.DownloadsFolderPath;
             InstallationFolderPath = Settings.InstallationFolderPath;
             UserDataFolderPath = Settings.UserDataFolderPath;
         }
@@ -102,6 +105,7 @@ partial class SettingsDialog
             }
         }
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
+        Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
         Settings.ScanForErrorLogs = ScanForErrorLogs;

@@ -27,7 +27,7 @@
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @CultureInfo.CurrentCulture.NativeName
                 </MudTextM3>
-                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataFolderOnClickAsync">Reset Path</MudButton>
+                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataAndDownloadsFoldersOnClickAsync">Reset Paths</MudButton>
             </MudStack>
         </MudStack>
     </MudItem>
@@ -113,6 +113,15 @@
                 </AdornmentStart>
                 <AdornmentEnd>
                     <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">Browse...</MudButton>
+                </AdornmentEnd>
+            </MudTextFieldExtended>
+            <br />
+            <MudTextFieldExtended T="string" Label="Downloads Folder" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath">
+                <AdornmentStart>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
+                </AdornmentStart>
+                <AdornmentEnd>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForDownloadsFolderOnClickAsync">Browse...</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
         </MudForm>

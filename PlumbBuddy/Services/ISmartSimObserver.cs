@@ -14,6 +14,6 @@ public interface ISmartSimObserver :
 
     void ClearCache();
     Task HelpWithPackPurchaseAsync(string packCode, IDialogService dialogService, IReadOnlyList<string>? creators, string? electronicArtsPromoCode);
-    void OpenDownloadsFolder();
+    Task OpenDownloadsFolderAsync();
     void OpenModsFolder();
 }

@@ -10,6 +10,12 @@ partial class FoldersSelector
     bool isTS4AvailableFromValve;
 
     [Parameter]
+    public string DownloadsFolderPath { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> DownloadsFolderPathChanged { get; set; }
+
+    [Parameter]
     public string InstallationFolderPath { get; set; } = string.Empty;
 
     [Parameter]
@@ -25,6 +31,17 @@ partial class FoldersSelector
 
     [Parameter]
     public EventCallback<string> UserDataFolderPathChanged { get; set; }
+
+    async Task BrowseForDownloadsFolderOnClickAsync()
+    {
+        var result = await FolderPicker.PickAsync(DownloadsFolderPath);
+        if (result.Exception is not null)
+            return;
+        if (!result.IsSuccessful)
+            return;
+        DownloadsFolderPath = result.Folder.Path;
+        await DownloadsFolderPathChanged.InvokeAsync(DownloadsFolderPath);
+    }
 
     async Task BrowseForInstallationFolderOnClickAsync()
     {
@@ -72,12 +89,16 @@ partial class FoldersSelector
             InstallationFolderPath = valveTS4InstallationDirectory.FullName;
             await InstallationFolderPathChanged.InvokeAsync(InstallationFolderPath);
         }
+        DownloadsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+        await DownloadsFolderPathChanged.InvokeAsync(DownloadsFolderPath);
     }
 
-    async Task UseDefaultUserDataFolderOnClickAsync()
+    async Task UseDefaultUserDataAndDownloadsFoldersOnClickAsync()
     {
         UserDataFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Electronic Arts", AppText.UserDataFolderName);
         await UserDataFolderPathChanged.InvokeAsync(UserDataFolderPath);
+        DownloadsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+        await DownloadsFolderPathChanged.InvokeAsync(DownloadsFolderPath);
         StateHasChanged();
     }
 
