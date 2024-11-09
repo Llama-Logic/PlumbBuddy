@@ -1,3 +1,6 @@
+using System.Text;
+using Windows.UI.Input.Spatial;
+
 namespace PlumbBuddy.Components.Controls;
 
 partial class ManifestEditor
@@ -27,6 +30,13 @@ partial class ManifestEditor
         compositionResetEvent.WaitAsync(cancellationToken);
 
     bool addRequiredModGuidanceOpen;
+    CancellationTokenSource? batchCancellationTokenSource;
+    bool batchContinue;
+    string batchOverlayFilename = string.Empty;
+    int batchOverlayMax = 0;
+    int batchOverlayValue = 0;
+    bool batchOverlayVisible;
+    TaskCompletionSource<IReadOnlyList<FileInfo>>? batchTaskCompletionSource;
     DirectoryInfo? commonComponentDirectory;
     readonly List<ModComponent> components = [];
     ModComponent? componentsStepSelectedComponent;
@@ -148,7 +158,10 @@ partial class ManifestEditor
     {
         modFile.Refresh();
         if (!modFile.Exists)
+        {
+            batchCancellationTokenSource?.Cancel();
             return AddFileResult.NonExistent;
+        }
         if (components.Any(component => component.File is { } file && Path.GetFullPath(file.FullName) == Path.GetFullPath(modFile.FullName)))
             return AddFileResult.AlreadyAdded;
         ImmutableArray<ModFileManifestModel> manifests = [];
@@ -163,6 +176,7 @@ partial class ManifestEditor
             }
             catch
             {
+                batchCancellationTokenSource?.Cancel();
                 await DialogService.ShowErrorDialogAsync("Package corrupt or damaged",
                     $"""
                     I was unable to read this file as a valid Maxis DataBase Packed File:
@@ -176,6 +190,8 @@ partial class ManifestEditor
                 .OrderBy(manifest => manifest.TuningName?.Length)
                 .ThenBy(manifest => manifest.TuningName)];
             if (manifests.Length is > 1)
+            {
+                batchCancellationTokenSource?.Cancel();
                 await DialogService.ShowInfoDialogAsync("Package is the result of multiple manifested packages which were merged",
                     $"""
                     Just so you're aware... this file has multiple manifests. Frankly, not the best. Don't worry, I'll tidy things up and leave it with just one when we finish here.
@@ -183,6 +199,7 @@ partial class ManifestEditor
                     From the available **Manifest Snippet Tuning Resource Names**, I selected `{manifestResourceName}`. You can change that if you want by selecting this file on the **Components** step.<br /><br />
                     <iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr">via GIPHY</a></p>
                     """).ConfigureAwait(false);
+            }
             fileObjectModel = dbpf;
         }
         else if (modFile.Extension.Equals(".ts4script", StringComparison.OrdinalIgnoreCase))
@@ -196,6 +213,7 @@ partial class ManifestEditor
             }
             catch
             {
+                batchCancellationTokenSource?.Cancel();
                 await DialogService.ShowErrorDialogAsync("Script archive corrupt or damaged",
                     $"""
                     I was unable to read this file as a valid ZIP archive:
@@ -210,6 +228,7 @@ partial class ManifestEditor
         }
         else
         {
+            batchCancellationTokenSource?.Cancel();
             await DialogService.ShowErrorDialogAsync("new extension... who dis?",
                 $"""
                 What even is this?
@@ -305,6 +324,8 @@ partial class ManifestEditor
             .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.TuningMarkup)
             .Concat([ResourceType.SimData, ResourceType.CombinedTuning])
             .ToImmutableHashSet();
+
+        var filesWithAlteredManifests = new List<FileInfo>();
 
         try
         {
@@ -412,6 +433,8 @@ partial class ManifestEditor
                 });
                 addCollectionElements(model.RequiredPacks, requiredPacks);
                 var hexHash = hash.ToHexString();
+                if (!component.SubsumedHashes.Contains(hexHash, StringComparer.OrdinalIgnoreCase))
+                    filesWithAlteredManifests.Add(component.File);
                 addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Except([hexHash], StringComparer.OrdinalIgnoreCase).Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
                 componentManifests.Add(component, model);
             }
@@ -454,7 +477,8 @@ partial class ManifestEditor
                 }
             }
 
-            compositionResetEvent.Reset();
+            if (!batchOverlayVisible)
+                compositionResetEvent.Reset();
 
             // stage 5: commit manifests
             foreach (var component in components)
@@ -508,10 +532,11 @@ partial class ManifestEditor
             await DialogService.ShowErrorDialogAsync("Something went wrong", "While I was writing your manifests, an unexpected error occurred. I've written it to my log file.");
         }
 
-        compositionResetEvent.Set();
+        if (!batchOverlayVisible)
+            compositionResetEvent.Set();
 
         await updateStatusAsync(5, "All component manifests have been updated and scaffolding has been written").ConfigureAwait(false);
-        await Task.Delay(5000).ConfigureAwait(false);
+        await Task.Delay(1000).ConfigureAwait(false);
 
         await StaticDispatcher.DispatchAsync(async () =>
         {
@@ -520,6 +545,10 @@ partial class ManifestEditor
             await Task.Delay(25);
             StateHasChanged();
         }).ConfigureAwait(false);
+
+        await Task.Delay(500).ConfigureAwait(false);
+
+        batchTaskCompletionSource?.SetResult(filesWithAlteredManifests.ToImmutableArray());
     }
 
     public void Dispose()
@@ -577,6 +606,9 @@ partial class ManifestEditor
             StateHasChanged();
         }
     }
+
+    void HandleCancelBatchProcess() =>
+        batchCancellationTokenSource?.Cancel();
 
     Task<bool> HandleCancelOnClickAsync() =>
         CancelAtUserRequestAsync();
@@ -708,7 +740,10 @@ partial class ManifestEditor
                     features = manifests.SelectMany(manifest => manifest.Features).Distinct().ToList().AsReadOnly();
                 }
                 else
-                    creators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                {
+                    batchContinue = true;
+                    creators = [.. Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                }
                 if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings) is { } scaffolding)
                 {
                     components[0].IsRequired = scaffolding.IsRequired;
@@ -796,9 +831,15 @@ partial class ManifestEditor
         if (targetIndex == 7)
         {
             if (confirmationStepMessages.Any(csm => csm.severity is Severity.Error))
+            {
+                batchCancellationTokenSource?.Cancel();
                 return true;
+            }
             if (confirmationStepMessages.Any(csm => csm.severity is Severity.Warning) && !await DialogService.ShowCautionDialogAsync("Point of No Return", "You *still* have **unresolved warnings** regarding your mod's manifest. I *can* proceed with these issues if you think I'm mistaken, but *you are responsible for ignoring these warnings if I'm not*."))
+            {
+                batchCancellationTokenSource?.Cancel();
                 return true;
+            }
             for (var i = 0; i < 6; ++i)
                 await stepper!.CompleteStep(i, false);
             _ = Task.Run(ComposeAsync);
@@ -890,6 +931,130 @@ partial class ManifestEditor
     {
         if (e.PropertyName is nameof(ModRequirement.Name))
             StateHasChanged();
+    }
+
+    async Task HandleUpdateAllManifestsInAFolderAsync()
+    {
+        if (stepper is null
+            || await FolderPicker.PickAsync() is not { } folderPickerResult
+            || !folderPickerResult.IsSuccessful)
+            return;
+        var (folderFromPicker, exception) = folderPickerResult;
+        if (exception is not null)
+        {
+            Logger.LogWarning(exception, "encountered unhandled exception while selecting a folder for batch manifest update");
+            await DialogService.ShowErrorDialogAsync("Whoops, That Didn't Work",
+                $"""
+                An error was reported back to me by the operating system:
+                `{exception.GetType().Name}: {exception.Message}`<br /><br />
+                I've written additional details to my log, in case they're relevant.
+                """);
+            return;
+        }
+        if (folderFromPicker is null)
+            return;
+        var (folderPath, _) = folderFromPicker;
+        var processingDirectory = new DirectoryInfo(folderPath);
+        if (!processingDirectory.Exists)
+            return;
+        var modFiles = processingDirectory
+            .GetFiles("*.*", SearchOption.AllDirectories)
+            .Where(mf => mf.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase) || mf.Extension.Equals(".ts4script", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var unmanifested = new List<FileInfo>();
+        var changedManifests = new List<FileInfo>();
+        var unchangedManifests = new List<FileInfo>();
+        batchOverlayMax = modFiles.Count;
+        batchOverlayValue = 0;
+        batchOverlayFilename = string.Empty;
+        batchOverlayVisible = true;
+        batchCancellationTokenSource = new();
+        StateHasChanged();
+        var token = batchCancellationTokenSource.Token;
+        compositionResetEvent.Reset();
+        try
+        {
+            while (modFiles.Count is > 0)
+            {
+                token.ThrowIfCancellationRequested();
+                var modFile = modFiles[0];
+                ++batchOverlayValue;
+                batchOverlayFilename = modFile.Name;
+                selectStepFile = modFile;
+                batchContinue = false;
+                await stepper.CompleteStep(0);
+                if (batchContinue)
+                {
+                    unmanifested.Add(modFile);
+                    await ResetAsync();
+                    modFiles.RemoveAt(0);
+                    continue;
+                }
+                for (var step = 1; step < 6; ++step)
+                {
+                    token.ThrowIfCancellationRequested();
+                    await stepper.CompleteStep(step);
+                }
+                token.ThrowIfCancellationRequested();
+                batchOverlayValue += modFiles.RemoveAll(mf => components.Any(c => Path.GetFullPath(c.File.FullName) == Path.GetFullPath(mf.FullName))) - 1;
+                var potentiallyChangedManifests = components.Select(c => c.File).ToImmutableArray();
+                batchTaskCompletionSource = new();
+                await stepper.CompleteStep(6);
+                token.ThrowIfCancellationRequested();
+                var changedManifestsForThisMod = await batchTaskCompletionSource.Task;
+                changedManifests.AddRange(changedManifestsForThisMod);
+                unchangedManifests.AddRange(potentiallyChangedManifests.Where(mf => !changedManifestsForThisMod.Any(cmf => Path.GetFullPath(cmf.FullName) == Path.GetFullPath(mf.FullName))));
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            batchCancellationTokenSource.Dispose();
+            batchCancellationTokenSource = null;
+            batchTaskCompletionSource = null;
+            batchOverlayVisible = false;
+            StateHasChanged();
+            compositionResetEvent.Set();
+        }
+        if (changedManifests.Count is > 0 || unchangedManifests.Count is > 0)
+        {
+            var commonPathLength = Path.GetFullPath(processingDirectory.FullName).Length + 1;
+            var reportElements = new List<string>();
+            if (changedManifests.Count is > 0)
+                reportElements.Add
+                (
+                    $"""
+                    The following files had manifests that *needed* to be updated:
+                    {string.Join(Environment.NewLine, changedManifests.OrderBy(mf => mf.FullName).Select(cm => $"- {cm.FullName[commonPathLength..]}"))}
+                    """
+                );
+            if (unchangedManifests.Count is > 0)
+                reportElements.Add
+                (
+                    $"""
+                    The following files had manifests that *did not need* to be updated:
+                    {string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))}
+                    """
+                );
+            if (unmanifested.Count is > 0)
+                reportElements.Add
+                (
+                    $"""
+                    The following files had no manifests and were therefore skipped:
+                    {string.Join(Environment.NewLine, unmanifested.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))}
+                    """
+                );
+            var report = string.Join($"{Environment.NewLine}{Environment.NewLine}", reportElements);
+            if (await DialogService.ShowQuestionDialogAsync("Would you like to copy this Batch Processing Report to your computer's clipboard?", report, false, true) ?? false)
+            {
+                await Clipboard.SetTextAsync(report);
+                await DialogService.ShowSuccessDialogAsync("Report Successfully Copied to Clipboard", "Paste it where you like. 😏");
+            }
+        }
+        else
+            await DialogService.ShowInfoDialogAsync("Whole Lotta Noth'n", "None of the mod files examined had manifests to potentially be updated.");
     }
 
     Task<bool> OfferToCancelAsync() =>

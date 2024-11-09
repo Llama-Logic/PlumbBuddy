@@ -71,7 +71,6 @@
 .manifest-editor-tab-container {
     height: calc(100vh - 112px);
     overflow: hidden;
-    padding: 24px;
 }
 
     .manifest-editor-tab-container .background {

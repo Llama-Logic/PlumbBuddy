@@ -16,7 +16,7 @@
     <DialogContent>
         <MudStepperExtended Color="Color.Info" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled" Vertical Class="mud-width-full mb-3">
             <ChildContent>
-                @foreach (var step in (CreatorName is { } creatorName ? SupportDiscord!.SpecificCreators[creatorName].AskForHelpSteps : IsPatchDay ? SupportDiscord!.PatchDayHelpSteps : ErrorFile is not null ? SupportDiscord!.TextFileSubmissionSteps : SupportDiscord!.AskForHelpSteps).GetLanguageOptimalValue())
+                @foreach (var step in Steps.GetLanguageOptimalValue(() => new()))
                 {
                     <MudStepExtended Icon="@(typeof(MaterialDesignIcons.Normal).GetField(step.Icon, BindingFlags.Public | BindingFlags.Static)?.GetValue(null) is string iconSvg ? iconSvg : MaterialDesignIcons.Normal.TextBox)" Title="@step.Label">
                         <MudGrid Justify="Justify.FlexStart">

@@ -46,9 +46,19 @@ div.mud-input-control.no-material-variant .mud-input > * {
     padding: 0 5px;
 }
 
+.mud-overlay {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
 .mud-paper, .mud-dialog, .mud-drawer, .mud-appbar, .mud-input-filled, .mud-alert-filled-normal, .mud-alert-filled-info, .mud-alert-filled-success, .mud-alert-filled-warning, .mud-alert-filled-error {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+}
+
+.expand-overlay-content .mud-overlay-content {
+    width: 100%;
+    height: 100%;
 }
 
 .mud-dialog {

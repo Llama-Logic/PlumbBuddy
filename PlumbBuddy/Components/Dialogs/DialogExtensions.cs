@@ -21,7 +21,7 @@ static class DialogExtensions
             var (discordName, creatorName) = await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile, isPatchDay, forCreators, forManifestHashHex);
             if (discordName is null)
                 return;
-            await ShowSupportDiscordStepsDialogAsync(dialogService, discordName, supportDiscords[discordName], errorFile, isPatchDay);
+            await ShowSupportDiscordStepsDialogAsync(dialogService, discordName, supportDiscords[discordName], errorFile, isPatchDay, creatorName);
         });
 
     public static Task<bool> ShowCautionDialogAsync(this IDialogService dialogService, string caption, string text) =>

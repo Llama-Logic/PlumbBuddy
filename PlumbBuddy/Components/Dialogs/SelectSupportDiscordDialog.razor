@@ -26,7 +26,7 @@
                                             <MudTextM3 Typo="TypoM3.Title">@supportDiscordName</MudTextM3>
                                         </MudCardHeader>
                                         <MudCardContent>
-                                            <MudMarkdown Value="@supportDiscord.Description.GetLanguageOptimalValue()" />
+                                            <MudMarkdown Value="@supportDiscord.Description.GetLanguageOptimalValue(() => string.Empty)" />
                                         </MudCardContent>
                                         <MudCardActions>
                                             <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName, creatorName))">Pick this Discord</MudButton>

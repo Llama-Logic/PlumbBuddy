@@ -5,7 +5,7 @@ static partial class Extensions
     [GeneratedRegex(@"[^\da-f]", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetNonHexStringCharacterPattern();
 
-    public static TValue GetLanguageOptimalValue<TValue>(this IReadOnlyDictionary<string, TValue> dictionary)
+    public static TValue GetLanguageOptimalValue<TValue>(this IReadOnlyDictionary<string, TValue> dictionary, Func<TValue> createEmptyValue)
     {
         var userLocaleName = CultureInfo.CurrentUICulture.Name;
         if (dictionary.TryGetValue(userLocaleName, out var regionOrCountryMatch))
@@ -15,7 +15,9 @@ static partial class Extensions
             return regionedCountryMatch;
         if (dictionary.TryGetValue(userLocaleName[0..userLocaleName.IndexOf('-', StringComparison.Ordinal)], out var languageMatch))
             return languageMatch;
-        return dictionary[""];
+        if (dictionary.TryGetValue(string.Empty, out var invariant))
+            return invariant;
+        return createEmptyValue();
     }
 
     public static IEnumerable<byte> ToByteSequence(this string hex)

@@ -14,6 +14,19 @@ partial class SupportDiscordStepsDialog
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
+    Dictionary<string, Collection<SupportDiscordStep>> Steps =>
+        CreatorName is { } creatorName
+        && SupportDiscord!.SpecificCreators.TryGetValue(creatorName, out var specificCreator)
+        && specificCreator.AskForHelpSteps.Count is > 0
+        ? specificCreator.AskForHelpSteps
+        : IsPatchDay
+        && SupportDiscord!.PatchDayHelpSteps.Count is > 0
+        ? SupportDiscord!.PatchDayHelpSteps
+        : ErrorFile is not null
+        && SupportDiscord!.TextFileSubmissionSteps.Count is > 0
+        ? SupportDiscord!.TextFileSubmissionSteps
+        : SupportDiscord!.AskForHelpSteps;
+
     [Parameter]
     public SupportDiscord? SupportDiscord { get; set; }
 
@@ -25,7 +38,7 @@ partial class SupportDiscordStepsDialog
 
     Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
-        if (targetIndex == (IsPatchDay ? SupportDiscord!.PatchDayHelpSteps : ErrorFile is not null ? SupportDiscord!.TextFileSubmissionSteps : SupportDiscord!.AskForHelpSteps).GetLanguageOptimalValue().Count)
+        if (targetIndex == Steps.GetLanguageOptimalValue(() => new()).Count)
             MudDialog?.Close();
         return Task.FromResult(false);
     }
