@@ -12,12 +12,16 @@ amethyst-lilac:
     Background: '#c2a0fbff'
     TextPrimary: '#2a1f4eff'
     TextSecondary: '#584a86ff'
+    DrawerBackground: '#b797f58b'
+    AppbarBackground: '#a487dfaa'
   palette_dark:
     Background: '#322d62ff'
     Surface: '#342d6ba6'
     Primary: '#8c81eeff'
     TextPrimary: '#b9b3f2ff'
     Tertiary: '#178c42ff'
+    DrawerBackground: '#352c894f'
+    AppbarBackground: '#352c894f'
   backgrounded_tabs:
     mod-health:
       dark: mod-health.png
