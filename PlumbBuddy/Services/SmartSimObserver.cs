@@ -968,16 +968,7 @@ public partial class SmartSimObserver :
                 if (modHealthStatusSummary != lastModHealthStatusSummary)
                 {
                     if (!appLifecycleManager.IsVisible)
-                    {
-                        try
-                        {
-                            await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            // don't let mean Auntie Amethyst upset you, bud -- just move on
-                        }
-                    }
+                        await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
                     lastModHealthStatusSummary = modHealthStatusSummary;
                 }
             }

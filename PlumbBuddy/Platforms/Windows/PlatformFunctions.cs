@@ -96,8 +96,8 @@ partial class PlatformFunctions :
             <toast duration="long">
                 <visual>
                     <binding template="ToastGeneric">
-                        <text>{caption}</text>
-                        <text>{text}</text>
+                        <text>{SecurityElement.Escape(caption)}</text>
+                        <text>{SecurityElement.Escape(text)}</text>
                     </binding>
                 </visual>
             </toast>
