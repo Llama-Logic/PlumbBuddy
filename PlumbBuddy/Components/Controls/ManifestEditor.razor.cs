@@ -27,6 +27,7 @@ partial class ManifestEditor
         compositionResetEvent.WaitAsync(cancellationToken);
 
     bool addRequiredModGuidanceOpen;
+    [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed")]
     CancellationTokenSource? batchCancellationTokenSource;
     bool batchContinue;
     string batchOverlayFilename = string.Empty;
@@ -1153,7 +1154,7 @@ partial class ManifestEditor
                 Severity.Normal,
                 (string?)MaterialDesignIcons.Normal.AccountCash,
                 $"""
-                Your mod requires packs which some Settingss may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
+                Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
                 If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).
                 """
             ));
