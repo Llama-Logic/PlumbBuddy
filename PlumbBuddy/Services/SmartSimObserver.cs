@@ -33,12 +33,13 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
+        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(electronicArtsApp);
@@ -49,6 +50,7 @@ public partial class SmartSimObserver :
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
+        this.appLifecycleManager = appLifecycleManager;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.electronicArtsApp = electronicArtsApp;
@@ -75,6 +77,7 @@ public partial class SmartSimObserver :
     ~SmartSimObserver() =>
         Dispose(false);
 
+    readonly IAppLifecycleManager appLifecycleManager;
     readonly IBlazorFramework blazorFramework;
     ImmutableArray<FileSystemInfo> cacheComponents;
     readonly IElectronicArtsApp electronicArtsApp;
@@ -956,7 +959,7 @@ public partial class SmartSimObserver :
                     }
                 })).ConfigureAwait(false);
             }
-            ScanIssues = [.. scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+            ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
             var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
             if (attentionWorthyScanIssues.Length is > 0)
             {
@@ -964,7 +967,17 @@ public partial class SmartSimObserver :
                 var modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
                 if (modHealthStatusSummary != lastModHealthStatusSummary)
                 {
-                    await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
+                    if (!appLifecycleManager.IsVisible)
+                    {
+                        try
+                        {
+                            await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            // don't let mean Auntie Amethyst upset you, bud -- just move on
+                        }
+                    }
                     lastModHealthStatusSummary = modHealthStatusSummary;
                 }
             }

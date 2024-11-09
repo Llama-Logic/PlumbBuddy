@@ -1,9 +1,7 @@
 using Foundation;
 using UIKit;
 using Microsoft.Maui.Platform;
-using PlumbBuddy.Services;
 using System;
-using System.Threading.Tasks;
 
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
@@ -11,6 +9,9 @@ public class AppLifecycleManager :
     IAppLifecycleManager
 {
     public bool HideMainWindowAtLaunch { get; } = false;
+
+    public bool IsVisible =>
+        true;
 
     public bool PreventCasualClosing { get; set; }
 

@@ -8,6 +8,11 @@ public interface IAppLifecycleManager
     bool HideMainWindowAtLaunch { get; }
 
     /// <summary>
+    /// Gets whether the app is visible in the Taskbar or Dock
+    /// </summary>
+    bool IsVisible { get; }
+
+    /// <summary>
     /// Gets/sets whether the app should prevent casual closing (default is <see langword="true"/>)
     /// </summary>
     bool PreventCasualClosing { get; set; }

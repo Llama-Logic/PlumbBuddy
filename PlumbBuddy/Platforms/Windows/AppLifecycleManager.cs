@@ -33,6 +33,10 @@ class AppLifecycleManager :
 
     public bool HideMainWindowAtLaunch { get; }
 
+    public bool IsVisible =>
+        appWindow is { } nonNullAppWindow
+        && nonNullAppWindow.IsVisible;
+
     public bool PreventCasualClosing
     {
         get => preventCasualClosing;
