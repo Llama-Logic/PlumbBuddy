@@ -1005,12 +1005,14 @@ partial class ManifestEditor
                 await stepper.CompleteStep(6);
                 token.ThrowIfCancellationRequested();
                 var changedManifestsForThisMod = await batchTaskCompletionSource.Task;
+                StateHasChanged();
                 changedManifests.AddRange(changedManifestsForThisMod);
                 unchangedManifests.AddRange(potentiallyChangedManifests.Where(mf => !changedManifestsForThisMod.Any(cmf => Path.GetFullPath(cmf.FullName) == Path.GetFullPath(mf.FullName))));
             }
         }
         catch (OperationCanceledException)
         {
+            StateHasChanged();
         }
         finally
         {
