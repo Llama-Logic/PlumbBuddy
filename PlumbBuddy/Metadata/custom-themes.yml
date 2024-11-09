@@ -14,7 +14,7 @@ amethyst-lilac:
     TextSecondary: '#584a86ff'
   palette_dark:
     Background: '#322d62ff'
-    Surface: '#342d6b5a'
+    Surface: '#342d6ba6'
     Primary: '#8c81eeff'
     TextPrimary: '#b9b3f2ff'
     Tertiary: '#178c42ff'

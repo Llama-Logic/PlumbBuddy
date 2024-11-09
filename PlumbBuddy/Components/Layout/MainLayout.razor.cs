@@ -16,10 +16,10 @@ public partial class MainLayout
             },
             PaletteDark = new PaletteDark()
             {
-                AppbarBackground = "rgba(39,39,47,.35)",
-                DrawerBackground = "rgba(39,39,47,.35)",
+                AppbarBackground = "rgba(39,39,47,.65)",
+                DrawerBackground = "rgba(39,39,47,.65)",
                 Primary = "#00a2ffff",
-                Surface = "rgba(55,55,64,.5)",
+                Surface = "rgba(55,55,64,.65)",
                 Tertiary = "#74c044ff",
                 Warning = "#d98806ff"
             }
