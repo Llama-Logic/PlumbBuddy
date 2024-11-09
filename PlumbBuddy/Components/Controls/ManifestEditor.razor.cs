@@ -779,14 +779,19 @@ partial class ManifestEditor
                         name = scaffolding.ModName.Trim();
                 }
                 else if (selectStepFileAddResult is AddFileResult.SucceededManifested)
-                    await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
-                        $"""
-                        There are only a few reasons this might happen. In any case, you are seen.
-                        1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
-                        2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
-                        3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
-                        <iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm">via GIPHY</a></p>
-                        """);
+                {
+                    if (batchOverlayVisible)
+                        batchContinue = true;
+                    else
+                        await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
+                            $"""
+                            There are only a few reasons this might happen. In any case, you are seen.
+                            1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
+                            2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
+                            3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
+                            <iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm">via GIPHY</a></p>
+                            """);
+                }
                 UpdateComponentsStructure();
             }
             isLoading = false;
@@ -961,7 +966,7 @@ partial class ManifestEditor
             .GetFiles("*.*", SearchOption.AllDirectories)
             .Where(mf => mf.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase) || mf.Extension.Equals(".ts4script", StringComparison.OrdinalIgnoreCase))
             .ToList();
-        var unmanifested = new List<FileInfo>();
+        var unscaffolded = new List<FileInfo>();
         var changedManifests = new List<FileInfo>();
         var unchangedManifests = new List<FileInfo>();
         batchOverlayMax = modFiles.Count;
@@ -985,7 +990,7 @@ partial class ManifestEditor
                 await stepper.CompleteStep(0);
                 if (batchContinue)
                 {
-                    unmanifested.Add(modFile);
+                    unscaffolded.Add(modFile);
                     await ResetAsync();
                     modFiles.RemoveAt(0);
                     continue;
@@ -1038,12 +1043,12 @@ partial class ManifestEditor
                     {string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))}
                     """
                 );
-            if (unmanifested.Count is > 0)
+            if (unscaffolded.Count is > 0)
                 reportElements.Add
                 (
                     $"""
-                    The following files had no manifests and were therefore skipped:
-                    {string.Join(Environment.NewLine, unmanifested.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))}
+                    The following files had no scaffolding and were therefore skipped:
+                    {string.Join(Environment.NewLine, unscaffolded.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))}
                     """
                 );
             var report = string.Join($"{Environment.NewLine}{Environment.NewLine}", reportElements);
