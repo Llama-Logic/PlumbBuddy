@@ -1,6 +1,3 @@
-using System.Text;
-using Windows.UI.Input.Spatial;
-
 namespace PlumbBuddy.Components.Controls;
 
 partial class ManifestEditor
