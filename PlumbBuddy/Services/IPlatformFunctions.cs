@@ -9,8 +9,8 @@ public interface IPlatformFunctions
     IReadOnlyList<Regex> ForeignFileNamePatterns { get; }
 
     Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory);
-    Task SendLocalNotificationAsync(string caption, string text);
-    Task SetBadgeNumberAsync(int number);
+    Task<bool> SendLocalNotificationAsync(string caption, string text);
+    Task<bool> SetBadgeNumberAsync(int number);
     void ViewDirectory(DirectoryInfo directoryInfo);
     void ViewFile(FileInfo fileInfo);
 }

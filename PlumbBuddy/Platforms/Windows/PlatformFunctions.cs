@@ -1,3 +1,4 @@
+using MudBlazor;
 using Windows.UI.Notifications;
 
 namespace PlumbBuddy.Platforms.Windows;
@@ -34,16 +35,19 @@ partial class PlatformFunctions :
 
     #endregion
 
-    public PlatformFunctions(ILifetimeScope lifetimeScope)
+    public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
+        ArgumentNullException.ThrowIfNull(logger);
         this.lifetimeScope = lifetimeScope;
+        this.logger = logger;
         badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
         toastNotifier = ToastNotificationManager.CreateToastNotifier();
     }
 
     readonly BadgeUpdater badgeUpdater;
     readonly ILifetimeScope lifetimeScope;
+    readonly ILogger<PlatformFunctions> logger;
     readonly ToastNotifier toastNotifier;
 
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
@@ -87,12 +91,14 @@ partial class PlatformFunctions :
     void HandleToastActivated(ToastNotification toastNotification, object args) =>
         lifetimeScope.Resolve<IAppLifecycleManager>().ShowWindow();
 
-    public Task SendLocalNotificationAsync(string caption, string text)
+    public Task<bool> SendLocalNotificationAsync(string caption, string text)
     {
-        var toastXml = new global::Windows.Data.Xml.Dom.XmlDocument();
-        toastXml.LoadXml
-        (
-            $"""
+        try
+        {
+            var toastXml = new global::Windows.Data.Xml.Dom.XmlDocument();
+            toastXml.LoadXml
+            (
+                $"""
             <toast duration="long">
                 <visual>
                     <binding template="ToastGeneric">
@@ -102,25 +108,39 @@ partial class PlatformFunctions :
                 </visual>
             </toast>
             """
-        );
-        var toast = new ToastNotification(toastXml);
-        toast.Activated += HandleToastActivated;
-        toastNotifier.Show(toast);
-        return Task.CompletedTask;
+            );
+            var toast = new ToastNotification(toastXml);
+            toast.Activated += HandleToastActivated;
+            toastNotifier.Show(toast);
+            return Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "failed to send a local notification with caption \"{Caption}\" and text \"{Text}\"", caption, text);
+            return Task.FromResult(false);
+        }
     }
 
-    public Task SetBadgeNumberAsync(int number)
+    public Task<bool> SetBadgeNumberAsync(int number)
     {
-        if (number <= 0)
+        try
         {
-            badgeUpdater.Clear();
-            return Task.CompletedTask;
+            if (number <= 0)
+            {
+                badgeUpdater.Clear();
+                return Task.FromResult(true);
+            }
+            var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+            var badgeElement = (global::Windows.Data.Xml.Dom.XmlElement)badgeXml.SelectSingleNode("/badge");
+            badgeElement.SetAttribute("value", number.ToString());
+            badgeUpdater.Update(new BadgeNotification(badgeXml));
+            return Task.FromResult(true);
         }
-        var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
-        var badgeElement = (global::Windows.Data.Xml.Dom.XmlElement)badgeXml.SelectSingleNode("/badge");
-        badgeElement.SetAttribute("value", number.ToString());
-        badgeUpdater.Update(new BadgeNotification(badgeXml));
-        return Task.CompletedTask;
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "failed to set Task Bar badge number to {BadgeNumber}", number);
+            return Task.FromResult(false);
+        }
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>

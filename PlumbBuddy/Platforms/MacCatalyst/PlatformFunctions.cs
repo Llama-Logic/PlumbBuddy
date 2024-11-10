@@ -108,10 +108,10 @@ partial class PlatformFunctions :
             userNotificationCenter.Delegate = new NotificationCenterDelegate();
     }
 
-    public async Task SendLocalNotificationAsync(string caption, string text)
+    public async Task<bool> SendLocalNotificationAsync(string caption, string text)
     {
         if (!userNotificationsAllowed)
-            return;
+            return false;
         using var content = new UNMutableNotificationContent
         {
             Title = caption,
@@ -120,12 +120,13 @@ partial class PlatformFunctions :
         };
         using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
         await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
+        return true;
     }
 
-    public async Task SetBadgeNumberAsync(int number)
+    public async Task<bool> SetBadgeNumberAsync(int number)
     {
         if (!userNotificationsAllowed)
-            return;
+            return false;
         using var content = new UNMutableNotificationContent
         {
             Badge = number,
@@ -133,6 +134,7 @@ partial class PlatformFunctions :
         };
         using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(1, false);
         await UNUserNotificationCenter.Current.AddNotificationRequestAsync(UNNotificationRequest.FromIdentifier(Guid.NewGuid().ToString(), content, trigger)).ConfigureAwait(false);
+        return true;
     }
 
     public void ViewDirectory(DirectoryInfo directoryInfo) =>
