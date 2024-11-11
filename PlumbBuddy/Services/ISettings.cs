@@ -29,6 +29,7 @@ public interface ISettings :
     bool ScanForScriptModsDisabled { get; set; }
     bool ScanForShowModsListAtStartupEnabled { get; set; }
     bool ShowThemeManager { get; set; }
+    Version? SkipUpdateVersion { get; set; }
     string? Theme { get; set; }
     UserType Type { get; set; }
     bool UsePublicPackCatalog { get; set; }

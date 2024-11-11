@@ -1,7 +1,6 @@
 namespace PlumbBuddy.Services;
 
-public interface IUpdateManager :
-    IDisposable
+public interface IUpdateManager
 {
     Version CurrentVersion { get; }
 

@@ -333,6 +333,21 @@ class Settings :
         }
     }
 
+    public Version? SkipUpdateVersion
+    {
+        get => preferences.Get(nameof(SkipUpdateVersion), (string?)null) is string versionStr
+            && Version.TryParse(versionStr, out var version)
+            ? version
+            : null;
+        set
+        {
+            if (SkipUpdateVersion == value)
+                return;
+            preferences.Set(nameof(SkipUpdateVersion), value?.ToString());
+            OnPropertyChanged();
+        }
+    }
+
     public string? Theme
     {
         get => preferences.Get<string?>(nameof(Theme), null);

@@ -1,3 +1,4 @@
+using MudBlazor;
 using Octokit;
 
 namespace PlumbBuddy.Services;
@@ -17,8 +18,6 @@ public sealed class UpdateManager :
         this.settings = settings;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
-        automaticLock = new();
-        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         var mauiVersion = AppInfo.Version;
         CurrentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
         if (CurrentVersion != settings.VersionAtLastStartup)
@@ -29,13 +28,9 @@ public sealed class UpdateManager :
                 logger.LogInformation("This is the first time this installation is starting.");
         }
         settings.VersionAtLastStartup = CurrentVersion;
-        ScheduleAutomaticUpdateCheck();
+        _ = Task.Run(PeriodicCheckForUpdateAsync);
     }
 
-    ~UpdateManager() =>
-        Dispose(false);
-
-    readonly AsyncLock automaticLock;
     readonly IBlazorFramework blazorFramework;
     readonly ILogger<UpdateManager> logger;
     readonly IPlatformFunctions platformFunctions;
@@ -43,40 +38,6 @@ public sealed class UpdateManager :
     readonly ISuperSnacks superSnacks;
 
     public Version CurrentVersion { get; }
-
-    async Task AutomaticUpdateCheckAsync()
-    {
-        var heldAutomaticLock = await automaticLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
-        if (heldAutomaticLock is null)
-            return;
-        try
-        {
-            if (settings.LastCheckForUpdate is { } lastCheckForUpdate)
-            {
-                var delay = lastCheckForUpdate + TimeSpan.FromDays(1) - DateTimeOffset.Now;
-                if (delay > TimeSpan.Zero)
-                    await Task.Delay(delay).ConfigureAwait(false);
-                if (settings.LastCheckForUpdate is { } lastCheckForUpdateRevisited && lastCheckForUpdateRevisited != lastCheckForUpdate || !settings.AutomaticallyCheckForUpdates)
-                    return;
-            }
-            var (version, releaseNotes, downloadUrl) = await CheckForUpdateAsync().ConfigureAwait(false);
-            if (version is null)
-                return;
-            await platformFunctions.SendLocalNotificationAsync("An Update is Available", "Oh my, there's a better version of me than me now! Click here to see more.").ConfigureAwait(false);
-            superSnacks.OfferRefreshments(new MarkupString($"PlumbBuddy {version} is now available to download."), Severity.Info, options =>
-            {
-                options.Icon = MaterialDesignIcons.Normal.Update;
-                options.Onclick = async _ => await PresentUpdateAsync(version, releaseNotes, downloadUrl);
-                options.RequireInteraction = true;
-                options.ShowCloseIcon = true;
-            });
-        }
-        finally
-        {
-            heldAutomaticLock.Dispose();
-            ScheduleAutomaticUpdateCheck();
-        }
-    }
 
     public async Task<(Version? version, string? releaseNotes, Uri? downloadUrl)> CheckForUpdateAsync()
     {
@@ -98,7 +59,7 @@ public sealed class UpdateManager :
             if (latestMostStableRelease is null
                 || latestMostStableRelease.TagName[(latestMostStableRelease.TagName.IndexOf('/', StringComparison.Ordinal) + 1)..] is not string versionStr
                 || !Version.TryParse(versionStr, out var version)
-                || version <= CurrentVersion)
+                || Comparer<Version>.Default.Compare(version, CurrentVersion) <= 0)
                 return (null, null, null);
             return
             (
@@ -126,22 +87,42 @@ public sealed class UpdateManager :
         }
     }
 
-    public void Dispose()
+    async Task PeriodicCheckForUpdateAsync()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    void Dispose(bool disposing)
-    {
-        if (disposing)
-            settings.PropertyChanged -= HandleSettingsPropertyChanged;
-    }
-
-    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ISettings.AutomaticallyCheckForUpdates))
-            ScheduleAutomaticUpdateCheck();
+        using var periodicTimer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        while (true)
+        {
+            try
+            {
+                if (!settings.AutomaticallyCheckForUpdates || settings.LastCheckForUpdate is { } lastCheckForUpdate && lastCheckForUpdate + TimeSpan.FromDays(1) > DateTimeOffset.Now)
+                    continue;
+                var (version, releaseNotes, downloadUrl) = await CheckForUpdateAsync().ConfigureAwait(false);
+                if (version is null)
+                    continue;
+                if (settings.SkipUpdateVersion is { } skipUpdateVersion)
+                {
+                    if (Comparer<Version>.Default.Compare(version, skipUpdateVersion) <= 0)
+                        continue;
+                    settings.SkipUpdateVersion = null;
+                }
+                await platformFunctions.SendLocalNotificationAsync("An Update is Available", "Oh my, there's a better version of me than me now! Click here to see more.").ConfigureAwait(false);
+                superSnacks.OfferRefreshments(new MarkupString($"PlumbBuddy {version} is now available to download."), Severity.Info, options =>
+                {
+                    options.Icon = MaterialDesignIcons.Normal.Update;
+                    options.Onclick = async _ => await PresentUpdateAsync(version, releaseNotes, downloadUrl);
+                    options.RequireInteraction = true;
+                    options.ShowCloseIcon = true;
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "encountered unhandled exception while periodically checking for updates");
+            }
+            finally
+            {
+                await periodicTimer.WaitForNextTickAsync().ConfigureAwait(false);
+            }
+        }
     }
 
     public async Task PresentUpdateAsync(Version version, string? releaseNotes, Uri? downloadUrl)
@@ -155,7 +136,10 @@ public sealed class UpdateManager :
                     $"""
                         I was unable to get the release notes for this version.
                         """) is { } saidYes && saidYes)
+                {
                     await Browser.OpenAsync("https://plumbbuddy.app/download", BrowserLaunchMode.External);
+                    return;
+                }
             }
             else
             {
@@ -163,7 +147,10 @@ public sealed class UpdateManager :
                     $"""
                         I was unable to get the release notes for this version.
                         """) is { } saidYes && saidYes)
+                {
                     await Browser.OpenAsync(downloadUrl.ToString(), BrowserLaunchMode.External);
+                    return;
+                }
             }
         }
         else
@@ -176,7 +163,10 @@ public sealed class UpdateManager :
 
                         {releaseNotes}
                         """, big: true) is { } saidYes && saidYes)
+                {
                     await Browser.OpenAsync("https://plumbbuddy.app/download", BrowserLaunchMode.External);
+                    return;
+                }
             }
             else
             {
@@ -186,14 +176,16 @@ public sealed class UpdateManager :
 
                         {releaseNotes}
                         """, big: true) is { } saidYes && saidYes)
+                {
                     await Browser.OpenAsync(downloadUrl.ToString(), BrowserLaunchMode.External);
+                    return;
+                }
             }
         }
-    }
-
-    void ScheduleAutomaticUpdateCheck()
-    {
-        if (settings.AutomaticallyCheckForUpdates)
-            _ = Task.Run(AutomaticUpdateCheckAsync);
+        if (await dialogService.ShowQuestionDialogAsync($"Planning to skip {version}?", "If you don't want me to remind you about this update in particular, I can make a note of that and not ask again until there's an even newer version. Would you like me to do that?") ?? false)
+        {
+            settings.SkipUpdateVersion = version;
+            superSnacks.OfferRefreshments(new MarkupString($"There will be no further periodic notifications regarding {version}. You can still use the <strong>Check for Update</strong> function in the main menu if you change your mind."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.DownloadOff);
+        }
     }
 }
