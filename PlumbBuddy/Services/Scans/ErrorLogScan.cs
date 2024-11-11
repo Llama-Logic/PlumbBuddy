@@ -41,12 +41,12 @@ public sealed class ErrorLogScan :
             }
             if (issueData is string userDataRelativePath)
             {
+                var dialogService = blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>();
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, userDataRelativePath));
                 if (file.Exists)
                 {
                     if (command is "delete")
                     {
-                        var dialogService = blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>();
                         var foundErrorLogs = smartSimObserver.ScanIssues
                             .Where(si => si.Origin is IErrorLogScan && si.Data is string)
                             .Select(si => (string)si.Data!)
@@ -78,7 +78,7 @@ public sealed class ErrorLogScan :
                     }
                     if (command is "discord")
                     {
-                        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowAskForHelpDialogAsync(logger, publicCatalogs, file).ConfigureAwait(false);
+                        await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, file).ConfigureAwait(false);
                         return;
                     }
                     if (command is "show")
@@ -86,6 +86,18 @@ public sealed class ErrorLogScan :
                         platformFunctions.ViewFile(file);
                         return;
                     }
+                }
+                else
+                {
+                    await dialogService.ShowInfoDialogAsync("Whoops, that file has run off...",
+                        """
+                        I'm sorry, but it's just not there any more. I'm gonna go ahead and refresh this screen for you.
+                        """);
+                    using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                    await pbDbContext.FilesOfInterest
+                        .Where(foi => foi.Path == userDataRelativePath)
+                        .ExecuteDeleteAsync().ConfigureAwait(false);
+                    smartSimObserver.Scan();
                 }
             }
         }

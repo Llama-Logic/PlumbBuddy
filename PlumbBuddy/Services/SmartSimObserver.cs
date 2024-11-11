@@ -927,7 +927,7 @@ public partial class SmartSimObserver :
         InstalledPackCodes = [.. packsDirectory.GetDirectories().Select(directoryInfo => directoryInfo.Name)];
     }
 
-    void Scan() =>
+    public void Scan() =>
         Task.Run(ScanAsync);
 
     async Task ScanAsync()
