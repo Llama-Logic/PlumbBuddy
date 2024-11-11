@@ -23,6 +23,13 @@
                             <MudItem>
                                 <MudMarkdown Value="@step.Content" />
                             </MudItem>
+                            @if (step.ShowAppLogFileHighlighter)
+                            {
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowAppLogFileOnClickAsync">Show me your most recent log file</MudButton>
+                                </MudItem>
+                            }
                             @if (step.ShowGameVersionFileHighlighter)
                             {
                                 <MudFlexBreak />

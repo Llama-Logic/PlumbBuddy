@@ -135,7 +135,7 @@
                     }
                     </TooltipContent>
             </MudTooltip>
-            <MudTooltip Arrow="true" Color="Color.Info">
+            <MudTooltip Arrow="true">
                 <ChildContent>
                     <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" OnClick="HandleAskForHelpOnClickAsync" />
                 </ChildContent>
@@ -146,7 +146,13 @@
                     </MudStack>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        Click here to start the process of requesting help with your game from a Support Discord.
+                        Click here to start the process of requesting help with your game from a Community Support venue.
+                    </MudTextM3>
+                    <MudDivider />
+                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                        If you're looking for help with a particular mod, see if it's listed in the
+                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Book" Label="true" Variant="Variant.Outlined" Size="Size.Small">Catalog</MudChip>
+                        first. If it is, use the <MudChip T="string" Icon="@MaterialDesignIcons.Normal.FaceAgent" Label="true" Color="Color.Primary" Size="Size.Small">ASK FOR HELP</MudChip> button there instead.
                     </MudTextM3>
                 </TooltipContent>
             </MudTooltip>

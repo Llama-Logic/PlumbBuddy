@@ -16,4 +16,7 @@ public class SupportDiscordStep
 
     [YamlMember(Order = 5, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
     public bool ShowTextFileHighlighter { get; set; }
+
+    [YamlMember(Order = 6, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+    public bool ShowAppLogFileHighlighter { get; set; }
 }

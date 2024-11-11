@@ -178,7 +178,7 @@ static class DialogExtensions
     public static Task<(string? discordName, string? creatorName)> ShowSelectSupportDiscordDialogAsync(this IDialogService dialogService, IReadOnlyDictionary<string, SupportDiscord> supportDiscords, FileInfo? errorFile = null, bool isPatchDay = false, IReadOnlyList<string>? forCreators = null, string? forManifestHashHex = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<SelectSupportDiscordDialog>("Select a Support Discord", new DialogParameters<SelectSupportDiscordDialog>()
+            var dialog = await dialogService.ShowAsync<SelectSupportDiscordDialog>("Select a Support Venue", new DialogParameters<SelectSupportDiscordDialog>()
             {
                 { x => x.ErrorFile, errorFile },
                 { x => x.ForCreators, forCreators },

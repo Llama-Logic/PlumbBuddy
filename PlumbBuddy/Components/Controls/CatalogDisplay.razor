@@ -74,7 +74,7 @@
                     }
                     <MudItem>
                         <MudStack Row>
-                            <MudTooltip Arrow Text="@($"Click here to ask specifically for help with {selectedModKey.Name} on a Discord Server.")" Color="Color.Info">
+                            <MudTooltip Arrow Text="@($"Click here to ask specifically for help with {selectedModKey.Name} in a Community Support venue.")" Color="Color.Info">
                                 <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))" StartIcon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info">Ask for Help</MudButton>
                             </MudTooltip>
                             @foreach (var requiredPackCode in requiredPackCodes)

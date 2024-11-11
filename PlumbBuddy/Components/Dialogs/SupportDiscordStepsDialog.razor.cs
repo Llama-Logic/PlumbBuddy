@@ -43,6 +43,27 @@ partial class SupportDiscordStepsDialog
         return Task.FromResult(false);
     }
 
+    async Task HandleShowAppLogFileOnClickAsync()
+    {
+        var appDataDirectory = new DirectoryInfo(FileSystem.AppDataDirectory);
+        if (!appDataDirectory.Exists)
+        {
+            await DialogService.ShowErrorDialogAsync("I Couldn't Find My Own App Data Directory", "Holy cow, how are you even getting to this error message?");
+            return;
+        }
+        var mostRecentLogFile = appDataDirectory
+            .GetFiles()
+            .Where(f => (f.Name.StartsWith("Log", StringComparison.OrdinalIgnoreCase) || f.Name.StartsWith("DebugLog", StringComparison.OrdinalIgnoreCase)) && f.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(f => f.LastWriteTime)
+            .FirstOrDefault();
+        if (mostRecentLogFile is null || !mostRecentLogFile.Exists)
+        {
+            await DialogService.ShowErrorDialogAsync("I Couldn't Find My Most Recent Log File", "That uhh... shouldn't be a thing. So sorry.");
+            return;
+        }
+        PlatformFunctions.ViewFile(mostRecentLogFile);
+    }
+
     async Task HandleShowGameVersionFileOnClickAsync()
     {
         var gameVersionFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "GameVersion.txt"));

@@ -4,6 +4,7 @@ partial class SelectSupportDiscordDialog
 {
     string description = string.Empty;
     IReadOnlyList<(string name, string creatorName, SupportDiscord discord)>? relevantSupportDiscords;
+    bool showAppSupport;
 
     [Parameter]
     public FileInfo? ErrorFile { get; set; }
@@ -26,6 +27,9 @@ partial class SelectSupportDiscordDialog
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());
 
+    void GetHelpWithMeOnClickHandler() =>
+        MudDialog?.Close(DialogResult.Ok((discord: "PlumbBuddy", creator: string.Empty)));
+
     [SuppressMessage("Security", "CA5394: Do not use insecure randomness", Justification = "I'm sure cryptographic strength is really important for shuffling the Discords. 🤦")]
     protected override void OnParametersSet()
     {
@@ -34,9 +38,9 @@ partial class SelectSupportDiscordDialog
             return;
         var discordsToUse = supportDiscords
 #if MACCATALYST
-            .Where(kv => !kv.Value.NoMacSupport);
+            .Where(kv => kv.Key is not "PlumbBuddy" && !kv.Value.NoMacSupport);
 #elif WINDOWS
-            .Where(kv => !kv.Value.NoWindowsSupport);
+            .Where(kv => kv.Key is not "PlumbBuddy" && !kv.Value.NoWindowsSupport);
 #else
             .Where(kv => true);
 #endif
@@ -44,7 +48,7 @@ partial class SelectSupportDiscordDialog
         {
             var forCreatorsHashSet = forCreators.ToImmutableHashSet();
             var forManifestHash = forManifestHashHex.ToByteSequence().ToImmutableArray();
-            description = "Here are the Community Support Discord servers which may offer support for this mod.";
+            description = "Here are the Community Support venues which may offer support for this mod.";
             var specificDiscordsToUseList = discordsToUse
                 .Where(kv => kv.Value.SpecificCreators.Any(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))))
                 .Select(kv => (name: kv.Key, creator: kv.Value.SpecificCreators.First(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))).Key, discord: kv.Value))
@@ -55,11 +59,14 @@ partial class SelectSupportDiscordDialog
                 .Select(kv => (name: kv.Key, creator: string.Empty, discord: kv.Value))
                 .ToList();
             Random.Shared.Shuffle(CollectionsMarshal.AsSpan(discordsToUseList));
-            relevantSupportDiscords = specificDiscordsToUseList.Concat(discordsToUseList).DistinctBy(discord => discord.name).ToImmutableArray();
+            relevantSupportDiscords = specificDiscordsToUseList
+                .Concat(discordsToUseList)
+                .DistinctBy(discord => discord.name)
+                .ToImmutableArray();
         }
         else if (ErrorFile is { } errorFile)
         {
-            description = $"Here are the Community Support Discord servers I could find to help us with: `{errorFile.Name}`";
+            description = $"Here are the Community Support methods I could find to help us with: `{errorFile.Name}`";
             var discordsToUseWeightedList = discordsToUse
                 .Where(kv => kv.Value.TextFileSubmissionSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, discord: kv.Value, recommendationWeight: kv.Value.SupportedTextFilePatterns.Sum(textFilePattern => Regex.IsMatch(errorFile.Name, textFilePattern.Pattern, textFilePattern.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None) ? 1D + textFilePattern.AdditionalRecommendationWeight : 0D)))
@@ -73,7 +80,7 @@ partial class SelectSupportDiscordDialog
         }
         else if (IsPatchDay)
         {
-            description = "Here are the Community Support Discord servers which announce mod updates.";
+            description = "Here are the Community Support methods which announce mod updates.";
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.PatchDayHelpSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))
@@ -83,7 +90,8 @@ partial class SelectSupportDiscordDialog
         }
         else
         {
-            description = "Here are the Community Support Discord servers prepared to offer general support. If you're looking for help with *me* instead of with the game or with a mod, [click here](https://plumbbuddy.app/redirect?to=PlumbBuddyDiscord).";
+            showAppSupport = true;
+            description = "Here are the Community Support methods prepared to offer general support.";
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.AskForHelpSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))
