@@ -19,4 +19,10 @@ public class SupportDiscordStep
 
     [YamlMember(Order = 6, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
     public bool ShowAppLogFileHighlighter { get; set; }
+
+    [YamlMember(Order = 7, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+    public bool ShowClearCache { get; set; }
+
+    [YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+    public bool ShowStartOver { get; set; }
 }

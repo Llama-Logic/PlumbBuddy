@@ -5,23 +5,28 @@ static class DialogExtensions
     public static Task ShowAskForHelpDialogAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, FileInfo? errorFile = null, bool isPatchDay = false, IReadOnlyList<string>? forCreators = null, string? forManifestHashHex = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
-                return;
-            IReadOnlyDictionary<string, SupportDiscord> supportDiscords;
-            try
+            while (true)
             {
-                supportDiscords = await publicCatalogs.GetSupportDiscordsAsync();
+                if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
+                    return;
+                IReadOnlyDictionary<string, SupportDiscord> supportDiscords;
+                try
+                {
+                    supportDiscords = await publicCatalogs.GetSupportDiscordsAsync();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "failed to retrieve Support Discords from PlumbBuddy.app");
+                    await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
+                    return;
+                }
+                var (discordName, creatorName) = await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile, isPatchDay, forCreators, forManifestHashHex);
+                if (discordName is null)
+                    return;
+                if (await ShowSupportDiscordStepsDialogAsync(dialogService, discordName, supportDiscords[discordName], errorFile, isPatchDay, creatorName) is "start-over")
+                    continue;
+                break;
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "failed to retrieve Support Discords from PlumbBuddy.app");
-                await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
-                return;
-            }
-            var (discordName, creatorName) = await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile, isPatchDay, forCreators, forManifestHashHex);
-            if (discordName is null)
-                return;
-            await ShowSupportDiscordStepsDialogAsync(dialogService, discordName, supportDiscords[discordName], errorFile, isPatchDay, creatorName);
         });
 
     public static Task<bool> ShowCautionDialogAsync(this IDialogService dialogService, string caption, string text) =>
@@ -197,7 +202,7 @@ static class DialogExtensions
             return (null, null);
         });
 
-    public static Task ShowSupportDiscordStepsDialogAsync(this IDialogService dialogService, string supportDiscordName, SupportDiscord supportDiscord, FileInfo? errorFile = null, bool isPatchDay = false, string? creatorName = null) =>
+    public static Task<string?> ShowSupportDiscordStepsDialogAsync(this IDialogService dialogService, string supportDiscordName, SupportDiscord supportDiscord, FileInfo? errorFile = null, bool isPatchDay = false, string? creatorName = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             var dialog = await dialogService.ShowAsync<SupportDiscordStepsDialog>(supportDiscordName, new DialogParameters<SupportDiscordStepsDialog>()
@@ -215,6 +220,10 @@ static class DialogExtensions
                 MaxWidth = MaxWidth.Large,
                 NoHeader = false
             });
-            await dialog.Result;
+            if (await dialog.Result is { } dialogResult
+                && !dialogResult.Canceled
+                && dialogResult.Data is string outcome)
+                return outcome;
+            return null;
         });
 }

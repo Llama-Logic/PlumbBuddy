@@ -36,6 +36,17 @@ partial class SupportDiscordStepsDialog
     void CloseOnClickHandler() =>
         MudDialog?.Close();
 
+    async Task HandleClearCacheOnClickAsync()
+    {
+        if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
+        {
+            await DialogService.ShowInfoDialogAsync("The Cache is Already Clear", "Good on you for being thorough, though!");
+            return;
+        }
+        SmartSimObserver.ClearCache();
+        await DialogService.ShowSuccessDialogAsync("The Cache is Now Clear", "Well done, you now have a clean slate.");
+    }
+
     Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
         if (targetIndex == Steps.GetLanguageOptimalValue(() => new()).Count)
@@ -86,4 +97,7 @@ partial class SupportDiscordStepsDialog
         }
         PlatformFunctions.ViewFile(ErrorFile);
     }
+
+    void HandleStartOverOnClick() =>
+        MudDialog?.Close("start-over");
 }
