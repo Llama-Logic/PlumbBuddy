@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Services;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public class ModsDirectoryCataloger :
     IModsDirectoryCataloger
 {
@@ -398,6 +399,7 @@ public class ModsDirectoryCataloger :
     public void GoToSleep() =>
         awakeManualResetEvent.Reset();
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ProcessPathsQueueAsync()
     {
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
@@ -577,6 +579,8 @@ public class ModsDirectoryCataloger :
         }
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ProcessDequeuedFileAsync(DirectoryInfo modsDirectoryInfo, FileInfo fileInfo)
     {
         var fileType = GetFileType(fileInfo);

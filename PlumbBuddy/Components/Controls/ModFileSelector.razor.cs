@@ -42,6 +42,7 @@ partial class ModFileSelector
         return default;
     }
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public static async Task<ModFileManifestModel?> SelectAModFileManifestAsync(PbDbContext pbDbContext, IDialogService dialogService)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);

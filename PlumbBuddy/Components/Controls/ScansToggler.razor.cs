@@ -241,6 +241,7 @@ partial class ScansToggler
                 yield return label;
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     void SetDefaultOnClickHandler()
     {
         ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;

@@ -1,5 +1,7 @@
 namespace PlumbBuddy.Components.Controls;
 
+[SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class ManifestEditor
 {
     enum AddFileResult

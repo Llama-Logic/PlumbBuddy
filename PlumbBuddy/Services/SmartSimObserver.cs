@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Services;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public partial class SmartSimObserver :
     ISmartSimObserver
 {

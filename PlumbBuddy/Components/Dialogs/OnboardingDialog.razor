@@ -2,7 +2,7 @@
 @inject IDialogService DialogService
 @inject ISettings Settings
 
-<MudLoading @bind-Loading="@isLoading" @bind-Text="@loadingText" Color="Color.Primary" LoaderType="LoaderType.Linear" Overlap>
+<MudLoading @bind-Loading="@isLoading" Text="@loadingText" Color="Color.Primary" LoaderType="LoaderType.Linear" Overlap>
     <MudDialog>
         <DialogContent>
             <MudStepperExtended Class="mud-width-full mb-4" Color="Color.Primary" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled">

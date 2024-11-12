@@ -1,5 +1,8 @@
 namespace PlumbBuddy.Data;
 
+#pragma warning disable IDE0079
+
+[SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
 public class ModFileManifest
 {
     [Key]
@@ -157,7 +160,7 @@ public class ModFileManifest
             return requiredMod;
         });
         addCollectionElements(RequiredPacks, model.RequiredPacks, entity => entity.Code);
-        addHashSetElements(SubsumedHashes, model.SubsumedHashes, entity => entity.Sha256.ToImmutableArray());
+        addHashSetElements(SubsumedHashes, model.SubsumedHashes, entity => [..entity.Sha256]);
         return model;
     }
 }

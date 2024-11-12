@@ -45,6 +45,7 @@ partial class Home
         await SetCustomThemeBackgroundsAsync();
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task SetCustomThemeBackgroundsAsync()
     {
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", "url('/img/ModHealthBackgroundDark.png')");

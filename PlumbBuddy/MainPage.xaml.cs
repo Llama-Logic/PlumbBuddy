@@ -1,5 +1,6 @@
 namespace PlumbBuddy;
 
+[SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
 public partial class MainPage :
     ContentPage
 {

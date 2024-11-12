@@ -9,6 +9,7 @@ public partial class App :
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        this.appLifecycleManager = appLifecycleManager;
         using var pbDbContext = pbDbContextFactory.CreateDbContext();
         var allMigrations = pbDbContext.Database.GetMigrations();
         //if (!allMigrations.Contains(packCodesModelMigration))
@@ -95,6 +96,10 @@ public partial class App :
         // but guess what, it's time for school
         lifetimeScope.Resolve<ISmartSimObserver>();
         InitializeComponent();
-        MainPage = new MainPage(appLifecycleManager);
     }
+
+    readonly IAppLifecycleManager appLifecycleManager;
+
+    protected override Window CreateWindow(IActivationState? activationState) =>
+        new(new MainPage(appLifecycleManager));
 }

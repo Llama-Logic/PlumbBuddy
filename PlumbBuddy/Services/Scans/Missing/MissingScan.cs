@@ -4,7 +4,7 @@ public abstract class MissingScan :
     Scan,
     IMissingScan
 {
-    public MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings)
+    protected MissingScan(IDbContextFactory<PbDbContext> pbDbContextFactory, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(settings);

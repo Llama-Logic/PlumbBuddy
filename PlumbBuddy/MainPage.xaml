@@ -6,7 +6,7 @@
     <Grid>
         <StackLayout x:Name="pleaseWait" HorizontalOptions="Center" VerticalOptions="Center">
             <Image Source="plumbbuddy_logo.png" Aspect="AspectFit" WidthRequest="256" HeightRequest="256" HorizontalOptions="Center" />
-            <Label Text="{Binding LoadingLabel}" HorizontalOptions="Center" FontSize="Medium" Margin="0,20,0,0" TextColor="{x:Static local:MainPage.TextColor}" />
+            <Label x:DataType="{x:Type local:MainPage}" Text="{Binding LoadingLabel}" HorizontalOptions="Center" FontSize="Medium" Margin="0,20,0,0" TextColor="{x:Static local:MainPage.TextColor}" />
         </StackLayout>
         <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" IsVisible="Hidden">
             <BlazorWebView.RootComponents>

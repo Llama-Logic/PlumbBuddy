@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Models;
 
+[SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
 public static class Yaml
 {
     static TBuilder ConfigureBuilder<TBuilder>(TBuilder builder)

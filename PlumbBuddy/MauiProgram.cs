@@ -3,6 +3,7 @@ namespace PlumbBuddy;
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class
 /// </summary>
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public static class MauiProgram
 {
     /// <summary>

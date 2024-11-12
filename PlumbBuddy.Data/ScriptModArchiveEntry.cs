@@ -31,7 +31,7 @@ public class ScriptModArchiveEntry
     public int ExternalAttributes { get; set; }
 
     [Required]
-    public string FullName { get; set; }
+    public required string FullName { get; set; }
 
     [Required]
     public bool IsEncrypted { get; set; }
@@ -43,5 +43,5 @@ public class ScriptModArchiveEntry
     public long Length { get; set; }
 
     [Required]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

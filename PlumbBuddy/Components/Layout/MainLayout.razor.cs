@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Components.Layout;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public partial class MainLayout
 {
     static MudTheme CreatePlumbBuddyFactoryTheme() =>
@@ -180,6 +181,7 @@ public partial class MainLayout
         StaticDispatcher.Dispatch(() => Snackbar.Add(e.Message, e.Severity, e.Configure, e.Key));
 
     [JSInvokable]
+    [SuppressMessage("Design", "CA1054: URI-like parameters should not be strings")]
     public async Task LaunchExternalUrlAsync(string url)
     {
         try
@@ -229,7 +231,7 @@ public partial class MainLayout
     {
         await base.OnInitializedAsync();
         javaScriptThis = DotNetObjectReference.Create(this);
-        if (Application.Current is { } app && app.MainPage is MainPage mainPage)
+        if (Application.Current is { } app && app.Windows[0].Page is MainPage mainPage)
         {
             SetPreferredColorScheme(app.RequestedTheme is AppTheme.Dark ? "dark" : "light");
             await JSRuntime.InvokeVoidAsync("subscribeToPreferredColorSchemeChanges", javaScriptThis);

@@ -64,6 +64,9 @@ public class ShowModListStartupSettingScan :
             Type = ScanIssueType.Healthy
         };
 
-    protected override void StopScanning(ISettings settings) =>
+    protected override void StopScanning(ISettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
         settings.ScanForShowModsListAtStartupEnabled = false;
+    }
 }

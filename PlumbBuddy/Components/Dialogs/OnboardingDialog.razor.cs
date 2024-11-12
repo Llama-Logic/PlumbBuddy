@@ -209,6 +209,7 @@ partial class OnboardingDialog
         return;
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     void SetDefaultScansForUserType(UserType value)
     {
         switch (value)
