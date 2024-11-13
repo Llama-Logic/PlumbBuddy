@@ -45,9 +45,9 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
-        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
         <TargetFramework>net9.0-maccatalyst</TargetFramework>
-        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
+        <TargetPlatformMinVersion>15.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::IsOSPlatform('osx'))">

@@ -9,7 +9,7 @@ else
 fi
 
 # Variables (taken from .env)
-APP_BUNDLE="bin/Release/net8.0-maccatalyst/PlumbBuddy.app"
+APP_BUNDLE="bin/Release/net9.0-maccatalyst/PlumbBuddy.app"
 ZIP_FILE="PlumbBuddy.zip"
 
 # Step 1: Remove old zip file if it exists
