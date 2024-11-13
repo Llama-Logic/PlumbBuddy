@@ -34,7 +34,7 @@
         <AppxAutoIncrementPackageRevision>true</AppxAutoIncrementPackageRevision>
         <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
         <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxPackageSigningTimestampServerUrl>http://ts.ssl.com</AppxPackageSigningTimestampServerUrl>
+        <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
         <AppxSymbolPackageEnabled>true</AppxSymbolPackageEnabled>
         <GenerateAppInstallerFile>true</GenerateAppInstallerFile>
         <GenerateTestArtifacts>false</GenerateTestArtifacts>
