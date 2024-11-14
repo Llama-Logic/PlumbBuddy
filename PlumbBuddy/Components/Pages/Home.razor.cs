@@ -20,7 +20,9 @@ partial class Home
     {
         if (e.PropertyName is nameof(ISettings.Theme))
             StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
-        if (e.PropertyName is nameof(ISettings.Type))
+        else if (e.PropertyName is nameof(ISettings.DevToolsUnlocked)
+            or nameof(ISettings.ShowThemeManager)
+            or nameof(ISettings.Type))
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 

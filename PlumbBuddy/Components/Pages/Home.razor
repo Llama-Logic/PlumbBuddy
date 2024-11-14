@@ -39,4 +39,13 @@
             <PreJector />
         </MudTabPanel> *@
     }
+    @if (Settings.DevToolsUnlocked && Settings.ShowThemeManager)
+    {
+        <MudTabPanel Text="Sample UI" Icon="@MaterialDesignIcons.Normal.ApplicationEdit">
+            <div class="mod-health-tab-container">
+                <div class="background"></div>
+                <SampleUserInterface />
+            </div>
+        </MudTabPanel>
+    }
 </MudTabs>

@@ -1,0 +1,528 @@
+<MudGrid Justify="Justify.Center">
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Alerts</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudPaper>
+            <MudAlert Severity="Severity.Normal">The reactor type is RBMK-1000</MudAlert>
+        </MudPaper>
+    </MudItem>
+    <MudItem>
+        <MudPaper>
+            <MudAlert Severity="Severity.Info">The reactor was fired up successfully</MudAlert>
+        </MudPaper>
+    </MudItem>
+    <MudItem>
+        <MudPaper>
+            <MudAlert Severity="Severity.Success">The reactor is running at optimum temperature</MudAlert>
+        </MudPaper>
+    </MudItem>
+    <MudItem>
+        <MudPaper>
+            <MudAlert Severity="Severity.Warning">The reactor temperature exceeds the optimal range</MudAlert>
+        </MudPaper>
+    </MudItem>
+    <MudItem>
+        <MudPaper>
+            <MudAlert Severity="Severity.Error">Meltdown is imminent</MudAlert>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Avatars</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudAvatar Color="Color.Primary">M</MudAvatar>
+            <MudAvatar Color="Color.Secondary">U</MudAvatar>
+            <MudAvatar Color="Color.Tertiary">D</MudAvatar>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudAvatar Color="Color.Info" Variant="Variant.Outlined">M</MudAvatar>
+            <MudAvatar Color="Color.Success" Variant="Variant.Outlined">U</MudAvatar>
+            <MudAvatar Color="Color.Warning" Variant="Variant.Outlined">D</MudAvatar>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudAvatar Color="Color.Warning" Variant="Variant.Filled">
+                <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Large" />
+            </MudAvatar>
+            <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
+                <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" />
+            </MudAvatar>
+            <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
+                <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
+            </MudAvatar>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudAvatar Square="true">N</MudAvatar>
+            <MudAvatar Rounded="true" Color="Color.Secondary">
+                <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
+            </MudAvatar>
+            <MudAvatar Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.Filled.Comment" />
+            </MudAvatar>
+            <MudAvatar Square="true" Variant="Variant.Outlined">N</MudAvatar>
+            <MudAvatar Rounded="true" Color="Color.Secondary" Variant="Variant.Outlined">
+                <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
+            </MudAvatar>
+            <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
+                <MudIcon Icon="@Icons.Material.Filled.Comment" />
+            </MudAvatar>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Buttons</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudButton Variant="Variant.Filled">Default</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Primary</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary">Secondary</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Tertiary">Tertiary</MudButton>
+            <MudButton Variant="Variant.Filled" Disabled="true">Disabled</MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudButton Variant="Variant.Text">Default</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Primary">Primary</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary">Secondary</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Tertiary">Tertiary</MudButton>
+            <MudButton Variant="Variant.Text" Disabled="true">Disabled</MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudButton Variant="Variant.Outlined">Default</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary">Primary</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Secondary</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Tertiary">Tertiary</MudButton>
+            <MudButton Variant="Variant.Outlined" Disabled="true">Disabled</MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Delete</MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary">Send</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Custom.Uncategorized.Radioactive" Color="Color.Warning">Warning</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Mic" IconColor="Color.Error">Talk</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small">Save</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" IconColor="Color.Secondary" Size="Size.Large">Save</MudButton>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Cards</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard>
+            <MudCardMedia Image="/img/CarouselCasual.png" Height="300" />
+            <MudCardContent>
+                <MudText Typo="Typo.h5">Bobby Pancakes</MudText>
+                <MudText Typo="Typo.body2">Look at Bob having fun.</MudText>
+                <MudText Typo="Typo.body2">That's great.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Share</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard>
+            <MudCardMedia Image="/img/CarouselEnthusiast.png" Height="300" />
+            <MudCardContent>
+                <MudText Typo="Typo.h5">Nan-slay Landgraab</MudText>
+                <MudText Typo="Typo.body2">Did she just burp toxic gas?</MudText>
+                <MudText Typo="Typo.body2">Alarming.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary">Share</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary">Learn More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudCard>
+            <MudCardMedia Image="/img/CarouselCreator.png" Height="300" />
+            <MudCardContent>
+                <MudText Typo="Typo.h5">Lady Goth</MudText>
+                <MudText Typo="Typo.body2">Madame, how much can you serve?</MudText>
+                <MudText Typo="Typo.body2">You're like the LMS of this gag...</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Tertiary">Share</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Tertiary">Learn More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Checkbox</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudCheckBox T="bool?" @bind-Value="checkboxValue" TriState>Default</MudCheckBox>
+            <MudCheckBox T="bool?" @bind-Value="checkboxValue" Color="Color.Primary" TriState>Primary</MudCheckBox>
+            <MudCheckBox T="bool?" @bind-Value="checkboxValue" Color="Color.Secondary" TriState>Secondary</MudCheckBox>
+            <MudCheckBox T="bool?" @bind-Value="checkboxValue" Color="Color.Tertiary" TriState>Tertiary</MudCheckBox>
+            <MudCheckBox T="bool?" @bind-Value="checkboxValue" Disabled TriState>Disabled</MudCheckBox>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Chips</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudChip T="string">Default</MudChip>
+            <MudChip T="string" Color="Color.Primary">Primary</MudChip>
+            <MudChip T="string" Color="Color.Secondary">Secondary</MudChip>
+            <MudChip T="string" Color="Color.Info">Info</MudChip>
+            <MudChip T="string" Color="Color.Success">Success</MudChip>
+            <MudChip T="string" Color="Color.Warning">Warning</MudChip>
+            <MudChip T="string" Color="Color.Error">Error</MudChip>
+            <MudChip T="string" Color="Color.Dark">Dark</MudChip>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudChip T="string" Disabled="true">Default</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Primary">Primary</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Secondary">Secondary</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Info">Info</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Success">Success</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Warning">Warning</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Error">Error</MudChip>
+            <MudChip T="string" Disabled="true" Color="Color.Dark">Dark</MudChip>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudChip T="string" Variant="Variant.Text">Default</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Primary">Primary</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Secondary">Secondary</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Info">Info</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Success">Success</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Warning">Warning</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Error">Error</MudChip>
+            <MudChip T="string" Variant="Variant.Text" Color="Color.Dark">Dark</MudChip>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text">Default</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Primary">Primary</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Secondary">Secondary</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Info">Info</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Success">Success</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Warning">Warning</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Error">Error</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Text" Color="Color.Dark">Dark</MudChip>
+        </MudStack>
+    </MudItem>
+    <MudItem>
+        <MudChip T="string" Variant="Variant.Outlined">Default</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary">Primary</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Secondary">Secondary</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Info">Info</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Success">Success</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Warning">Warning</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Error">Error</MudChip>
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Dark">Dark</MudChip>
+    </MudItem>
+    <MudItem>
+        <MudStack Row>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined">Default</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Primary">Primary</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Secondary">Secondary</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Info">Info</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Success">Success</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Warning">Warning</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Error">Error</MudChip>
+            <MudChip T="string" Disabled="true" Variant="Variant.Outlined" Color="Color.Dark">Dark</MudChip>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Progress</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudProgressCircular Color="Color.Default" Indeterminate />
+            <MudProgressCircular Color="Color.Primary" Indeterminate />
+            <MudProgressCircular Color="Color.Secondary" Indeterminate />
+            <MudProgressCircular Color="Color.Tertiary" Indeterminate />
+            <MudProgressCircular Color="Color.Success" Indeterminate />
+            <MudProgressCircular Color="Color.Info" Indeterminate />
+        </MudStack>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Default" Indeterminate />
+    </MudItem>
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Primary" Indeterminate />
+    </MudItem>
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Secondary" Indeterminate />
+    </MudItem>
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Tertiary" Indeterminate />
+    </MudItem>
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Success" Indeterminate />
+    </MudItem>
+    <MudItem xs="4">
+        <MudProgressLinear Color="Color.Info" Indeterminate />
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Radio</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudForm>
+                <MudRadioGroup @bind-Value="radioGroupSelectedOption">
+                    <MudRadio Value="@("Default")">Default</MudRadio>
+                    <MudRadio Value="@("Primary")" Color="Color.Primary">Primary</MudRadio>
+                    <MudRadio Value="@("Secondary")" Color="Color.Secondary">Secondary</MudRadio>
+                    <MudRadio Value="@("Tertiary")" Color="Color.Tertiary">Tertiary</MudRadio>
+                    <MudRadio Value="@("Disabled")" Disabled>Disabled</MudRadio>
+                </MudRadioGroup>
+            </MudForm>
+            <div class="d-flex align-center">
+                <MudButton Variant="Variant.Outlined" OnClick="@(() => radioGroupSelectedOption = "None")">Reset</MudButton>
+                <MudText Class="ml-4">Selected Option: @radioGroupSelectedOption</MudText>
+            </div>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Scan Issues</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-refreshing">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.FolderSync" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">I'm Looking at Your Mods Folder...</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">Once I'm done I'll let you know if there's anything to be concerned about. Don't worry, anything important will be at the top of the list!</MudTextM3>
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning" Class="mt-4">Please don't launch the game right now!</MudChip>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-sleeping">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">Game's Running... So Sleepy...</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">Since we shouldn't be doing anything to your Mods folder while the game is running, I hope you won't mind if I catch a few winks while you play.</MudTextM3>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-Healthy">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.EmoticonHappy" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">Healthy Scan Issue</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">It's all good.</MudTextM3>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-Uncomfortable">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.EmoticonConfused" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">Uncomfortable Scan Issue</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">This is displeasing.</MudTextM3>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-Sick">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.EmoticonCry" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">Sick Scan Issue</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">This hurts.</MudTextM3>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+        <MudCard Outlined="true" Class="scan-issue scan-issue-Dead">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@MaterialDesignIcons.Normal.EmoticonDead" Size="Size.Large" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudTextM3 Typo="TypoM3.Title">Dead Scan Issue</MudTextM3>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextM3 Typo="TypoM3.Body">I'm dead.</MudTextM3>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Select</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudStack Row>
+            <MudSelect @bind-Value="selectedState"
+            Variant="Variant.Filled"
+            Label="US State"
+            HelperText="Pick your favorite state in the United States of America!"
+            Clearable>
+                @foreach (var state in states)
+                {
+                    <MudSelectItem Value="state">@state</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Sliders</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="12" sm="6" md="4">
+        <MudSlider T="int" Color="Color.Primary">Primary</MudSlider>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudSlider T="int" Color="Color.Secondary">Secondary</MudSlider>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudSlider T="int" Color="Color.Tertiary">Tertiary</MudSlider>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Sliders</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudSwitchM3 T="bool" @bind-Value="switchValue" ThumbIcon="@MaterialDesignIcons.Normal.Check" ThumbOffIcon="@MaterialDesignIcons.Normal.Close">Default</MudSwitchM3>
+    </MudItem>
+    <MudItem>
+        <MudSwitchM3 T="bool" @bind-Value="switchValue" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Check" ThumbOffIcon="@MaterialDesignIcons.Normal.Close">Primary</MudSwitchM3>
+    </MudItem>
+    <MudItem>
+        <MudSwitchM3 T="bool" @bind-Value="switchValue" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Check" ThumbOffIcon="@MaterialDesignIcons.Normal.Close">Secondary</MudSwitchM3>
+    </MudItem>
+    <MudItem>
+        <MudSwitchM3 T="bool" @bind-Value="switchValue" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.Check" ThumbOffIcon="@MaterialDesignIcons.Normal.Close">Tertiary</MudSwitchM3>
+    </MudItem>
+    <MudItem>
+        <MudSwitchM3 T="bool" @bind-Value="switchValue" Disabled ThumbIcon="@MaterialDesignIcons.Normal.Check" ThumbOffIcon="@MaterialDesignIcons.Normal.Close">Disabled</MudSwitchM3>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider />
+    </MudItem>
+    <MudItem>
+        <MudTextM3 Typo="TypoM3.Title">Text Field</MudTextM3>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem>
+        <MudTextField T="string" Label="Text Field" Variant="Variant.Filled" />
+    </MudItem>
+</MudGrid>
+
+@code {
+    bool? checkboxValue = true;
+    string radioGroupSelectedOption = "None";
+    string? selectedState;
+    private string[] states =
+    {
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
+        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    };
+    bool switchValue;
+}
