@@ -41,7 +41,7 @@
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" StartIcon="@(Settings.Theme == slug ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.Theme == slug)">Select</MudButton>
+                    <MudButton Variant="Variant.Text" StartIcon="@(Settings.Theme == slug ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">Select</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>

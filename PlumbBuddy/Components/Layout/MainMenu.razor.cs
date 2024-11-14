@@ -116,7 +116,10 @@ partial class MainMenu
         if (Settings.ShowThemeManager)
             Settings.ShowThemeManager = false;
         else if (await DialogService.ShowCautionDialogAsync("Toggle Theme Manager?", "Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒."))
+        {
+            Settings.Theme = null;
             Settings.ShowThemeManager = true;
+        }
     }
 
     void HandleVersionOnClick()
