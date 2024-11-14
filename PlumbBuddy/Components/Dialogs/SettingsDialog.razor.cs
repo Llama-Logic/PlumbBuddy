@@ -12,6 +12,8 @@ partial class SettingsDialog
 
     string DownloadsFolderPath { get; set; } = string.Empty;
 
+    bool GenerateGlobalManifestPackage { get; set; }
+
     string InstallationFolderPath { get; set; } = string.Empty;
 
     [CascadingParameter]
@@ -74,6 +76,7 @@ partial class SettingsDialog
     {
         await base.OnParametersSetAsync();
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
+        GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
         ScanForErrorLogs = Settings.ScanForErrorLogs;
         ScanForInvalidModSubdirectoryDepth = Settings.ScanForInvalidModSubdirectoryDepth;
@@ -115,6 +118,7 @@ partial class SettingsDialog
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;
+        Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
         Settings.ScanForErrorLogs = ScanForErrorLogs;

@@ -168,6 +168,12 @@
                                         <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="This is a package file that lets Mod Creators know what I know about your manifested mods. It's basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy.">
+                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">Generate global manifest package</MudSwitchM3>
+                                    </MudTooltip>
+                                </MudItem>
                             </MudGrid>
                         </ChildContent>
                     </MudStepExtended>

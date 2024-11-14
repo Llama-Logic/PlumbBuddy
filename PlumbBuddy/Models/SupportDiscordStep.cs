@@ -25,4 +25,7 @@ public class SupportDiscordStep
 
     [YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
     public bool ShowStartOver { get; set; }
+
+    [YamlMember(Order = 9, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+    public bool ShowGlobalManifestGenerationToggle { get; set; }
 }

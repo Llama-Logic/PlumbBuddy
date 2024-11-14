@@ -68,6 +68,18 @@ class Settings :
         }
     }
 
+    public bool GenerateGlobalManifestPackage
+    {
+        get => preferences.Get(nameof(GenerateGlobalManifestPackage), true);
+        set
+        {
+            if (GenerateGlobalManifestPackage == value)
+                return;
+            preferences.Set(nameof(GenerateGlobalManifestPackage), value);
+            OnPropertyChanged();
+        }
+    }
+
     public string InstallationFolderPath
     {
         get => preferences.Get(nameof(InstallationFolderPath), string.Empty);

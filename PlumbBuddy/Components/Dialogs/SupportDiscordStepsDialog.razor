@@ -1,3 +1,4 @@
+@implements IDisposable
 @inject IDialogService DialogService
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
@@ -57,6 +58,15 @@
                                 <MudFlexBreak />
                                 <MudItem>
                                     <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.Restart" OnClick="HandleStartOverOnClick">Start over</MudButton>
+                                </MudItem>
+                            }
+                            @if (step.ShowGlobalManifestGenerationToggle)
+                            {
+                                <MudFlexBreak />
+                                <MudItem>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it on. I'll do that for you. 💖">
+                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">Generate global manifest package</MudSwitchM3>
+                                    </MudTooltip>
                                 </MudItem>
                             }
                         </MudGrid>

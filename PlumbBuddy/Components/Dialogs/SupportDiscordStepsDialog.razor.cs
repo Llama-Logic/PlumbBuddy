@@ -2,11 +2,19 @@ namespace PlumbBuddy.Components.Dialogs;
 
 partial class SupportDiscordStepsDialog
 {
+    bool wasGeneratingGlobalManifestPackage;
+
     [Parameter]
     public string? CreatorName { get; set; }
 
     [Parameter]
     public FileInfo? ErrorFile { get; set; }
+
+    bool GenerateGlobalManifestPackage
+    {
+        get => Settings.GenerateGlobalManifestPackage;
+        set => Settings.GenerateGlobalManifestPackage = value;
+    }
 
     [Parameter]
     public bool IsPatchDay { get; set; }
@@ -35,6 +43,12 @@ partial class SupportDiscordStepsDialog
 
     void CloseOnClickHandler() =>
         MudDialog?.Close();
+
+    public void Dispose()
+    {
+        if (wasGeneratingGlobalManifestPackage)
+            Settings.GenerateGlobalManifestPackage = true;
+    }
 
     async Task HandleClearCacheOnClickAsync()
     {
@@ -100,4 +114,7 @@ partial class SupportDiscordStepsDialog
 
     void HandleStartOverOnClick() =>
         MudDialog?.Close("start-over");
+
+    protected override void OnInitialized() =>
+        wasGeneratingGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
 }

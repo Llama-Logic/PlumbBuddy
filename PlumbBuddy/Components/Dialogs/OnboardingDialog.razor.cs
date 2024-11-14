@@ -20,6 +20,12 @@ partial class OnboardingDialog
         set => Settings.DownloadsFolderPath = value;
     }
 
+    bool GenerateGlobalManifestPackage
+    {
+        get => Settings.GenerateGlobalManifestPackage;
+        set => Settings.GenerateGlobalManifestPackage = value;
+    }
+
     string InstallationFolderPath
     {
         get => Settings.InstallationFolderPath;

@@ -8,6 +8,7 @@ public interface ISettings :
     string DefaultCreatorsList { get; set; }
     bool DevToolsUnlocked { get; set; }
     string DownloadsFolderPath { get; set; }
+    bool GenerateGlobalManifestPackage { get; set; }
     string InstallationFolderPath { get; set; }
     DateTimeOffset? LastCheckForUpdate { get; set; }
     Version? LastGameVersion { get; set; }

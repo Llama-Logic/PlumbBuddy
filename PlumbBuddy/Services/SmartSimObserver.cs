@@ -555,8 +555,12 @@ public partial class SmartSimObserver :
         }
     }
 
-    void FreshenGlobalManifest(bool force = false) =>
+    void FreshenGlobalManifest(bool force = false)
+    {
+        if (!settings.GenerateGlobalManifestPackage)
+            return;
         _ = Task.Run(() => FreshenGlobalManifestAsync(force));
+    }
 
     async Task FreshenGlobalManifestAsync(bool force = false)
     {
@@ -651,6 +655,14 @@ public partial class SmartSimObserver :
     {
         if (e.PropertyName is nameof(ISettings.CacheStatus) or nameof(ISettings.Type))
             Scan();
+        else if (e.PropertyName is nameof(ISettings.GenerateGlobalManifestPackage))
+        {
+            var globalModsManifestPackageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", GlobalModsManifestPackageName));
+            if (!settings.GenerateGlobalManifestPackage && globalModsManifestPackageFile.Exists)
+                globalModsManifestPackageFile.Delete();
+            else if (settings.GenerateGlobalManifestPackage)
+                FreshenGlobalManifest(force: true);
+        }
         else if (e.PropertyName == nameof(ISettings.InstallationFolderPath))
         {
             DisconnectFromInstallationDirectoryWatcher();
