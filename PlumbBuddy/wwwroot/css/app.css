@@ -38,6 +38,10 @@ article:last-child > * {
     background-color: transparent;
 }
 
+.mud-typographym3 {
+    font-family: var(--mud-typography-body1-family);
+}
+
 div.mud-input-control.no-material-variant .mud-input-outlined-border {
     display: none;
 }
