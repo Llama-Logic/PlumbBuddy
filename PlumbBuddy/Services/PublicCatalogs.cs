@@ -37,7 +37,7 @@ public class PublicCatalogs :
     {
         get
         {
-            var supportDiscordsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "support-discords.yml"));
+            var supportDiscordsCachedFile = new FileInfo(Path.Combine(MauiProgram.CacheDirectory.FullName, "support-discords.yml"));
             if (!supportDiscordsCachedFile.Exists)
                 return null;
             return TimeSpan.FromDays(1) - (DateTime.UtcNow - supportDiscordsCachedFile.LastWriteTimeUtc);
@@ -65,7 +65,7 @@ public class PublicCatalogs :
     {
         try
         {
-            var packsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "packs.yml"));
+            var packsCachedFile = new FileInfo(Path.Combine(MauiProgram.CacheDirectory.FullName, "packs.yml"));
             if (!force && packsCachedFile.Exists && packsCachedFile.LastWriteTimeUtc.AddDays(7) > DateTime.UtcNow)
                 PackCatalog = Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, PackDescription>>(await File.ReadAllTextAsync(packsCachedFile.FullName).ConfigureAwait(false));
             else
@@ -90,7 +90,7 @@ public class PublicCatalogs :
 
     public async Task<IReadOnlyDictionary<string, SupportDiscord>> GetSupportDiscordsAsync(bool? useCache = null)
     {
-        var supportDiscordsCachedFile = new FileInfo(Path.Combine(FileSystem.AppDataDirectory, "support-discords.yml"));
+        var supportDiscordsCachedFile = new FileInfo(Path.Combine(MauiProgram.CacheDirectory.FullName, "support-discords.yml"));
         if (useCache is null or true && supportDiscordsCachedFile.Exists && supportDiscordsCachedFile.LastWriteTimeUtc.AddDays(1) > DateTime.UtcNow)
             return Yaml.CreateYamlDeserializer().Deserialize<Dictionary<string, SupportDiscord>>(await File.ReadAllTextAsync(supportDiscordsCachedFile.FullName).ConfigureAwait(false));
         else if (useCache is null or false)

@@ -63,10 +63,16 @@ partial class MainMenu
         SmartSimObserver.OpenModsFolder();
     }
 
+    async Task HandleOpenPlumbBuddyCacheOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        PlatformFunctions.ViewDirectory(MauiProgram.CacheDirectory);
+    }
+
     async Task HandleOpenPlumbBuddyStorageOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        PlatformFunctions.ViewDirectory(new DirectoryInfo(FileSystem.AppDataDirectory));
+        PlatformFunctions.ViewDirectory(MauiProgram.AppDataDirectory);
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)

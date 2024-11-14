@@ -6,6 +6,38 @@ namespace PlumbBuddy;
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public static class MauiProgram
 {
+    public static DirectoryInfo AppDataDirectory
+    {
+        get
+        {
+#if MACCATALYST
+            var appDataDirectory = new DirectoryInfo(Path.Combine(FileSystem.AppDataDirectory, "com.llamalogic.plumbbuddy"));
+            if (!appDataDirectory.Exists)
+                appDataDirectory.Create();
+            return appDataDirectory;
+#else
+            var appDataDirectory = new DirectoryInfo(FileSystem.AppDataDirectory);
+            return appDataDirectory;
+#endif
+        }
+    }
+
+    public static DirectoryInfo CacheDirectory
+    {
+        get
+        {
+#if MACCATALYST
+            var cacheDirectory = new DirectoryInfo(Path.Combine(FileSystem.CacheDirectory, "com.llamalogic.plumbbuddy"));
+            if (!cacheDirectory.Exists)
+                cacheDirectory.Create();
+            return cacheDirectory;
+#else
+            var cacheDirectory = new DirectoryInfo(FileSystem.CacheDirectory);
+            return cacheDirectory;
+#endif
+        }
+    }
+
     /// <summary>
     /// Creates the <see cref="MauiApp"/> to be used in this application
     /// </summary>
@@ -30,7 +62,7 @@ public static class MauiProgram
             new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #if DEBUG
-                .WriteTo.File(Path.Combine(FileSystem.AppDataDirectory, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .WriteTo.File(Path.Combine(AppDataDirectory.FullName, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
                 .WriteTo.Debug()
                 .Enrich.WithAssemblyVersion()
                 .Enrich.WithProcessId()
@@ -38,7 +70,7 @@ public static class MauiProgram
                 .Enrich.WithThreadId()
                 .Enrich.WithThreadName()
 #else
-                .WriteTo.File(Path.Combine(FileSystem.AppDataDirectory, "Log.txt"), Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Month, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
+                .WriteTo.File(Path.Combine(AppDataDirectory.FullName, "Log.txt"), Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Month, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")
                 .Enrich.WithAssemblyInformationalVersion()
                 .Enrich.WithEnvironmentName()
                 .Enrich.WithMemoryUsage()
@@ -61,7 +93,7 @@ public static class MauiProgram
         builder.Services.AddDbContextFactory<PbDbContext>
         (
             (options) => options
-                .UseSqlite($"Data Source={Path.Combine(FileSystem.AppDataDirectory, "PlumbBuddy.sqlite")}", options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                .UseSqlite($"Data Source={Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite")}", options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 #if DEBUG
                 .EnableSensitiveDataLogging()
 #endif

@@ -56,7 +56,7 @@ partial class SupportDiscordStepsDialog
 
     async Task HandleShowAppLogFileOnClickAsync()
     {
-        var appDataDirectory = new DirectoryInfo(FileSystem.AppDataDirectory);
+        var appDataDirectory = MauiProgram.AppDataDirectory;
         if (!appDataDirectory.Exists)
         {
             await DialogService.ShowErrorDialogAsync("I Couldn't Find My Own App Data Directory", "Holy cow, how are you even getting to this error message?");
