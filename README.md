@@ -53,7 +53,7 @@ Before building the app, make sure your system meets the following requirements:
 1. Open a terminal (Command Prompt, PowerShell, or Git Bash).
 2. Run the following command to clone the repository:
     ```batch
-    git clone https://github.com/yourusername/PlumbBuddy.git
+    git clone https://github.com/Llama-Logic/PlumbBuddy.git
     cd PlumbBuddy
     ```
 
@@ -112,7 +112,7 @@ Ensure your system meets the following requirements:
 2. **Clone the Repository**:
    * In Terminal, execute:
         ```zsh
-        git clone https://github.com/yourusername/PlumbBuddy.git
+        git clone https://github.com/Llama-Logic/PlumbBuddy.git
         cd PlumbBuddy
         ```
 3. **Open the Project in VS Code**:
