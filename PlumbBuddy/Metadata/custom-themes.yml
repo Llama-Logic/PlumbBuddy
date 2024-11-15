@@ -39,6 +39,37 @@ amethyst-lilac:
       light: simvault-light.png
       size: contain
 
+littlbowbub:
+  display_name: Littlbowbub
+  description: |
+    Visit on [Patreon](https://www.patreon.com/littlbowbub)!
+  default_border_radius: 15px
+  palette_light:
+    Primary: '#cf5e5eff'
+    Secondary: '#bd7777ff'
+    Tertiary: '#ab5c5cff'
+    Info: '#506ec0ff'
+    Warning: '#bd640bff'
+    AppbarBackground: '#e2cdc0ff'
+    DrawerBackground: '#e2cdc0ff'
+    Surface: '#e5e5e5ff'
+    Background: '#ffffffec'
+    TextPrimary: '#b46666ff'
+    TextSecondary: '#cd6f6fff'
+  backgrounded_tabs:
+    mod-health:
+      dark: mod-health.png
+      light: mod-health.png
+    catalog:
+      dark: catalog.png
+      light: catalog.png
+    manifest-editor:
+      dark: manifest-editor.png
+      light: manifest-editor.png
+    simvault:
+      dark: simvault.png
+      light: simvault.png
+
 little-ms-sam:
   display_name: LittleMsSam
   description: |
@@ -91,7 +122,6 @@ little-ms-sam:
     manifest-editor:
       dark: none.png
       light: none.png
-      animation_display: none
     simvault:
       dark: none.png
       light: none.png

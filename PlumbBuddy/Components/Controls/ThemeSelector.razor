@@ -2,21 +2,16 @@
 @inject ISettings Settings
 
 <MudGrid Justify="Justify.Center">
-    <MudItem xs="3">
-        <MudCard Elevation="5" Class="@(string.IsNullOrWhiteSpace(Settings.Theme) ? "mud-background-primary-selected" : "mud-background")">
-            <MudCardMedia Image="/img/PlumbBuddyLogo.svg" Height="160" />
-            <MudCardContent>
-                <MudStack Spacing="0" Class="align-center">
-                    <MudTextM3 Typo="TypoM3.Title">PlumbBuddy</MudTextM3>
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Variant="Variant.Text">Light or Dark Mode</MudChip>
-                    <MudTextM3 Typo="TypoM3.Body">Default theme.</MudTextM3>
-                </MudStack>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Variant="Variant.Text" StartIcon="@(string.IsNullOrWhiteSpace(Settings.Theme) ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(null))" Disabled="@string.IsNullOrWhiteSpace(Settings.Theme)">Select</MudButton>
-            </MudCardActions>
-        </MudCard>
+    <MudItem>
+        <MudStack Row Spacing="0">
+            <MudTextM3>Click </MudTextM3>
+            <MudTextM3 Color="Color.Primary" Class="mx-1"><strong>SELECT</strong></MudTextM3>
+            <MudTextM3> to choose a theme or </MudTextM3>
+            <MudTextM3 Color="Color.Primary" Class="mx-1"><strong>SELECTED</strong></MudTextM3>
+            <MudTextM3> for the current theme to return to the default.</MudTextM3>
+        </MudStack>
     </MudItem>
+    <MudFlexBreak />
     @foreach (var (slug, customTheme) in CustomThemes.Themes.OrderBy(kv => kv.Key))
     {
         <MudItem xs="3">
@@ -41,7 +36,14 @@
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" StartIcon="@(Settings.Theme == slug ? MaterialDesignIcons.Normal.CheckboxMarked : MaterialDesignIcons.Normal.CheckboxBlank)" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">Select</MudButton>
+                    @if (Settings.Theme == slug)
+                    {
+                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxMarked" Color="Color.Primary" OnClick="@(() => SelectTheme(null))">Selected</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxBlank" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">Select</MudButton>
+                    }
                 </MudCardActions>
             </MudCard>
         </MudItem>
