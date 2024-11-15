@@ -1,13 +1,13 @@
 <h1>Contributing</h1>
 
-Thanks you for your interest in contributing to Llama Logic! In this document we'll outline what you need to know about contributing and how to get started.
+Thanks you for your interest in contributing to PlumbBuddy! In this document we'll outline what you need to know about contributing and how to get started.
 
 - [What contributions we accept](#what-contributions-we-accept)
 - [Style Guidelines](#style-guidelines)
 
 # What contributions we accept
 
-In short, we’ll entertain anything that makes Llama Logic better in terms of stability, quality, and capability. This may take the shape of:
+In short, we’ll entertain anything that makes PlumbBuddy better in terms of stability, quality, and capability. This may take the shape of:
 
 - Bug fixes
 - Feature implementations
