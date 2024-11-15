@@ -177,9 +177,9 @@ partial class ManifestEditor
             catch
             {
                 batchCancellationTokenSource?.Cancel();
-                await DialogService.ShowErrorDialogAsync("Package corrupt or damaged",
+                await DialogService.ShowErrorDialogAsync("Package corrupt, damaged, or locked",
                     $"""
-                    I was unable to read this file as a valid Maxis DataBase Packed File:
+                    I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
                     `{modFile.FullName}`<br /><br />
                     <iframe src="https://giphy.com/embed/1g2JyW7p6mtZc6bOEY" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY">via GIPHY</a></p>
                     """).ConfigureAwait(false);
@@ -214,9 +214,9 @@ partial class ManifestEditor
             catch
             {
                 batchCancellationTokenSource?.Cancel();
-                await DialogService.ShowErrorDialogAsync("Script archive corrupt or damaged",
+                await DialogService.ShowErrorDialogAsync("Script archive corrupt, damaged, or locked",
                     $"""
-                    I was unable to read this file as a valid ZIP archive:
+                    I was unable to read this file as a valid ZIP archive with exclusive access:
                     `{modFile.FullName}`<br /><br />
                     <iframe src="https://giphy.com/embed/3o72EYhVhAYFJ4rv68" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68">via GIPHY</a></p>
                     """).ConfigureAwait(false);
