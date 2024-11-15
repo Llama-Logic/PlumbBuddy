@@ -35,7 +35,7 @@
 <MudLayout>
     <MudAppBar>
         <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudImage Src="/img/PlumbBuddyLogo.svg" Elevation="2" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+        <MudImage Src="/img/PlumbBuddyLogo.svg" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
         @if (Settings.ShowThemeManager)
         {
             if (@manualLightDarkModeToggleEnabled)
