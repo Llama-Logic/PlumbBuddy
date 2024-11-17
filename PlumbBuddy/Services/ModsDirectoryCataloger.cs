@@ -18,6 +18,9 @@ public class ModsDirectoryCataloger :
 
     static ModsDirectoryFileType GetFileType(FileInfo fileInfo)
     {
+        // fix: https://github.com/Llama-Logic/PlumbBuddy/issues/1
+        if (fileInfo.FullName.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Contains("__MACOSX", StringComparer.Ordinal))
+            return ModsDirectoryFileType.Ignored;
         return fileInfo.Extension.ToUpperInvariant() switch
         {
             ".7Z" => ModsDirectoryFileType.SevenZipArchive,
@@ -584,9 +587,7 @@ public class ModsDirectoryCataloger :
     async Task ProcessDequeuedFileAsync(DirectoryInfo modsDirectoryInfo, FileInfo fileInfo)
     {
         var fileType = GetFileType(fileInfo);
-        if (fileType is ModsDirectoryFileType.Ignored
-            // fix: https://github.com/Llama-Logic/PlumbBuddy/issues/1
-            || fileInfo.FullName.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Contains("__MACOSX", StringComparer.Ordinal))
+        if (fileType is ModsDirectoryFileType.Ignored)
             return;
         var path = fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..];
         var filesOfInterestPath = Path.Combine("Mods", path);
