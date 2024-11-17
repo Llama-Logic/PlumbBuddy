@@ -977,7 +977,11 @@ public partial class SmartSimObserver :
             if (attentionWorthyScanIssues.Length is > 0)
             {
                 var distinctAttentionWorthyScanIssueCaptions = attentionWorthyScanIssues.Select(si => si.Caption).Distinct().ToImmutableArray();
-                var modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
+                string modHealthStatusSummary;
+                if (distinctAttentionWorthyScanIssueCaptions.Length is <= 3)
+                    modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
+                else
+                    modHealthStatusSummary = $"Click here to get help with the problems that {distinctAttentionWorthyScanIssueCaptions.Take(2).Append("other issue".ToQuantity(distinctAttentionWorthyScanIssueCaptions.Length - 2, ShowQuantityAs.Words)).Humanize()}.";
                 if (modHealthStatusSummary != lastModHealthStatusSummary)
                 {
                     if (!appLifecycleManager.IsVisible)
