@@ -28,6 +28,19 @@ public sealed class UpdateManager :
                 {
                     settings.ScanForCorruptMods = false;
                     settings.ScanForCorruptScriptMods = false;
+                    superSnacks.OfferRefreshments(new MarkupString("Two new scans to detect corrupt mod files have been added, but since you've self-identified as a Mod Creator, I have turned them off by default."), Severity.Info, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.NewBox;
+                        options.Action = "Turn Them On";
+                        options.ActionColor = MudBlazor.Color.Success;
+                        options.Onclick = _ =>
+                        {
+                            settings.ScanForCorruptMods = true;
+                            settings.ScanForCorruptScriptMods = true;
+                            return Task.CompletedTask;
+                        };
+                        options.RequireInteraction = true;
+                    });
                 }
             }
             else
