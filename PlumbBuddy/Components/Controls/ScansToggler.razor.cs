@@ -23,6 +23,8 @@ partial class ScansToggler
             { nameof(ScanForLooseZipArchives), "...a .zip file" },
             { nameof(ScanForLooseRarArchives), "...a .rar file" },
             { nameof(ScanForLoose7ZipArchives), "...a .7z file" },
+            { nameof(ScanForCorruptMods), "...a corrupt .package file" },
+            { nameof(ScanForCorruptScriptMods), "...a corrupt .ts4script file" },
             { nameof(ScanForErrorLogs), "...a file that appears to contain error information" }
         }.ToImmutableDictionary();
         foundScanLabels =
@@ -32,6 +34,8 @@ partial class ScansToggler
             foundScanLabelByName[nameof(ScanForLooseZipArchives)],
             foundScanLabelByName[nameof(ScanForLooseRarArchives)],
             foundScanLabelByName[nameof(ScanForLoose7ZipArchives)],
+            foundScanLabelByName[nameof(ScanForCorruptMods)],
+            foundScanLabelByName[nameof(ScanForCorruptScriptMods)],
             foundScanLabelByName[nameof(ScanForErrorLogs)]
         ];
         notFoundScanLabelByName = new Dictionary<string, string>
@@ -76,6 +80,18 @@ partial class ScansToggler
 
     [Parameter]
     public EventCallback<bool> ScanForCacheStalenessChanged { get; set; }
+
+    [Parameter]
+    public bool ScanForCorruptMods { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForCorruptModsChanged { get; set; }
+
+    [Parameter]
+    public bool ScanForCorruptScriptMods { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForCorruptScriptModsChanged { get; set; }
 
     [Parameter]
     public bool ScanForErrorLogs { get; set; }
@@ -194,6 +210,8 @@ partial class ScansToggler
     void DisableAllOnClickHandler()
     {
         ScanForCacheStaleness = false;
+        ScanForCorruptMods = false;
+        ScanForCorruptScriptMods = false;
         ScanForErrorLogs = false;
         ScanForInvalidModSubdirectoryDepth = false;
         ScanForInvalidScriptModSubdirectoryDepth = false;
@@ -215,6 +233,8 @@ partial class ScansToggler
     void EnableAllOnClickHandler()
     {
         ScanForCacheStaleness = true;
+        ScanForCorruptMods = true;
+        ScanForCorruptScriptMods = true;
         ScanForErrorLogs = true;
         ScanForInvalidModSubdirectoryDepth = true;
         ScanForInvalidScriptModSubdirectoryDepth = true;
@@ -245,6 +265,8 @@ partial class ScansToggler
     void SetDefaultOnClickHandler()
     {
         ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
+        ScanForCorruptMods = ScanAttribute.Get(typeof(IPackageCorruptScan))?.IsEnabledByDefault ?? false;
+        ScanForCorruptScriptMods = ScanAttribute.Get(typeof(ITs4ScriptCorruptScan))?.IsEnabledByDefault ?? false;
         ScanForErrorLogs = ScanAttribute.Get(typeof(IErrorLogScan))?.IsEnabledByDefault ?? false;
         ScanForInvalidModSubdirectoryDepth = ScanAttribute.Get(typeof(IPackageDepthScan))?.IsEnabledByDefault ?? false;
         ScanForInvalidScriptModSubdirectoryDepth = ScanAttribute.Get(typeof(ITs4ScriptDepthScan))?.IsEnabledByDefault ?? false;

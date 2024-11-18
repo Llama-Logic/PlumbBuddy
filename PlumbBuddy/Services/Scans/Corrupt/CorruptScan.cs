@@ -1,10 +1,10 @@
-namespace PlumbBuddy.Services.Scans.LooseArchive;
+namespace PlumbBuddy.Services.Scans.Corrupt;
 
-public abstract class LooseArchiveScan :
+public abstract class CorruptScan :
     Scan,
-    ILooseArchiveScan
+    ICorruptScan
 {
-    protected LooseArchiveScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks, ModsDirectoryFileType modDirectoryFileType)
+    protected CorruptScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks, ModsDirectoryFileType modsDirectoryFileType, int maximumDepth)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -14,10 +14,12 @@ public abstract class LooseArchiveScan :
         this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.superSnacks = superSnacks;
-        this.modDirectoryFileType = modDirectoryFileType;
+        this.modsDirectoryFileType = modsDirectoryFileType;
+        this.maximumDepth = maximumDepth;
     }
 
-    readonly ModsDirectoryFileType modDirectoryFileType;
+    readonly int maximumDepth;
+    readonly ModsDirectoryFileType modsDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly ISettings settings;
@@ -25,7 +27,9 @@ public abstract class LooseArchiveScan :
 
     protected abstract ScanIssue GenerateHealthyScanIssue();
 
-    protected abstract ScanIssue GenerateUncomfortableScanIssue(FileInfo file, FileOfInterest fileOfInterest);
+    protected abstract ScanIssue GenerateDeadScanIssue(FileInfo file, ModFile modFile);
+
+    protected abstract ScanIssue GenerateUncomfortableScanIssue(FileInfo file, ModFile modFile);
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
@@ -33,7 +37,7 @@ public abstract class LooseArchiveScan :
         {
             if (resolutionCmd is "moveToDownloads")
             {
-                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, looseArchiveRelativePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", looseArchiveRelativePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -88,15 +92,18 @@ public abstract class LooseArchiveScan :
 
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
-        var prefix = $"Mods{Path.DirectorySeparatorChar}";
-        var foundNaughtyLooseArchives = false;
+        var anyCheeseSlidOffTheCracker = false;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var naughtyLooseArchive in pbDbContext.FilesOfInterest.Where(foi => foi.FileType == modDirectoryFileType && foi.Path.StartsWith(prefix)).AsAsyncEnumerable())
+        await foreach (var offendingModFile in pbDbContext.ModFiles.Where(mf => mf.Path != null && mf.FileType == modsDirectoryFileType).AsAsyncEnumerable())
         {
-            foundNaughtyLooseArchives = true;
-            yield return GenerateUncomfortableScanIssue(new FileInfo(Path.Combine(settings.UserDataFolderPath, naughtyLooseArchive.Path)), naughtyLooseArchive);
+            anyCheeseSlidOffTheCracker = true;
+            var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", offendingModFile.Path!));
+            if (offendingModFile.Path!.AsSpan().Count(Path.DirectorySeparatorChar) > maximumDepth)
+                yield return GenerateUncomfortableScanIssue(file, offendingModFile);
+            else
+                yield return GenerateDeadScanIssue(file, offendingModFile);
         }
-        if (!foundNaughtyLooseArchives)
+        if (!anyCheeseSlidOffTheCracker)
             yield return GenerateHealthyScanIssue();
     }
 

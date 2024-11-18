@@ -143,6 +143,30 @@ class Settings :
         }
     }
 
+    public bool ScanForCorruptMods
+    {
+        get => preferences.Get(nameof(ScanForCorruptMods), true);
+        set
+        {
+            if (ScanForCorruptMods == value)
+                return;
+            preferences.Set(nameof(ScanForCorruptMods), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ScanForCorruptScriptMods
+    {
+        get => preferences.Get(nameof(ScanForCorruptScriptMods), true);
+        set
+        {
+            if (ScanForCorruptScriptMods == value)
+                return;
+            preferences.Set(nameof(ScanForCorruptScriptMods), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ScanForErrorLogs
     {
         get => preferences.Get(nameof(ScanForErrorLogs), true);

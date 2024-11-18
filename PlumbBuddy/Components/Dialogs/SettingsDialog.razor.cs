@@ -21,6 +21,10 @@ partial class SettingsDialog
 
     bool ScanForCacheStaleness { get; set; }
 
+    bool ScanForCorruptMods { get; set; }
+
+    bool ScanForCorruptScriptMods { get; set; }
+
     bool ScanForErrorLogs { get; set; }
 
     bool ScanForInvalidModSubdirectoryDepth { get; set; }
@@ -78,6 +82,8 @@ partial class SettingsDialog
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
+        ScanForCorruptMods = Settings.ScanForCorruptMods;
+        ScanForCorruptScriptMods = Settings.ScanForCorruptScriptMods;
         ScanForErrorLogs = Settings.ScanForErrorLogs;
         ScanForInvalidModSubdirectoryDepth = Settings.ScanForInvalidModSubdirectoryDepth;
         ScanForInvalidScriptModSubdirectoryDepth = Settings.ScanForInvalidScriptModSubdirectoryDepth;
@@ -121,6 +127,8 @@ partial class SettingsDialog
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
+        Settings.ScanForCorruptMods = ScanForCorruptMods;
+        Settings.ScanForCorruptScriptMods = ScanForCorruptScriptMods;
         Settings.ScanForErrorLogs = ScanForErrorLogs;
         Settings.ScanForInvalidModSubdirectoryDepth = ScanForInvalidModSubdirectoryDepth;
         Settings.ScanForInvalidScriptModSubdirectoryDepth = ScanForInvalidScriptModSubdirectoryDepth;

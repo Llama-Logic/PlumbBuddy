@@ -12,7 +12,8 @@ public class ModFile
     [ForeignKey(nameof(ModFileHashId))]
     public ModFileHash? ModFileHash { get; set; }
 
-    public string? Path { get; set; }
+    [Required]
+    public required string Path { get; set; }
 
     public DateTimeOffset? Creation { get; set; }
 
@@ -21,6 +22,4 @@ public class ModFile
     public long? Size { get; set; }
 
     public ModsDirectoryFileType FileType { get; set; }
-
-    public DateTimeOffset? AbsenceNoticed { get; set; }
 }

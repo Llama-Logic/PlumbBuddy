@@ -31,6 +31,7 @@ global using PlumbBuddy.Localization;
 global using PlumbBuddy.Models;
 global using PlumbBuddy.Services;
 global using PlumbBuddy.Services.Scans;
+global using PlumbBuddy.Services.Scans.Corrupt;
 global using PlumbBuddy.Services.Scans.Depth;
 global using PlumbBuddy.Services.Scans.LooseArchive;
 global using PlumbBuddy.Services.Scans.Missing;

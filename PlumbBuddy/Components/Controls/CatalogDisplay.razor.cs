@@ -139,7 +139,6 @@ partial class CatalogDisplay
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))
             .Include(mfm => mfm.ModFileHash!)
                 .ThenInclude(mfh => mfh.ModFiles)
             .Include(mfm => mfm.Creators!)
@@ -173,7 +172,7 @@ partial class CatalogDisplay
             values.Add(new
             (
                 activeManifest.ToModel(),
-                activeManifest.ModFileHash!.ModFiles!.Where(mf => mf.Path is not null && mf.AbsenceNoticed is null).Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList(),
+                activeManifest.ModFileHash!.ModFiles!.Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new ModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList(),
                 (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new ModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList()
             ));

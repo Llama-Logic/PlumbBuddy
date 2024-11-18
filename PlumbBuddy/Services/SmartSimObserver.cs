@@ -134,9 +134,9 @@ public partial class SmartSimObserver :
                 {
                     using var pbDbContext = pbDbContextFactory.CreateDbContext();
                     if (!IsModsDisabledGameSettingOn
-                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.Package && mf.Path != null && mf.AbsenceNoticed == null)
+                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.Package)
                         || IsScriptModsEnabledGameSettingOn
-                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.ScriptArchive && mf.Path != null && mf.AbsenceNoticed == null))
+                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.ScriptArchive))
                     {
                         superSnacks.OfferRefreshments(new MarkupString(
                             $"""
@@ -337,6 +337,8 @@ public partial class SmartSimObserver :
         containerBuilder.RegisterType<LooseZipArchiveScan>().As<ILooseZipArchiveScan>();
         containerBuilder.RegisterType<LooseRarArchiveScan>().As<ILooseRarArchiveScan>();
         containerBuilder.RegisterType<Loose7ZipArchiveScan>().As<ILoose7ZipArchiveScan>();
+        containerBuilder.RegisterType<PackageCorruptScan>().As<IPackageCorruptScan>();
+        containerBuilder.RegisterType<Ts4ScriptCorruptScan>().As<ITs4ScriptCorruptScan>();
         containerBuilder.RegisterType<ErrorLogScan>().As<IErrorLogScan>();
         containerBuilder.RegisterType<McccMissingScan>().As<IMcccMissingScan>();
         containerBuilder.RegisterType<BeMissingScan>().As<IBeMissingScan>();
@@ -580,10 +582,10 @@ public partial class SmartSimObserver :
         var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var modFileHashElements in await pbDbContext.ModFileHashes
-            .Where(mfh => mfh.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfh.ModFileManifests!.Any())
+            .Where(mfh => mfh.ModFiles!.Any() && mfh.ModFileManifests!.Any())
             .Select(mfh => new
             {
-                Paths = mfh.ModFiles!.Where(mf => mf.Path != null && mf.AbsenceNoticed == null).Select(mf => mf.Path!).ToList(),
+                Paths = mfh.ModFiles!.Select(mf => mf.Path!).ToList(),
                 Manifests = mfh.ModFileManifests!.Select(mfm => new
                 {
                     mfm.Key,
@@ -1060,6 +1062,8 @@ public partial class SmartSimObserver :
                 initializationChange |= checkScanInitialization(settings.ScanForLooseZipArchives, typeof(ILooseZipArchiveScan));
                 initializationChange |= checkScanInitialization(settings.ScanForLooseRarArchives, typeof(ILooseRarArchiveScan));
                 initializationChange |= checkScanInitialization(settings.ScanForLoose7ZipArchives, typeof(ILoose7ZipArchiveScan));
+                initializationChange |= checkScanInitialization(settings.ScanForCorruptMods, typeof(IPackageCorruptScan));
+                initializationChange |= checkScanInitialization(settings.ScanForCorruptScriptMods, typeof(ITs4ScriptCorruptScan));
                 initializationChange |= checkScanInitialization(settings.ScanForErrorLogs, typeof(IErrorLogScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMissingMccc, typeof(IMcccMissingScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMissingBe, typeof(IBeMissingScan));

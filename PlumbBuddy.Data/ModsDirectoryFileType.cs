@@ -10,5 +10,7 @@ public enum ModsDirectoryFileType :
     HtmlFile,
     ZipArchive,
     RarArchive,
-    SevenZipArchive
+    SevenZipArchive,
+    CorruptPackage,
+    CorruptScriptArchive
 }

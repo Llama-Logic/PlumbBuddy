@@ -25,4 +25,6 @@ public class ModFileHash
 
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModFileManifest>? ModFileManifests { get; set; }
+
+    public bool IsCorrupt { get; set; }
 }

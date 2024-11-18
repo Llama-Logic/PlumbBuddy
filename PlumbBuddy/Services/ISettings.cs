@@ -14,6 +14,8 @@ public interface ISettings :
     Version? LastGameVersion { get; set; }
     bool Onboarded { get; set; }
     bool ScanForCacheStaleness { get; set; }
+    bool ScanForCorruptMods { get; set; }
+    bool ScanForCorruptScriptMods { get; set; }
     bool ScanForErrorLogs { get; set; }
     bool ScanForLoose7ZipArchives { get; set; }
     bool ScanForLooseRarArchives { get; set; }

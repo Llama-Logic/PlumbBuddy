@@ -68,14 +68,14 @@ public sealed class DependencyScan :
         var installedPackCodes = smartSimObserver.InstalledPackCodes;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modWithMissingPacks in pbDbContext.ModFileManifests
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfm.RequiredPacks!.Any(pc => !installedPackCodes.Contains(pc.Code.ToUpper())))
+            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any() && mfm.RequiredPacks!.Any(pc => !installedPackCodes.Contains(pc.Code.ToUpper())))
             .Select(mfm => new ModWithMissingPacks
             (
                 mfm.Name,
                 mfm.Creators!.Select(c => c.Name).ToList(),
                 mfm.ElectronicArtsPromoCode == null ? null : mfm.ElectronicArtsPromoCode.Code,
                 mfm.RequiredPacks!.Where(pc => !installedPackCodes.Contains(pc.Code.ToUpper())).Select(pc => pc.Code.ToUpper()).ToList(),
-                mfm.ModFileHash!.ModFiles!.Where(mf => mf.Path != null && mf.AbsenceNoticed == null).Select(mf => mf.Path!).ToList()
+                mfm.ModFileHash!.ModFiles!.Select(mf => mf.Path!).ToList()
             ))
             .AsAsyncEnumerable())
         {
@@ -119,12 +119,12 @@ public sealed class DependencyScan :
             };
         }
         await foreach (var modWithIncompatiblePacks in pbDbContext.ModFileManifests
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) && mfm.IncompatiblePacks!.Any(pc => installedPackCodes.Contains(pc.Code.ToUpper())))
+            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any() && mfm.IncompatiblePacks!.Any(pc => installedPackCodes.Contains(pc.Code.ToUpper())))
             .Select(mfm => new ModWithIncompatiblePacks
             (
                 mfm.Name,
                 mfm.IncompatiblePacks!.Where(pc => installedPackCodes.Contains(pc.Code.ToUpper())).Select(pc => pc.Code.ToUpper()).ToList(),
-                mfm.ModFileHash!.ModFiles!.Where(mf => mf.Path != null && mf.AbsenceNoticed == null).Select(mf => mf.Path!).ToList()
+                mfm.ModFileHash!.ModFiles!.Select(mf => mf.Path!).ToList()
             ))
             .AsAsyncEnumerable())
             yield return new ScanIssue
@@ -169,20 +169,20 @@ public sealed class DependencyScan :
         var commonRequirementIdentifiers = new Dictionary<(long modManifestId, string requirementIdentifier), List<ModWithMissingDependencyMod>>();
         await foreach (var modWithMissingDependencyMod in pbDbContext.RequiredMods
             .Where(rm =>
-                rm.ModFileManifest!.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null) // mod is present in Mods folder
+                rm.ModFileManifest!.ModFileHash!.ModFiles!.Any() // mod is present in Mods folder
                 && (rm.IgnoreIfHashAvailable == null // ignore if hash available is unset
-                    || !rm.IgnoreIfHashAvailable.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null)) // hash is not available by calculation
-                    && !rm.IgnoreIfHashAvailable.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))) // hash is not available by subsumption
+                    || !rm.IgnoreIfHashAvailable.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any()) // hash is not available by calculation
+                    && !rm.IgnoreIfHashAvailable.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any())) // hash is not available by subsumption
                 && (rm.IgnoreIfHashUnavailable == null // ignore if hash unavailable is unset
-                    || rm.IgnoreIfHashUnavailable.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null)) // hash is available by calculation
-                    || rm.IgnoreIfHashUnavailable.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))) // hash is available by subsumption
+                    || rm.IgnoreIfHashUnavailable.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any()) // hash is available by calculation
+                    || rm.IgnoreIfHashUnavailable.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any())) // hash is available by subsumption
                 && (rm.IgnoreIfPackAvailable == null // ignore if pack available is unset
                     || !installedPackCodes.Contains(rm.IgnoreIfPackAvailable.Code)) // pack is not installed
                 && (rm.IgnoreIfPackUnavailable == null // ignore if pack unavailable is unset
                     || installedPackCodes.Contains(rm.IgnoreIfPackUnavailable.Code)) // pack is installed
                 && (rm.Hashes!.Any(h => // at least one required hash is
-                    !h.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null)) //... not available via calculation
-                        && !h.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))) // and not available via subsumption
+                    !h.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any()) //... not available via calculation
+                        && !h.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any())) // and not available via subsumption
                     || rm.RequiredFeatures!.Any(rf => !rm.Hashes!.Any(h => // ... or at least one feature is not
                         h.ManifestsByCalculation!.Any(mfm => mfm.Features!.Any(f => f.Name == rf.Name)) // ... available via calculation
                         || h.ManifestsBySubsumption!.Any(mfm => mfm.Features!.Any(f => f.Name == rf.Name)))))) // ... or available via subsumption
@@ -197,10 +197,10 @@ public sealed class DependencyScan :
                 rm.Name,
                 rm.Creators!.Select(c => c.Name).ToList(),
                 rm.Url,
-                rm.ModFileManifest!.ModFileHash!.ModFiles!.Where(mf => mf.Path != null && mf.AbsenceNoticed == null).Select(mf => mf.Path!).ToList(),
+                rm.ModFileManifest!.ModFileHash!.ModFiles!.Select(mf => mf.Path!).ToList(),
                 rm.Hashes!.All(h => // all hashes are
-                    h.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null)) //... available via calculation
-                        || h.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any(mf => mf.Path != null && mf.AbsenceNoticed == null))) // or available via subsumption
+                    h.ManifestsByCalculation!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any()) //... available via calculation
+                        || h.ManifestsBySubsumption!.Any(mfm => mfm.ModFileHash!.ModFiles!.Any())) // or available via subsumption
             ))
             .AsAsyncEnumerable())
         {

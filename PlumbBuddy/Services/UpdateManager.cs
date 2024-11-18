@@ -22,7 +22,14 @@ public sealed class UpdateManager :
         if (CurrentVersion != settings.VersionAtLastStartup)
         {
             if (settings.VersionAtLastStartup is { } lastVersion)
+            {
                 logger.LogInformation("This is the first time starting after the upgrade from {LastVersion}.", lastVersion);
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: 0, Build: <= 8 } && settings.Type is UserType.Creator)
+                {
+                    settings.ScanForCorruptMods = false;
+                    settings.ScanForCorruptScriptMods = false;
+                }
+            }
             else
                 logger.LogInformation("This is the first time this installation is starting.");
         }

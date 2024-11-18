@@ -41,6 +41,18 @@ partial class OnboardingDialog
         set => Settings.ScanForCacheStaleness = value;
     }
 
+    bool ScanForCorruptMods
+    {
+        get => Settings.ScanForCorruptMods;
+        set => Settings.ScanForCorruptMods = value;
+    }
+
+    bool ScanForCorruptScriptMods
+    {
+        get => Settings.ScanForCorruptScriptMods;
+        set => Settings.ScanForCorruptScriptMods = value;
+    }
+
     bool ScanForErrorLogs
     {
         get => Settings.ScanForErrorLogs;
@@ -228,6 +240,8 @@ partial class OnboardingDialog
                 Settings.ScanForLooseZipArchives = false;
                 Settings.ScanForLooseRarArchives = false;
                 Settings.ScanForLoose7ZipArchives = false;
+                Settings.ScanForCorruptMods = false;
+                Settings.ScanForCorruptScriptMods = false;
                 Settings.ScanForErrorLogs = false;
                 Settings.ScanForMissingMccc = false;
                 Settings.ScanForMissingBe = false;
@@ -246,6 +260,8 @@ partial class OnboardingDialog
                 Settings.ScanForLooseZipArchives = ScanAttribute.Get(typeof(ILooseZipArchiveScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForLooseRarArchives = ScanAttribute.Get(typeof(ILooseRarArchiveScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForLoose7ZipArchives = ScanAttribute.Get(typeof(ILoose7ZipArchiveScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForCorruptMods = ScanAttribute.Get(typeof(IPackageCorruptScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForCorruptScriptMods = ScanAttribute.Get(typeof(ITs4ScriptCorruptScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForErrorLogs = ScanAttribute.Get(typeof(IErrorLogScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;

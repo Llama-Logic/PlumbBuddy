@@ -239,12 +239,9 @@
         <div class="d-inline-block" style="width: 100px;">
             <MudProgressLinear Color="Color.Primary" Max="@progressMax" Value="@ModsDirectoryCataloger.ProgressValue" Buffer />
         </div>
-    }
-    if (ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining)
-    {
         <MudTooltip Arrow="true" Color="Color.Info">
             <ChildContent>
-                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@estimatedTimeRemaining.ToString("mm':'ss")" />
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : "Estimating")" />
             </ChildContent>
             <TooltipContent>
                 <MudStack Row="true">
