@@ -137,7 +137,7 @@ public sealed class ErrorLogScan :
                 [
                     new()
                     {
-                        Label = "Select a Sims 4 Community Discord",
+                        Label = "Select a Sims 4 Support Venue",
                         Icon = MaterialDesignIcons.Normal.FaceAgent,
                         Color = MudBlazor.Color.Primary,
                         Data = "discord"

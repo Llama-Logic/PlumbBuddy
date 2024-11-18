@@ -795,6 +795,8 @@ public class ModsDirectoryCataloger :
                 modFile.LastWrite = lastWrite;
                 modFile.Size = size;
                 modFile.FileType = fileType;
+                if (pbDbContext.Entry(modFile).State is EntityState.Added)
+                    await pbDbContext.ModFiles.Where(mf => mf.Path == path).ExecuteDeleteAsync().ConfigureAwait(false);
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
             }
             else if (fileType is not ModsDirectoryFileType.Ignored && !await pbDbContext.FilesOfInterest.AnyAsync(foi => foi.Path == filesOfInterestPath).ConfigureAwait(false))
