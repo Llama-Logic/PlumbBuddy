@@ -139,6 +139,7 @@ partial class CatalogDisplay
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
+            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any())
             .Include(mfm => mfm.ModFileHash!)
                 .ThenInclude(mfh => mfh.ModFiles)
             .Include(mfm => mfm.Creators!)
