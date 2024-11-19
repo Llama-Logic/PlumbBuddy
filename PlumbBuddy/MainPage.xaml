@@ -4,14 +4,17 @@
              xmlns:local="clr-namespace:PlumbBuddy"
              x:Class="PlumbBuddy.MainPage">
     <Grid>
-        <StackLayout x:Name="pleaseWait" HorizontalOptions="Center" VerticalOptions="Center">
-            <Image Source="plumbbuddy_logo.png" Aspect="AspectFit" WidthRequest="256" HeightRequest="256" HorizontalOptions="Center" />
-            <Label x:DataType="{x:Type local:MainPage}" Text="{Binding LoadingLabel}" HorizontalOptions="Center" FontSize="Medium" Margin="0,20,0,0" TextColor="{x:Static local:MainPage.TextColor}" />
-        </StackLayout>
         <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" IsVisible="Hidden">
             <BlazorWebView.RootComponents>
                 <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
             </BlazorWebView.RootComponents>
         </BlazorWebView>
+        <StackLayout x:Name="pleaseWait" HorizontalOptions="Center" VerticalOptions="Center">
+            <Image Source="plumbbuddy_logo.png" Aspect="AspectFit" WidthRequest="256" HeightRequest="256" HorizontalOptions="Center" />
+            <StackLayout Orientation="Horizontal" VerticalOptions="Center" Margin="0,20,0,0">
+                <ActivityIndicator IsRunning="True" />
+                <Label x:DataType="{x:Type local:MainPage}" Text="{Binding LoadingLabel}" Margin="20,0,0,0" FontSize="Medium" TextColor="{x:Static local:MainPage.TextColor}" />
+            </StackLayout>
+        </StackLayout>
     </Grid>
 </ContentPage>

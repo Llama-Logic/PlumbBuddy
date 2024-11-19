@@ -25,7 +25,7 @@ public class SuperSnacks :
         lock (pendingSnacksLock)
         {
             if (pendingSnacks is null)
-                throw new Exception("Some other fat kid already cleaned me out"); // I can say this; ask my endocrinologist
+                return;
             foreach (var pendingSnack in pendingSnacks)
                 RefreshmentsOffered?.Invoke(this, pendingSnack);
             pendingSnacks = null;

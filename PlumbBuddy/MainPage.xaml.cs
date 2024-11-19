@@ -17,6 +17,7 @@ public partial class MainPage :
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
+    bool webViewShownBefore;
 
     public string LoadingLabel => appLifecycleManager.HideMainWindowAtLaunch
         ? "Starting Sims 4 Mods monitoring..."
@@ -30,6 +31,9 @@ public partial class MainPage :
 
     public async Task ShowWebViewAsync()
     {
+        if (webViewShownBefore)
+            return;
+        webViewShownBefore = true;
         if (appLifecycleManager.HideMainWindowAtLaunch)
         {
             appLifecycleManager.HideWindow();
@@ -39,11 +43,10 @@ public partial class MainPage :
                 appLifecycleManager.ShowWindow();
             });
         }
-        await pleaseWait.FadeTo(0, 250);
-        pleaseWait.IsVisible = false;
-        blazorWebView.Opacity = 0;
+        blazorWebView.Opacity = 0.01;
         blazorWebView.IsVisible = true;
-        await blazorWebView.FadeTo(0.01, 500);
-        await blazorWebView.FadeTo(1, 500);
+        await Task.Delay(250);
+        await Task.WhenAll(pleaseWait.FadeTo(0, 500), blazorWebView.FadeTo(1, 500));
+        pleaseWait.IsVisible = false;
     }
 }
