@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Services.Scans.Missing;
 
-[Scan(IsEnabledByDefault = true)]
+[Scan(IsEnabledByDefault = false)]
 public interface IMcccMissingScan :
     IMissingScan
 {
