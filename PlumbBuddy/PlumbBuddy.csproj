@@ -46,9 +46,17 @@
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug' and $([MSBuild]::IsOSPlatform('osx'))">
+        <EnableCodeSigning>false</EnableCodeSigning>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::IsOSPlatform('osx'))">
+        <CodesignKey>Developer ID Application: Daniel Henry (UA3C4N249P)</CodesignKey>
+        <EnableCodeSigning>true</EnableCodeSigning>
         <MtouchLink>none</MtouchLink>
+        <ProvisionType>Manual</ProvisionType>
         <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+        <UseHardenedRuntime>true</UseHardenedRuntime>
         <UseInterpreter>true</UseInterpreter>
     </PropertyGroup>
 
