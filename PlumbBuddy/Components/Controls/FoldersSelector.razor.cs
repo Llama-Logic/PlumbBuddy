@@ -141,10 +141,6 @@ partial class FoldersSelector
     {
         if (!Directory.Exists(path))
             return "Bruh... 🤦... there's not even a folder there.";
-        if (File.Exists(Path.Combine(path, "Options.ini")))
-            return "Hmm, I think maybe we've gotten our 🦁s crossed. THAT, my friend, is your User Data folder, not your Installation Folder.";
-        if (new DirectoryInfo(path) is { Name: "Mods", Exists: true } directory && File.Exists(Path.Combine(path, "..", "Options.ini")))
-            return "😖 Oy, that's your Mods folder. I need the path to where your game is installed in this field, pal.";
 #if WINDOWS
         if (!File.Exists(Path.Combine(path, "Game", "Bin", "TS4_x64.exe")))
             return "That's not a valid The Sims 4 installation. 🙄";
@@ -161,16 +157,7 @@ partial class FoldersSelector
     {
         if (!Directory.Exists(path))
             return "Bruh... 🤦... there's not even a folder there.";
-#if WINDOWS
-        if (File.Exists(Path.Combine(path, "Game", "Bin", "TS4_x64.exe")))
-            return "Woah, woah, woah. 🤚 That's your Installation Folder, not your User Data Folder.";
-#elif MACCATALYST
-        if (File.Exists(Path.Combine(path, "Contents", "MacOS", "The Sims 4")))
-            return "Woah, woah, woah. 🤚 That's your App Bundle (Installation Folder), not your User Data Folder.";
-#else
-        throw new NotSupportedException("The actual fu--");
-#endif
-        if (new DirectoryInfo(path) is { Name: "Mods", Exists: true } directory && File.Exists(Path.Combine(path, "..", "Options.ini")))
+        if (new DirectoryInfo(path) is { Name: "Mods", Exists: true } && File.Exists(Path.Combine(path, "..", "Options.ini")))
             return "👏 Very ambitious for taking me right to your Mods folder, but I actually need your User Data Folder (go up one, please!).";
         if (!File.Exists(Path.Combine(path, "Options.ini")))
             return "Hey, Silly! That's not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again...";
