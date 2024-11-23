@@ -234,4 +234,16 @@
   <data name="FoldersSelector_DownloadsFolder" xml:space="preserve">
     <value>Downloads Folder</value>
   </data>
+  <data name="FoldersSelector_ValidateFolder_DoesNotExist" xml:space="preserve">
+    <value>Bruh... 🤦... there's not even a folder there.</value>
+  </data>
+  <data name="FoldersSelector_ValidateUserDataFolder_ModsFolder" xml:space="preserve">
+    <value>👏 Very ambitious for taking me right to your Mods folder, but I actually need your User Data Folder (go up one, please!).</value>
+  </data>
+  <data name="FoldersSelector_ValidateUserDataFolder_NoOptionsIni" xml:space="preserve">
+    <value>Hey, Silly! That's not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again...</value>
+  </data>
+  <data name="FoldersSelector_ValidateInstallationFolder_NoBinary" xml:space="preserve">
+    <value>hat's not a valid The Sims 4 installation. 🙄</value>
+  </data>
 </root>

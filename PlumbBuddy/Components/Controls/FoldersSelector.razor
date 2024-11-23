@@ -121,7 +121,7 @@
                 </AdornmentEnd>
             </MudTextFieldExtended>
             <br />
-            <MudTextFieldExtended T="string" Label="@Localizer["FoldersSelector_DownloadsFolder"]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath">
+            <MudTextFieldExtended T="string" Label="@Localizer["FoldersSelector_DownloadsFolder"]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
                 </AdornmentStart>

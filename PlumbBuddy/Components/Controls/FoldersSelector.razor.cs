@@ -137,16 +137,23 @@ partial class FoldersSelector
         }
     }
 
+    string? ValidateDownloadsFolderPath(string path)
+    {
+        if (!Directory.Exists(path))
+            return AppText.FoldersSelector_ValidateFolder_DoesNotExist;
+        return null;
+    }
+
     string? ValidateInstallationFolderPath(string path)
     {
         if (!Directory.Exists(path))
-            return "Bruh... 🤦... there's not even a folder there.";
+            return AppText.FoldersSelector_ValidateFolder_DoesNotExist;
 #if WINDOWS
         if (!File.Exists(Path.Combine(path, "Game", "Bin", "TS4_x64.exe")))
-            return "That's not a valid The Sims 4 installation. 🙄";
+            return AppText.FoldersSelector_ValidateInstallationFolder_NoBinary;
 #elif MACCATALYST
         if (!File.Exists(Path.Combine(path, "Contents", "MacOS", "The Sims 4")))
-            return "That's not a valid The Sims 4 installation. 🙄";
+            return AppText.FoldersSelector_ValidateInstallationFolder_NoBinary;
 #else
         throw new NotSupportedException("The actual fu--");
 #endif
@@ -156,11 +163,11 @@ partial class FoldersSelector
     string? ValidateUserDataFolderPath(string path)
     {
         if (!Directory.Exists(path))
-            return "Bruh... 🤦... there's not even a folder there.";
+            return AppText.FoldersSelector_ValidateFolder_DoesNotExist;
         if (new DirectoryInfo(path) is { Name: "Mods", Exists: true } && File.Exists(Path.Combine(path, "..", "Options.ini")))
-            return "👏 Very ambitious for taking me right to your Mods folder, but I actually need your User Data Folder (go up one, please!).";
+            return AppText.FoldersSelector_ValidateUserDataFolder_ModsFolder;
         if (!File.Exists(Path.Combine(path, "Options.ini")))
-            return "Hey, Silly! That's not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again...";
+            return AppText.FoldersSelector_ValidateUserDataFolder_NoOptionsIni;
         return null;
     }
 }

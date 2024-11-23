@@ -115,7 +115,7 @@ partial class SettingsDialog
             await foldersSelector.ValidateAsync();
             if (!foldersSelector.IsValid)
             {
-                tabs.ActivatePanel(1);
+                tabs.ActivatePanel(2);
                 return;
             }
         }

@@ -367,6 +367,42 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bruh... 🤦... there&apos;s not even a folder there..
+        /// </summary>
+        internal static string FoldersSelector_ValidateFolder_DoesNotExist {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ValidateFolder_DoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hat&apos;s not a valid The Sims 4 installation. 🙄.
+        /// </summary>
+        internal static string FoldersSelector_ValidateInstallationFolder_NoBinary {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ValidateInstallationFolder_NoBinary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 👏 Very ambitious for taking me right to your Mods folder, but I actually need your User Data Folder (go up one, please!)..
+        /// </summary>
+        internal static string FoldersSelector_ValidateUserDataFolder_ModsFolder {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ValidateUserDataFolder_ModsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hey, Silly! That&apos;s not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again....
+        /// </summary>
+        internal static string FoldersSelector_ValidateUserDataFolder_NoOptionsIni {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ValidateUserDataFolder_NoOptionsIni", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Valve Steam.
         /// </summary>
         internal static string FoldersSelector_ValveSteam {
