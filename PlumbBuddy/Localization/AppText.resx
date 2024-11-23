@@ -162,15 +162,6 @@
   <data name="CatalogDisplay_Dependencies" xml:space="preserve">
     <value>Dependencies</value>
   </data>
-  <data name="CatalogDisplay_Dependencies_Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="CatalogDisplay_Dependencies_Creators" xml:space="preserve">
-    <value>Creators</value>
-  </data>
-  <data name="CatalogDisplay_Dependencies_Url" xml:space="preserve">
-    <value>URL</value>
-  </data>
   <data name="CatalogDisplay_Dependencies_OpenCatalogEntry_Tip" xml:space="preserve">
     <value>Open Catalog Entry</value>
   </data>
@@ -180,19 +171,67 @@
   <data name="CatalogDisplay_Dependents" xml:space="preserve">
     <value>Dependents</value>
   </data>
-  <data name="CatalogDisplay_Dependents_Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="CatalogDisplay_Dependents_Creators" xml:space="preserve">
-    <value>Creators</value>
-  </data>
-  <data name="CatalogDisplay_Dependents_URL" xml:space="preserve">
-    <value>URL</value>
-  </data>
   <data name="CatalogDisplay_Dependents_OpenCatalogEntry_Tip" xml:space="preserve">
     <value>Open Catalog Entry</value>
   </data>
   <data name="CatalogDisplay_SearchCatalog" xml:space="preserve">
     <value>Search Catalog</value>
+  </data>
+  <data name="FoldersSelector_MacOS" xml:space="preserve">
+    <value>Apple macOS</value>
+  </data>
+  <data name="FoldersSelector_Windows" xml:space="preserve">
+    <value>Microsoft Windows</value>
+  </data>
+  <data name="FoldersSelector_OperatingSystem" xml:space="preserve">
+    <value>Operating System</value>
+  </data>
+  <data name="FoldersSelector_ResetPaths" xml:space="preserve">
+    <value>Reset Paths</value>
+  </data>
+  <data name="FoldersSelector_DistributionPlatform" xml:space="preserve">
+    <value>Distribution Platform</value>
+  </data>
+  <data name="FoldersSelector_TheEAApp" xml:space="preserve">
+    <value>The EA App</value>
+  </data>
+  <data name="FoldersSelector_TS4_Installed" xml:space="preserve">
+    <value>The Sims 4 is installed.</value>
+  </data>
+  <data name="FoldersSelector_TS4_NotInstalled" xml:space="preserve">
+    <value>The Sims 4 is not installed.</value>
+  </data>
+  <data name="FoldersSelector_ValveSteam" xml:space="preserve">
+    <value>Valve Steam</value>
+  </data>
+  <data name="FoldersSelector_ManualSelection_OnboardingHeading_1" xml:space="preserve">
+    <value>But, ya know... 👉👈... I can make mistakes just like anyone else.</value>
+  </data>
+  <data name="FoldersSelector_ManualSelection_OnboardingHeading_2" xml:space="preserve">
+    <value>You can change any of these if they're wrong.</value>
+  </data>
+  <data name="FoldersSelector_UserDataFolder" xml:space="preserve">
+    <value>User Data Folder</value>
+  </data>
+  <data name="Common_Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Common_Creators" xml:space="preserve">
+    <value>Creators</value>
+  </data>
+  <data name="Common_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Common_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Common_Browse_Ellipsis" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="FoldersSelector_InstallationFolder" xml:space="preserve">
+    <value>Installation Folder</value>
+  </data>
+  <data name="FoldersSelector_DownloadsFolder" xml:space="preserve">
+    <value>Downloads Folder</value>
   </data>
 </root>

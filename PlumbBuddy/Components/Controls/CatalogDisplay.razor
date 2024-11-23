@@ -128,19 +128,19 @@
                                     <MudTextField @bind-Value="@dependenciesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
                                 </ToolBarContent>
                                 <HeaderContent>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependencies_Name"]</MudTh>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependencies_Creators"]</MudTh>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependencies_Url"]</MudTh>
+                                    <MudTh>@Localizer["Common_Name"]</MudTh>
+                                    <MudTh>@Localizer["Common_Creators"]</MudTh>
+                                    <MudTh>@Localizer["Common_Url"]</MudTh>
                                     <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependencies_Name"]">
+                                    <MudTd DataLabel="@Localizer["Common_Name"]">
                                         <MudTextM3 Color="@(mods.ContainsKey(context) ? Color.Default : Color.Error)">@context.Name</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependencies_Creators"]">
+                                    <MudTd DataLabel="@Localizer["Common_Creators"]">
                                         <MudTextM3>@context.Creators</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependencies_Url"]">
+                                    <MudTd DataLabel="@Localizer["Common_Url"]">
                                         <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
                                     </MudTd>
                                     <MudTd>
@@ -173,19 +173,19 @@
                                     <MudTextField @bind-Value="@dependentsSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
                                 </ToolBarContent>
                                 <HeaderContent>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependents_Name"]</MudTh>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependents_Creators"]</MudTh>
-                                    <MudTh>@Localizer["CatalogDisplay_Dependents_URL"]</MudTh>
+                                    <MudTh>@Localizer["Common_Name"]</MudTh>
+                                    <MudTh>@Localizer["Common_Creators"]</MudTh>
+                                    <MudTh>@Localizer["Common_Url"]</MudTh>
                                     <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependents_Name"]">
+                                    <MudTd DataLabel="@Localizer["Common_Name"]">
                                         <MudTextM3>@context.Name</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependents_Creators"]">
+                                    <MudTd DataLabel="@Localizer["Common_Creators"]">
                                         <MudTextM3>@context.Creators</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["CatalogDisplay_Dependents_URL"]">
+                                    <MudTd DataLabel="@Localizer["Common_Url"]">
                                         <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
                                     </MudTd>
                                     <MudTd>

@@ -88,24 +88,6 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creators.
-        /// </summary>
-        internal static string CatalogDisplay_Dependencies_Creators {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependencies_Creators", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name.
-        /// </summary>
-        internal static string CatalogDisplay_Dependencies_Name {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependencies_Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This dependency is missing!.
         /// </summary>
         internal static string CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip {
@@ -124,15 +106,6 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to URL.
-        /// </summary>
-        internal static string CatalogDisplay_Dependencies_Url {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependencies_Url", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Dependents.
         /// </summary>
         internal static string CatalogDisplay_Dependents {
@@ -142,38 +115,11 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creators.
-        /// </summary>
-        internal static string CatalogDisplay_Dependents_Creators {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependents_Creators", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name.
-        /// </summary>
-        internal static string CatalogDisplay_Dependents_Name {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependents_Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open Catalog Entry.
         /// </summary>
         internal static string CatalogDisplay_Dependents_OpenCatalogEntry_Tip {
             get {
                 return ResourceManager.GetString("CatalogDisplay_Dependents_OpenCatalogEntry_Tip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to URL.
-        /// </summary>
-        internal static string CatalogDisplay_Dependents_URL {
-            get {
-                return ResourceManager.GetString("CatalogDisplay_Dependents_URL", resourceCulture);
             }
         }
         
@@ -264,6 +210,177 @@ namespace PlumbBuddy.Localization {
         internal static string CatalogDisplay_UserAssistanceNote {
             get {
                 return ResourceManager.GetString("CatalogDisplay_UserAssistanceNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        internal static string Common_Browse_Ellipsis {
+            get {
+                return ResourceManager.GetString("Common_Browse_Ellipsis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creators.
+        /// </summary>
+        internal static string Common_Creators {
+            get {
+                return ResourceManager.GetString("Common_Creators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string Common_Name {
+            get {
+                return ResourceManager.GetString("Common_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        internal static string Common_Select {
+            get {
+                return ResourceManager.GetString("Common_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL.
+        /// </summary>
+        internal static string Common_Url {
+            get {
+                return ResourceManager.GetString("Common_Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distribution Platform.
+        /// </summary>
+        internal static string FoldersSelector_DistributionPlatform {
+            get {
+                return ResourceManager.GetString("FoldersSelector_DistributionPlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloads Folder.
+        /// </summary>
+        internal static string FoldersSelector_DownloadsFolder {
+            get {
+                return ResourceManager.GetString("FoldersSelector_DownloadsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installation Folder.
+        /// </summary>
+        internal static string FoldersSelector_InstallationFolder {
+            get {
+                return ResourceManager.GetString("FoldersSelector_InstallationFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Apple macOS.
+        /// </summary>
+        internal static string FoldersSelector_MacOS {
+            get {
+                return ResourceManager.GetString("FoldersSelector_MacOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to But, ya know... 👉👈... I can make mistakes just like anyone else..
+        /// </summary>
+        internal static string FoldersSelector_ManualSelection_OnboardingHeading_1 {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ManualSelection_OnboardingHeading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can change any of these if they&apos;re wrong..
+        /// </summary>
+        internal static string FoldersSelector_ManualSelection_OnboardingHeading_2 {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ManualSelection_OnboardingHeading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operating System.
+        /// </summary>
+        internal static string FoldersSelector_OperatingSystem {
+            get {
+                return ResourceManager.GetString("FoldersSelector_OperatingSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset Paths.
+        /// </summary>
+        internal static string FoldersSelector_ResetPaths {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ResetPaths", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The EA App.
+        /// </summary>
+        internal static string FoldersSelector_TheEAApp {
+            get {
+                return ResourceManager.GetString("FoldersSelector_TheEAApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Sims 4 is installed..
+        /// </summary>
+        internal static string FoldersSelector_TS4_Installed {
+            get {
+                return ResourceManager.GetString("FoldersSelector_TS4_Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Sims 4 is not installed..
+        /// </summary>
+        internal static string FoldersSelector_TS4_NotInstalled {
+            get {
+                return ResourceManager.GetString("FoldersSelector_TS4_NotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Data Folder.
+        /// </summary>
+        internal static string FoldersSelector_UserDataFolder {
+            get {
+                return ResourceManager.GetString("FoldersSelector_UserDataFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Valve Steam.
+        /// </summary>
+        internal static string FoldersSelector_ValveSteam {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ValveSteam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft Windows.
+        /// </summary>
+        internal static string FoldersSelector_Windows {
+            get {
+                return ResourceManager.GetString("FoldersSelector_Windows", resourceCulture);
             }
         }
         
