@@ -117,7 +117,82 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CatalogDisplay_Files" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="CatalogDisplay_Files_ModsFolderPath" xml:space="preserve">
+    <value>Mods Folder Path</value>
+  </data>
+  <data name="CatalogDisplay_AskForHelp" xml:space="preserve">
+    <value>Ask for Help</value>
+  </data>
+  <data name="CatalogDisplay_AskForHelp_Tip" xml:space="preserve">
+    <value>Click here to ask specifically for help with {0} in a Community Support venue.</value>
+    <comment>{0} = Mod Name</comment>
+  </data>
+  <data name="CatalogDisplay_IncompatiblePack_GuidanceUrl" xml:space="preserve">
+    <value>https://jamesturner.yt/disablepacks</value>
+    <comment>This external reference is in English. If you know of an equivalent in a your language, put its URL here. If not, leave it blank.</comment>
+  </data>
+  <data name="CatalogDisplay_IncompatiblePack_Installed_Tip" xml:space="preserve">
+    <value>{0} requires that {1} is NOT installed. You DO have {1} installed. Click here to view information about how to remove or disable packs.</value>
+    <comment>{0} = Mod Name; {1} = Incompatible Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_IncompatiblePack_NotInstalled_Tip" xml:space="preserve">
+    <value>{0} requires that {1} is NOT installed. You do not have {1} installed. Click here to view information about how to remove or disable packs.</value>
+    <comment>{0} = Mod Name; {1} = Incompatible Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_RequiredPack_Installed_Tip" xml:space="preserve">
+    <value>{0} requires that {1} is installed. You do have {1} installed. Click here to view the store page for {1}.</value>
+    <comment>{0} = Mod Name; {1} = Required Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_RequiredPack_NotInstalled_Tip" xml:space="preserve">
+    <value>{0} requires that {1} is installed. You do NOT have {1} installed. Click here to view the store page for {1}.</value>
+    <comment>{0} = Mod Name; {1} = Required Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_UserAssistanceNote" xml:space="preserve">
+    <value>Mods appear in your Catalog when creators have included manifests in them.</value>
+  </data>
   <data name="UserDataFolderName" xml:space="preserve">
     <value>The Sims 4</value>
+  </data>
+  <data name="CatalogDisplay_Files_ViewThisFile_Tip" xml:space="preserve">
+    <value>View this File</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies_Creators" xml:space="preserve">
+    <value>Creators</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies_Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies_OpenCatalogEntry_Tip" xml:space="preserve">
+    <value>Open Catalog Entry</value>
+  </data>
+  <data name="CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip" xml:space="preserve">
+    <value>This dependency is missing!</value>
+  </data>
+  <data name="CatalogDisplay_Dependents" xml:space="preserve">
+    <value>Dependents</value>
+  </data>
+  <data name="CatalogDisplay_Dependents_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="CatalogDisplay_Dependents_Creators" xml:space="preserve">
+    <value>Creators</value>
+  </data>
+  <data name="CatalogDisplay_Dependents_URL" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="CatalogDisplay_Dependents_OpenCatalogEntry_Tip" xml:space="preserve">
+    <value>Open Catalog Entry</value>
+  </data>
+  <data name="CatalogDisplay_SearchCatalog" xml:space="preserve">
+    <value>Search Catalog</value>
   </data>
 </root>

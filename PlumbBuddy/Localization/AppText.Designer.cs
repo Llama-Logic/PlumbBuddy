@@ -61,6 +61,213 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ask for Help.
+        /// </summary>
+        internal static string CatalogDisplay_AskForHelp {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_AskForHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to ask specifically for help with {0} in a Community Support venue..
+        /// </summary>
+        internal static string CatalogDisplay_AskForHelp_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_AskForHelp_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dependencies.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creators.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies_Creators {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies_Creators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies_Name {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This dependency is missing!.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Catalog Entry.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies_OpenCatalogEntry_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies_OpenCatalogEntry_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL.
+        /// </summary>
+        internal static string CatalogDisplay_Dependencies_Url {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependencies_Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dependents.
+        /// </summary>
+        internal static string CatalogDisplay_Dependents {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creators.
+        /// </summary>
+        internal static string CatalogDisplay_Dependents_Creators {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependents_Creators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string CatalogDisplay_Dependents_Name {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependents_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Catalog Entry.
+        /// </summary>
+        internal static string CatalogDisplay_Dependents_OpenCatalogEntry_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependents_OpenCatalogEntry_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL.
+        /// </summary>
+        internal static string CatalogDisplay_Dependents_URL {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Dependents_URL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files.
+        /// </summary>
+        internal static string CatalogDisplay_Files {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods Folder Path.
+        /// </summary>
+        internal static string CatalogDisplay_Files_ModsFolderPath {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Files_ModsFolderPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View this File.
+        /// </summary>
+        internal static string CatalogDisplay_Files_ViewThisFile_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_Files_ViewThisFile_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://jamesturner.yt/disablepacks.
+        /// </summary>
+        internal static string CatalogDisplay_IncompatiblePack_GuidanceUrl {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_IncompatiblePack_GuidanceUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} requires that {1} is NOT installed. You DO have {1} installed. Click here to view information about how to remove or disable packs..
+        /// </summary>
+        internal static string CatalogDisplay_IncompatiblePack_Installed_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_IncompatiblePack_Installed_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} requires that {1} is NOT installed. You do not have {1} installed. Click here to view information about how to remove or disable packs..
+        /// </summary>
+        internal static string CatalogDisplay_IncompatiblePack_NotInstalled_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_IncompatiblePack_NotInstalled_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} requires that {1} is installed. You do have {1} installed. Click here to view the store page for {1}..
+        /// </summary>
+        internal static string CatalogDisplay_RequiredPack_Installed_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RequiredPack_Installed_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} requires that {1} is installed. You do NOT have {1} installed. Click here to view the store page for {1}..
+        /// </summary>
+        internal static string CatalogDisplay_RequiredPack_NotInstalled_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RequiredPack_NotInstalled_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search Catalog.
+        /// </summary>
+        internal static string CatalogDisplay_SearchCatalog {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_SearchCatalog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods appear in your Catalog when creators have included manifests in them..
+        /// </summary>
+        internal static string CatalogDisplay_UserAssistanceNote {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_UserAssistanceNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Sims 4.
         /// </summary>
         internal static string UserDataFolderName {
