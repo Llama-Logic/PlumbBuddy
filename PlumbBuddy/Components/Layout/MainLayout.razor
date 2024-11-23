@@ -90,7 +90,7 @@
             </MudTooltip>
             <MudTooltip Arrow="true">
                 <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="SmartSimObserver.ClearCache" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="@(() => SmartSimObserver.ClearCache())" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
                 </ChildContent>
                 <TooltipContent>
                     <MudStack Row="true">

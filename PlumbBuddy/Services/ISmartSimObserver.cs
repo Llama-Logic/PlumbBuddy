@@ -13,7 +13,7 @@ public interface ISmartSimObserver :
     bool IsSteamInstallation { get; }
     IReadOnlyList<ScanIssue> ScanIssues { get; }
 
-    void ClearCache();
+    bool ClearCache();
     Task HelpWithPackPurchaseAsync(string packCode, IDialogService dialogService, IReadOnlyList<string>? creators, string? electronicArtsPromoCode);
     Task OpenDownloadsFolderAsync();
     void OpenModsFolder();

@@ -2,24 +2,38 @@ namespace PlumbBuddy.Components.Dialogs;
 
 static class DialogExtensions
 {
+    public static async Task<SupportDiscord?> GetSupportDiscordAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, string name)
+    {
+        if (await GetSupportDiscordsAsync(dialogService, logger, publicCatalogs) is not { } supportDiscords
+            || !supportDiscords.TryGetValue(name, out var supportDiscord))
+            return null;
+        return supportDiscord;
+    }
+
+    public static Task<IReadOnlyDictionary<string, SupportDiscord>?> GetSupportDiscordsAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
+                return null;
+            try
+            {
+                return await publicCatalogs.GetSupportDiscordsAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "failed to retrieve Support Discords from PlumbBuddy.app");
+                await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
+                return null;
+            }
+        });
+
     public static Task ShowAskForHelpDialogAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs, FileInfo? errorFile = null, bool isPatchDay = false, IReadOnlyList<string>? forCreators = null, string? forManifestHashHex = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             while (true)
             {
-                if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
+                if (await GetSupportDiscordsAsync(dialogService, logger, publicCatalogs) is not { } supportDiscords)
                     return;
-                IReadOnlyDictionary<string, SupportDiscord> supportDiscords;
-                try
-                {
-                    supportDiscords = await publicCatalogs.GetSupportDiscordsAsync();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "failed to retrieve Support Discords from PlumbBuddy.app");
-                    await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
-                    return;
-                }
                 var (discordName, creatorName) = await ShowSelectSupportDiscordDialogAsync(dialogService, supportDiscords, errorFile, isPatchDay, forCreators, forManifestHashHex);
                 if (discordName is null)
                     return;

@@ -34,7 +34,7 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -47,6 +47,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
+        ArgumentNullException.ThrowIfNull(publicCatalogs);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
@@ -58,6 +59,7 @@ public partial class SmartSimObserver :
         this.steam = steam;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
+        this.publicCatalogs = publicCatalogs;
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
@@ -106,6 +108,7 @@ public partial class SmartSimObserver :
     FileSystemWatcher? packsDirectoryWatcher;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
+    readonly IPublicCatalogs publicCatalogs;
     readonly ISettings settings;
     readonly AsyncDebouncer resampleGameVersionDebouncer;
     readonly AsyncLock resamplingPacksTaskLock;
@@ -292,7 +295,7 @@ public partial class SmartSimObserver :
             && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(settings.InstallationFolderPath);
     }
 
-    public void ClearCache()
+    public bool ClearCache()
     {
         try
         {
@@ -307,9 +310,11 @@ public partial class SmartSimObserver :
                         cacheComponent.Delete();
                 }
             }
+            return true;
         }
         catch (Exception ex)
         {
+            logger.LogWarning(ex, "a user-initiated attempt to clear the cache failed");
             superSnacks.OfferRefreshments(new MarkupString(
                 $"""
                 <h3>Whoops!</h3>
@@ -319,12 +324,21 @@ public partial class SmartSimObserver :
                 <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
                 <br />
                 There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents.
+                Click me to start Guided Support for the PlumbBuddy Discord and we can get that log file looked at, if you want.
                 """), Severity.Warning, options =>
                 {
                     options.RequireInteraction = true;
                     options.Icon = MaterialDesignIcons.Normal.EraserVariant;
+                    options.Onclick = async _ =>
+                    {
+                        var dialogService = blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>();
+                        if (await dialogService.GetSupportDiscordAsync(logger, publicCatalogs, "PlumbBuddy") is not { } plumbBuddySupportDiscord)
+                            return;
+                        await dialogService.ShowSupportDiscordStepsDialogAsync("PlumbBuddy", plumbBuddySupportDiscord);
+                    };
                 });
         }
+        return false;
     }
 
     void ConfigureLifetimeScope(ContainerBuilder containerBuilder)

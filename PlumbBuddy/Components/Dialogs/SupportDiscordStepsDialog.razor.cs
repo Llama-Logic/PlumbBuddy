@@ -57,8 +57,8 @@ partial class SupportDiscordStepsDialog
             await DialogService.ShowInfoDialogAsync("The Cache is Already Clear", "Good on you for being thorough, though!");
             return;
         }
-        SmartSimObserver.ClearCache();
-        await DialogService.ShowSuccessDialogAsync("The Cache is Now Clear", "Well done, you now have a clean slate.");
+        if (SmartSimObserver.ClearCache())
+            await DialogService.ShowSuccessDialogAsync("The Cache is Now Clear", "Well done, you now have a clean slate.");
     }
 
     Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
