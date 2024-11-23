@@ -99,6 +99,8 @@ public static class MauiProgram
 #endif
         );
 
+        builder.Services.AddLocalization();
+
         builder.Services.AddPlumbBuddyServices();
 
         builder.Services.AddMauiBlazorWebView();
