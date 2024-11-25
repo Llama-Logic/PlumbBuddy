@@ -244,7 +244,7 @@
     <value>Hey, Silly! That's not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again...</value>
   </data>
   <data name="FoldersSelector_ValidateInstallationFolder_NoBinary" xml:space="preserve">
-    <value>hat's not a valid The Sims 4 installation. 🙄</value>
+    <value>That's not a valid The Sims 4 installation. 🙄</value>
   </data>
   <data name="HUD_GameVersion_Tip_Caption" xml:space="preserve">
     <value>Game Version</value>

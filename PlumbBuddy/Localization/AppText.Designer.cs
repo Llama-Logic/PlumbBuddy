@@ -376,7 +376,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to hat&apos;s not a valid The Sims 4 installation. 🙄.
+        ///   Looks up a localized string similar to That&apos;s not a valid The Sims 4 installation. 🙄.
         /// </summary>
         internal static string FoldersSelector_ValidateInstallationFolder_NoBinary {
             get {
