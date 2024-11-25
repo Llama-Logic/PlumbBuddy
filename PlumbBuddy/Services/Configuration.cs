@@ -8,6 +8,8 @@ static class Configuration
         services.AddSingleton<ICustomThemes, CustomThemes>();
         services.AddSingleton<ISettings, Settings>();
         services.AddSingleton<IPublicCatalogs, PublicCatalogs>();
+        services.AddSingleton<IMarkupLocalizer, MarkupLocalizer>();
+        services.AddSingleton(typeof(IMarkupLocalizer<>), typeof(MarkupLocalizer<>));
         services.AddSingleton<IModsDirectoryCataloger, ModsDirectoryCataloger>();
         services.AddSingleton<ISmartSimObserver, SmartSimObserver>();
         services.AddSingleton<ISuperSnacks, SuperSnacks>();

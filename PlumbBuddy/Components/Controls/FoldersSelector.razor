@@ -1,7 +1,8 @@
 @inject IElectronicArtsApp ElectronicArtsApp
 @inject IFolderPicker FolderPicker
-@inject IStringLocalizer<AppText> Localizer
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISteam Steam
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Spacing="12" Justify="Justify.Center">
     <MudItem>
@@ -11,24 +12,24 @@
             </MudBadge>
             <MudStack Justify="Justify.FlexStart" Spacing="0">
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
-                    @Localizer["FoldersSelector_OperatingSystem"]
+                    @MarkupLocalizer["FoldersSelector_OperatingSystem"]
                 </MudTextM3>
                 @if (DeviceInfo.Current.Platform == DevicePlatform.macOS || DeviceInfo.Current.Platform == DevicePlatform.MacCatalyst)
                 {
                     <MudTextM3 Typo="TypoM3.Body">
-                        @Localizer["FolderSelector_MacOS"]
+                        @MarkupLocalizer["FolderSelector_MacOS"]
                     </MudTextM3>
                 }
                 @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                 {
                     <MudTextM3 Typo="TypoM3.Body">
-                        @Localizer["FoldersSelector_Windows"]
+                        @MarkupLocalizer["FoldersSelector_Windows"]
                     </MudTextM3>
                 }
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @CultureInfo.CurrentCulture.NativeName
                 </MudTextM3>
-                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataAndDownloadsFoldersOnClickAsync">@Localizer["FoldersSelector_ResetPaths"]</MudButton>
+                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataAndDownloadsFoldersOnClickAsync">@MarkupLocalizer["FoldersSelector_ResetPaths"]</MudButton>
             </MudStack>
         </MudStack>
     </MudItem>
@@ -39,24 +40,24 @@
             </MudBadge>
             <MudStack Justify="Justify.FlexStart" Spacing="0">
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
-                    @Localizer["FoldersSelector_DistributionPlatform"]
+                    @MarkupLocalizer["FoldersSelector_DistributionPlatform"]
                 </MudTextM3>
                 <MudTextM3 Typo="TypoM3.Body">
-                    @Localizer["FoldersSelector_TheEAApp"]
+                    @MarkupLocalizer["FoldersSelector_TheEAApp"]
                 </MudTextM3>
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @if (isTS4AvailableFromEA)
                     {
-                        @Localizer["FoldersSelector_TS4_Installed"]
+                        @MarkupLocalizer["FoldersSelector_TS4_Installed"]
                     }
                     else
                     {
-                        @Localizer["FoldersSelector_TS4_NotInstalled"]
+                        @MarkupLocalizer["FoldersSelector_TS4_NotInstalled"]
                     }
                 </MudTextM3>
                 @if (isTS4AvailableFromEA)
                 {
-                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseEAAppVersionOnClickAsync">@Localizer["Common_Select"]</MudLoadingButton>
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseEAAppVersionOnClickAsync">@MarkupLocalizer["Common_Select"]</MudLoadingButton>
                 }
             </MudStack>
         </MudStack>
@@ -68,24 +69,24 @@
             </MudBadge>
             <MudStack Justify="Justify.FlexStart" Spacing="0">
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
-                    @Localizer["FoldersSelector_DistributionPlatform"]
+                    @MarkupLocalizer["FoldersSelector_DistributionPlatform"]
                 </MudTextM3>
                 <MudTextM3 Typo="TypoM3.Body">
-                    @Localizer["FoldersSelector_ValveSteam"]
+                    @MarkupLocalizer["FoldersSelector_ValveSteam"]
                 </MudTextM3>
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @if (isTS4AvailableFromValve)
                     {
-                        @Localizer["FoldersSelector_TS4_Installed"]
+                        @MarkupLocalizer["FoldersSelector_TS4_Installed"]
                     }
                     else
                     {
-                        @Localizer["FoldersSelector_TS4_NotInstalled"]
+                        @MarkupLocalizer["FoldersSelector_TS4_NotInstalled"]
                     }
                 </MudTextM3>
                 @if (isTS4AvailableFromValve)
                 {
-                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseSteamVersionOnClickAsync">@Localizer["Common_Select"]</MudLoadingButton>
+                    <MudLoadingButton @bind-Loading="@isFetchingInstallationFolder" StartIcon="@MaterialDesignIcons.Normal.FolderTable" LoadingAdornment="Adornment.Start" Variant="Variant.Filled" Class="mt-4" OnClick="UseSteamVersionOnClickAsync">@MarkupLocalizer["Common_Select"]</MudLoadingButton>
                 }
             </MudStack>
         </MudStack>
@@ -94,39 +95,39 @@
 @if (IsOnboarding)
 {
     <MudTextM3 Typo="TypoM3.Title" Align="Align.Center" Class="mt-8">
-        @Localizer["FoldersSelector_ManualSelection_OnboardingHeading_1"]
+        @MarkupLocalizer["FoldersSelector_ManualSelection_OnboardingHeading_1"]
     </MudTextM3>
     <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-        @Localizer["FoldersSelector_ManualSelection_OnboardingHeading_2"]
+        @MarkupLocalizer["FoldersSelector_ManualSelection_OnboardingHeading_2"]
     </MudTextM3>
 }
 <MudGrid Justify="Justify.Center" Class="mt-8 mb-4">
     <MudItem xs="10">
         <MudForm @ref="@foldersForm">
-            <MudTextFieldExtended T="string" Label="@Localizer["FoldersSelector_UserDataFolder"]" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
+            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_UserDataFolder"]" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">@Localizer["Common_Browse_Ellipsis"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">@MarkupLocalizer["Common_Browse_Ellipsis"]</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
             <br />
-            <MudTextFieldExtended T="string" Label="@Localizer["FoldersSelector_InstallationFolder"]" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
+            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_InstallationFolder"]" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">@Localizer["Common_Browse_Ellipsis"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">@MarkupLocalizer["Common_Browse_Ellipsis"]</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
             <br />
-            <MudTextFieldExtended T="string" Label="@Localizer["FoldersSelector_DownloadsFolder"]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
+            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_DownloadsFolder"]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForDownloadsFolderOnClickAsync">@Localizer["Common_Browse_Ellipsis"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForDownloadsFolderOnClickAsync">@MarkupLocalizer["Common_Browse_Ellipsis"]</MudButton>
                 </AdornmentEnd>
             </MudTextFieldExtended>
         </MudForm>

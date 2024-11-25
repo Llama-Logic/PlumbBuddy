@@ -1,22 +1,23 @@
 @implements IDisposable
 @inject IDialogService DialogService
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
-@inject IStringLocalizer<AppText> Localizer
 @inject ILogger<CatalogDisplay> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlatformFunctions PlatformFunctions
 @inject IPublicCatalogs PublicCatalogs
 @inject ISettings Settings;
 @inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Justify="Justify.Center" Class="align-center">
     <MudItem Class="flex-grow-1">
         <div class="catalog-note rounded">
-            <MudAlert Severity="Severity.Info">@Localizer["CatalogDisplay_UserAssistanceNote"]</MudAlert>
+            <MudAlert Severity="Severity.Info">@MarkupLocalizer["CatalogDisplay_UserAssistanceNote"]</MudAlert>
         </div>
     </MudItem>
     <MudItem>
-        <MudTextField T="string" @bind-Value="@ModsSearchText" Variant="Variant.Filled" Label="@Localizer["CatalogDisplay_SearchCatalog"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" />
+        <MudTextField T="string" @bind-Value="@ModsSearchText" Variant="Variant.Filled" Label="@StringLocalizer["CatalogDisplay_SearchCatalog"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" />
     </MudItem>
     <MudFlexBreak />
     <MudItem xs="4">
@@ -75,18 +76,18 @@
                     }
                     <MudItem>
                         <MudStack Row>
-                            <MudTooltip Arrow Text="@Localizer["CatalogDisplay_AskForHelp_Tip", selectedModKey.Name]" Color="Color.Info">
-                                <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))" StartIcon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info">@Localizer["CatalogDisplay_AskForHelp"]</MudButton>
+                            <MudTooltip Arrow Text="@StringLocalizer["CatalogDisplay_AskForHelp_Tip", selectedModKey.Name]" Color="Color.Info">
+                                <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))" StartIcon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info">@MarkupLocalizer["CatalogDisplay_AskForHelp"]</MudButton>
                             </MudTooltip>
                             @foreach (var requiredPackCode in requiredPackCodes)
                             {
-                                <MudTooltip Arrow Text="@(Localizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
+                                <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
                                     <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(requiredPackCode, DialogService, creators, selectedMod.Select(mod => mod.manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
                                 </MudTooltip>
                             }
                             @foreach (var incompatiblePackCode in incompatiblePackCodes)
                             {
-                                <MudTooltip Arrow Text="@(Localizer[installedPackCodes.Contains(incompatiblePackCode) ? "CatalogDisplay_IncompatiblePack_Installed_Tip" : "CatalogDisplay_IncompatiblePack_NotInstalled_Tip", selectedModKey.Name, incompatiblePackCode])" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
+                                <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(incompatiblePackCode) ? "CatalogDisplay_IncompatiblePack_Installed_Tip" : "CatalogDisplay_IncompatiblePack_NotInstalled_Tip", selectedModKey.Name, incompatiblePackCode])" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
                                     <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Browser.OpenAsync(new Uri("https://jamesturner.yt/disablepacks", UriKind.Absolute), BrowserLaunchMode.External))" StartIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
                                 </MudTooltip>
                             }
@@ -96,21 +97,21 @@
                     <MudItem xs="12">
                         <MudTable T="FileInfo" Items="@files" Breakpoint="Breakpoint.Md" Dense Filter="IncludeFile" Class="mt-2">
                             <ToolBarContent>
-                                <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@Localizer["CatalogDisplay_Files"]</MudTextM3>
+                                <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer["CatalogDisplay_Files"]</MudTextM3>
                                 <MudSpacer />
                                 <MudTextField @bind-Value="@filesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
                             </ToolBarContent>
                             <HeaderContent>
-                                <MudTh>@Localizer["CatalogDisplay_Files_ModsFolderPath"]</MudTh>
+                                <MudTh>@StringLocalizer["CatalogDisplay_Files_ModsFolderPath"]</MudTh>
                                 <MudTh></MudTh>
                             </HeaderContent>
                             <RowTemplate>
-                                <MudTd DataLabel="@Localizer["CatalogDisplay_Files_ModsFolderPath"]">
+                                <MudTd DataLabel="@StringLocalizer["CatalogDisplay_Files_ModsFolderPath"]">
                                     <MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0" />
                                 </MudTd>
                                 <MudTd>
                                     <MudStack Row Justify="Justify.FlexEnd">
-                                        <MudTooltip Text="@Localizer["CatalogDisplay_Files_ViewThisFile_Tip"]" Arrow>
+                                        <MudTooltip Text="@StringLocalizer["CatalogDisplay_Files_ViewThisFile_Tip"]" Arrow>
                                             <MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="(() => PlatformFunctions.ViewFile(context))" />
                                         </MudTooltip>
                                     </MudStack>
@@ -123,37 +124,37 @@
                         <MudItem xs="12">
                             <MudTable T="ModKey" Items="dependencies" Breakpoint="Breakpoint.Md" Dense Filter="IncludeDependency" Class="mt-2">
                                 <ToolBarContent>
-                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@Localizer["CatalogDisplay_Dependencies"]</MudTextM3>
+                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer["CatalogDisplay_Dependencies"]</MudTextM3>
                                     <MudSpacer />
                                     <MudTextField @bind-Value="@dependenciesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
                                 </ToolBarContent>
                                 <HeaderContent>
-                                    <MudTh>@Localizer["Common_Name"]</MudTh>
-                                    <MudTh>@Localizer["Common_Creators"]</MudTh>
-                                    <MudTh>@Localizer["Common_Url"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Name"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Creators"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Url"]</MudTh>
                                     <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="@Localizer["Common_Name"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Name"]">
                                         <MudTextM3 Color="@(mods.ContainsKey(context) ? Color.Default : Color.Error)">@context.Name</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["Common_Creators"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Creators"]">
                                         <MudTextM3>@context.Creators</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["Common_Url"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Url"]">
                                         <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
                                     </MudTd>
                                     <MudTd>
                                         <MudStack Row Justify="Justify.FlexEnd">
                                             @if (mods.ContainsKey(context))
                                             {
-                                                <MudTooltip Text="@Localizer["CatalogDisplay_Dependencies_OpenCatalogEntry_Tip"]" Arrow>
+                                                <MudTooltip Text="@StringLocalizer["CatalogDisplay_Dependencies_OpenCatalogEntry_Tip"]" Arrow>
                                                     <MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInApp" Size="Size.Small" OnClick="@(() => selectedModKey = context)" />
                                                 </MudTooltip>
                                             }
                                             else
                                             {
-                                                <MudTooltip Text="@Localizer["CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip"]" Arrow Color="Color.Error">
+                                                <MudTooltip Text="@StringLocalizer["CatalogDisplay_Dependencies_OpenCatalogEntry_Missing_Tip"]" Arrow Color="Color.Error">
                                                     <MudIcon Icon="@MaterialDesignIcons.Normal.FileQuestion" Size="Size.Small" Color="Color.Error" />
                                                 </MudTooltip>
                                             }
@@ -168,29 +169,29 @@
                         <MudItem xs="12">
                             <MudTable T="ModKey" Items="indexableDependents" Breakpoint="Breakpoint.Md" Dense Filter="IncludeDependent" Class="mt-2">
                                 <ToolBarContent>
-                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@Localizer["CatalogDisplay_Dependents"]</MudTextM3>
+                                    <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer["CatalogDisplay_Dependents"]</MudTextM3>
                                     <MudSpacer />
                                     <MudTextField @bind-Value="@dependentsSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
                                 </ToolBarContent>
                                 <HeaderContent>
-                                    <MudTh>@Localizer["Common_Name"]</MudTh>
-                                    <MudTh>@Localizer["Common_Creators"]</MudTh>
-                                    <MudTh>@Localizer["Common_Url"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Name"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Creators"]</MudTh>
+                                    <MudTh>@StringLocalizer["Common_Url"]</MudTh>
                                     <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="@Localizer["Common_Name"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Name"]">
                                         <MudTextM3>@context.Name</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["Common_Creators"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Creators"]">
                                         <MudTextM3>@context.Creators</MudTextM3>
                                     </MudTd>
-                                    <MudTd DataLabel="@Localizer["Common_Url"]">
+                                    <MudTd DataLabel="@StringLocalizer["Common_Url"]">
                                         <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
                                     </MudTd>
                                     <MudTd>
                                         <MudStack Row Justify="Justify.FlexEnd">
-                                            <MudTooltip Text="@Localizer["CatalogDisplay_Dependents_OpenCatalogEntry_Tip"]" Arrow>
+                                            <MudTooltip Text="@StringLocalizer["CatalogDisplay_Dependents_OpenCatalogEntry_Tip"]" Arrow>
                                                 <MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInApp" Size="Size.Small" OnClick="@(() => selectedModKey = context)" />
                                             </MudTooltip>
                                         </MudStack>
