@@ -3,7 +3,6 @@
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
-@inject IStringLocalizer<AppText> StringLocalizer
 
 @if (Settings.Type is not UserType.Casual && SmartSimObserver.GameVersion is { } gameVersion)
 {
@@ -238,7 +237,7 @@
         </div>
         <MudTooltip Arrow="true" Color="Color.Info">
             <ChildContent>
-                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : StringLocalizer["HUD_CatalogingETA_Tip_Estimating"])" />
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : AppText.HUD_CatalogingETA_Tip_Estimating)" />
             </ChildContent>
             <TooltipContent>
                 <MudStack Row="true">

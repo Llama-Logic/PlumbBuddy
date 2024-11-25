@@ -2,7 +2,6 @@
 @inject IFolderPicker FolderPicker
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISteam Steam
-@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Spacing="12" Justify="Justify.Center">
     <MudItem>
@@ -104,7 +103,7 @@
 <MudGrid Justify="Justify.Center" Class="mt-8 mb-4">
     <MudItem xs="10">
         <MudForm @ref="@foldersForm">
-            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_UserDataFolder"]" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
+            <MudTextFieldExtended T="string" Label="@(AppText.FoldersSelector_UserDataFolder)" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
                 </AdornmentStart>
@@ -113,7 +112,7 @@
                 </AdornmentEnd>
             </MudTextFieldExtended>
             <br />
-            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_InstallationFolder"]" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
+            <MudTextFieldExtended T="string" Label="@(AppText.FoldersSelector_InstallationFolder)" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
                 </AdornmentStart>
@@ -122,7 +121,7 @@
                 </AdornmentEnd>
             </MudTextFieldExtended>
             <br />
-            <MudTextFieldExtended T="string" Label="@StringLocalizer["FoldersSelector_DownloadsFolder"]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
+            <MudTextFieldExtended T="string" Label="@(AppText.FoldersSelector_DownloadsFolder)" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
                 <AdornmentStart>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
                 </AdornmentStart>
