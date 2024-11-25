@@ -421,6 +421,285 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Analyzing Topography.
+        /// </summary>
+        internal static string HUD_AnalyzingTopography_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_AnalyzingTopography_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏.
+        /// </summary>
+        internal static string HUD_AnalyzingTopography_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_AnalyzingTopography_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Python Byte Code Files.
+        /// </summary>
+        internal static string HUD_ByteCodeFiles_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_ByteCodeFiles_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the number of compiled Python byte code files I found in script archives in your Mods folder..
+        /// </summary>
+        internal static string HUD_ByteCodeFiles_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_ByteCodeFiles_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4..
+        /// </summary>
+        internal static string HUD_ByteCodeFiles_Tip_ModsDisabled {
+            get {
+                return ResourceManager.GetString("HUD_ByteCodeFiles_Tip_ModsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cataloging ETA.
+        /// </summary>
+        internal static string HUD_CatalogingETA_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_CatalogingETA_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is my best guess as to how much longer this process is going to take. It will fluctuate a bit as I progress, but less so as I near the end of the list of files..
+        /// </summary>
+        internal static string HUD_CatalogingETA_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_CatalogingETA_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Estimating.
+        /// </summary>
+        internal static string HUD_CatalogingETA_Tip_Estimating {
+            get {
+                return ResourceManager.GetString("HUD_CatalogingETA_Tip_Estimating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cataloging Mods.
+        /// </summary>
+        internal static string HUD_CatalogingMods_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_CatalogingMods_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m currently combing through the files in your Mods folder and scribbling down notes, don&apos;t mind me. 😏.
+        /// </summary>
+        internal static string HUD_CatalogingMods_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_CatalogingMods_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Composing Manifests.
+        /// </summary>
+        internal static string HUD_ComposingManifests_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_ComposingManifests_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It&apos;s probably best that I do not actively read your Mods folder while I&apos;m also... writing to it? I&apos;ll resume cataloging as soon as these manifests are written. 😏.
+        /// </summary>
+        internal static string HUD_ComposingManifests_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_ComposingManifests_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Version.
+        /// </summary>
+        internal static string HUD_GameVersion_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_GameVersion_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the current version of The Sims 4 you have installed..
+        /// </summary>
+        internal static string HUD_GameVersion_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_GameVersion_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages.
+        /// </summary>
+        internal static string HUD_Packages_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_Packages_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the number of packages I was able to catalog in your Mods folder..
+        /// </summary>
+        internal static string HUD_Packages_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_Packages_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because Mods are disabled in your Game Options, these packages will not be loaded by The Sims 4..
+        /// </summary>
+        internal static string HUD_Packages_Tip_Description_ModsDisabled {
+            get {
+                return ResourceManager.GetString("HUD_Packages_Tip_Description_ModsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Python Scripts.
+        /// </summary>
+        internal static string HUD_PythonScripts_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_PythonScripts_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis&apos; SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script archives. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;.
+        /// </summary>
+        internal static string HUD_PythonScripts_Tip_CreatorsNote {
+            get {
+                return ResourceManager.GetString("HUD_PythonScripts_Tip_CreatorsNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script archives in your Mods folder..
+        /// </summary>
+        internal static string HUD_PythonScripts_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_PythonScripts_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resources.
+        /// </summary>
+        internal static string HUD_Resources_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_Resources_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the number of resources in the packages I was able to catalog in your Mods folder..
+        /// </summary>
+        internal static string HUD_Resources_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_Resources_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: This sum does not account for resource overrides. It is a strict, &quot;dumb sum&quot;.&lt;/em&gt;.
+        /// </summary>
+        internal static string HUD_Resources_Tip_Description_CreatorsNote {
+            get {
+                return ResourceManager.GetString("HUD_Resources_Tip_Description_CreatorsNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4..
+        /// </summary>
+        internal static string HUD_Resources_Tip_Description_ModsDisabled {
+            get {
+                return ResourceManager.GetString("HUD_Resources_Tip_Description_ModsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script Archives.
+        /// </summary>
+        internal static string HUD_ScriptArchives_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_ScriptArchives_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the number of script archives I was able to catalog in your Mods folder..
+        /// </summary>
+        internal static string HUD_ScriptArchives_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_ScriptArchives_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4..
+        /// </summary>
+        internal static string HUD_ScriptArchives_Tip_ModsDisabled {
+            get {
+                return ResourceManager.GetString("HUD_ScriptArchives_Tip_ModsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sleeping.
+        /// </summary>
+        internal static string HUD_Sleeping_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_Sleeping_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It&apos;s probably best that I do not actively read your Mods folder while you&apos;re playing to maximize your computer&apos;s resources for the game itself. I&apos;ll wake up as soon as you exit the game. 😏.
+        /// </summary>
+        internal static string HUD_Sleeping_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_Sleeping_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting.
+        /// </summary>
+        internal static string HUD_Waiting_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_Waiting_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m just waiting for activity in your Mods folder to die down and then I&apos;ll have a look. 😏.
+        /// </summary>
+        internal static string HUD_Waiting_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_Waiting_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Sims 4.
         /// </summary>
         internal static string UserDataFolderName {

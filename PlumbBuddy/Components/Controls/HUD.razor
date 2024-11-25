@@ -1,7 +1,9 @@
 @implements IDisposable
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
 
 @if (Settings.Type is not UserType.Casual && SmartSimObserver.GameVersion is { } gameVersion)
 {
@@ -13,11 +15,11 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.TimelineCheck" />
-                <MudTextM3 Typo="TypoM3.Title">Game Version</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_GameVersion_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the current version of The Sims 4 you have installed.
+                @MarkupLocalizer["HUD_GameVersion_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -31,17 +33,17 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" />
-                <MudTextM3 Typo="TypoM3.Title">Packages</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_Packages_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the number of packages I was able to catalog in your Mods folder.
+                @MarkupLocalizer["HUD_Packages_Tip_Description"]
             </MudTextM3>
             @if (SmartSimObserver.IsModsDisabledGameSettingOn)
             {
                 <MudDivider />
                 <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                    Because Mods are disabled in your Game Options, these packages will not be loaded by The Sims 4.
+                    @MarkupLocalizer["HUD_Packages_Tip_Description_ModsDisabled"]
                 </MudTextM3>
             }
         </TooltipContent>
@@ -56,21 +58,21 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.FileDocumentRemove : MaterialDesignIcons.Normal.FileDocumentCheck)" />
-                <MudTextM3 Typo="TypoM3.Title">Resources</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_Resources_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the number of resources in the packages I was able to catalog in your Mods folder.
+                @MarkupLocalizer["HUD_Resources_Tip_Description"]
             </MudTextM3>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                <em>Creator's Note: This sum does not account for resource overrides. It is a strict, "dumb sum".</em>
+                @MarkupLocalizer["HUD_Resources_Tip_Description_CreatorsNote"]
             </MudTextM3>
             @if (SmartSimObserver.IsModsDisabledGameSettingOn)
             {
                 <MudDivider />
                 <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                    Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.
+                    @MarkupLocalizer["HUD_Resources_Tip_Description_ModsDisabled"]
                 </MudTextM3>
             }
         </TooltipContent>
@@ -85,17 +87,17 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn ? MaterialDesignIcons.Normal.SourceBranchRemove : MaterialDesignIcons.Normal.SourceBranchCheck)" />
-                <MudTextM3 Typo="TypoM3.Title">Script Archives</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_ScriptArchives_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the number of script archives I was able to catalog in your Mods folder.
+                @MarkupLocalizer["HUD_ScriptArchives_Tip_Description"]
             </MudTextM3>
             @if (SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn)
             {
                 <MudDivider />
                 <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                    Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4.
+                    @MarkupLocalizer["HUD_ScriptArchives_Tip_ModsDisabled"]
                 </MudTextM3>
             }
         </TooltipContent>
@@ -110,20 +112,15 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.SpeedometerSlow" />
-                <MudTextM3 Typo="TypoM3.Title">Python Scripts</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_PythonScripts_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the number of <strong>uncompiled</strong> Python scripts I found in script archives in your Mods folder.
+                @MarkupLocalizer["HUD_PythonScripts_Tip_Description"]
             </MudTextM3>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                <em>
-                    Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them.
-                    Maxis' SmartSim engine <strong>does not</strong> Just-in-Time compile Python scripts in script archives.
-                    This means they will underperform <strong>considerably</strong>.
-                    If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.
-                </em>
+                @MarkupLocalizer["HUD_PythonScripts_Tip_CreatorsNote"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -137,17 +134,17 @@
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.Speedometer" />
-                <MudTextM3 Typo="TypoM3.Title">Python Byte Code Files</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_ByteCodeFiles_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                This is the number of compiled Python byte code files I found in script archives in your Mods folder.
+                @MarkupLocalizer["HUD_ByteCodeFiles_Tip_Description"]
             </MudTextM3>
             @if (SmartSimObserver.IsModsDisabledGameSettingOn || !SmartSimObserver.IsScriptModsEnabledGameSettingOn)
             {
                 <MudDivider />
                 <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                    Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4.
+                    @MarkupLocalizer["HUD_ByteCodeFiles_Tip_ModsDisabled"]
                 </MudTextM3>
             }
         </TooltipContent>
@@ -158,17 +155,17 @@
     <MudTooltip Arrow="true" Color="Color.Tertiary">
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.FileSign" Color="Color.Tertiary">
-                <ChildContent>Composing Manifests</ChildContent>
+                <ChildContent>@MarkupLocalizer["HUD_ComposingManifests_Tip_Caption"]</ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.FileSign" />
-                <MudTextM3 Typo="TypoM3.Title">Composing Manifests</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_ComposingManifests_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                It's probably best that I do not actively read your Mods folder while I'm also... writing to it? I'll resume cataloging as soon as these manifests are written. 😏
+                @MarkupLocalizer["HUD_ComposingManifests_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -178,17 +175,17 @@
     <MudTooltip Arrow="true" Color="Color.Dark">
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Sleep" Color="Color.Dark">
-                <ChildContent>Sleeping</ChildContent>
+                <ChildContent>@MarkupLocalizer["HUD_Sleeping_Tip_Caption"]</ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" />
-                <MudTextM3 Typo="TypoM3.Title">Sleeping</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_Sleeping_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                It's probably best that I do not actively read your Mods folder while you're playing to maximize your computer's resources for the game itself. I'll wake up as soon as you exit the game. 😏
+                @MarkupLocalizer["HUD_Sleeping_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -198,17 +195,17 @@
     <MudTooltip Arrow="true" Color="Color.Tertiary">
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Tertiary" Class="plumbbuddy-is-thinking">
-                <ChildContent>Waiting</ChildContent>
+                <ChildContent>@MarkupLocalizer["HUD_Waiting_Tip_Caption"]</ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.Timer" />
-                <MudTextM3 Typo="TypoM3.Title">Waiting</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_Waiting_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                I'm just waiting for activity in your Mods folder to die down and then I'll have a look. 😏
+                @MarkupLocalizer["HUD_Waiting_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -219,18 +216,18 @@
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Primary" Class="plumbbuddy-is-thinking">
                 <ChildContent>
-                    Cataloging Mods
+                    @MarkupLocalizer["HUD_CatalogingMods_Tip_Caption"]
                 </ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.CubeScan" />
-                <MudTextM3 Typo="TypoM3.Title">Cataloging Mods</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_CatalogingMods_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                I'm currently combing through the files in your Mods folder and scribbling down notes, don't mind me. 😏
+                @MarkupLocalizer["HUD_CatalogingMods_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>
@@ -241,17 +238,16 @@
         </div>
         <MudTooltip Arrow="true" Color="Color.Info">
             <ChildContent>
-                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : "Estimating")" />
+                <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(ModsDirectoryCataloger.EstimatedStateTimeRemaining is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : StringLocalizer["HUD_CatalogingETA_Tip_Estimating"])" />
             </ChildContent>
             <TooltipContent>
                 <MudStack Row="true">
                     <MudIcon Icon="@MaterialDesignIcons.Normal.Timer" />
-                    <MudTextM3 Typo="TypoM3.Title">Cataloging ETA</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_CatalogingETA_Tip_Caption"]</MudTextM3>
                 </MudStack>
                 <MudDivider />
                 <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                    This is my best guess as to how much longer this process is going to take.
-                    It will fluctuate a bit as I progress, but less so as I near the end of the list of files.
+                    @MarkupLocalizer["HUD_CatalogingETA_Tip_Description"]
                 </MudTextM3>
             </TooltipContent>
         </MudTooltip>
@@ -262,17 +258,17 @@
     <MudTooltip Arrow="true" Color="Color.Secondary">
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
-                <ChildContent>Analyzing Topography</ChildContent>
+                <ChildContent>@MarkupLocalizer["HUD_AnalyzingTopography_Tip_Caption"]</ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.SelectCompare" />
-                <MudTextM3 Typo="TypoM3.Title">Analyzing Topography</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["HUD_AnalyzingTopography_Tip_Caption"]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                I'm taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏
+                @MarkupLocalizer["HUD_AnalyzingTopography_Tip_Description"]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>

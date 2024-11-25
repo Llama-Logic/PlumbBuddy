@@ -246,4 +246,97 @@
   <data name="FoldersSelector_ValidateInstallationFolder_NoBinary" xml:space="preserve">
     <value>hat's not a valid The Sims 4 installation. 🙄</value>
   </data>
+  <data name="HUD_GameVersion_Tip_Caption" xml:space="preserve">
+    <value>Game Version</value>
+  </data>
+  <data name="HUD_GameVersion_Tip_Description" xml:space="preserve">
+    <value>This is the current version of The Sims 4 you have installed.</value>
+  </data>
+  <data name="HUD_Packages_Tip_Caption" xml:space="preserve">
+    <value>Packages</value>
+  </data>
+  <data name="HUD_Packages_Tip_Description" xml:space="preserve">
+    <value>This is the number of packages I was able to catalog in your Mods folder.</value>
+  </data>
+  <data name="HUD_Packages_Tip_Description_ModsDisabled" xml:space="preserve">
+    <value>Because Mods are disabled in your Game Options, these packages will not be loaded by The Sims 4.</value>
+  </data>
+  <data name="HUD_Resources_Tip_Caption" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="HUD_Resources_Tip_Description" xml:space="preserve">
+    <value>This is the number of resources in the packages I was able to catalog in your Mods folder.</value>
+  </data>
+  <data name="HUD_Resources_Tip_Description_CreatorsNote" xml:space="preserve">
+    <value>&lt;em&gt;Creator's Note: This sum does not account for resource overrides. It is a strict, "dumb sum".&lt;/em&gt;</value>
+  </data>
+  <data name="HUD_Resources_Tip_Description_ModsDisabled" xml:space="preserve">
+    <value>Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.</value>
+  </data>
+  <data name="HUD_ScriptArchives_Tip_Caption" xml:space="preserve">
+    <value>Script Archives</value>
+  </data>
+  <data name="HUD_ScriptArchives_Tip_Description" xml:space="preserve">
+    <value>This is the number of script archives I was able to catalog in your Mods folder.</value>
+  </data>
+  <data name="HUD_ScriptArchives_Tip_ModsDisabled" xml:space="preserve">
+    <value>Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4.</value>
+  </data>
+  <data name="HUD_PythonScripts_Tip_Caption" xml:space="preserve">
+    <value>Python Scripts</value>
+  </data>
+  <data name="HUD_PythonScripts_Tip_Description" xml:space="preserve">
+    <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script archives in your Mods folder.</value>
+  </data>
+  <data name="HUD_PythonScripts_Tip_CreatorsNote" xml:space="preserve">
+    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script archives. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
+  </data>
+  <data name="HUD_ByteCodeFiles_Tip_Caption" xml:space="preserve">
+    <value>Python Byte Code Files</value>
+  </data>
+  <data name="HUD_ByteCodeFiles_Tip_Description" xml:space="preserve">
+    <value>This is the number of compiled Python byte code files I found in script archives in your Mods folder.</value>
+  </data>
+  <data name="HUD_ByteCodeFiles_Tip_ModsDisabled" xml:space="preserve">
+    <value>Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4.</value>
+  </data>
+  <data name="HUD_ComposingManifests_Tip_Caption" xml:space="preserve">
+    <value>Composing Manifests</value>
+  </data>
+  <data name="HUD_ComposingManifests_Tip_Description" xml:space="preserve">
+    <value>It's probably best that I do not actively read your Mods folder while I'm also... writing to it? I'll resume cataloging as soon as these manifests are written. 😏</value>
+  </data>
+  <data name="HUD_Sleeping_Tip_Caption" xml:space="preserve">
+    <value>Sleeping</value>
+  </data>
+  <data name="HUD_Sleeping_Tip_Description" xml:space="preserve">
+    <value>It's probably best that I do not actively read your Mods folder while you're playing to maximize your computer's resources for the game itself. I'll wake up as soon as you exit the game. 😏</value>
+  </data>
+  <data name="HUD_Waiting_Tip_Caption" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="HUD_Waiting_Tip_Description" xml:space="preserve">
+    <value>I'm just waiting for activity in your Mods folder to die down and then I'll have a look. 😏</value>
+  </data>
+  <data name="HUD_CatalogingMods_Tip_Caption" xml:space="preserve">
+    <value>Cataloging Mods</value>
+  </data>
+  <data name="HUD_CatalogingMods_Tip_Description" xml:space="preserve">
+    <value>I'm currently combing through the files in your Mods folder and scribbling down notes, don't mind me. 😏</value>
+  </data>
+  <data name="HUD_CatalogingETA_Tip_Caption" xml:space="preserve">
+    <value>Cataloging ETA</value>
+  </data>
+  <data name="HUD_CatalogingETA_Tip_Estimating" xml:space="preserve">
+    <value>Estimating</value>
+  </data>
+  <data name="HUD_CatalogingETA_Tip_Description" xml:space="preserve">
+    <value>This is my best guess as to how much longer this process is going to take. It will fluctuate a bit as I progress, but less so as I near the end of the list of files.</value>
+  </data>
+  <data name="HUD_AnalyzingTopography_Tip_Caption" xml:space="preserve">
+    <value>Analyzing Topography</value>
+  </data>
+  <data name="HUD_AnalyzingTopography_Tip_Description" xml:space="preserve">
+    <value>I'm taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏</value>
+  </data>
 </root>
