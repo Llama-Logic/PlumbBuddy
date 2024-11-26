@@ -339,4 +339,262 @@
   <data name="HUD_AnalyzingTopography_Tip_Description" xml:space="preserve">
     <value>I'm taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏</value>
   </data>
+  <data name="ManifestEditor_Select_Heading_1" xml:space="preserve">
+    <value>Teach me about your mod so I can help players (and other creators) with it.</value>
+  </data>
+  <data name="ManifestEditor_Select_Heading_2" xml:space="preserve">
+    <value>It will be &lt;em&gt;manifestly&lt;/em&gt; awesome. 😏</value>
+  </data>
+  <data name="ManifestEditor_Select_Guidance" xml:space="preserve">
+    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files on the next step.</value>
+  </data>
+  <data name="ManifestEditor_Select_CheckForScaffoldingLocation_Label" xml:space="preserve">
+    <value>Check for scaffolding in a "PlumbBuddy" subfolder first.</value>
+  </data>
+  <data name="ManifestEditor_Select_Picker_Label" xml:space="preserve">
+    <value>Any File from Your Mod</value>
+  </data>
+  <data name="ManifestEditor_Select_CheckForScaffoldingLocation_Tip" xml:space="preserve">
+    <value>I'll check in both places either way, but you can use this switch to control where I look first.</value>
+  </data>
+  <data name="ManifestEditor_Select_BatchUpdate_Label" xml:space="preserve">
+    <value>Update all the Manifests in Mods in a Folder</value>
+  </data>
+  <data name="ManifestEditor_Select_BatchUpdate_Tip" xml:space="preserve">
+    <value>Click this button to select a folder and then update the manifests in every mod found in a recursive search of the folder. Any problems or warnings encountered by the Manifest Editor will immediately interrupt the process.</value>
+  </data>
+  <data name="ManifestEditor_Details_Heading_1" xml:space="preserve">
+    <value>Alright, let's get started nice and easy... 😅</value>
+  </data>
+  <data name="ManifestEditor_Details_Heading_2" xml:space="preserve">
+    <value>📝 How about we cover the basics first?</value>
+  </data>
+  <data name="ManifestEditor_Details_ModName_Label" xml:space="preserve">
+    <value>Mod Name</value>
+  </data>
+  <data name="ManifestEditor_Details_ModName_HelperText" xml:space="preserve">
+    <value>What's your mod called? Pretty simple.</value>
+  </data>
+  <data name="ManifestEditor_Details_Creators_Label" xml:space="preserve">
+    <value>Creators</value>
+  </data>
+  <data name="ManifestEditor_Details_Creators_Placeholder" xml:space="preserve">
+    <value>Enter a creator name here and press enter</value>
+  </data>
+  <data name="ManifestEditor_Details_Creators_HelperText" xml:space="preserve">
+    <value>So uhh... 🕵️‍♂️ who's responsible for this?</value>
+  </data>
+  <data name="ManifestEditor_Details_DownloadPageUrl_Caption" xml:space="preserve">
+    <value>Download Page URL</value>
+  </data>
+  <data name="ManifestEditor_Details_DownloadPageUrl_HelperText" xml:space="preserve">
+    <value>This should be a web page on which links or buttons are available to download the mod files for THIS MOD.</value>
+  </data>
+  <data name="ManifestEditor_Details_OpenInWebBrowser_Tip" xml:space="preserve">
+    <value>Open in Web Browser</value>
+  </data>
+  <data name="ManifestEditor_Details_SeeThingsNotToDo_Tip" xml:space="preserve">
+    <value>See Things Not To Do</value>
+  </data>
+  <data name="ManifestEditor_Details_SeeThingsNotToDo_Popover_1" xml:space="preserve">
+    <value>Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**{0}* your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);{0}* your Patreon feed (as opposed to a Patreon post devoted to this mod);{0}* your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,{0}* any other page which does not feature a one-click step to downloading your mod's files.</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Details_SeeThingsNotToDo_Popover_2" xml:space="preserve">
+    <value>If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs.</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Details_SeeThingsToDo_Popover" xml:space="preserve">
+    <value>It is completely okay if on this same page you *also*:{0}* feature your other modding content;{0}* feature links to other creators;{0}* display ads to the player; and,{0}* solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts' Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/).</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Details_SeeThingsToDo_Tip" xml:space="preserve">
+    <value>See Things To Do</value>
+  </data>
+  <data name="ManifestEditor_Details_Label" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ManifestEditor_Select_Label" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="ManifestEditor_Components_Label" xml:space="preserve">
+    <value>Components</value>
+  </data>
+  <data name="ManifestEditor_Components_Heading_1" xml:space="preserve">
+    <value>Here are all the files we currently consider a part of your mod.</value>
+  </data>
+  <data name="ManifestEditor_Components_Heading_2" xml:space="preserve">
+    <value>🏗️ Are we leaving anything out?</value>
+  </data>
+  <data name="ManifestEditor_Components_DuplicateSettings_Tip_Caption" xml:space="preserve">
+    <value>Duplicate Settings</value>
+  </data>
+  <data name="ManifestEditor_Components_DuplicateSettings_Tip_Description" xml:space="preserve">
+    <value>Duplicate these settings, applying them to multiple mod files at once.</value>
+  </data>
+  <data name="ManifestEditor_Requirements_Label" xml:space="preserve">
+    <value>Requirements</value>
+  </data>
+  <data name="ManifestEditor_Requirements_Heading_1" xml:space="preserve">
+    <value>🤔 We're all searching for fulfillment at the end of the day.</value>
+  </data>
+  <data name="ManifestEditor_Requirements_Heading_2" xml:space="preserve">
+    <value>What does your mod &lt;strong&gt;need&lt;/strong&gt; to be happy? 😊</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RequiredPacks_Label" xml:space="preserve">
+    <value>Required Packs</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RequiredPacks_HelperText" xml:space="preserve">
+    <value>Does your mod need any official The Sims 4 packs from Electronic Arts to work?</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder" xml:space="preserve">
+    <value>(click here to select/search for packs)</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder" xml:space="preserve">
+    <value>Type a pack code like GP08 for Realm of Magic and press enter</value>
+  </data>
+  <data name="ManifestEditor_Requirements_PromoCode_HelperText" xml:space="preserve">
+    <value>If you have been invited to the EA Creator Network, PlumbBuddy can give players your Promo Code to use at check-out when buying packs to use with your mod.</value>
+  </data>
+  <data name="ManifestEditor_Requirements_PromoCode_Label" xml:space="preserve">
+    <value>EA Promo Code</value>
+  </data>
+  <data name="ManifestEditor_Requirements_IncompatiblePacks_Label" xml:space="preserve">
+    <value>Incompatible Packs</value>
+  </data>
+  <data name="ManifestEditor_Requirements_IncompatiblePacks_HelperText" xml:space="preserve">
+    <value>Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?</value>
+  </data>
+  <data name="ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder" xml:space="preserve">
+    <value>(click here to select/search for packs)</value>
+  </data>
+  <data name="ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder" xml:space="preserve">
+    <value>Type a pack code like GP12 for Werewolves and press enter</value>
+  </data>
+  <data name="ManifestEditor_Requirements_AddRequiredMod_Label" xml:space="preserve">
+    <value>Add Required Mod...</value>
+  </data>
+  <data name="ManifestEditor_Requirements_AddRequiredMod_Popover" xml:space="preserve">
+    <value>If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.{0}{0}If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don't worry! You can always go back!</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Requirements_RemoveRequirement_Label" xml:space="preserve">
+    <value>Remove Requirement</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Label" xml:space="preserve">
+    <value>Cross-Mod</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Heading_1" xml:space="preserve">
+    <value>🕹️ Entertaining the player ourselves isn't the only way we can bring value.</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Heading_2" xml:space="preserve">
+    <value>Sometimes it's helping others shine. 💁‍♀️</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Version_Label" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_VersionToggle_Label" xml:space="preserve">
+    <value>I maintain versions of my mod.</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_SemanticVersioning_Label" xml:space="preserve">
+    <value>Quick Semantic Versioning Links</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_SemanticVersioning_MajorLink" xml:space="preserve">
+    <value>I made changes to my mod which will break other mods that require it.</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_SemanticVersioning_MinorLink" xml:space="preserve">
+    <value>I added features to my mod in a way which will not break other mods that require it.</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_SemanticVersioning_PatchLink" xml:space="preserve">
+    <value>I made other changes to my mod in a way which will not break other mods that require it.</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Features_Label" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Features_Placeholder" xml:space="preserve">
+    <value>Type a feature name here and press enter</value>
+  </data>
+  <data name="ManifestEditor_CrossMod_Features_HelperText" xml:space="preserve">
+    <value>You can use this field to establish feature flags. When other creators reference your mod as a requirement, they will be able to specify which features they need. This can be seen as an alternative to version ranges.</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Label" xml:space="preserve">
+    <value>Hashing</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Heading_1" xml:space="preserve">
+    <value>Some players like to alter packages for their own purposes. 📦</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Heading_2" xml:space="preserve">
+    <value>🔐 We should talk about what you're comfortable with.</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Info" xml:space="preserve">
+    <value>I identify your mod's files on players' computers by examining the contents of the files, *not* by trusting file names. This is because players can (and do) rename mod files to influence the game's mod load order. I need to know what things in your mod's files to consider in identifying your mod.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Hashing_Warning" xml:space="preserve">
+    <value>The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_Label" xml:space="preserve">
+    <value>Hashing Elements</value>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_OtherPackageData" xml:space="preserve">
+    <value>Other Package Data</value>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_Tuning" xml:space="preserve">
+    <value>Tuning</value>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_SimData" xml:space="preserve">
+    <value>Sim Data</value>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_Images" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="ManifestEditor_Hashing_HashingElements_StringTables" xml:space="preserve">
+    <value>String Tables</value>
+  </data>
+  <data name="ManifestEditor_Confirm_Label" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ManifestEditor_Confirm_ErrorHeading_1" xml:space="preserve">
+    <value>🛑 Woah, there, Chief! We can't quite do this... ⛔</value>
+  </data>
+  <data name="ManifestEditor_Confirm_ErrorHeading_2" xml:space="preserve">
+    <value>👈 It looks like you need to go back and fix something.</value>
+  </data>
+  <data name="ManifestEditor_Confirm_ReadyHeading_2" xml:space="preserve">
+    <value>Click &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-filled mud-chip-size-large mud-chip-color-tertiary mud-chip-label"&gt;&lt;span class="mud-chip-content"&gt;FINISH&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; to update the manifest in your {0} and they'll be ready to go. 🚀</value>
+    <comment>{0} = Quantized Mod Files</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_ReadyHeading_2_ModFile" xml:space="preserve">
+    <value>mod file</value>
+    <comment>This noun will be pluralized by Humanizer.</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_ReadyHeading_1" xml:space="preserve">
+    <value>📃 If I had any notes or concerns, I put them below. If the area's blank then... 🤷 no notes.</value>
+  </data>
+  <data name="ManifestEditor_Select_WriteScaffoldingLocation_Label" xml:space="preserve">
+    <value>Write scaffolding in a "PlumbBuddy" subfolder to keep my mod files' folder more orderly.</value>
+  </data>
+  <data name="ManifestEditor_Select_WriteScaffoldingLocation_Tip" xml:space="preserve">
+    <value>I'll clean up any old, unneeded scaffolding files left behind if you change this setting.</value>
+  </data>
+  <data name="ManifestEditor_Composing_Heading_1" xml:space="preserve">
+    <value>☝️ Please wait just a moment.</value>
+  </data>
+  <data name="ManifestEditor_Composing_Heading_2" xml:space="preserve">
+    <value>🚧 Manifest Composition is in progress. 🚧</value>
+  </data>
+  <data name="ManifestEditor_UsePublicPackCatalog_Label" xml:space="preserve">
+    <value>Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes</value>
+  </data>
+  <data name="ManifestEditor_UsePublicPackCatalog_Tip" xml:space="preserve">
+    <value>Switching this on will cause fields which expect Pack Codes to connect to the PlumbBuddy.app web site, allowing you to search and select from its Public Pack Catalog instead of having to know the codes yourself. This feature requires an Internet connection.</value>
+  </data>
+  <data name="ManifestEditor_BatchUpdate_Status" xml:space="preserve">
+    <value>Processing &lt;strong&gt;{0}&lt;/strong&gt; (mod file &lt;strong&gt;{1:n0}&lt;/strong&gt; of &lt;strong&gt;{2:n0}&lt;/strong&gt;)</value>
+    <comment>{0} = Name of current mod file; {1} = Number of current mod file in sequence; {2} Total number of mod files in sequence</comment>
+  </data>
+  <data name="Common_Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
 </root>

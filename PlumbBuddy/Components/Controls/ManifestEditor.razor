@@ -3,104 +3,87 @@
 @inject IFolderPicker FolderPicker
 @inject IJSRuntime JSRuntime
 @inject ILogger<ManifestEditor> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <div class="relative" style="height: 100%;">
     <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
         <MudStepperExtended @ref="stepper" Animation="@(!batchOverlayVisible)" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%; padding: 24px;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
             <ChildContent>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="Select">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="@(AppText.ManifestEditor_Select_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Teach me about your mod so I can help players (and other creators) with it.
+                                @MarkupLocalizer["ManifestEditor_Select_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                It will be <em>manifestly</em> awesome. 😏
+                                @MarkupLocalizer["ManifestEditor_Select_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="mb-4">
                                 <MudItem xs="10">
                                     <MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
-                                        Let's start by selecting <strong>any</strong> file for your mod.
-                                    </MudTextM3>
-                                    <MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
-                                        It doesn’t matter if it’s a package or a script archive.
-                                        If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷.
-                                        You'll be able to specify any remaining files on the next step.
+                                        @MarkupLocalizer["ManifestEditor_Select_Guidance"]
                                     </MudTextM3>
                                     <MudForm @ref="selectStepForm" Class="mt-4">
-                                        <ModFileSelector Label="Any File from Your Mod" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
+                                        <ModFileSelector Label="@(AppText.ManifestEditor_Select_Picker_Label)" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
                                     </MudForm>
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudTooltip Color="Color.Tertiary" Arrow Text="I'll check in both places either way, but you can use this switch to control where I look first.">
-                                        <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">Check for scaffolding in a "PlumbBuddy" subfolder first.</MudSwitchM3>
+                                    <MudTooltip Color="Color.Tertiary" Arrow Text="@(AppText.ManifestEditor_Select_CheckForScaffoldingLocation_Tip)">
+                                        <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">@MarkupLocalizer["ManifestEditor_Select_CheckForScaffoldingLocation_Label"]</MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudTooltip Arrow Color="Color.Tertiary" Text="Click this button to select a folder and then update the manifests in every mod found in a recursive search of the folder. Any problems or warnings encountered by the Manifest Editor will immediately interrupt the process.">
-                                        <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.ArrowDecisionAuto" OnClick="HandleUpdateAllManifestsInAFolderAsync">Update all the Manifests in Mods in a Folder</MudButton>
+                                    <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.ManifestEditor_Select_BatchUpdate_Tip)">
+                                        <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.ArrowDecisionAuto" OnClick="HandleUpdateAllManifestsInAFolderAsync">@MarkupLocalizer["ManifestEditor_Select_BatchUpdate_Label"]</MudButton>
                                     </MudTooltip>
                                 </MudItem>
                             </MudGrid>
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Tag" Title="Details">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Tag" Title="@(AppText.ManifestEditor_Details_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Alright, let's get started nice and easy... 😅
+                                @MarkupLocalizer["ManifestEditor_Details_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                📝 How about we cover the basics first?
+                                @MarkupLocalizer["ManifestEditor_Details_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="mb-4">
                                 <MudItem xs="8">
                                     <MudForm @ref="@detailsStepForm">
-                                        <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="Mod Name" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="What's your mod called? Pretty simple." Immediate Class="mt-4" />
-                                        <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="So uhh... 🕵️‍♂️ who's responsible for this?" Class="mt-4" />
-                                        <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="Download Page URL" HelperText="This should be a web page on which links or buttons are available to download the mod files for THIS MOD." Immediate Class="mt-4">
+                                        <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_ModName_Label)" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@(AppText.ManifestEditor_Details_ModName_HelperText)" Immediate Class="mt-4" />
+                                        <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@(AppText.ManifestEditor_Details_Creators_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@(AppText.ManifestEditor_Details_Creators_Placeholder)" HelperText="@(AppText.ManifestEditor_Details_Creators_HelperText)" Class="mt-4" />
+                                        <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_DownloadPageUrl_Caption)" HelperText="@(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)" Immediate Class="mt-4">
                                             <AdornmentStart>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
                                             </AdornmentStart>
                                             <AdornmentEnd>
-                                                <MudTooltip Arrow Color="Color.Info" Text="Open in Web Browser">
+                                                <MudTooltip Arrow Color="Color.Info" Text="@(AppText.ManifestEditor_Details_OpenInWebBrowser_Tip)">
                                                     <MudIconButton Icon="@MaterialDesignIcons.Normal.Web" Color="Color.Info" OnClick="HandleOpenDownloadPageUrlInBrowserAsync" />
                                                 </MudTooltip>
-                                                <MudTooltip Arrow Color="Color.Warning" Text="See Things Not To Do">
+                                                <MudTooltip Arrow Color="Color.Warning" Text="@(AppText.ManifestEditor_Details_SeeThingsNotToDo_Tip)">
                                                     <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
                                                     <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                         <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
-                                                            <InlineMarkdown>
-                                                                Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
-                                                                * your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);
-                                                                * your Patreon feed (as opposed to a Patreon post devoted to this mod);
-                                                                * your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,
-                                                                * any other page which does not feature a one-click step to downloading your mod's files.
-                                                            </InlineMarkdown>
-                                                            <InlineMarkdown>
-                                                                If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs.
-                                                            </InlineMarkdown>
+                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsNotToDo_Popover_1", Environment.NewLine]" />
+                                                            <MudMarkdown Value="@(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_2)" />
                                                         </MudAlert>
                                                     </MudPopover>
                                                 </MudTooltip>
-                                                <MudTooltip Arrow Color="Color.Success" Text="See Things To Do">
+                                                <MudTooltip Arrow Color="Color.Success" Text="@(AppText.ManifestEditor_Details_SeeThingsToDo_Tip)">
                                                     <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
                                                     <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                         <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
-                                                            <InlineMarkdown>
-                                                                It is completely okay if on this same page you *also*:
-                                                                * feature your other modding content;
-                                                                * feature links to other creators;
-                                                                * display ads to the player; and,
-                                                                * solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts' Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/).
-                                                            </InlineMarkdown>
+                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsToDo_Popover", Environment.NewLine]" />
                                                         </MudAlert>
                                                     </MudPopover>
                                                 </MudTooltip>
@@ -112,14 +95,14 @@
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCheck" Title="Components">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCheck" Title="@(AppText.ManifestEditor_Components_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Here are all the files we currently consider a part of your mod.
+                                @MarkupLocalizer["ManifestEditor_Components_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                🏗️ Are we leaving anything out?
+                                @MarkupLocalizer["ManifestEditor_Components_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="mb-4">
                                 <MudItem Class="mt-4" xs="8">
@@ -154,11 +137,11 @@
                                                 <TooltipContent>
                                                     <MudStack Row="true">
                                                         <MudIcon Icon="@MaterialDesignIcons.Normal.ContentDuplicate" />
-                                                        <MudTextM3 Typo="TypoM3.Title">Duplicate Settings</MudTextM3>
+                                                        <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["ManifestEditor_Components_DuplicateSettings_Tip_Caption"]</MudTextM3>
                                                     </MudStack>
                                                     <MudDivider />
                                                     <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                                        Duplicate these settings, applying them to multiple mod files at once.
+                                                        @MarkupLocalizer["ManifestEditor_Components_DuplicateSettings_Tip_Description"]
                                                     </MudTextM3>
                                                 </TooltipContent>
                                             </MudTooltip>
@@ -175,52 +158,49 @@
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Asterisk" Title="Requirements">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Asterisk" Title="@(AppText.ManifestEditor_Requirements_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                🤔 We're all searching for fulfillment at the end of the day.
+                                @MarkupLocalizer["ManifestEditor_Requirements_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                What does your mod <strong>need</strong> to be happy? 😊
+                                @MarkupLocalizer["ManifestEditor_Requirements_Heading_2"]
                             </MudTextM3>
                             <MudForm @ref="@requirementsStepForm">
                                 <MudGrid Justify="Justify.Center" Class="my-4 align-center">
                                     <MudItem xs="8">
                                         @if (PublicCatalogs.PackCatalog is { } packCatalog)
                                         {
-                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@RequiredPackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Required Packs" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" Placeholder="(click here to select/search for packs)" />
+                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@RequiredPackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@(AppText.ManifestEditor_Requirements_RequiredPacks_Label)" HelperText="@(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)" Placeholder="@(AppText.ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder)" />
                                         }
                                         else
                                         {
-                                            <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="Required Packs" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="Type a pack code like GP08 for Realm of Magic and press enter" HelperText="Does your mod need any official The Sims 4 packs from Electronic Arts to work?" />
+                                            <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="@(AppText.ManifestEditor_Requirements_RequiredPacks_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="@(AppText.ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder)" HelperText="@(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)" />
                                         }
                                     </MudItem>
                                     <MudItem xs="8">
-                                        <MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="EA Promo Code" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="If you have been invited to the EA Creator Network, PlumbBuddy can give players your Promo Code to use at check-out when buying packs to use with your mod." Disabled="@(requiredPacks.Count == 0)" />
+                                        <MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Requirements_PromoCode_Label)" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="@(AppText.ManifestEditor_Requirements_PromoCode_HelperText)" Disabled="@(requiredPacks.Count == 0)" />
                                     </MudItem>
                                     <MudItem xs="8">
                                         @if (PublicCatalogs.PackCatalog is { } packCatalog)
                                         {
-                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@IncompatiblePackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Incompatible Packs" HelperText="Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?" Placeholder="(click here to select/search for packs)" />
+                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@IncompatiblePackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)" HelperText="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)" Placeholder="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder)" />
                                         }
                                         else
                                         {
-                                            <ChipSetField @ref="@incompatibleChipSetField" @bind-Values="@incompatiblePacks" Color="Color.Tertiary" Label="Incompatible Packs" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Placeholder="Type a pack code like GP12 for Werewolves and press enter" HelperText="Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?" />
+                                            <ChipSetField @ref="@incompatibleChipSetField" @bind-Values="@incompatiblePacks" Color="Color.Tertiary" Label="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Placeholder="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder)" HelperText="@(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)" />
                                         }
                                     </MudItem>
                                     <MudFlexBreak />
                                     <MudItem>
-                                        <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">Add Required Mod...</MudButton>
+                                        <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer["ManifestEditor_Requirements_AddRequiredMod_Label"]</MudButton>
                                     </MudItem>
                                     <MudItem Class="ml-n4">
                                         <MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
                                         <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight">
                                             <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
-                                                <InlineMarkdown>
-                                                    If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.<br />
-                                                    If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don't worry! You can always go back!
-                                                </InlineMarkdown>
+                                                <MudMarkdown Value="@StringLocalizer["ManifestEditor_Requirements_AddRequiredMod_Popover", Environment.NewLine]" />
                                             </MudAlert>
                                         </MudPopover>
                                     </MudItem>
@@ -233,7 +213,7 @@
                                                     <ChildContent>
                                                         <MudStack Class="align-center">
                                                             <ModRequirementEditor ModRequirement="@requiredMod" />
-                                                            <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">Remove Requirement</MudButton>
+                                                            <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">@MarkupLocalizer["ManifestEditor_Requirements_RemoveRequirement_Label"]</MudButton>
                                                         </MudStack>
                                                     </ChildContent>
                                                 </MudExpansionPanel>
@@ -245,56 +225,56 @@
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Offer" Title="Cross-Mod">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Offer" Title="@(AppText.ManifestEditor_CrossMod_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                🕹️ Entertaining the player ourselves isn't the only way we can bring value.
+                                @MarkupLocalizer["ManifestEditor_CrossMod_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                Sometimes it's helping others shine. 💁‍♀️
+                                @MarkupLocalizer["ManifestEditor_CrossMod_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="my-4 align-center">
                                 <MudItem>
-                                    <MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">I maintain versions of my mod.</MudSwitchM3>
+                                    <MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">@MarkupLocalizer["ManifestEditor_CrossMod_VersionToggle_Label"]</MudSwitchM3>
                                 </MudItem>
                                 <MudItem>
-                                    <MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="Version" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Timeline" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
+                                    <MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_CrossMod_Version_Label)" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Timeline" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem>
                                     <MudPaper Class="pa-4">
-                                        <MudTextM3 Typo="TypoM3.Title">Quick Semantic Versioning Links</MudTextM3>
+                                        <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["ManifestEditor_CrossMod_SemanticVersioning_Label"]</MudTextM3>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudIcon Icon="@MaterialDesignIcons.Normal.AutorenewOff" Color="Color.Warning" />
-                                            <MudLink OnClick="HandleQuickSemanticMajorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I made changes to my mod which will break other mods that require it.</MudLink>
+                                            <MudLink OnClick="HandleQuickSemanticMajorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">@MarkupLocalizer["ManifestEditor_CrossMod_SemanticVersioning_MajorLink"]</MudLink>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudIcon Icon="@MaterialDesignIcons.Normal.Autorenew" Color="Color.Success" />
-                                            <MudLink OnClick="HandleQuickSemanticMinorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I added features to my mod in a way which will not break other mods that require it.</MudLink>
+                                            <MudLink OnClick="HandleQuickSemanticMinorOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">@MarkupLocalizer["ManifestEditor_CrossMod_SemanticVersioning_MinorLink"]</MudLink>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudIcon Icon="@MaterialDesignIcons.Normal.Autorenew" />
-                                            <MudLink OnClick="HandleQuickSemanticPatchOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">I made other changes to my mod in a way which will not break other mods that require it.</MudLink>
+                                            <MudLink OnClick="HandleQuickSemanticPatchOnClick" Color="Color.Tertiary" Disabled="@(!versionEnabled)">@MarkupLocalizer["ManifestEditor_CrossMod_SemanticVersioning_PatchLink"]</MudLink>
                                         </MudStack>
                                     </MudPaper>
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem xs="8">
-                                    <ChipSetField @ref="@featuresChipSetField" @bind-Values="@features" Color="Color.Tertiary" Label="Features" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Offer" Placeholder="Type a feature name here and press enter" HelperText="You can use this field to establish feature flags. When other creators reference your mod as a requirement, they will be able to specify which features they need. This can be seen as an alternative to version ranges." />
+                                    <ChipSetField @ref="@featuresChipSetField" @bind-Values="@features" Color="Color.Tertiary" Label="@(AppText.ManifestEditor_CrossMod_Features_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Offer" Placeholder="@(AppText.ManifestEditor_CrossMod_Features_Placeholder)" HelperText="@(AppText.ManifestEditor_CrossMod_Features_HelperText)" />
                                 </MudItem>
                             </MudGrid>
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.BarcodeScan" Title="Hashing">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.BarcodeScan" Title="@(AppText.ManifestEditor_Hashing_Label)">
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Some players like to alter packages for their own purposes. 📦
+                                @MarkupLocalizer["ManifestEditor_Hashing_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                🔐 We should talk about what you're comfortable with.
+                                @MarkupLocalizer["ManifestEditor_Hashing_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="my-4 align-center">
                                 <MudItem xs="8">
@@ -305,51 +285,47 @@
                                 <MudItem xs="8">
                                     <MudPaper>
                                         <MudAlert Severity="Severity.Info">
-                                            <InlineMarkdown>
-                                                I identify your mod's files on players' computers by examining the contents of the files, *not* by trusting file names. This is because players can (and do) rename mod files to influence the game's mod load order. I need to know what things in your mod's files to consider in identifying your mod.
-                                            </InlineMarkdown>
+                                            <MudMarkdown Value="@(AppText.ManifestEditor_Hashing_Info)" />
                                         </MudAlert>
                                     </MudPaper>
                                     <MudPaper Class="mt-6">
                                         <MudAlert Severity="Severity.Warning">
-                                            <InlineMarkdown>
-                                                The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention.
-                                            </InlineMarkdown>
+                                            <MudMarkdown Value="@(AppText.ManifestEditor_Hashing_Warning)" />
                                         </MudAlert>
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem>
                                     <MudPaper Class="pa-4">
-                                        <MudTextM3 Typo="TypoM3.Title">Hashing Elements</MudTextM3>
+                                        <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_Label"]</MudTextM3>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudBadge Icon="@MaterialDesignIcons.Normal.Lock" Color="Color.Info" Origin="Origin.BottomRight" Overlap>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.DatabaseCog" />
                                             </MudBadge>
-                                            <MudTextM3>Other Package Data</MudTextM3>
+                                            <MudTextM3>@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_OtherPackageData"]</MudTextM3>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudBadge Icon="@(hashingLevel is >= 1 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 1 ? Color.Success : Color.Dark)" Origin="Origin.BottomRight" Overlap>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Xml" />
                                             </MudBadge>
-                                            <MudTextM3>Tuning</MudTextM3>
+                                            <MudTextM3>@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_Tuning"]</MudTextM3>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudBadge Icon="@(hashingLevel is >= 1 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 1 ? Color.Success : Color.Dark)" Origin="Origin.BottomRight" Overlap>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.DataMatrix" />
                                             </MudBadge>
-                                            <MudTextM3>Sim Data</MudTextM3>
+                                            <MudTextM3>@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_SimData"]</MudTextM3>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudBadge Icon="@(hashingLevel is >= 2 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 2 ? Color.Warning : Color.Dark)" Origin="Origin.BottomRight" Overlap>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.ImageMultiple" />
                                             </MudBadge>
-                                            <MudTextM3>Images</MudTextM3>
+                                            <MudTextM3>@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_Images"]</MudTextM3>
                                         </MudStack>
                                         <MudStack Row Class="align-center mt-2">
                                             <MudBadge Icon="@(hashingLevel is >= 2 ? MaterialDesignIcons.Normal.Lock : MaterialDesignIcons.Normal.LockOpen)" Color="@(hashingLevel is >= 2 ? Color.Warning : Color.Dark)" Origin="Origin.BottomRight" Overlap>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Translate" />
                                             </MudBadge>
-                                            <MudTextM3>String Tables</MudTextM3>
+                                            <MudTextM3>@MarkupLocalizer["ManifestEditor_Hashing_HashingElements_StringTables"]</MudTextM3>
                                         </MudStack>
                                     </MudPaper>
                                 </MudItem>
@@ -357,31 +333,31 @@
                         </div>
                     </ChildContent>
                 </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileSign" Title="Confirm">
+                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileSign" Title="@(AppText.ManifestEditor_Confirm_Label)">
                     <ChildContent>
                         <div class="step-content">
                             @if (confirmationStepMessages.Any(csm => csm.severity is Severity.Error))
                             {
                                 <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                    🛑 Woah, there, Chief! We can't quite do this... ⛔
+                                    @MarkupLocalizer["ManifestEditor_Confirm_ErrorHeading_1"]
                                 </MudTextM3>
                                 <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                    👈 It looks like you need to go back and fix something.
+                                    @MarkupLocalizer["ManifestEditor_Confirm_ErrorHeading_2"]
                                 </MudTextM3>
                             }
                             else
                             {
                                 <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                    📃 If I had any notes or concerns, I put them below. If the area's blank then... 🤷 no notes.
+                                    @MarkupLocalizer["ManifestEditor_Confirm_ReadyHeading_1"]
                                 </MudTextM3>
                                 <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                    Click <MudChip T="string" Label="true" Color="Color.Tertiary" Size="Size.Large">FINISH</MudChip> to update the manifest in your @("mod file".ToQuantity(components.Count, formatProvider: new CultureInfo("en-US"))) and they'll be ready to go. 🚀
+                                    @(MarkupLocalizer["ManifestEditor_Confirm_ReadyHeading_2", AppText.ManifestEditor_Confirm_ReadyHeading_2_ModFile.ToQuantity(components.Count)])
                                 </MudTextM3>
                             }
                             <MudGrid Justify="Justify.Center" Class="my-4">
                                 <MudItem>
-                                    <MudTooltip Color="Color.Tertiary" Arrow Text="I'll clean up any old, unneeded scaffolding files left behind if you change this setting.">
-                                        <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">Write scaffolding in a "PlumbBuddy" subfolder to keep my mod files' folder more orderly.</MudSwitchM3>
+                                    <MudTooltip Color="Color.Tertiary" Arrow Text="@(AppText.ManifestEditor_Select_WriteScaffoldingLocation_Tip)">
+                                        <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">@MarkupLocalizer["ManifestEditor_Select_WriteScaffoldingLocation_Label"]</MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
                                 <MudFlexBreak />
@@ -420,10 +396,10 @@
                     <ChildContent>
                         <div class="step-content">
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                ☝️ Please wait just a moment.
+                                @MarkupLocalizer["ManifestEditor_Composing_Heading_1"]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                🚧 Manifest Composition is in progress. 🚧
+                                @MarkupLocalizer["ManifestEditor_Composing_Heading_2"]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center">
                                 <MudItem xs="8" Class="mt-4">
@@ -446,8 +422,8 @@
                         }
                     </MudItem>
                     <MudItem>
-                        <MudTooltip Text="Switching this on will cause fields which expect Pack Codes to connect to the PlumbBuddy.app web site, allowing you to search and select from its Public Pack Catalog instead of having to know the codes yourself. This feature requires an Internet connection." Color="Color.Tertiary" Placement="Placement.Top" Arrow>
-                            <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Label="Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+                        <MudTooltip Text="@(AppText.ManifestEditor_UsePublicPackCatalog_Tip)" Color="Color.Tertiary" Placement="Placement.Top" Arrow>
+                            <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Label="@(AppText.ManifestEditor_UsePublicPackCatalog_Label)" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
                         </MudTooltip>
                     </MudItem>
                 </MudGrid>
@@ -458,9 +434,9 @@
         <MudGrid Justify="Justify.Center" Class="absolute pa-20" Style="bottom: 0;">
             <MudItem xs="6">
                 <MudStack AlignItems="AlignItems.Center">
-                    <MudTextM3>Processing <strong>@batchOverlayFilename</strong> (mod file <strong>@batchOverlayValue</strong> of <strong>@batchOverlayMax</strong>)</MudTextM3>
+                    <MudTextM3>@MarkupLocalizer["ManifestEditor_BatchUpdate_Status", batchOverlayFilename, batchOverlayValue, batchOverlayMax]</MudTextM3>
                     <MudProgressLinear Buffer Value="@batchOverlayValue" Max="@(batchOverlayMax + 1)" Color="Color.Tertiary" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.Octagon" OnClick="HandleCancelBatchProcess">Stop</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.Octagon" OnClick="HandleCancelBatchProcess">@MarkupLocalizer["Common_Stop"]</MudButton>
                 </MudStack>
             </MudItem>
         </MudGrid>

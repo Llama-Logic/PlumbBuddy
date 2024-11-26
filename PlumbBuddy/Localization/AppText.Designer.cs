@@ -250,6 +250,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string Common_Stop {
+            get {
+                return ResourceManager.GetString("Common_Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to URL.
         /// </summary>
         internal static string Common_Url {
@@ -696,6 +705,744 @@ namespace PlumbBuddy.Localization {
         internal static string HUD_Waiting_Tip_Description {
             get {
                 return ResourceManager.GetString("HUD_Waiting_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing &lt;strong&gt;{0}&lt;/strong&gt; (mod file &lt;strong&gt;{1:n0}&lt;/strong&gt; of &lt;strong&gt;{2:n0}&lt;/strong&gt;).
+        /// </summary>
+        internal static string ManifestEditor_BatchUpdate_Status {
+            get {
+                return ResourceManager.GetString("ManifestEditor_BatchUpdate_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate Settings.
+        /// </summary>
+        internal static string ManifestEditor_Components_DuplicateSettings_Tip_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Components_DuplicateSettings_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate these settings, applying them to multiple mod files at once..
+        /// </summary>
+        internal static string ManifestEditor_Components_DuplicateSettings_Tip_Description {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Components_DuplicateSettings_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are all the files we currently consider a part of your mod..
+        /// </summary>
+        internal static string ManifestEditor_Components_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Components_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🏗️ Are we leaving anything out?.
+        /// </summary>
+        internal static string ManifestEditor_Components_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Components_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Components.
+        /// </summary>
+        internal static string ManifestEditor_Components_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Components_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ☝️ Please wait just a moment..
+        /// </summary>
+        internal static string ManifestEditor_Composing_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🚧 Manifest Composition is in progress. 🚧.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🛑 Woah, there, Chief! We can&apos;t quite do this... ⛔.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_ErrorHeading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_ErrorHeading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 👈 It looks like you need to go back and fix something..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_ErrorHeading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_ErrorHeading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📃 If I had any notes or concerns, I put them below. If the area&apos;s blank then... 🤷 no notes..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_ReadyHeading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_ReadyHeading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click &lt;div class=&quot;mud-chip-container&quot;&gt;&lt;div tabindex=&quot;-1&quot; class=&quot;mud-chip mud-chip-filled mud-chip-size-large mud-chip-color-tertiary mud-chip-label&quot;&gt;&lt;span class=&quot;mud-chip-content&quot;&gt;FINISH&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; to update the manifest in your {0} and they&apos;ll be ready to go. 🚀.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_ReadyHeading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_ReadyHeading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mod file.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_ReadyHeading_2_ModFile {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_ReadyHeading_2_ModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can use this field to establish feature flags. When other creators reference your mod as a requirement, they will be able to specify which features they need. This can be seen as an alternative to version ranges..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Features_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Features_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Features.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Features_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Features_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a feature name here and press enter.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Features_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Features_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🕹️ Entertaining the player ourselves isn&apos;t the only way we can bring value..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sometimes it&apos;s helping others shine. 💁‍♀️.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cross-Mod.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quick Semantic Versioning Links.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_SemanticVersioning_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_SemanticVersioning_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I made changes to my mod which will break other mods that require it..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_SemanticVersioning_MajorLink {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_SemanticVersioning_MajorLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I added features to my mod in a way which will not break other mods that require it..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_SemanticVersioning_MinorLink {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_SemanticVersioning_MinorLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I made other changes to my mod in a way which will not break other mods that require it..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_SemanticVersioning_PatchLink {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_SemanticVersioning_PatchLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_Version_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_Version_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I maintain versions of my mod..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_VersionToggle_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_VersionToggle_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So uhh... 🕵️‍♂️ who&apos;s responsible for this?.
+        /// </summary>
+        internal static string ManifestEditor_Details_Creators_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Creators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creators.
+        /// </summary>
+        internal static string ManifestEditor_Details_Creators_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Creators_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a creator name here and press enter.
+        /// </summary>
+        internal static string ManifestEditor_Details_Creators_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Creators_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Page URL.
+        /// </summary>
+        internal static string ManifestEditor_Details_DownloadPageUrl_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This should be a web page on which links or buttons are available to download the mod files for THIS MOD..
+        /// </summary>
+        internal static string ManifestEditor_Details_DownloadPageUrl_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alright, let&apos;s get started nice and easy... 😅.
+        /// </summary>
+        internal static string ManifestEditor_Details_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📝 How about we cover the basics first?.
+        /// </summary>
+        internal static string ManifestEditor_Details_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        internal static string ManifestEditor_Details_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What&apos;s your mod called? Pretty simple..
+        /// </summary>
+        internal static string ManifestEditor_Details_ModName_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_ModName_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Name.
+        /// </summary>
+        internal static string ManifestEditor_Details_ModName_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_ModName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Web Browser.
+        /// </summary>
+        internal static string ManifestEditor_Details_OpenInWebBrowser_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_OpenInWebBrowser_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**{0}* your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);{0}* your Patreon feed (as opposed to a Patreon post devoted to this mod);{0}* your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,{0}* any other page which does not feat [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Details_SeeThingsNotToDo_Popover_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_SeeThingsNotToDo_Popover_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you are concerned about the stability of the URL you currently have for any reason, consider [applying for a modding community sponsored redirect URL](https://plumbbuddy.app/community-services/redirect-hosting) which you will be able to change later to suit your needs..
+        /// </summary>
+        internal static string ManifestEditor_Details_SeeThingsNotToDo_Popover_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_SeeThingsNotToDo_Popover_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See Things Not To Do.
+        /// </summary>
+        internal static string ManifestEditor_Details_SeeThingsNotToDo_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_SeeThingsNotToDo_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is completely okay if on this same page you *also*:{0}* feature your other modding content;{0}* feature links to other creators;{0}* display ads to the player; and,{0}* solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts&apos; Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/)..
+        /// </summary>
+        internal static string ManifestEditor_Details_SeeThingsToDo_Popover {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_SeeThingsToDo_Popover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See Things To Do.
+        /// </summary>
+        internal static string ManifestEditor_Details_SeeThingsToDo_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_SeeThingsToDo_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Images.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_Images {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_Images", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hashing Elements.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other Package Data.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_OtherPackageData {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_OtherPackageData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sim Data.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_SimData {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_SimData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to String Tables.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_StringTables {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_StringTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tuning.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_HashingElements_Tuning {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_HashingElements_Tuning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some players like to alter packages for their own purposes. 📦.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🔐 We should talk about what you&apos;re comfortable with..
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I identify your mod&apos;s files on players&apos; computers by examining the contents of the files, *not* by trusting file names. This is because players can (and do) rename mod files to influence the game&apos;s mod load order. I need to know what things in your mod&apos;s files to consider in identifying your mod..
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Info {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hashing.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention..
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Warning {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add Required Mod....
+        /// </summary>
+        internal static string ManifestEditor_Requirements_AddRequiredMod_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_AddRequiredMod_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.{0}{0}If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don&apos;t worry! You can always go back!.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_AddRequiredMod_Popover {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_AddRequiredMod_Popover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🤔 We&apos;re all searching for fulfillment at the end of the day..
+        /// </summary>
+        internal static string ManifestEditor_Requirements_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What does your mod &lt;strong&gt;need&lt;/strong&gt; to be happy? 😊.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a pack code like GP12 for Werewolves and press enter.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are there any official The Sims 4 packs from Electronic Arts that will cause your mod to NOT WORK?.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_IncompatiblePacks_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_IncompatiblePacks_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incompatible Packs.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_IncompatiblePacks_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_IncompatiblePacks_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (click here to select/search for packs).
+        /// </summary>
+        internal static string ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requirements.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you have been invited to the EA Creator Network, PlumbBuddy can give players your Promo Code to use at check-out when buying packs to use with your mod..
+        /// </summary>
+        internal static string ManifestEditor_Requirements_PromoCode_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_PromoCode_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EA Promo Code.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_PromoCode_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_PromoCode_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Requirement.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RemoveRequirement_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RemoveRequirement_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a pack code like GP08 for Realm of Magic and press enter.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Does your mod need any official The Sims 4 packs from Electronic Arts to work?.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RequiredPacks_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RequiredPacks_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required Packs.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RequiredPacks_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RequiredPacks_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (click here to select/search for packs).
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update all the Manifests in Mods in a Folder.
+        /// </summary>
+        internal static string ManifestEditor_Select_BatchUpdate_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_BatchUpdate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click this button to select a folder and then update the manifests in every mod found in a recursive search of the folder. Any problems or warnings encountered by the Manifest Editor will immediately interrupt the process..
+        /// </summary>
+        internal static string ManifestEditor_Select_BatchUpdate_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_BatchUpdate_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for scaffolding in a &quot;PlumbBuddy&quot; subfolder first..
+        /// </summary>
+        internal static string ManifestEditor_Select_CheckForScaffoldingLocation_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_CheckForScaffoldingLocation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ll check in both places either way, but you can use this switch to control where I look first..
+        /// </summary>
+        internal static string ManifestEditor_Select_CheckForScaffoldingLocation_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_CheckForScaffoldingLocation_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Let&apos;s start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there&apos;s more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You&apos;ll be able to specify any remaining files on the next step..
+        /// </summary>
+        internal static string ManifestEditor_Select_Guidance {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_Guidance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teach me about your mod so I can help players (and other creators) with it..
+        /// </summary>
+        internal static string ManifestEditor_Select_Heading_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It will be &lt;em&gt;manifestly&lt;/em&gt; awesome. 😏.
+        /// </summary>
+        internal static string ManifestEditor_Select_Heading_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        internal static string ManifestEditor_Select_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any File from Your Mod.
+        /// </summary>
+        internal static string ManifestEditor_Select_Picker_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_Picker_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write scaffolding in a &quot;PlumbBuddy&quot; subfolder to keep my mod files&apos; folder more orderly..
+        /// </summary>
+        internal static string ManifestEditor_Select_WriteScaffoldingLocation_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_WriteScaffoldingLocation_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ll clean up any old, unneeded scaffolding files left behind if you change this setting..
+        /// </summary>
+        internal static string ManifestEditor_Select_WriteScaffoldingLocation_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Select_WriteScaffoldingLocation_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes.
+        /// </summary>
+        internal static string ManifestEditor_UsePublicPackCatalog_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_UsePublicPackCatalog_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switching this on will cause fields which expect Pack Codes to connect to the PlumbBuddy.app web site, allowing you to search and select from its Public Pack Catalog instead of having to know the codes yourself. This feature requires an Internet connection..
+        /// </summary>
+        internal static string ManifestEditor_UsePublicPackCatalog_Tip {
+            get {
+                return ResourceManager.GetString("ManifestEditor_UsePublicPackCatalog_Tip", resourceCulture);
             }
         }
         

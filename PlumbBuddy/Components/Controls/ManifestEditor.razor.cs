@@ -674,6 +674,11 @@ partial class ManifestEditor
             UrlProhibitiveGuidanceOpen = false;
             UrlEncouragingGuidanceOpen = false;
         }
+        if (activeIndex is 3)
+        {
+            if (addRequiredModGuidanceOpen)
+                addRequiredModGuidanceOpen = false;
+        }
         if (direction is StepChangeDirection.Backward)
             return false;
         if (activeIndex is 0 && components.Count == 0)
@@ -819,8 +824,6 @@ partial class ManifestEditor
                 await requiredPacksChipSetField.CommitPendingEntryIfEmptyAsync();
             if (incompatibleChipSetField is not null)
                 await incompatibleChipSetField.CommitPendingEntryIfEmptyAsync();
-            if (addRequiredModGuidanceOpen)
-                addRequiredModGuidanceOpen = false;
             foreach (var requiredMod in requiredMods)
                 await requiredMod.CommitPendingEntriesIfEmptyAsync();
         }
