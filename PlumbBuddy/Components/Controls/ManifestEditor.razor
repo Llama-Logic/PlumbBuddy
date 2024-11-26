@@ -12,7 +12,7 @@
 
 <div class="relative" style="height: 100%;">
     <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
-        <MudStepperExtended @ref="stepper" Animation="@(!batchOverlayVisible)" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%; padding: 24px;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
+        <MudStepperExtended @ref="stepper" Animation="@(!batchOverlayVisible)" LocalizedStrings="@(MarkupLocalizer.StepperLocalizedStrings)" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%; padding: 24px;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
             <ChildContent>
                 <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="@(AppText.ManifestEditor_Select_Label)">
                     <ChildContent>
@@ -60,8 +60,8 @@
                             <MudGrid Justify="Justify.Center" Class="mb-4">
                                 <MudItem xs="8">
                                     <MudForm @ref="@detailsStepForm">
-                                        <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_ModName_Label)" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@(AppText.ManifestEditor_Details_ModName_HelperText)" Immediate Class="mt-4" />
-                                        <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@(AppText.ManifestEditor_Details_Creators_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@(AppText.ManifestEditor_Details_Creators_Placeholder)" HelperText="@(AppText.ManifestEditor_Details_Creators_HelperText)" Class="mt-4" />
+                                        <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@(AppText.Common_Name)" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@(AppText.ManifestEditor_Details_ModName_HelperText)" Immediate Class="mt-4" />
+                                        <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@(AppText.Common_Creators)" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@(AppText.ManifestEditor_Details_Creators_Placeholder)" HelperText="@(AppText.ManifestEditor_Details_Creators_HelperText)" Class="mt-4" />
                                         <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_DownloadPageUrl_Caption)" HelperText="@(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)" Immediate Class="mt-4">
                                             <AdornmentStart>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
@@ -418,7 +418,7 @@
                     <MudItem>
                         @if (components.Count > 0 && !isComposing)
                         {
-                            <MudButton OnClick="HandleCancelOnClickAsync" Variant="Variant.Filled" Color="Color.Warning">Cancel</MudButton>
+                            <MudButton OnClick="HandleCancelOnClickAsync" Variant="Variant.Filled" Color="Color.Warning">@MarkupLocalizer["Common_Cancel"]</MudButton>
                         }
                     </MudItem>
                     <MudItem>

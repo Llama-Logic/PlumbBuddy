@@ -223,11 +223,38 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string Common_Cancel {
+            get {
+                return ResourceManager.GetString("Common_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed.
+        /// </summary>
+        internal static string Common_Completed {
+            get {
+                return ResourceManager.GetString("Common_Completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creators.
         /// </summary>
         internal static string Common_Creators {
             get {
                 return ResourceManager.GetString("Common_Creators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        internal static string Common_Finish {
+            get {
+                return ResourceManager.GetString("Common_Finish", resourceCulture);
             }
         }
         
@@ -241,11 +268,56 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        internal static string Common_Next {
+            get {
+                return ResourceManager.GetString("Common_Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optional.
+        /// </summary>
+        internal static string Common_Optional {
+            get {
+                return ResourceManager.GetString("Common_Optional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        internal static string Common_Previous {
+            get {
+                return ResourceManager.GetString("Common_Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select.
         /// </summary>
         internal static string Common_Select {
             get {
                 return ResourceManager.GetString("Common_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip.
+        /// </summary>
+        internal static string Common_Skip {
+            get {
+                return ResourceManager.GetString("Common_Skip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skipped.
+        /// </summary>
+        internal static string Common_Skipped {
+            get {
+                return ResourceManager.GetString("Common_Skipped", resourceCulture);
             }
         }
         
@@ -952,15 +1024,6 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creators.
-        /// </summary>
-        internal static string ManifestEditor_Details_Creators_Label {
-            get {
-                return ResourceManager.GetString("ManifestEditor_Details_Creators_Label", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enter a creator name here and press enter.
         /// </summary>
         internal static string ManifestEditor_Details_Creators_Placeholder {
@@ -1020,15 +1083,6 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Details_ModName_HelperText {
             get {
                 return ResourceManager.GetString("ManifestEditor_Details_ModName_HelperText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mod Name.
-        /// </summary>
-        internal static string ManifestEditor_Details_ModName_Label {
-            get {
-                return ResourceManager.GetString("ManifestEditor_Details_ModName_Label", resourceCulture);
             }
         }
         
@@ -1366,7 +1420,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Let&apos;s start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there&apos;s more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You&apos;ll be able to specify any remaining files on the next step..
+        ///   Looks up a localized string similar to Let&apos;s start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there&apos;s more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You&apos;ll be able to specify any remaining files later in this process..
         /// </summary>
         internal static string ManifestEditor_Select_Guidance {
             get {

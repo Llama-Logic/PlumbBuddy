@@ -346,7 +346,7 @@
     <value>It will be &lt;em&gt;manifestly&lt;/em&gt; awesome. 😏</value>
   </data>
   <data name="ManifestEditor_Select_Guidance" xml:space="preserve">
-    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files on the next step.</value>
+    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files later in this process.</value>
   </data>
   <data name="ManifestEditor_Select_CheckForScaffoldingLocation_Label" xml:space="preserve">
     <value>Check for scaffolding in a "PlumbBuddy" subfolder first.</value>
@@ -369,14 +369,8 @@
   <data name="ManifestEditor_Details_Heading_2" xml:space="preserve">
     <value>📝 How about we cover the basics first?</value>
   </data>
-  <data name="ManifestEditor_Details_ModName_Label" xml:space="preserve">
-    <value>Mod Name</value>
-  </data>
   <data name="ManifestEditor_Details_ModName_HelperText" xml:space="preserve">
     <value>What's your mod called? Pretty simple.</value>
-  </data>
-  <data name="ManifestEditor_Details_Creators_Label" xml:space="preserve">
-    <value>Creators</value>
   </data>
   <data name="ManifestEditor_Details_Creators_Placeholder" xml:space="preserve">
     <value>Enter a creator name here and press enter</value>
@@ -596,5 +590,29 @@
   </data>
   <data name="Common_Stop" xml:space="preserve">
     <value>Stop</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Common_Finish" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="Common_Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Common_Optional" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="Common_Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Common_Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="Common_Skipped" xml:space="preserve">
+    <value>Skipped</value>
   </data>
 </root>

@@ -24,6 +24,7 @@ global using MudBlazor.Services;
 global using MudBlazor.ThemeManager;
 global using MudExtensions;
 global using MudExtensions.Services;
+global using MudExtensions.Utilities;
 global using Nito.AsyncEx;
 global using PlumbBuddy.Components.Controls;
 global using PlumbBuddy.Components.Dialogs;
