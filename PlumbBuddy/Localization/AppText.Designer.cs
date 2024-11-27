@@ -781,6 +781,285 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add subsumed hash from mod file....
+        /// </summary>
+        internal static string ManifestComponentEditor_AddSubsumedHashFromModFile_Local {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_AddSubsumedHashFromModFile_Local", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Since each file in your mod will have its own manifest resource, it can technically have a different name if you want it to. This can be good for specifically labeling add-ons. It would probably be smart, however, to still include the full name of your mod, e.g. Vacuum Clean the Cats: Discover University Support..
+        /// </summary>
+        internal static string ManifestComponentEditor_ComponentName_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ComponentName_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Component Name.
+        /// </summary>
+        internal static string ManifestComponentEditor_ComponentName_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ComponentName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (type a specific name for this component if you want).
+        /// </summary>
+        internal static string ManifestComponentEditor_ComponentName_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ComponentName_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:{0}&gt; vyxated - Chalk&apos;d UI - Support - TMEX - Smarter Pie Menu.
+        /// </summary>
+        internal static string ManifestComponentEditor_Exclusivities_Guidance {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Exclusivities_Guidance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed..
+        /// </summary>
+        internal static string ManifestComponentEditor_Exclusivities_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Exclusivities_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exclusivities.
+        /// </summary>
+        internal static string ManifestComponentEditor_Exclusivities_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Exclusivities_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type the name of an exclusivity here and press enter.
+        /// </summary>
+        internal static string ManifestComponentEditor_Exclusivities_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Exclusivities_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instructs agents to ignore this requirement if the presence of a mod manifest hash in the load order indicates the player has installed another mod..
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashAvailable_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashAvailable_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore if Hash Available.
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashAvailable_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashAvailable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (hash of the mod&apos;s manifest in hex format).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instructs agents to ignore this requirement if the absence of a mod manifest hash in the load order indicates the player has not installed another mod..
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore if Hash Unavailable.
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashUnavailable_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashUnavailable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (hash of the mod&apos;s manifest in hex format).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (use a pack code like EP01 for Get to Work).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player..
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackAvailable_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackAvailable_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore if Pack Available.
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackAvailable_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackAvailable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (click here to select/search for a pack).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (use a pack code like SP46 for Home Chef Hustle).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player..
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore if Pack Unavailable.
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackUnavailable_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackUnavailable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (click here to select/search for a pack).
+        /// </summary>
+        internal static string ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to My mod requires this file to work properly — it is not an optional add-on to suit the player&apos;s preferences..
+        /// </summary>
+        internal static string ManifestComponentEditor_IsRequired_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IsRequired_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because this component of your mod is a package file, its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set..
+        /// </summary>
+        internal static string ManifestComponentEditor_ManifestSnippetTuningResourceName_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ManifestSnippetTuningResourceName_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manifest Snippet Tuning Resource Name.
+        /// </summary>
+        internal static string ManifestComponentEditor_ManifestSnippetTuningResourceName_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ManifestSnippetTuningResourceName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If set, the player must have at least one file using this requirement identifier. Requirement Identifiers are scoped only to your mod. You don&apos;t need to worry about making them globally unique..
+        /// </summary>
+        internal static string ManifestComponentEditor_RequirementIdentifier_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_RequirementIdentifier_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requirement Identifier.
+        /// </summary>
+        internal static string ManifestComponentEditor_RequirementIdentifier_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_RequirementIdentifier_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (currently independently required).
+        /// </summary>
+        internal static string ManifestComponentEditor_RequirementIdentifier_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_RequirementIdentifier_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These are the hashes of previous version of this mod file. The manifest keeps them so that if I&apos;m checking to see if a player has your mod installed because another mod requires it, the other mod requiring an older version of your mod is not a problem. However, if you make breaking changes in this mod file you should probably clear these out so that it will be obvious that your newer version isn&apos;t going to work well with the other mod. Otherwise, it&apos;s best to leave this field alone and let me manage it for  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestComponentEditor_SubsumedHashes_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_SubsumedHashes_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subsumed Hashes.
+        /// </summary>
+        internal static string ManifestComponentEditor_SubsumedHashes_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_SubsumedHashes_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a hex-formatted SHA 256 manifest hash here and press enter.
+        /// </summary>
+        internal static string ManifestComponentEditor_SubsumedHashes_Placeholder {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_SubsumedHashes_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following files had manifests that *did not need* to be updated:{0}{1}.
         /// </summary>
         internal static string ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated {
@@ -1141,7 +1420,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... agai [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... again. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankDownloadPageUrl {
             get {

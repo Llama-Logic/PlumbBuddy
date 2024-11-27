@@ -719,7 +719,7 @@
     <value>So, a manifest but no scaffolding, eh?</value>
   </data>
   <data name="ManifestEditor_Info_MissingScaffolding_Text" xml:space="preserve">
-    <value>There are only a few reasons this might happen. In any case, you are seen.{0}1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.{0}2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).{0}3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <value>There are only a few reasons this might happen. In any case, you are seen.{0}1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.{0}2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).{0}3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
   <data name="ManifestEditor_Caution_ConfirmWithWarnings_Caption" xml:space="preserve">
@@ -800,7 +800,7 @@
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_BlankDownloadPageUrl" xml:space="preserve">
-    <value>*Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔</value>
+    <value>*Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_BlackRequiredModName" xml:space="preserve">
@@ -814,5 +814,99 @@
   <data name="ManifestEditor_Confirm_Note_BlankPromoCode" xml:space="preserve">
     <value>Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestComponentEditor_IsRequired_Label" xml:space="preserve">
+    <value>My mod requires this file to work properly — it is not an optional add-on to suit the player's preferences.</value>
+  </data>
+  <data name="ManifestComponentEditor_RequirementIdentifier_Label" xml:space="preserve">
+    <value>Requirement Identifier</value>
+  </data>
+  <data name="ManifestComponentEditor_RequirementIdentifier_HelperText" xml:space="preserve">
+    <value>If set, the player must have at least one file using this requirement identifier. Requirement Identifiers are scoped only to your mod. You don't need to worry about making them globally unique.</value>
+  </data>
+  <data name="ManifestComponentEditor_RequirementIdentifier_Placeholder" xml:space="preserve">
+    <value>(currently independently required)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackAvailable_Label" xml:space="preserve">
+    <value>Ignore if Pack Available</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackAvailable_HelperText" xml:space="preserve">
+    <value>Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player.</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder" xml:space="preserve">
+    <value>(click here to select/search for a pack)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder" xml:space="preserve">
+    <value>(use a pack code like EP01 for Get to Work)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackUnavailable_Label" xml:space="preserve">
+    <value>Ignore if Pack Unavailable</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText" xml:space="preserve">
+    <value>Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player.</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder" xml:space="preserve">
+    <value>(use a pack code like SP46 for Home Chef Hustle)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder" xml:space="preserve">
+    <value>(click here to select/search for a pack)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashAvailable_Label" xml:space="preserve">
+    <value>Ignore if Hash Available</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashAvailable_HelperText" xml:space="preserve">
+    <value>Instructs agents to ignore this requirement if the presence of a mod manifest hash in the load order indicates the player has installed another mod.</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder" xml:space="preserve">
+    <value>(hash of the mod's manifest in hex format)</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashUnavailable_Label" xml:space="preserve">
+    <value>Ignore if Hash Unavailable</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText" xml:space="preserve">
+    <value>Instructs agents to ignore this requirement if the absence of a mod manifest hash in the load order indicates the player has not installed another mod.</value>
+  </data>
+  <data name="ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder" xml:space="preserve">
+    <value>(hash of the mod's manifest in hex format)</value>
+  </data>
+  <data name="ManifestComponentEditor_Exclusivities_Label" xml:space="preserve">
+    <value>Exclusivities</value>
+  </data>
+  <data name="ManifestComponentEditor_Exclusivities_HelperText" xml:space="preserve">
+    <value>Only one file with the same exclusivity will be permitted. If PlumbBuddy discovers multiple manifests in the same Mods folder with the same exclusivity, this will generate a warning for the player. Use this to mark mod files that are incompatible with each other, such as when they needed to select one package or another depending on whether they have a pack or another mod installed.</value>
+  </data>
+  <data name="ManifestComponentEditor_Exclusivities_Placeholder" xml:space="preserve">
+    <value>Type the name of an exclusivity here and press enter</value>
+  </data>
+  <data name="ManifestComponentEditor_Exclusivities_Guidance" xml:space="preserve">
+    <value>**Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:{0}&gt; vyxated - Chalk'd UI - Support - TMEX - Smarter Pie Menu</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestComponentEditor_ComponentName_Label" xml:space="preserve">
+    <value>Component Name</value>
+  </data>
+  <data name="ManifestComponentEditor_ComponentName_HelperText" xml:space="preserve">
+    <value>Since each file in your mod will have its own manifest resource, it can technically have a different name if you want it to. This can be good for specifically labeling add-ons. It would probably be smart, however, to still include the full name of your mod, e.g. Vacuum Clean the Cats: Discover University Support.</value>
+  </data>
+  <data name="ManifestComponentEditor_ComponentName_Placeholder" xml:space="preserve">
+    <value>(type a specific name for this component if you want)</value>
+  </data>
+  <data name="ManifestComponentEditor_ManifestSnippetTuningResourceName_Label" xml:space="preserve">
+    <value>Manifest Snippet Tuning Resource Name</value>
+  </data>
+  <data name="ManifestComponentEditor_ManifestSnippetTuningResourceName_HelperText" xml:space="preserve">
+    <value>Because this component of your mod is a package file, its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set.</value>
+  </data>
+  <data name="ManifestComponentEditor_SubsumedHashes_Label" xml:space="preserve">
+    <value>Subsumed Hashes</value>
+  </data>
+  <data name="ManifestComponentEditor_SubsumedHashes_HelperText" xml:space="preserve">
+    <value>These are the hashes of previous version of this mod file. The manifest keeps them so that if I'm checking to see if a player has your mod installed because another mod requires it, the other mod requiring an older version of your mod is not a problem. However, if you make breaking changes in this mod file you should probably clear these out so that it will be obvious that your newer version isn't going to work well with the other mod. Otherwise, it's best to leave this field alone and let me manage it for you.</value>
+  </data>
+  <data name="ManifestComponentEditor_SubsumedHashes_Placeholder" xml:space="preserve">
+    <value>Enter a hex-formatted SHA 256 manifest hash here and press enter</value>
+  </data>
+  <data name="ManifestComponentEditor_AddSubsumedHashFromModFile_Local" xml:space="preserve">
+    <value>Add subsumed hash from mod file...</value>
   </data>
 </root>
