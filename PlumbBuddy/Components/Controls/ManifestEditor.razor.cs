@@ -16,9 +16,9 @@ partial class ManifestEditor
 
     static readonly string[] hashingLevelTickMarkLabels =
     [
-        "Lenient",
-        "Moderate (Recommended)",
-        "Strict"
+        AppText.ManifestEditor_Hashing_Slider_TickMark_1,
+        AppText.ManifestEditor_Hashing_Slider_TickMark_2,
+        AppText.ManifestEditor_Hashing_Slider_TickMark_3
     ];
     static readonly AsyncManualResetEvent compositionResetEvent = new(true);
 
@@ -177,28 +177,26 @@ partial class ManifestEditor
             catch
             {
                 batchCancellationTokenSource?.Cancel();
-                await DialogService.ShowErrorDialogAsync("Package corrupt, damaged, or locked",
-                    $"""
-                    I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
-                    `{modFile.FullName}`<br /><br />
-                    <iframe src="https://giphy.com/embed/1g2JyW7p6mtZc6bOEY" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY">via GIPHY</a></p>
-                    """).ConfigureAwait(false);
+                await DialogService.ShowErrorDialogAsync
+                (
+                    AppText.ManifestEditor_Error_InaccessiblePackage_Caption,
+                    StringLocalizer["ManifestEditor_Error_InaccessiblePackage_Text", Environment.NewLine, modFile.FullName]
+                ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
             manifests = [..(await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                 .Values
                 .OrderBy(manifest => manifest.TuningName?.Length)
                 .ThenBy(manifest => manifest.TuningName)];
+            manifestResourceName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.TuningName))?.TuningName ?? $"llamalogic:manifest_{Guid.NewGuid():n}";
             if (manifests.Length is > 1)
             {
                 batchCancellationTokenSource?.Cancel();
-                await DialogService.ShowInfoDialogAsync("Package is the result of multiple manifested packages which were merged",
-                    $"""
-                    Just so you're aware... this file has multiple manifests. Frankly, not the best. Don't worry, I'll tidy things up and leave it with just one when we finish here.
-                    `{modFile.FullName}`<br /><br />
-                    From the available **Manifest Snippet Tuning Resource Names**, I selected `{manifestResourceName}`. You can change that if you want by selecting this file on the **Components** step.<br /><br />
-                    <iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr">via GIPHY</a></p>
-                    """).ConfigureAwait(false);
+                await DialogService.ShowInfoDialogAsync
+                (
+                    AppText.ManifestEditor_Info_SelectedMergedPackage_Caption,
+                    StringLocalizer["ManifestEditor_Info_SelectedMergedPackage_Text", Environment.NewLine, modFile.FullName, manifestResourceName]
+                ).ConfigureAwait(false);
             }
             fileObjectModel = dbpf;
         }
@@ -214,12 +212,11 @@ partial class ManifestEditor
             catch
             {
                 batchCancellationTokenSource?.Cancel();
-                await DialogService.ShowErrorDialogAsync("Script archive corrupt, damaged, or locked",
-                    $"""
-                    I was unable to read this file as a valid ZIP archive with exclusive access:
-                    `{modFile.FullName}`<br /><br />
-                    <iframe src="https://giphy.com/embed/3o72EYhVhAYFJ4rv68" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68">via GIPHY</a></p>
-                    """).ConfigureAwait(false);
+                await DialogService.ShowErrorDialogAsync
+                (
+                    AppText.ManifestEditor_Error_InaccessibleScriptArchive_Caption,
+                    StringLocalizer["ManifestEditor_Error_InaccessibleScriptArchive_Text", Environment.NewLine, modFile.FullName]
+                ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
             if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
@@ -229,12 +226,11 @@ partial class ManifestEditor
         else
         {
             batchCancellationTokenSource?.Cancel();
-            await DialogService.ShowErrorDialogAsync("new extension... who dis?",
-                $"""
-                What even is this?
-                `{modFile.FullName}`<br /><br />
-                <iframe src="https://giphy.com/embed/WRQBXSCnEFJIuxktnw" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw">via GIPHY</a></p>
-                """).ConfigureAwait(false);
+            await DialogService.ShowErrorDialogAsync
+            (
+                AppText.ManifestEditor_Error_UnrecognizedFileType_Caption,
+                StringLocalizer["ManifestEditor_Error_UnrecognizedFileType_Text", Environment.NewLine, modFile.FullName]
+            ).ConfigureAwait(false);
             return AddFileResult.Unrecognized;
         }
         var componentName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name;
@@ -242,7 +238,7 @@ partial class ManifestEditor
         (
             modFile,
             fileObjectModel,
-            manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.TuningName))?.TuningName ?? (fileObjectModel is DataBasePackedFile ? $"llamalogic:manifest_{Guid.NewGuid():n}" : null),
+            manifestResourceName,
             true,
             null,
             null,
@@ -332,7 +328,7 @@ partial class ManifestEditor
             // stage 1: wipe all components clean of manifests
             foreach (var component in components)
             {
-                await updateStatusAsync(0, $"Removing any manifests from `{getComponentRelativePath(component)}`").ConfigureAwait(false);
+                await updateStatusAsync(0, StringLocalizer["ManifestEditor_Composing_Status_RemovingManifests", getComponentRelativePath(component)]).ConfigureAwait(false);
                 if (component.FileObjectModel is DataBasePackedFile dbpf)
                     foreach (var manifestResourceKey in (await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false)).Keys)
                         dbpf.Delete(manifestResourceKey); // 😱
@@ -348,7 +344,7 @@ partial class ManifestEditor
             foreach (var component in components)
             {
                 var componentRelativePath = getComponentRelativePath(component);
-                await updateStatusAsync(1, $"Computing manfiest hash for `{componentRelativePath}`").ConfigureAwait(false);
+                await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_ComputingHash", componentRelativePath]).ConfigureAwait(false);
                 ImmutableArray<byte> hash;
                 HashSet<ResourceKey>? hashResourceKeys = null;
                 if (component.FileObjectModel is DataBasePackedFile dbpf)
@@ -387,7 +383,7 @@ partial class ManifestEditor
                     hash = ModFileManifestModel.GetModFileHash(zipArchive);
                 else
                     throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
-                await updateStatusAsync(1, $"Initializing manfiest for `{componentRelativePath}`").ConfigureAwait(false);
+                await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_InitializingManifest", componentRelativePath]).ConfigureAwait(false);
                 var tuningName = component.FileObjectModel is DataBasePackedFile
                     ? (
                         string.IsNullOrWhiteSpace(component.ManifestResourceName)
@@ -443,8 +439,7 @@ partial class ManifestEditor
             var crossReferenceRequirements = new List<(ModComponent component, ModFileManifestModelRequiredMod requiredModModel)>();
             foreach (var component in components.Where(component => component.IsRequired))
             {
-                var componentRelativePath = getComponentRelativePath(component);
-                await updateStatusAsync(2, $"Generating cross-reference requirement for `{componentRelativePath}`").ConfigureAwait(false);
+                await updateStatusAsync(2, StringLocalizer["ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
                 if (componentManifests.TryGetValue(component, out var manifest) && manifest?.Hash is { } hash && !hash.IsDefaultOrEmpty)
                 {
                     var model = new ModFileManifestModelRequiredMod
@@ -467,8 +462,7 @@ partial class ManifestEditor
             // stage 4: add cross reference requirements
             foreach (var component in components)
             {
-                var componentRelativePath = getComponentRelativePath(component);
-                await updateStatusAsync(3, $"Adding cross-reference requirements to `{componentRelativePath}`").ConfigureAwait(false);
+                await updateStatusAsync(3, StringLocalizer["ManifestEditor_Composing_Status_AddingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
                 if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                 {
                     var requirementIndex = -1;
@@ -486,7 +480,7 @@ partial class ManifestEditor
                 if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                 {
                     var componentRelativePath = getComponentRelativePath(component);
-                    await updateStatusAsync(4, $"Saving manifest to `{componentRelativePath}`").ConfigureAwait(false);
+                    await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", componentRelativePath]).ConfigureAwait(false);
                     if (component.FileObjectModel is DataBasePackedFile dbpf)
                     {
                         await dbpf.SetAsync(new ResourceKey(ResourceType.SnippetTuning, 0x80000000, manifest.TuningFullInstance), manifest).ConfigureAwait(false);
@@ -503,7 +497,7 @@ partial class ManifestEditor
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                     component.FileObjectModel.Dispose();
-                    await updateStatusAsync(4, $"Creating scaffolding for `{componentRelativePath}`").ConfigureAwait(false);
+                    await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", componentRelativePath]).ConfigureAwait(false);
                     var scaffolding = new ManifestedModFileScaffolding
                     {
                         ModName = name.Trim(),
@@ -529,13 +523,13 @@ partial class ManifestEditor
         catch (Exception ex)
         {
             Logger.LogError(ex, "unhandled exception during manifest composition");
-            await DialogService.ShowErrorDialogAsync("Something went wrong", "While I was writing your manifests, an unexpected error occurred. I've written it to my log file.");
+            await DialogService.ShowErrorDialogAsync(AppText.ManifestEditor_Error_ManifestCompositionFailure_Caption, AppText.ManifestEditor_Error_ManifestCompositionFailure_Text);
         }
 
         if (!batchOverlayVisible)
             compositionResetEvent.Set();
 
-        await updateStatusAsync(5, "All component manifests have been updated and scaffolding has been written").ConfigureAwait(false);
+        await updateStatusAsync(5, AppText.ManifestEditor_Composing_Status_Finished).ConfigureAwait(false);
         await Task.Delay(1000).ConfigureAwait(false);
 
         await StaticDispatcher.DispatchAsync(async () =>
@@ -563,7 +557,7 @@ partial class ManifestEditor
         var modFiles = await ModFileSelector.SelectModFilesAsync();
         if (modFiles is null || modFiles.Count is 0)
             return;
-        loadingText = "Reading mod files";
+        loadingText = AppText.ManifestEditor_Loading_ReadingModFiles;
         isLoading = true;
         StateHasChanged();
         if (await Task.Run(async () => await AddFilesAsync(modFiles).ConfigureAwait(false)))
@@ -632,7 +626,7 @@ partial class ManifestEditor
         {
             try
             {
-                if (componentsStepSelectedComponent is not { } displayedComponent || componentsStepSelectedComponents.Count == 0 || !await DialogService.ShowCautionDialogAsync("This Cannot Be Undone", "I am about to apply the component settings on screen now to every mod file you have checked in the list."))
+                if (componentsStepSelectedComponent is not { } displayedComponent || componentsStepSelectedComponents.Count == 0 || !await DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_DuplicateComponentSettings_Caption, AppText.ManifestEditor_Caution_DuplicateComponentSettings_Text))
                     return;
                 var componentsToApplySettings = componentsStepSelectedComponents.ToImmutableHashSet();
                 foreach (var componentToApplySettings in componentsToApplySettings)
@@ -685,10 +679,10 @@ partial class ManifestEditor
         {
             if (selectStepFile is null)
             {
-                await DialogService.ShowErrorDialogAsync("Select a mod file first", "A journey of a thousand miles begins with the first step. And this is gonna be like... *much quicker* than that.");
+                await DialogService.ShowErrorDialogAsync(AppText.ManifestEditor_Error_SelectAModFileFirst_Caption, AppText.ManifestEditor_Error_SelectAModFileFirst_Text);
                 return true;
             }
-            loadingText = $"Examining mod file";
+            loadingText = AppText.ManifestEditor_Loading_ExaminingModFile;
             isLoading = true;
             StateHasChanged();
             var selectStepFileAddResult = await AddFileAsync(selectStepFile);
@@ -767,12 +761,11 @@ partial class ManifestEditor
                             && !string.IsNullOrWhiteSpace(otherModComponent.LocalAbsolutePath))
                             addScaffoldedComponentResult = await AddFileAsync(otherFileInfo = new FileInfo(otherModComponent.LocalAbsolutePath));
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent)
-                            await DialogService.ShowErrorDialogAsync("Scaffolding points to missing file",
-                                $"""
-                                When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren't expecting to see this message, you should probably investigate.
-                                `{otherModComponent.LocalAbsolutePath}`<br /><br />
-                                <iframe src="https://giphy.com/embed/6uGhT1O4sxpi8" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8">via GIPHY</a></p>
-                                """);
+                            await DialogService.ShowErrorDialogAsync
+                            (
+                                AppText.ManifestEditor_Error_ScaffoldingReferenceBroken_Caption,
+                                StringLocalizer["ManifestEditor_Error_ScaffoldingReferenceBroken_Text", Environment.NewLine, otherModComponent.LocalAbsolutePath]
+                            );
                         var otherComponent = components[^1];
                         RemoveComponentFromRequiredMods(otherComponent, addScaffoldedComponentResult);
                         if (otherFileInfo is not null && await ManifestedModFileScaffolding.TryLoadForAsync(otherFileInfo, Settings) is { } otherScaffolding)
@@ -788,14 +781,11 @@ partial class ManifestEditor
                     if (batchOverlayVisible)
                         batchContinue = true;
                     else
-                        await DialogService.ShowInfoDialogAsync("So, a manifest but no scaffolding, eh?",
-                            $"""
-                            There are only a few reasons this might happen. In any case, you are seen.
-                            1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
-                            2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
-                            3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷<br /><br />
-                            <iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm">via GIPHY</a></p>
-                            """);
+                        await DialogService.ShowInfoDialogAsync
+                        (
+                            AppText.ManifestEditor_Info_MissingScaffolding_Caption,
+                            StringLocalizer["ManifestEditor_Info_MissingScaffolding_Text", Environment.NewLine]
+                        );
                 }
                 UpdateComponentsStructure();
             }
@@ -843,7 +833,7 @@ partial class ManifestEditor
                 batchCancellationTokenSource?.Cancel();
                 return true;
             }
-            if (confirmationStepMessages.Any(csm => csm.severity is Severity.Warning) && !await DialogService.ShowCautionDialogAsync("Point of No Return", "You *still* have **unresolved warnings** regarding your mod's manifest. I *can* proceed with these issues if you think I'm mistaken, but *you are responsible for ignoring these warnings if I'm not*."))
+            if (confirmationStepMessages.Any(csm => csm.severity is Severity.Warning) && !await DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_ConfirmWithWarnings_Caption, AppText.ManifestEditor_Caution_ConfirmWithWarnings_Text))
             {
                 batchCancellationTokenSource?.Cancel();
                 return true;
@@ -901,7 +891,7 @@ partial class ManifestEditor
         {
             try
             {
-                if (componentsStepSelectedComponents.Count == 0 || !await DialogService.ShowCautionDialogAsync("This Cannot Be Undone", "If I remove the selected components of your mod and you change your mind, you'll need to click cancel on the bottom of the window and start the whole process over again or add them back manually."))
+                if (componentsStepSelectedComponents.Count == 0 || !await DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_RemoveModFiles_Caption, AppText.ManifestEditor_Caution_RemoveModFiles_Text))
                     return;
                 var componentsToRemove = componentsStepSelectedComponents.ToImmutableHashSet();
                 components.RemoveAll(componentsToRemove.Contains);
@@ -925,11 +915,11 @@ partial class ManifestEditor
 
     async Task HandleRemoveRequiredModOnClickedAsync(ModRequirement requiredMod)
     {
-        if (!await DialogService.ShowCautionDialogAsync($"Are you sure?",
-            $"""
-            You're about to remove your mod's requirement of {requiredMod.Name ?? "this mod"}. If you change your mind you'll have to **Cancel** and start from scratch or add it back.<br /><br />
-            <iframe src="https://giphy.com/embed/qxCYGGPbQp3yj5aSsL" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL">via GIPHY</a></p>
-            """))
+        if (!await DialogService.ShowCautionDialogAsync
+            (
+                AppText.ManifestEditor_Caution_RemoveRequiredMod_Caption,
+                StringLocalizer["ManifestEditor_Caution_RemoveRequiredMod_Text", Environment.NewLine, requiredMod.Name ?? AppText.ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback]
+            ))
             return;
         requiredMods.Remove(requiredMod);
         StateHasChanged();
@@ -949,17 +939,8 @@ partial class ManifestEditor
             return;
         var (folderFromPicker, exception) = folderPickerResult;
         if (exception is not null)
-        {
             Logger.LogWarning(exception, "encountered unhandled exception while selecting a folder for batch manifest update");
-            await DialogService.ShowErrorDialogAsync("Whoops, That Didn't Work",
-                $"""
-                An error was reported back to me by the operating system:
-                `{exception.GetType().Name}: {exception.Message}`<br /><br />
-                I've written additional details to my log, in case they're relevant.
-                """);
-            return;
-        }
-        if (folderFromPicker is null)
+        if (folderFromPicker is null || exception is not null)
             return;
         var (folderPath, _) = folderFromPicker;
         var processingDirectory = new DirectoryInfo(folderPath);
@@ -1033,42 +1014,24 @@ partial class ManifestEditor
             var commonPathLength = Path.GetFullPath(processingDirectory.FullName).Length + 1;
             var reportElements = new List<string>();
             if (changedManifests.Count is > 0)
-                reportElements.Add
-                (
-                    $"""
-                    The following files had manifests that *needed* to be updated:
-                    {string.Join(Environment.NewLine, changedManifests.OrderBy(mf => mf.FullName).Select(cm => $"- {cm.FullName[commonPathLength..]}"))}
-                    """
-                );
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsUpdated", Environment.NewLine, string.Join(Environment.NewLine, changedManifests.OrderBy(mf => mf.FullName).Select(cm => $"- {cm.FullName[commonPathLength..]}"))]);
             if (unchangedManifests.Count is > 0)
-                reportElements.Add
-                (
-                    $"""
-                    The following files had manifests that *did not need* to be updated:
-                    {string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))}
-                    """
-                );
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated", Environment.NewLine, string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))]);
             if (unscaffolded.Count is > 0)
-                reportElements.Add
-                (
-                    $"""
-                    The following files had no scaffolding and were therefore skipped:
-                    {string.Join(Environment.NewLine, unscaffolded.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))}
-                    """
-                );
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded", Environment.NewLine, string.Join(Environment.NewLine, unscaffolded.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))]);
             var report = string.Join($"{Environment.NewLine}{Environment.NewLine}", reportElements);
-            if (await DialogService.ShowQuestionDialogAsync("Would you like to copy this Batch Processing Report to your computer's clipboard?", report, false, true) ?? false)
+            if (await DialogService.ShowQuestionDialogAsync(AppText.ManifestEditor_Question_CopyBatchUpdateReportToClipboard_Caption, report, false, true) ?? false)
             {
                 await Clipboard.SetTextAsync(report);
-                await DialogService.ShowSuccessDialogAsync("Report Successfully Copied to Clipboard", "Paste it where you like. 😏");
+                await DialogService.ShowSuccessDialogAsync(AppText.ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Caption, AppText.ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Text);
             }
         }
         else
-            await DialogService.ShowInfoDialogAsync("Whole Lotta Noth'n", "None of the mod files examined had manifests to potentially be updated.");
+            await DialogService.ShowInfoDialogAsync(AppText.ManifestEditor_Info_BatchUpdateNoModFilesManifested_Caption, AppText.ManifestEditor_Info_BatchUpdateNoModFilesManifested_Text);
     }
 
     Task<bool> OfferToCancelAsync() =>
-        DialogService.ShowCautionDialogAsync("Are you sure you want to cancel?", "I'll discard any changes you've made to this manifest and go back to the beginning of the process.");
+        DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_OfferToCancel_Caption, AppText.ManifestEditor_Caution_OfferToCancel_Text);
 
     protected override void OnInitialized()
     {
@@ -1088,10 +1051,7 @@ partial class ManifestEditor
             (
                 Severity.Error,
                 (string?)MaterialDesignIcons.Normal.FormatLetterMatches,
-                $"""
-                Whoops, it looks like you used the `{componentsWithSameManifestName.Key}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.
-                {string.Join(Environment.NewLine, componentsWithSameManifestName.Select(component => $"* `{component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]}`"))}
-                """
+                StringLocalizer["ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames", Environment.NewLine, componentsWithSameManifestName.Key!, string.Join(Environment.NewLine, componentsWithSameManifestName.Select(component => $"* `{component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]}`"))].Value
             )));
         messages.AddRange(components
             .Where(component => component.FileObjectModel is DataBasePackedFile && string.IsNullOrWhiteSpace(component.ManifestResourceName))
@@ -1099,40 +1059,28 @@ partial class ManifestEditor
             (
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.DiceMultiple,
-                $"""
-                Your `{component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]}` mod file is a package with a **Manifest Snippet Tuning Resource Name** which you left either blank or just as white space. Since I have to have something substantive and unique there, if we continue I'm going to generate something for you. If you'd rather I didn't, you can go back to the **Components** step and fill it in for yourself.
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankManifestSnippetTuningName", component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]].Value
             )));
         if (string.IsNullOrWhiteSpace(name))
             messages.Add
             ((
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                $"""
-                *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:
-                * If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have to refer to file names when I could be using a more familiar name.
-                * If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankModName", Environment.NewLine].Value
             ));
         if (creators.Count is 0)
             messages.Add
             ((
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.AccountSearch,
-                $"""
-                *You haven't specified any creators.* Look, I know stepping into the limelight can be a bit daunting... but you deserve recognition for what you've done! You can go back to the **Details** step and fill in your own name and the names of anyone who worked with you on this mod.
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_NoCreators"].Value
             ));
         if (string.IsNullOrWhiteSpace(url) || !GetUrlPattern().IsMatch(url))
             messages.Add
             ((
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.CloudSearch,
-                $"""
-                *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:
-                * If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.
-                * If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankDownloadPageUrl", Environment.NewLine].Value
             ));
         messages.AddRange(requiredMods
             .Select((requiredMod, index) => (requiredMod, index))
@@ -1141,9 +1089,7 @@ partial class ManifestEditor
             (
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                $"""
-                *Your {(t.index + 1).Ordinalize()} required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a Settings, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlackRequiredModName", (t.index + 1).Ordinalize()].Value
             )));
         messages.AddRange(requiredMods
             .Where(requiredMod => !string.IsNullOrWhiteSpace(requiredMod.Name) && (string.IsNullOrWhiteSpace(requiredMod.Url) || !Uri.TryCreate(requiredMod.Url, UriKind.Absolute, out _)))
@@ -1151,19 +1097,14 @@ partial class ManifestEditor
             (
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                $"""
-                *Your **{requiredMod.Name}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.
-                """
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl", requiredMod.Name!].Value
             )));
         if (requiredPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
             messages.Add
             ((
                 Severity.Normal,
                 (string?)MaterialDesignIcons.Normal.AccountCash,
-                $"""
-                Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.<br />
-                If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).
-                """
+                StringLocalizer["ManifestEditor_Confirm_Note_BlankPromoCode", Environment.NewLine].Value
             ));
 
         confirmationStepMessages = [..messages];

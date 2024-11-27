@@ -781,11 +781,137 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following files had manifests that *did not need* to be updated:{0}{1}.
+        /// </summary>
+        internal static string ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated {
+            get {
+                return ResourceManager.GetString("ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following files had manifests that *needed* to be updated:{0}{1}.
+        /// </summary>
+        internal static string ManifestEditor_BatchUpdate_Report_ManifestsUpdated {
+            get {
+                return ResourceManager.GetString("ManifestEditor_BatchUpdate_Report_ManifestsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following files had no scaffolding and were therefore skipped:{0}{1}.
+        /// </summary>
+        internal static string ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded {
+            get {
+                return ResourceManager.GetString("ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Processing &lt;strong&gt;{0}&lt;/strong&gt; (mod file &lt;strong&gt;{1:n0}&lt;/strong&gt; of &lt;strong&gt;{2:n0}&lt;/strong&gt;).
         /// </summary>
         internal static string ManifestEditor_BatchUpdate_Status {
             get {
                 return ResourceManager.GetString("ManifestEditor_BatchUpdate_Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Point of No Return.
+        /// </summary>
+        internal static string ManifestEditor_Caution_ConfirmWithWarnings_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_ConfirmWithWarnings_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You *still* have **unresolved warnings** regarding your mod&apos;s manifest. I *can* proceed with these issues if you think I&apos;m mistaken, but *you are responsible for ignoring these warnings if I&apos;m not*..
+        /// </summary>
+        internal static string ManifestEditor_Caution_ConfirmWithWarnings_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_ConfirmWithWarnings_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Cannot Be Undone.
+        /// </summary>
+        internal static string ManifestEditor_Caution_DuplicateComponentSettings_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_DuplicateComponentSettings_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I am about to apply the component settings on screen now to every mod file you have checked in the list..
+        /// </summary>
+        internal static string ManifestEditor_Caution_DuplicateComponentSettings_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_DuplicateComponentSettings_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to cancel?.
+        /// </summary>
+        internal static string ManifestEditor_Caution_OfferToCancel_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_OfferToCancel_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ll discard any changes you&apos;ve made to this manifest and go back to the beginning of the process..
+        /// </summary>
+        internal static string ManifestEditor_Caution_OfferToCancel_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_OfferToCancel_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Cannot Be Undone.
+        /// </summary>
+        internal static string ManifestEditor_Caution_RemoveModFiles_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_RemoveModFiles_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If I remove the selected components of your mod and you change your mind, you&apos;ll need to click cancel on the bottom of the window and start the whole process over again or add them back manually..
+        /// </summary>
+        internal static string ManifestEditor_Caution_RemoveModFiles_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_RemoveModFiles_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure?.
+        /// </summary>
+        internal static string ManifestEditor_Caution_RemoveRequiredMod_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_RemoveRequiredMod_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;re about to remove your mod&apos;s requirement of {1}. If you change your mind you&apos;ll have to **Cancel** and start from scratch or add it back.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/qxCYGGPbQp3yj5aSsL&quot; width=&quot;480&quot; height=&quot;360&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestEditor_Caution_RemoveRequiredMod_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_RemoveRequiredMod_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to this mod.
+        /// </summary>
+        internal static string ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback", resourceCulture);
             }
         }
         
@@ -853,6 +979,87 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adding cross-reference requirements to `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_AddingCrossReferenceRequirements {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_AddingCrossReferenceRequirements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Computing manifest hash for `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_ComputingHash {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_ComputingHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating scaffolding for `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_CreatingScaffolding {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_CreatingScaffolding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All component manifests have been updated and scaffolding has been written.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_Finished {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_Finished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generating cross-reference requirements for `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initializing manfiest for `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_InitializingManifest {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_InitializingManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing any manifests from `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_RemovingManifests {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_RemovingManifests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving manifest to `{0}`.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Status_SavingManifest {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Status_SavingManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, it looks like you used the `{1}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.{0}{2}.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 🛑 Woah, there, Chief! We can&apos;t quite do this... ⛔.
         /// </summary>
         internal static string ManifestEditor_Confirm_ErrorHeading_1 {
@@ -880,6 +1087,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Note_BlankPromoCode {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Note_BlankPromoCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 📃 If I had any notes or concerns, I put them below. If the area&apos;s blank then... 🤷 no notes..
         /// </summary>
         internal static string ManifestEditor_Confirm_ReadyHeading_1 {
@@ -903,6 +1119,60 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Confirm_ReadyHeading_2_ModFile {
             get {
                 return ResourceManager.GetString("ManifestEditor_Confirm_ReadyHeading_2_ModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your **{0}** required mod doesn&apos;t have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod&apos;s download page. Not the best user experience..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirements with a Settings, it&apos;s gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlackRequiredModName {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlackRequiredModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... agai [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlankDownloadPageUrl {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankDownloadPageUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your `{0}` mod file is a package with a **Manifest Snippet Tuning Resource Name** which you left either blank or just as white space. Since I have to have something substantive and unique there, if we continue I&apos;m going to generate something for you. If you&apos;d rather I didn&apos;t, you can go back to the **Components** step and fill it in for yourself..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlankManifestSnippetTuningName {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankManifestSnippetTuningName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlankModName {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *You haven&apos;t specified any creators.* Look, I know stepping into the limelight can be a bit daunting... but you deserve recognition for what you&apos;ve done! You can go back to the **Details** step and fill in your own name and the names of anyone who worked with you on this mod..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_NoCreators {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_NoCreators", resourceCulture);
             }
         }
         
@@ -1141,6 +1411,114 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package corrupt, damaged, or locked.
+        /// </summary>
+        internal static string ManifestEditor_Error_InaccessiblePackage_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_InaccessiblePackage_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/1g2JyW7p6mtZc6bOEY&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestEditor_Error_InaccessiblePackage_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_InaccessiblePackage_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script archive corrupt, damaged, or locked.
+        /// </summary>
+        internal static string ManifestEditor_Error_InaccessibleScriptArchive_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_InaccessibleScriptArchive_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I was unable to read this file as a valid ZIP archive with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/3o72EYhVhAYFJ4rv68&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestEditor_Error_InaccessibleScriptArchive_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_InaccessibleScriptArchive_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something went wrong.
+        /// </summary>
+        internal static string ManifestEditor_Error_ManifestCompositionFailure_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_ManifestCompositionFailure_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to While I was writing your manifests, an unexpected error occurred. I&apos;ve written it to my log file..
+        /// </summary>
+        internal static string ManifestEditor_Error_ManifestCompositionFailure_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_ManifestCompositionFailure_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scaffolding points to missing file.
+        /// </summary>
+        internal static string ManifestEditor_Error_ScaffoldingReferenceBroken_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_ScaffoldingReferenceBroken_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren&apos;t expecting to see this message, you should probably investigate.{0}`{otherModComponent.LocalAbsolutePath}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/6uGhT1O4sxpi8&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestEditor_Error_ScaffoldingReferenceBroken_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_ScaffoldingReferenceBroken_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a mod file first.
+        /// </summary>
+        internal static string ManifestEditor_Error_SelectAModFileFirst_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_SelectAModFileFirst_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A journey of a thousand miles begins with the first step. And this is gonna be like... *much quicker* than that..
+        /// </summary>
+        internal static string ManifestEditor_Error_SelectAModFileFirst_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_SelectAModFileFirst_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to new extension... who dis?.
+        /// </summary>
+        internal static string ManifestEditor_Error_UnrecognizedFileType_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_UnrecognizedFileType_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What even is this?{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/WRQBXSCnEFJIuxktnw&quot; width=&quot;480&quot; height=&quot;307&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestEditor_Error_UnrecognizedFileType_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Error_UnrecognizedFileType_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Images.
         /// </summary>
         internal static string ManifestEditor_Hashing_HashingElements_Images {
@@ -1231,11 +1609,119 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Lenient.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Slider_TickMark_1 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Slider_TickMark_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moderate (Recommended).
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Slider_TickMark_2 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Slider_TickMark_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strict.
+        /// </summary>
+        internal static string ManifestEditor_Hashing_Slider_TickMark_3 {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Hashing_Slider_TickMark_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention..
         /// </summary>
         internal static string ManifestEditor_Hashing_Warning {
             get {
                 return ResourceManager.GetString("ManifestEditor_Hashing_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whole Lotta Noth&apos;n.
+        /// </summary>
+        internal static string ManifestEditor_Info_BatchUpdateNoModFilesManifested_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_BatchUpdateNoModFilesManifested_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None of the mod files examined had manifests to potentially be updated..
+        /// </summary>
+        internal static string ManifestEditor_Info_BatchUpdateNoModFilesManifested_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_BatchUpdateNoModFilesManifested_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So, a manifest but no scaffolding, eh?.
+        /// </summary>
+        internal static string ManifestEditor_Info_MissingScaffolding_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_MissingScaffolding_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are only a few reasons this might happen. In any case, you are seen.{0}1. *You are* the original creator of this mod and you don&apos;t back up your files (in which case, for shame). You&apos;re going to have to re-add all of your mod&apos;s components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.{0}2. You&apos;re a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Info_MissingScaffolding_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_MissingScaffolding_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package is the result of multiple manifested packages which were merged.
+        /// </summary>
+        internal static string ManifestEditor_Info_SelectedMergedPackage_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_SelectedMergedPackage_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Just so you&apos;re aware... this file has multiple manifests. Frankly, not the best. Don&apos;t worry, I&apos;ll tidy things up and leave it with just one when we finish here.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}From the available **Manifest Snippet Tuning Resource Names**, I selected `{2}`. You can change that if you want by selecting this file on the **Components** step.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/ifram [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Info_SelectedMergedPackage_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Info_SelectedMergedPackage_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Examining mod file.
+        /// </summary>
+        internal static string ManifestEditor_Loading_ExaminingModFile {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Loading_ExaminingModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading mod files.
+        /// </summary>
+        internal static string ManifestEditor_Loading_ReadingModFiles {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Loading_ReadingModFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to copy this Batch Processing Report to your computer&apos;s clipboard?.
+        /// </summary>
+        internal static string ManifestEditor_Question_CopyBatchUpdateReportToClipboard_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Question_CopyBatchUpdateReportToClipboard_Caption", resourceCulture);
             }
         }
         
@@ -1479,6 +1965,24 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Select_WriteScaffoldingLocation_Tip {
             get {
                 return ResourceManager.GetString("ManifestEditor_Select_WriteScaffoldingLocation_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Successfully Copied to Clipboard.
+        /// </summary>
+        internal static string ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste it where you like. 😏.
+        /// </summary>
+        internal static string ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Text", resourceCulture);
             }
         }
         

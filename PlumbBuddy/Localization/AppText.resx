@@ -615,4 +615,204 @@
   <data name="Common_Skipped" xml:space="preserve">
     <value>Skipped</value>
   </data>
+  <data name="ManifestEditor_Hashing_Slider_TickMark_1" xml:space="preserve">
+    <value>Lenient</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Slider_TickMark_2" xml:space="preserve">
+    <value>Moderate (Recommended)</value>
+  </data>
+  <data name="ManifestEditor_Hashing_Slider_TickMark_3" xml:space="preserve">
+    <value>Strict</value>
+  </data>
+  <data name="ManifestEditor_Error_InaccessiblePackage_Caption" xml:space="preserve">
+    <value>Package corrupt, damaged, or locked</value>
+  </data>
+  <data name="ManifestEditor_Error_InaccessiblePackage_Text" xml:space="preserve">
+    <value>I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/1g2JyW7p6mtZc6bOEY" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Info_SelectedMergedPackage_Caption" xml:space="preserve">
+    <value>Package is the result of multiple manifested packages which were merged</value>
+  </data>
+  <data name="ManifestEditor_Info_SelectedMergedPackage_Text" xml:space="preserve">
+    <value>Just so you're aware... this file has multiple manifests. Frankly, not the best. Don't worry, I'll tidy things up and leave it with just one when we finish here.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}From the available **Manifest Snippet Tuning Resource Names**, I selected `{2}`. You can change that if you want by selecting this file on the **Components** step.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to Mod File; {2} = Selected manifest resource name</comment>
+  </data>
+  <data name="ManifestEditor_Error_InaccessibleScriptArchive_Caption" xml:space="preserve">
+    <value>Script archive corrupt, damaged, or locked</value>
+  </data>
+  <data name="ManifestEditor_Error_InaccessibleScriptArchive_Text" xml:space="preserve">
+    <value>I was unable to read this file as a valid ZIP archive with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/3o72EYhVhAYFJ4rv68" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Error_UnrecognizedFileType_Caption" xml:space="preserve">
+    <value>new extension... who dis?</value>
+  </data>
+  <data name="ManifestEditor_Error_UnrecognizedFileType_Text" xml:space="preserve">
+    <value>What even is this?{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/WRQBXSCnEFJIuxktnw" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_RemovingManifests" xml:space="preserve">
+    <value>Removing any manifests from `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_ComputingHash" xml:space="preserve">
+    <value>Computing manifest hash for `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_InitializingManifest" xml:space="preserve">
+    <value>Initializing manfiest for `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements" xml:space="preserve">
+    <value>Generating cross-reference requirements for `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_AddingCrossReferenceRequirements" xml:space="preserve">
+    <value>Adding cross-reference requirements to `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_SavingManifest" xml:space="preserve">
+    <value>Saving manifest to `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Status_CreatingScaffolding" xml:space="preserve">
+    <value>Creating scaffolding for `{0}`</value>
+    <comment>{0} = Relative path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Error_ManifestCompositionFailure_Caption" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="ManifestEditor_Error_ManifestCompositionFailure_Text" xml:space="preserve">
+    <value>While I was writing your manifests, an unexpected error occurred. I've written it to my log file.</value>
+  </data>
+  <data name="ManifestEditor_Composing_Status_Finished" xml:space="preserve">
+    <value>All component manifests have been updated and scaffolding has been written</value>
+  </data>
+  <data name="ManifestEditor_Loading_ReadingModFiles" xml:space="preserve">
+    <value>Reading mod files</value>
+  </data>
+  <data name="ManifestEditor_Caution_DuplicateComponentSettings_Caption" xml:space="preserve">
+    <value>This Cannot Be Undone</value>
+  </data>
+  <data name="ManifestEditor_Caution_DuplicateComponentSettings_Text" xml:space="preserve">
+    <value>I am about to apply the component settings on screen now to every mod file you have checked in the list.</value>
+  </data>
+  <data name="ManifestEditor_Error_SelectAModFileFirst_Caption" xml:space="preserve">
+    <value>Select a mod file first</value>
+  </data>
+  <data name="ManifestEditor_Error_SelectAModFileFirst_Text" xml:space="preserve">
+    <value>A journey of a thousand miles begins with the first step. And this is gonna be like... *much quicker* than that.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Loading_ExaminingModFile" xml:space="preserve">
+    <value>Examining mod file</value>
+  </data>
+  <data name="ManifestEditor_Error_ScaffoldingReferenceBroken_Caption" xml:space="preserve">
+    <value>Scaffolding points to missing file</value>
+  </data>
+  <data name="ManifestEditor_Error_ScaffoldingReferenceBroken_Text" xml:space="preserve">
+    <value>When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren't expecting to see this message, you should probably investigate.{0}`{otherModComponent.LocalAbsolutePath}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/6uGhT1O4sxpi8" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Absolute path to Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Info_MissingScaffolding_Caption" xml:space="preserve">
+    <value>So, a manifest but no scaffolding, eh?</value>
+  </data>
+  <data name="ManifestEditor_Info_MissingScaffolding_Text" xml:space="preserve">
+    <value>There are only a few reasons this might happen. In any case, you are seen.{0}1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.{0}2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).{0}3. You're *one of those* Settingss who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Caution_ConfirmWithWarnings_Caption" xml:space="preserve">
+    <value>Point of No Return</value>
+  </data>
+  <data name="ManifestEditor_Caution_ConfirmWithWarnings_Text" xml:space="preserve">
+    <value>You *still* have **unresolved warnings** regarding your mod's manifest. I *can* proceed with these issues if you think I'm mistaken, but *you are responsible for ignoring these warnings if I'm not*.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Caution_RemoveModFiles_Caption" xml:space="preserve">
+    <value>This Cannot Be Undone</value>
+  </data>
+  <data name="ManifestEditor_Caution_RemoveModFiles_Text" xml:space="preserve">
+    <value>If I remove the selected components of your mod and you change your mind, you'll need to click cancel on the bottom of the window and start the whole process over again or add them back manually.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Caution_RemoveRequiredMod_Caption" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="ManifestEditor_Caution_RemoveRequiredMod_Text" xml:space="preserve">
+    <value>You're about to remove your mod's requirement of {1}. If you change your mind you'll have to **Cancel** and start from scratch or add it back.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/qxCYGGPbQp3yj5aSsL" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Required Mod Name</comment>
+  </data>
+  <data name="ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback" xml:space="preserve">
+    <value>this mod</value>
+    <comment>This is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_BatchUpdate_Report_ManifestsUpdated" xml:space="preserve">
+    <value>The following files had manifests that *needed* to be updated:{0}{1}</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = List of Mod Files</comment>
+  </data>
+  <data name="ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated" xml:space="preserve">
+    <value>The following files had manifests that *did not need* to be updated:{0}{1}</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = List of Mod Files</comment>
+  </data>
+  <data name="ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded" xml:space="preserve">
+    <value>The following files had no scaffolding and were therefore skipped:{0}{1}</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = List of Mod Files</comment>
+  </data>
+  <data name="ManifestEditor_Question_CopyBatchUpdateReportToClipboard_Caption" xml:space="preserve">
+    <value>Would you like to copy this Batch Processing Report to your computer's clipboard?</value>
+  </data>
+  <data name="ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Caption" xml:space="preserve">
+    <value>Report Successfully Copied to Clipboard</value>
+  </data>
+  <data name="ManifestEditor_Success_BatchUpdateReportCopiedToClipboard_Text" xml:space="preserve">
+    <value>Paste it where you like. 😏</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Info_BatchUpdateNoModFilesManifested_Caption" xml:space="preserve">
+    <value>Whole Lotta Noth'n</value>
+  </data>
+  <data name="ManifestEditor_Info_BatchUpdateNoModFilesManifested_Text" xml:space="preserve">
+    <value>None of the mod files examined had manifests to potentially be updated.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Caution_OfferToCancel_Caption" xml:space="preserve">
+    <value>Are you sure you want to cancel?</value>
+  </data>
+  <data name="ManifestEditor_Caution_OfferToCancel_Text" xml:space="preserve">
+    <value>I'll discard any changes you've made to this manifest and go back to the beginning of the process.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames" xml:space="preserve">
+    <value>Whoops, it looks like you used the `{1}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.{0}{2}</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Manifest Snippet Tuning Name; {2} = List of Mod Files</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_BlankManifestSnippetTuningName" xml:space="preserve">
+    <value>Your `{0}` mod file is a package with a **Manifest Snippet Tuning Resource Name** which you left either blank or just as white space. Since I have to have something substantive and unique there, if we continue I'm going to generate something for you. If you'd rather I didn't, you can go back to the **Components** step and fill it in for yourself.</value>
+    <comment>This text is in Markdown. {0} = Mod File</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_BlankModName" xml:space="preserve">
+    <value>*Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_NoCreators" xml:space="preserve">
+    <value>*You haven't specified any creators.* Look, I know stepping into the limelight can be a bit daunting... but you deserve recognition for what you've done! You can go back to the **Details** step and fill in your own name and the names of anyone who worked with you on this mod.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_BlankDownloadPageUrl" xml:space="preserve">
+    <value>*Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_BlackRequiredModName" xml:space="preserve">
+    <value>*Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a Settings, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***</value>
+    <comment>This text is in Markdown. {0} = Requirement Ordinal (e.g. first, second, thirteenth, etc.)</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl" xml:space="preserve">
+    <value>*Your **{0}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.</value>
+    <comment>This text is in Markdown. {0} = Required Mod Name</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Note_BlankPromoCode" xml:space="preserve">
+    <value>Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
+    <comment>This text is in Markdown. {0} = Line Break</comment>
+  </data>
 </root>
