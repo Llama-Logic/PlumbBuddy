@@ -745,7 +745,7 @@
   </data>
   <data name="ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback" xml:space="preserve">
     <value>this mod</value>
-    <comment>This is in Markdown.</comment>
+    <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_BatchUpdate_Report_ManifestsUpdated" xml:space="preserve">
     <value>The following files had manifests that *needed* to be updated:{0}{1}</value>
@@ -792,7 +792,7 @@
     <comment>This text is in Markdown. {0} = Mod File</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_BlankModName" xml:space="preserve">
-    <value>*Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I'll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.</value>
+    <value>*Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_NoCreators" xml:space="preserve">
@@ -800,19 +800,19 @@
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_BlankDownloadPageUrl" xml:space="preserve">
-    <value>*Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔</value>
+    <value>*Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a player doesn't have it or needs to update it, that conversation gets even more awkward because... again... what do I say? Google it? Come on, don't do that to me... 😔</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
-  <data name="ManifestEditor_Confirm_Warning_BlackRequiredModName" xml:space="preserve">
-    <value>*Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a Settings, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***</value>
+  <data name="ManifestEditor_Confirm_Warning_BlankRequiredModName" xml:space="preserve">
+    <value>*Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirements with a player, it's gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***</value>
     <comment>This text is in Markdown. {0} = Requirement Ordinal (e.g. first, second, thirteenth, etc.)</comment>
   </data>
-  <data name="ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl" xml:space="preserve">
-    <value>*Your **{0}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.</value>
+  <data name="ManifestEditor_Confirm_Warning_BlankRequiredModDownloadPageUrl" xml:space="preserve">
+    <value>*Your **{0}** required mod doesn't have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don't and a problem comes up and I need to discuss your mod's requirement with a player, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod's download page. Not the best user experience.</value>
     <comment>This text is in Markdown. {0} = Required Mod Name</comment>
   </data>
   <data name="ManifestEditor_Confirm_Note_BlankPromoCode" xml:space="preserve">
-    <value>Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
+    <value>Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
   <data name="ManifestComponentEditor_IsRequired_Label" xml:space="preserve">

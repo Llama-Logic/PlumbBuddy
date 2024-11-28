@@ -1089,7 +1089,7 @@ partial class ManifestEditor
             (
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                StringLocalizer["ManifestEditor_Confirm_Warning_BlackRequiredModName", (t.index + 1).Ordinalize()].Value
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankRequiredModName", (t.index + 1).Ordinalize()].Value
             )));
         messages.AddRange(requiredMods
             .Where(requiredMod => !string.IsNullOrWhiteSpace(requiredMod.Name) && (string.IsNullOrWhiteSpace(requiredMod.Url) || !Uri.TryCreate(requiredMod.Url, UriKind.Absolute, out _)))
@@ -1097,7 +1097,7 @@ partial class ManifestEditor
             (
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                StringLocalizer["ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl", requiredMod.Name!].Value
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankRequiredModDownloadPageUrl", requiredMod.Name!].Value
             )));
         if (requiredPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
             messages.Add

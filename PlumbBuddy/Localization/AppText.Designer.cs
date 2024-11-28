@@ -1366,7 +1366,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your mod requires packs which some Settings may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Note_BlankPromoCode {
             get {
@@ -1402,25 +1402,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your **{0}** required mod doesn&apos;t have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirement with a Settings, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod&apos;s download page. Not the best user experience..
-        /// </summary>
-        internal static string ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl {
-            get {
-                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlackRequiredModDownloadPageUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to *Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirements with a Settings, it&apos;s gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***.
-        /// </summary>
-        internal static string ManifestEditor_Confirm_Warning_BlackRequiredModName {
-            get {
-                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlackRequiredModName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... again. [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... again... [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankDownloadPageUrl {
             get {
@@ -1438,11 +1420,29 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a Settings it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
+        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankModName {
             get {
                 return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your **{0}** required mod doesn&apos;t have a valid download page URL!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirement with a player, it will be awkward because the only place to send them on the web to try to find a fresh copy of the requirement will be your mod&apos;s download page. Not the best user experience..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlankRequiredModDownloadPageUrl {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankRequiredModDownloadPageUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *Your **{0}** required mod has no name!* You can go back to the **Requirements** step and type one in, and probably should because if you don&apos;t and a problem comes up and I need to discuss your mod&apos;s requirements with a player, it&apos;s gonna be very vague. *Did you notice how I just had to tell you which requirement has this problem **with a number?***.
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_BlankRequiredModName {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_BlankRequiredModName", resourceCulture);
             }
         }
         
