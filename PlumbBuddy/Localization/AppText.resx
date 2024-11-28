@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -792,7 +792,7 @@
     <comment>This text is in Markdown. {0} = Mod File</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_BlankModName" xml:space="preserve">
-    <value>*Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.</value>
+    <value>*Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don't:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I'll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a player doesn't have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it's called.</value>
     <comment>This text is in Markdown. {0} = Line Break</comment>
   </data>
   <data name="ManifestEditor_Confirm_Warning_NoCreators" xml:space="preserve">
@@ -908,5 +908,28 @@
   </data>
   <data name="ManifestComponentEditor_AddSubsumedHashFromModFile_Local" xml:space="preserve">
     <value>Add subsumed hash from mod file...</value>
+  </data>
+  <data name="ModFileSelector_SelectAModFile_Caption" xml:space="preserve">
+    <value>Select a Mod File</value>
+  </data>
+  <data name="ModFileSelector_SelectAModFileManifest_Error_NoManifests_Caption" xml:space="preserve">
+    <value>Mod file contains no manifests</value>
+  </data>
+  <data name="ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text" xml:space="preserve">
+    <value>I'm sorry, but the mod file you selected doesn't contain any manifests. For technical reasons, it simply isn't safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/3oEjI8D0T5KXgPZrTW" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/summerbreak-summer-break-sb3-3oEjI8D0T5KXgPZrTW"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to the Mod File</comment>
+  </data>
+  <data name="ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption" xml:space="preserve">
+    <value>Mod file contains multiple manifests</value>
+  </data>
+  <data name="ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text" xml:space="preserve">
+    <value>This is embarassing, but I'm going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn't update the manifests. 🤦{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Line Break; {1} = Full path to the Mod File</comment>
+  </data>
+  <data name="ModFileSelector_Validate_FileNotFound" xml:space="preserve">
+    <value>There is no file at this location.</value>
+  </data>
+  <data name="ModFileSelector_Validate_InvalidFormat" xml:space="preserve">
+    <value>This is not a Maxis DBPF package or a TS4 script archive.</value>
   </data>
 </root>

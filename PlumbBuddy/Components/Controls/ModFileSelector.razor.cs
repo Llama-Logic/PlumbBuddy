@@ -6,7 +6,7 @@ partial class ModFileSelector
     {
         if (await FilePicker.PickAsync(new()
         {
-            PickerTitle = "Select a Mod File",
+            PickerTitle = AppText.ModFileSelector_SelectAModFile_Caption,
             FileTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>()
             {
                 { DevicePlatform.WinUI, [".package", ".ts4script"] },
@@ -23,7 +23,7 @@ partial class ModFileSelector
         var files = new List<FileInfo>();
         if (await FilePicker.PickMultipleAsync(new()
         {
-            PickerTitle = "Select a Mod File",
+            PickerTitle = AppText.ModFileSelector_SelectAModFile_Caption,
             FileTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>()
             {
                 { DevicePlatform.WinUI, [".package", ".ts4script"] },
@@ -121,22 +121,20 @@ partial class ModFileSelector
             }
             if (manifests?.Count is 0)
             {
-                await dialogService.ShowErrorDialogAsync("Mod file contains no manifests",
-                    $"""
-                    I'm sorry, but the mod file you selected doesn't contain any manifests. For technical reasons, it simply isn't safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.
-                    `{modFile.FullName}`<br /><br />
-                    <iframe src="https://giphy.com/embed/3oEjI8D0T5KXgPZrTW" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/summerbreak-summer-break-sb3-3oEjI8D0T5KXgPZrTW">via GIPHY</a></p>
-                    """).ConfigureAwait(false);
+                await dialogService.ShowErrorDialogAsync
+                (
+                    AppText.ModFileSelector_SelectAModFileManifest_Error_NoManifests_Caption,
+                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text, Environment.NewLine, modFile.FullName)
+                ).ConfigureAwait(false);
                 return default;
             }
             if (manifests?.Count is > 1)
             {
-                await dialogService.ShowInfoDialogAsync("Mod file contains multiple manifests",
-                    $"""
-                    This is embarassing, but I'm going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn't update the manifests. 🤦
-                    `{modFile.FullName}`<br /><br />
-                    <iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr">via GIPHY</a></p>
-                    """).ConfigureAwait(false);
+                await dialogService.ShowInfoDialogAsync
+                (
+                    AppText.ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption,
+                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text, Environment.NewLine, modFile.FullName)
+                ).ConfigureAwait(false);
                 if (manifests.TryGetValue(await dialogService.ShowSelectManifestDialogAsync(manifests), out var manifest))
                     return manifest;
             }
@@ -194,7 +192,7 @@ partial class ModFileSelector
                 return null;
             var file = new FileInfo(path);
             if (!file.Exists)
-                return "There is no file at this location.";
+                return AppText.ModFileSelector_Validate_FileNotFound;
             if (file.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase))
             {
                 FileType = ModsDirectoryFileType.Package;
@@ -207,7 +205,7 @@ partial class ModFileSelector
                 icon = MaterialDesignIcons.Normal.SourceBranchCheck;
                 return null;
             }
-            return "This is not a Maxis DBPF package or a TS4 script archive.";
+            return AppText.ModFileSelector_Validate_InvalidFormat;
         }
         finally
         {

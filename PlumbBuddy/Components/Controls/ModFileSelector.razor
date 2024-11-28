@@ -1,8 +1,10 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
 <MudTextFieldExtended T="string" Label="@Label" Variant="Variant.Filled" @bind-Text="FilePath" Immediate Required Validation="@(new Func<string, string?>(ValidateModFilePath))" Disabled="Disabled" ReadOnly>
     <AdornmentStart>
         <MudIcon Icon="@icon" Color="Color.Tertiary" />
     </AdornmentStart>
     <AdornmentEnd>
-        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseOnClickAsync" Disabled="Disabled">Browse...</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseOnClickAsync" Disabled="Disabled">@MarkupLocalizer["Common_Browse_Ellipsis"]</MudButton>
     </AdornmentEnd>
 </MudTextFieldExtended>

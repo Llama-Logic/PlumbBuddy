@@ -1420,7 +1420,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a Settings doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
+        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankModName {
             get {
@@ -2280,6 +2280,69 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_UsePublicPackCatalog_Tip {
             get {
                 return ResourceManager.GetString("ManifestEditor_UsePublicPackCatalog_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a Mod File.
+        /// </summary>
+        internal static string ModFileSelector_SelectAModFile_Caption {
+            get {
+                return ResourceManager.GetString("ModFileSelector_SelectAModFile_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod file contains no manifests.
+        /// </summary>
+        internal static string ModFileSelector_SelectAModFileManifest_Error_NoManifests_Caption {
+            get {
+                return ResourceManager.GetString("ModFileSelector_SelectAModFileManifest_Error_NoManifests_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m sorry, but the mod file you selected doesn&apos;t contain any manifests. For technical reasons, it simply isn&apos;t safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/3oEjI8D0T5KXgPZrTW&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/su [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text {
+            get {
+                return ResourceManager.GetString("ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod file contains multiple manifests.
+        /// </summary>
+        internal static string ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption {
+            get {
+                return ResourceManager.GetString("ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is embarassing, but I&apos;m going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn&apos;t update the manifests. 🤦{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/8Fla28qk2RGlYa2nXr&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text {
+            get {
+                return ResourceManager.GetString("ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is no file at this location..
+        /// </summary>
+        internal static string ModFileSelector_Validate_FileNotFound {
+            get {
+                return ResourceManager.GetString("ModFileSelector_Validate_FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is not a Maxis DBPF package or a TS4 script archive..
+        /// </summary>
+        internal static string ModFileSelector_Validate_InvalidFormat {
+            get {
+                return ResourceManager.GetString("ModFileSelector_Validate_InvalidFormat", resourceCulture);
             }
         }
         
