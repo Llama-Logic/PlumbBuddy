@@ -62,7 +62,7 @@
                                     <MudForm @ref="@detailsStepForm">
                                         <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@(AppText.Common_Name)" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@(AppText.ManifestEditor_Details_ModName_HelperText)" Immediate Class="mt-4" />
                                         <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@(AppText.Common_Creators)" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@(AppText.ManifestEditor_Details_Creators_Placeholder)" HelperText="@(AppText.ManifestEditor_Details_Creators_HelperText)" Class="mt-4" />
-                                        <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_DownloadPageUrl_Caption)" HelperText="@(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)" Immediate Class="mt-4">
+                                        <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@(AppText.ManifestEditor_Details_DownloadPageUrl_Label)" HelperText="@(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)" Immediate Class="mt-4">
                                             <AdornmentStart>
                                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
                                             </AdornmentStart>

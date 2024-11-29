@@ -378,7 +378,7 @@
   <data name="ManifestEditor_Details_Creators_HelperText" xml:space="preserve">
     <value>So uhh... 🕵️‍♂️ who's responsible for this?</value>
   </data>
-  <data name="ManifestEditor_Details_DownloadPageUrl_Caption" xml:space="preserve">
+  <data name="ManifestEditor_Details_DownloadPageUrl_Label" xml:space="preserve">
     <value>Download Page URL</value>
   </data>
   <data name="ManifestEditor_Details_DownloadPageUrl_HelperText" xml:space="preserve">
@@ -931,5 +931,20 @@
   </data>
   <data name="ModFileSelector_Validate_InvalidFormat" xml:space="preserve">
     <value>This is not a Maxis DBPF package or a TS4 script archive.</value>
+  </data>
+  <data name="ModRequirementEditor_Name_HelperText" xml:space="preserve">
+    <value>If a player installs your mod but does not have this requirement, this is the name I will use to describe the missing requirement to them.</value>
+  </data>
+  <data name="ModRequirementEditor_Creators_HelperText" xml:space="preserve">
+    <value>If a player installs your mod but does not have this requirement, these are the creators I may tell them about when describing the missing requirement to them.</value>
+  </data>
+  <data name="ModRequirementEditor_RequiredFeatures_Label" xml:space="preserve">
+    <value>Required Features</value>
+  </data>
+  <data name="ModRequirementEditor_RequiredFeatures_HelperText" xml:space="preserve">
+    <value>These are the features the required mod must offer in order for your requirement to be satisfied. This field exists just in case the required mod's creator ever removes a feature, I can guide the player through resolving the issue.</value>
+  </data>
+  <data name="ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label" xml:space="preserve">
+    <value>Select features based on a mod file manifest...</value>
   </data>
 </root>

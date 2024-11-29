@@ -1582,20 +1582,20 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download Page URL.
-        /// </summary>
-        internal static string ManifestEditor_Details_DownloadPageUrl_Caption {
-            get {
-                return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_Caption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This should be a web page on which links or buttons are available to download the mod files for THIS MOD..
         /// </summary>
         internal static string ManifestEditor_Details_DownloadPageUrl_HelperText {
             get {
                 return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Page URL.
+        /// </summary>
+        internal static string ManifestEditor_Details_DownloadPageUrl_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_Label", resourceCulture);
             }
         }
         
@@ -2343,6 +2343,51 @@ namespace PlumbBuddy.Localization {
         internal static string ModFileSelector_Validate_InvalidFormat {
             get {
                 return ResourceManager.GetString("ModFileSelector_Validate_InvalidFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If a player installs your mod but does not have this requirement, these are the creators I may tell them about when describing the missing requirement to them..
+        /// </summary>
+        internal static string ModRequirementEditor_Creators_HelperText {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Creators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If a player installs your mod but does not have this requirement, this is the name I will use to describe the missing requirement to them..
+        /// </summary>
+        internal static string ModRequirementEditor_Name_HelperText {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Name_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These are the features the required mod must offer in order for your requirement to be satisfied. This field exists just in case the required mod&apos;s creator ever removes a feature, I can guide the player through resolving the issue..
+        /// </summary>
+        internal static string ModRequirementEditor_RequiredFeatures_HelperText {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_RequiredFeatures_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required Features.
+        /// </summary>
+        internal static string ModRequirementEditor_RequiredFeatures_Label {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_RequiredFeatures_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select features based on a mod file manifest....
+        /// </summary>
+        internal static string ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label", resourceCulture);
             }
         }
         

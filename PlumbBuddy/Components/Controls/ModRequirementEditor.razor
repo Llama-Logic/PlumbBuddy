@@ -1,72 +1,82 @@
 @inject IDialogService DialogService
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Justify="Justify.Center" Spacing="4">
     <MudItem xs="12">
-        <MudTextField T="string" Value="@Name" ValueChanged="HandleNameChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" Label="Name" HelperText="If a player installs your mod but does not have this requirement, this is the name I will use to describe the missing requirement to them." Immediate />
+        <MudTextField T="string" Value="@Name" ValueChanged="HandleNameChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" Label="@StringLocalizer["Common_Name"]" HelperText="@StringLocalizer["ModRequirementEditor_Name_HelperText"]" Immediate />
     </MudItem>
     <MudItem xs="12">
-        <ChipSetField Values="@Creators" ValuesChanged="HandleCreatorsChanged" Color="Color.Tertiary" Label="Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="If a player installs your mod but does not have this requirement, these are the creators I may tell them about when describing the missing requirement to them." />
+        <ChipSetField Values="@Creators" ValuesChanged="HandleCreatorsChanged" Color="Color.Tertiary" Label="@StringLocalizer["Common_Creators"]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer["ManifestEditor_Details_Creators_Placeholder"]" HelperText="@StringLocalizer["ModRequirementEditor_Creators_HelperText"]" />
     </MudItem>
     <MudItem xs="12">
-        <MudTextField T="string" Value="@Url" ValueChanged="HandleUrlChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Download" Label="Download Page URL" HelperText="If a player installs your mod but does not have this requirement, this is the download page URL I will give to them so that they can go get it to install it." />
+        <MudTextField T="string" Value="@Url" ValueChanged="HandleUrlChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Download" Label="@StringLocalizer["ManifestEditor_Details_DownloadPageUrl_Label"]" HelperText="@StringLocalizer["ModRequirementEditor_DownloadPageUrl_HelperText"]" />
     </MudItem>
     <MudItem xs="12">
-        <ChipSetField @ref="@(ModRequirement!.HashesField)" Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="Hashes" HelperText="There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don't worry about the required mod's requirements. It's responsible for those considerations." Placeholder="Enter a hex-formatted SHA 256 manifest hash here and press enter" />
+        <ChipSetField @ref="@(ModRequirement!.HashesField)" Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="@StringLocalizer["ModRequirementEditor_Hashes_Label"]" HelperText="@StringLocalizer["ModRequirementEditor_Hashes_Label"]" Placeholder="@StringLocalizer["ManifestComponentEditor_SubsumedHashes_Placeholder"]" />
     </MudItem>
     <MudItem>
-        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">Add mod file...</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">
+            @MarkupLocalizer["ModRequirementEditor_AddModFile_Label"]
+        </MudButton>
     </MudItem>
     <MudFlexBreak />
     <MudItem xs="12">
-        <ChipSetField @ref="@(ModRequirement!.RequiredFeaturesField)" Values="@RequiredFeatures" ValuesChanged="HandleRequiredFeaturesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Label="Required Features" HelperText="These are the features the required mod must offer in order for your requirement to be satisfied. This field exists just in case the required mod's creator ever removes a feature, I can guide the player through resolving the issue." Placeholder="Type a feature name here and press enter" />
+        <ChipSetField @ref="@(ModRequirement!.RequiredFeaturesField)" Values="@RequiredFeatures" ValuesChanged="HandleRequiredFeaturesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FeatureSearch" ChipIcon="@MaterialDesignIcons.Normal.Offer" Label="@StringLocalizer["ModRequirementEditor_RequiredFeatures_Label"]" HelperText="@StringLocalizer["ModRequirementEditor_RequiredFeatures_HelperText"]" Placeholder="@StringLocalizer["ManifestEditor_CrossMod_Features_Placeholder"]" />
     </MudItem>
     <MudItem>
-        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync">Select features based on a mod file manifest...</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync">
+            @MarkupLocalizer["ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label"]
+        </MudButton>
     </MudItem>
     <MudFlexBreak />
     <MudItem md="12">
-        <MudTextField T="string" Text="@RequirementIdentifier" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" AdornmentColor="Color.Tertiary" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="Requirement Identifier" HelperText="If set, the player must have at least one file using this requirement identifier. Requirement Identifiers are scoped only to your mod. You don't need to worry about making them globally unique." Placeholder="(currently independently required)" />
+        <MudTextField T="string" Text="@RequirementIdentifier" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" AdornmentColor="Color.Tertiary" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer["ManifestComponentEditor_RequirementIdentifier_Label"]" HelperText="@StringLocalizer["ManifestComponentEditor_RequirementIdentifier_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_RequirementIdentifier_Placeholder"]" />
     </MudItem>
     <MudItem xs="12" lg="6">
         @if (PublicCatalogs.PackCatalog is { } packCatalog)
         {
-            <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Available" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(click here to select/search for a pack)" />
+            <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_Label"]" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder"]" />
         }
         else
         {
-            <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Available" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has been installed by the player." Placeholder="(use a pack code like EP01 for Get to Work)" />
+            <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_Label"]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder"]" />
         }
     </MudItem>
     <MudItem xs="12" lg="6">
         @if (PublicCatalogs.PackCatalog is { } packCatalog)
         {
-            <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="Ignore if Pack Unavailable" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(click here to select/search for a pack)" />
+            <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_Label"]" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder"]" />
         }
         else
         {
-            <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Pack Unavailable" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="Instructs agents to ignore this requirement if an official The Sims 4 pack from Electronic Arts has not been installed by the player." Placeholder="(use a pack code like SP46 for Home Chef Hustle)" />
+            <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_Label"]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder"]" />
         }
     </MudItem>
     <MudItem xs="12" lg="6">
-        <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Available" HelperText="Instructs agents to ignore this requirement if the presence of a mod manifest hash in the load order indicates the player has installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
+        <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashAvailable_Label"]" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashAvailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder"]">
             <AdornmentStart>
                 <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
             </AdornmentStart>
             <AdornmentEnd>
-                <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">Browse...</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
+                    @MarkupLocalizer["Common_Browse_Ellipsis"]
+                </MudButton>
             </AdornmentEnd>
         </MudTextFieldExtended>
     </MudItem>
     <MudItem xs="12" lg="6">
-        <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="Ignore if Hash Unavailable" HelperText="Instructs agents to ignore this requirement if the absence of a mod manifest hash in the load order indicates the player has not installed another mod." Placeholder="(hash of the mod's manifest in hex format)">
+        <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashUnavailable_Label"]" HelperText="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText"]" Placeholder="@StringLocalizer["ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder"]">
             <AdornmentStart>
                 <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
             </AdornmentStart>
             <AdornmentEnd>
-                <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">Browse...</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
+                    @MarkupLocalizer["Common_Browse_Ellipsis"]
+                </MudButton>
             </AdornmentEnd>
         </MudTextFieldExtended>
     </MudItem>
