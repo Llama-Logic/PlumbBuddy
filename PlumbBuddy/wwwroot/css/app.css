@@ -224,13 +224,6 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
         color: var(--mud-palette-tertiary-text);
     }
 
-.classified-paper {
-    backdrop-filter: blur(10px);
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 70%);
-    margin-top: 1em;
-    padding: 1em;
-}
-
 .scan-issue {
     height: 100%;
 }
