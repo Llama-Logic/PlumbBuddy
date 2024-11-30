@@ -1,15 +1,13 @@
 @inject ICustomThemes CustomThemes
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISettings Settings
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Justify="Justify.Center">
     <MudItem>
-        <MudStack Row Spacing="0">
-            <MudTextM3>Click </MudTextM3>
-            <MudTextM3 Color="Color.Primary" Class="mx-1"><strong>SELECT</strong></MudTextM3>
-            <MudTextM3> to choose a theme or </MudTextM3>
-            <MudTextM3 Color="Color.Primary" Class="mx-1"><strong>SELECTED</strong></MudTextM3>
-            <MudTextM3> for the current theme to return to the default.</MudTextM3>
-        </MudStack>
+        <MudTextM3>
+            @MarkupLocalizer["ThemeSelector_Instructions"]
+        </MudTextM3>
     </MudItem>
     <MudFlexBreak />
     @foreach (var (slug, customTheme) in CustomThemes.Themes.OrderBy(kv => kv.Key))
@@ -19,18 +17,24 @@
                 <MudCardMedia Image="@($"/img/custom-themes/{slug}/logo.png")" Height="160" />
                 <MudCardContent>
                     <MudStack Spacing="0" Class="align-center">
-                        <MudTextM3 Typo="TypoM3.Title">@customTheme.DisplayName</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">@(customTheme.DisplayName)</MudTextM3>
                         @if ((customTheme.PaletteLight is null) == (customTheme.PaletteDark is null))
                         {
-                            <MudChip T="string" Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Variant="Variant.Text">Light or Dark Mode</MudChip>
+                            <MudChip T="string" Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Variant="Variant.Text">
+                                @MarkupLocalizer["ThemeSelector_LightOrDarkMode"]
+                            </MudChip>
                         }
                         else if (customTheme.PaletteLight is null)
                         {
-                            <MudChip T="string" Icon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Dark">Dark Mode Only</MudChip>
+                            <MudChip T="string" Icon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Dark">
+                                @MarkupLocalizer["ThemeSelector_DarkModeOnly"]
+                            </MudChip>
                         }
                         else
                         {
-                            <MudChip T="string" Icon="@MaterialDesignIcons.Outline.LightbulbOn">Light Mode Only</MudChip>
+                            <MudChip T="string" Icon="@MaterialDesignIcons.Outline.LightbulbOn">
+                                @MarkupLocalizer["ThemeSelector_LightModeOnly"]
+                            </MudChip>
                         }
                         <MudMarkdown Value="@customTheme.Description" />
                     </MudStack>
@@ -38,11 +42,15 @@
                 <MudCardActions>
                     @if (Settings.Theme == slug)
                     {
-                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxMarked" Color="Color.Primary" OnClick="@(() => SelectTheme(null))">Selected</MudButton>
+                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxMarked" Color="Color.Primary" OnClick="@(() => SelectTheme(null))">
+                            @MarkupLocalizer["Common_Selected"]
+                        </MudButton>
                     }
                     else
                     {
-                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxBlank" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">Select</MudButton>
+                        <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxBlank" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">
+                            @MarkupLocalizer["Common_Select"]
+                        </MudButton>
                     }
                 </MudCardActions>
             </MudCard>

@@ -322,6 +322,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Selected.
+        /// </summary>
+        internal static string Common_Selected {
+            get {
+                return ResourceManager.GetString("Common_Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set Default.
         /// </summary>
         internal static string Common_SetDefault {
@@ -2723,6 +2732,42 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_SelectedNotFoundScans_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_SelectedNotFoundScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dark Mode Only.
+        /// </summary>
+        internal static string ThemeSelector_DarkModeOnly {
+            get {
+                return ResourceManager.GetString("ThemeSelector_DarkModeOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click &lt;span class=&quot;mud-primary-text&quot;&gt;&lt;strong&gt;SELECT&lt;/strong&gt;&lt;/span&gt; to choose a theme or &lt;span class=&quot;mud-primary-text&quot;&gt;&lt;strong&gt;SELECTED&lt;/strong&gt;&lt;/span&gt; for the current theme to return to the default..
+        /// </summary>
+        internal static string ThemeSelector_Instructions {
+            get {
+                return ResourceManager.GetString("ThemeSelector_Instructions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light Mode Only.
+        /// </summary>
+        internal static string ThemeSelector_LightModeOnly {
+            get {
+                return ResourceManager.GetString("ThemeSelector_LightModeOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light or Dark Mode.
+        /// </summary>
+        internal static string ThemeSelector_LightOrDarkMode {
+            get {
+                return ResourceManager.GetString("ThemeSelector_LightOrDarkMode", resourceCulture);
             }
         }
         

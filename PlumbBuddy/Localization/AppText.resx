@@ -1086,4 +1086,19 @@ If you don't have one, but you're interested in getting a commission for all the
   <data name="ScansToggler_ScanForMutuallyExclusiveMods_Label" xml:space="preserve">
     <value>...one or more mutually-exclusive mods</value>
   </data>
+  <data name="ThemeSelector_Instructions" xml:space="preserve">
+    <value>Click &lt;span class="mud-primary-text"&gt;&lt;strong&gt;SELECT&lt;/strong&gt;&lt;/span&gt; to choose a theme or &lt;span class="mud-primary-text"&gt;&lt;strong&gt;SELECTED&lt;/strong&gt;&lt;/span&gt; for the current theme to return to the default.</value>
+  </data>
+  <data name="ThemeSelector_LightModeOnly" xml:space="preserve">
+    <value>Light Mode Only</value>
+  </data>
+  <data name="ThemeSelector_DarkModeOnly" xml:space="preserve">
+    <value>Dark Mode Only</value>
+  </data>
+  <data name="ThemeSelector_LightOrDarkMode" xml:space="preserve">
+    <value>Light or Dark Mode</value>
+  </data>
+  <data name="Common_Selected" xml:space="preserve">
+    <value>Selected</value>
+  </data>
 </root>
