@@ -1101,4 +1101,22 @@ If you don't have one, but you're interested in getting a commission for all the
   <data name="Common_Selected" xml:space="preserve">
     <value>Selected</value>
   </data>
+  <data name="UserTypeSelector_CasualPlayer_Label" xml:space="preserve">
+    <value>Casual Player</value>
+  </data>
+  <data name="UserTypeSelector_CasualPlayer_Description" xml:space="preserve">
+    <value>I got PlumbBuddy because I want to play The Sims 4 with mods, but without any hassles. Don't bother me with a bunch of technical mumbo-jumbo. Just keep an eye on my mods, let me know when there's a problem, and give me an easy-to-follow way to fix it.</value>
+  </data>
+  <data name="UserTypeSelector_EnthusiastPlayer_Label" xml:space="preserve">
+    <value>Enthusiast Player</value>
+  </data>
+  <data name="UserTypeSelector_EnthusiastPlayer_Description" xml:space="preserve">
+    <value>I've been using mods in The Sims 4 for some time and I got PlumbBuddy to help automate all the mod maintenance I need to do. I'm comfortable with the technical stuff, so don't hold back. I want to see all the options, learn what they do, and exercise full control over them. I may have unusual preferences regarding how I want PlumbBuddy to behave.</value>
+  </data>
+  <data name="UserTypeSelector_ModCreator_Label" xml:space="preserve">
+    <value>Mod Creator</value>
+  </data>
+  <data name="UserTypeSelector_ModCreator_Description" xml:space="preserve">
+    <value>Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don't actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my packages.</value>
+  </data>
 </root>

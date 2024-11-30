@@ -2779,5 +2779,59 @@ namespace PlumbBuddy.Localization {
                 return ResourceManager.GetString("UserDataFolderName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I got PlumbBuddy because I want to play The Sims 4 with mods, but without any hassles. Don&apos;t bother me with a bunch of technical mumbo-jumbo. Just keep an eye on my mods, let me know when there&apos;s a problem, and give me an easy-to-follow way to fix it..
+        /// </summary>
+        internal static string UserTypeSelector_CasualPlayer_Description {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_CasualPlayer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Casual Player.
+        /// </summary>
+        internal static string UserTypeSelector_CasualPlayer_Label {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_CasualPlayer_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve been using mods in The Sims 4 for some time and I got PlumbBuddy to help automate all the mod maintenance I need to do. I&apos;m comfortable with the technical stuff, so don&apos;t hold back. I want to see all the options, learn what they do, and exercise full control over them. I may have unusual preferences regarding how I want PlumbBuddy to behave..
+        /// </summary>
+        internal static string UserTypeSelector_EnthusiastPlayer_Description {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_EnthusiastPlayer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enthusiast Player.
+        /// </summary>
+        internal static string UserTypeSelector_EnthusiastPlayer_Label {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_EnthusiastPlayer_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don&apos;t actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my packages..
+        /// </summary>
+        internal static string UserTypeSelector_ModCreator_Description {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_ModCreator_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Creator.
+        /// </summary>
+        internal static string UserTypeSelector_ModCreator_Label {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_ModCreator_Label", resourceCulture);
+            }
+        }
     }
 }

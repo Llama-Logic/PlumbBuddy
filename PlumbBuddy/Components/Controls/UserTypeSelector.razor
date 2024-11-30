@@ -1,3 +1,5 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
 <MudCarousel TData="object" @bind-SelectedIndex="@UserTypeSelectedIndex" AutoCycle="false" BulletsPosition="Position.Start" Class="user-type-carousel mud-width-full" ShowArrows ShowBullets>
     <BulletTemplate Context="selected">
         <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
@@ -36,12 +38,12 @@
                 <MudSection Class="description-backdrop" Column="2" ColSpan="2" Row="2" RowSpan="3">
                 </MudSection>
                 <MudSection Class="description" Column="2" ColSpan="2" Row="2" RowSpan="3">
-                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Casual Player</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_CasualPlayer_Label)]
+                    </MudTextM3>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Body">
-                        I got PlumbBuddy because I want to play The Sims 4 with mods, but without any hassles.
-                        Don't bother me with a bunch of technical mumbo-jumbo.
-                        Just keep an eye on my mods, let me know when there's a problem, and give me an easy-to-follow way to fix it.
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_CasualPlayer_Description)]
                     </MudTextM3>
                 </MudSection>
             </MudPage>
@@ -61,13 +63,12 @@
                 <MudSection Class="description-backdrop" Column="2" ColSpan="5" Row="4" RowSpan="2">
                 </MudSection>
                 <MudSection Class="description" Column="2" ColSpan="5" Row="4" RowSpan="2">
-                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Enthusiast Player</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_EnthusiastPlayer_Label)]
+                    </MudTextM3>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Body">
-                        I've been using mods in The Sims 4 for some time and I got PlumbBuddy to help automate all the mod maintenance I need to do.
-                        I'm comfortable with the technical stuff, so don't hold back.
-                        I want to see all the options, learn what they do, and exercise full control over them.
-                        I may have unusual preferences regarding how I want PlumbBuddy to behave.
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_EnthusiastPlayer_Description)]
                     </MudTextM3>
                 </MudSection>
             </MudPage>
@@ -87,14 +88,12 @@
                 <MudSection Class="description-backdrop" Column="5" ColSpan="3" Row="2" RowSpan="3">
                 </MudSection>
                 <MudSection Class="description" Column="5" ColSpan="3" Row="2" RowSpan="3">
-                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">Mod Creator</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Title" Size="Size.Large">
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_ModCreator_Label)]
+                    </MudTextM3>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Body">
-                        Hey, PlumbBuddy!
-                        You should probably just default all your health scans off for me unless I turn them on for myself.
-                        You and I both know I don't actually have time to play the game. 😂
-                        Oh, and could you unlock your Creator Tools for me?
-                        I may need to update manifests in my packages.
+                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_ModCreator_Description)]
                     </MudTextM3>
                 </MudSection>
             </MudPage>
