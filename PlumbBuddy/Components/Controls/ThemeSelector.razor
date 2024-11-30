@@ -6,7 +6,7 @@
 <MudGrid Justify="Justify.Center">
     <MudItem>
         <MudTextM3>
-            @MarkupLocalizer["ThemeSelector_Instructions"]
+            @MarkupLocalizer[nameof(AppText.ThemeSelector_Instructions)]
         </MudTextM3>
     </MudItem>
     <MudFlexBreak />
@@ -21,19 +21,19 @@
                         @if ((customTheme.PaletteLight is null) == (customTheme.PaletteDark is null))
                         {
                             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Variant="Variant.Text">
-                                @MarkupLocalizer["ThemeSelector_LightOrDarkMode"]
+                                @MarkupLocalizer[nameof(AppText.ThemeSelector_LightOrDarkMode)]
                             </MudChip>
                         }
                         else if (customTheme.PaletteLight is null)
                         {
                             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Dark">
-                                @MarkupLocalizer["ThemeSelector_DarkModeOnly"]
+                                @MarkupLocalizer[nameof(AppText.ThemeSelector_DarkModeOnly)]
                             </MudChip>
                         }
                         else
                         {
                             <MudChip T="string" Icon="@MaterialDesignIcons.Outline.LightbulbOn">
-                                @MarkupLocalizer["ThemeSelector_LightModeOnly"]
+                                @MarkupLocalizer[nameof(AppText.ThemeSelector_LightModeOnly)]
                             </MudChip>
                         }
                         <MudMarkdown Value="@customTheme.Description" />
@@ -43,13 +43,13 @@
                     @if (Settings.Theme == slug)
                     {
                         <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxMarked" Color="Color.Primary" OnClick="@(() => SelectTheme(null))">
-                            @MarkupLocalizer["Common_Selected"]
+                            @MarkupLocalizer[nameof(AppText.Common_Selected)]
                         </MudButton>
                     }
                     else
                     {
                         <MudButton Variant="Variant.Text" StartIcon="@MaterialDesignIcons.Normal.CheckboxBlank" Color="Color.Primary" OnClick="@(() => SelectTheme(slug))" Disabled="@(Settings.ShowThemeManager || Settings.Theme == slug)">
-                            @MarkupLocalizer["Common_Select"]
+                            @MarkupLocalizer[nameof(AppText.Common_Select)]
                         </MudButton>
                     }
                 </MudCardActions>
