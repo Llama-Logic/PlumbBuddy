@@ -1,4 +1,7 @@
-<MudComboBox T="string" @bind-SelectedValues="@SelectedGameOptionScans" Label="In The Sims 4 game options..." AdornmentIcon="@MaterialDesignIcons.Normal.Cog" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Primary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<MudComboBox T="string" @bind-SelectedValues="@SelectedGameOptionScans" Label="@StringLocalizer[nameof(AppText.ScansToggler_SelectedGameOptionScans_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.Cog" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Primary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
     <ChildContent>
         @foreach (var scan in gameOptionsScanLabels)
         {
@@ -6,7 +9,7 @@
         }
     </ChildContent>
 </MudComboBox>
-<MudComboBox T="string" @bind-SelectedValues="@SelectedFoundScans" Label="Inside your Mods Folder, I find..." AdornmentIcon="@MaterialDesignIcons.Normal.FolderWrench" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Secondary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
+<MudComboBox T="string" @bind-SelectedValues="@SelectedFoundScans" Label="@StringLocalizer[nameof(AppText.ScansToggler_SelectedFoundScans_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.FolderWrench" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Secondary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
     <ChildContent>
         @foreach (var scan in foundScanLabels)
         {
@@ -14,7 +17,7 @@
         }
     </ChildContent>
 </MudComboBox>
-<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="Inside your Installation and Mods Folders, I DO NOT find..." AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
+<MudComboBox T="string" @bind-SelectedValues="@SelectedNotFoundScans" Label="@StringLocalizer[nameof(AppText.ScansToggler_SelectedNotFoundScans_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Tertiary" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
     <ChildContent>
         @foreach (var scan in notFoundScanLabels)
         {
@@ -22,7 +25,7 @@
         }
     </ChildContent>
 </MudComboBox>
-<MudComboBox T="string" @bind-SelectedValues="@SelectedAnalysisScans" Label="Mod file analysis suggests..." AdornmentIcon="@MaterialDesignIcons.Normal.SyncAlert" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
+<MudComboBox T="string" @bind-SelectedValues="@SelectedAnalysisScans" Label="@StringLocalizer[nameof(AppText.ScansToggler_SelectedAnalysisScans_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.SyncAlert" Adornment="Adornment.End" MultiSelection="true" InputPresenter="ValuePresenter.Chip" Color="Color.Warning" ChipSize="Size.Medium" Variant="Variant.Filled" Clearable SelectAll Class="mt-4">
     <ChildContent>
         @foreach (var scan in analysisScanLabels)
         {
@@ -31,7 +34,13 @@
     </ChildContent>
 </MudComboBox>
 <MudTextM3 Align="Align.Center" Class="mt-4">
-    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.Checkbox" OnClick="EnableAllOnClickHandler">Enable All</MudButton>
-    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxBlank" Style="margin-left: 5px;" OnClick="DisableAllOnClickHandler">Disable All</MudButton>
-    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxMultipleMarked" Style="margin-left: 5px;" OnClick="SetDefaultOnClickHandler">Set Default</MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.Checkbox" OnClick="EnableAllOnClickHandler">
+        @MarkupLocalizer[nameof(AppText.Common_EnableAll)]
+    </MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxBlank" Style="margin-left: 5px;" OnClick="DisableAllOnClickHandler">
+        @MarkupLocalizer[nameof(AppText.Common_DisableAll)]
+    </MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.CheckboxMultipleMarked" Style="margin-left: 5px;" OnClick="SetDefaultOnClickHandler">
+        @MarkupLocalizer[nameof(AppText.Common_SetDefault)]
+    </MudButton>
 </MudTextM3>

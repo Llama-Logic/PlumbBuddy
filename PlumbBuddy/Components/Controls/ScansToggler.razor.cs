@@ -6,9 +6,9 @@ partial class ScansToggler
     {
         gameOptionScanLabelByName = new Dictionary<string, string>
         {
-            { nameof(ScanForModsDisabled), "...Mods are disabled even though you have .package files" },
-            { nameof(ScanForScriptModsDisabled), "...Script Mods are disabled even though you have .ts4script files" },
-            { nameof(ScanForShowModsListAtStartupEnabled), "...Show At Startup is enabled in View Custom Content" }
+            { nameof(ScanForModsDisabled), AppText.ScansToggler_ScanForModsDisabled_Label },
+            { nameof(ScanForScriptModsDisabled), AppText.ScansToggler_ScanForScriptModsDisabled_Label },
+            { nameof(ScanForShowModsListAtStartupEnabled), AppText.ScansToggler_ScanForShowModsListAtStartupEnabled_Label }
         }.ToImmutableDictionary();
         gameOptionsScanLabels =
         [
@@ -18,14 +18,14 @@ partial class ScansToggler
         ];
         foundScanLabelByName = new Dictionary<string, string>
         {
-            { nameof(ScanForInvalidModSubdirectoryDepth), "...a .package file more than five subfolders deep" },
-            { nameof(ScanForInvalidScriptModSubdirectoryDepth), "...a .ts4script file more than one subfolder deep" },
-            { nameof(ScanForLooseZipArchives), "...a .zip file" },
-            { nameof(ScanForLooseRarArchives), "...a .rar file" },
-            { nameof(ScanForLoose7ZipArchives), "...a .7z file" },
-            { nameof(ScanForCorruptMods), "...a corrupt .package file" },
-            { nameof(ScanForCorruptScriptMods), "...a corrupt .ts4script file" },
-            { nameof(ScanForErrorLogs), "...a file that appears to contain error information" }
+            { nameof(ScanForInvalidModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidModSubdirectoryDepth_Label },
+            { nameof(ScanForInvalidScriptModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label },
+            { nameof(ScanForLooseZipArchives), AppText.ScansToggler_ScanForLooseZipArchives_Label },
+            { nameof(ScanForLooseRarArchives), AppText.ScansToggler_ScanForLooseRarArchives_Label },
+            { nameof(ScanForLoose7ZipArchives), AppText.ScansToggler_ScanForLoose7ZipArchives_Label },
+            { nameof(ScanForCorruptMods), AppText.ScansToggler_ScanForCorruptMods_Label },
+            { nameof(ScanForCorruptScriptMods), AppText.ScansToggler_ScanForCorruptScriptMods_Label },
+            { nameof(ScanForErrorLogs), AppText.ScansToggler_ScanForErrorLogs_Label }
         }.ToImmutableDictionary();
         foundScanLabels =
         [
@@ -40,10 +40,10 @@ partial class ScansToggler
         ];
         notFoundScanLabelByName = new Dictionary<string, string>
         {
-            { nameof(ScanForMissingMccc), "...Deaderpool's MC Command Center" },
-            { nameof(ScanForMissingBe), "...TwistedMexi's Better Exceptions" },
-            { nameof(ScanForMissingModGuard), "...TwistedMexi's Mod Guard" },
-            { nameof(ScanForMissingDependency), "...a pack or mod required by another mod you have installed" }
+            { nameof(ScanForMissingModGuard), AppText.ScansToggler_ScanForMissingModGuard_Label },
+            { nameof(ScanForMissingDependency), AppText.ScansToggler_ScanForMissingDependency_Label },
+            { nameof(ScanForMissingMccc), AppText.ScansToggler_ScanForMissingMccc_Label },
+            { nameof(ScanForMissingBe), AppText.ScansToggler_ScanForMissingBe_Label }
         }.ToImmutableDictionary();
         notFoundScanLabels =
         [
@@ -54,9 +54,9 @@ partial class ScansToggler
         ];
         analysisScanLabelByName = new Dictionary<string, string>
         {
-            { nameof(ScanForCacheStaleness), "...it is appropriate to clear the cache files" },
-            { nameof(ScanForMultipleModVersions), "...multiple versions of the same mod" },
-            { nameof(ScanForMutuallyExclusiveMods), "...one or more mutually-exclusive mods" }
+            { nameof(ScanForCacheStaleness), AppText.ScansToggler_ScanForCacheStaleness_Label },
+            { nameof(ScanForMultipleModVersions), AppText.ScansToggler_ScanForMultipleModVersions_Label },
+            { nameof(ScanForMutuallyExclusiveMods), AppText.ScansToggler_ScanForMutuallyExclusiveMods_Label }
         }.ToImmutableDictionary();
         analysisScanLabels =
         [

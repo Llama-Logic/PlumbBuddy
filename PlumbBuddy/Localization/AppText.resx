@@ -1002,4 +1002,88 @@ If you don't have one, but you're interested in getting a commission for all the
   <data name="ScanIssuesDisplay_MDCRefreshing_Warning" xml:space="preserve">
     <value>Please don't launch the game right now!</value>
   </data>
+  <data name="Common_EnableAll" xml:space="preserve">
+    <value>Enable All</value>
+  </data>
+  <data name="Common_DisableAll" xml:space="preserve">
+    <value>Disable All</value>
+  </data>
+  <data name="Common_SetDefault" xml:space="preserve">
+    <value>Set Default</value>
+  </data>
+  <data name="ScansToggler_SelectedGameOptionScans_Label" xml:space="preserve">
+    <value>In The Sims 4 game options...</value>
+  </data>
+  <data name="ScansToggler_SelectedFoundScans_Label" xml:space="preserve">
+    <value>Inside your Mods Folder, I find...</value>
+  </data>
+  <data name="ScansToggler_SelectedNotFoundScans_Label" xml:space="preserve">
+    <value>Inside your Installation and Mods Folders, I DO NOT find...</value>
+  </data>
+  <data name="ScansToggler_SelectedAnalysisScans_Label" xml:space="preserve">
+    <value>Mod file analysis suggests...</value>
+  </data>
+  <data name="ModRequirementEditor_AddModFile_Label" xml:space="preserve">
+    <value>Add Hash from Mod File...</value>
+  </data>
+  <data name="ModRequirementEditor_Hashes_Label" xml:space="preserve">
+    <value>Hashes</value>
+  </data>
+  <data name="ModRequirementEditor_DownloadPageUrl_HelperText" xml:space="preserve">
+    <value>If a player needs to download this mod, this is the page I will send them to in order to do so.</value>
+  </data>
+  <data name="ScansToggler_ScanForModsDisabled_Label" xml:space="preserve">
+    <value>...Mods are disabled even though you have .package files</value>
+  </data>
+  <data name="ScansToggler_ScanForScriptModsDisabled_Label" xml:space="preserve">
+    <value>...Script Mods are disabled even though you have .ts4script files</value>
+  </data>
+  <data name="ScansToggler_ScanForShowModsListAtStartupEnabled_Label" xml:space="preserve">
+    <value>...Show At Startup is enabled in View Custom Content</value>
+  </data>
+  <data name="ScansToggler_ScanForInvalidModSubdirectoryDepth_Label" xml:space="preserve">
+    <value>...a .package file more than five subfolders deep</value>
+  </data>
+  <data name="ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label" xml:space="preserve">
+    <value>...a .ts4script file more than one subfolder deep</value>
+  </data>
+  <data name="ScansToggler_ScanForLooseZipArchives_Label" xml:space="preserve">
+    <value>...a .zip file</value>
+  </data>
+  <data name="ScansToggler_ScanForLooseRarArchives_Label" xml:space="preserve">
+    <value>...a .rar file</value>
+  </data>
+  <data name="ScansToggler_ScanForLoose7ZipArchives_Label" xml:space="preserve">
+    <value>...a .7z file</value>
+  </data>
+  <data name="ScansToggler_ScanForCorruptMods_Label" xml:space="preserve">
+    <value>...a corrupt .package file</value>
+  </data>
+  <data name="ScansToggler_ScanForCorruptScriptMods_Label" xml:space="preserve">
+    <value>...a corrupt .ts4script file</value>
+  </data>
+  <data name="ScansToggler_ScanForErrorLogs_Label" xml:space="preserve">
+    <value>...a file that appears to contain error information</value>
+  </data>
+  <data name="ScansToggler_ScanForMissingMccc_Label" xml:space="preserve">
+    <value>...Deaderpool's MC Command Center</value>
+  </data>
+  <data name="ScansToggler_ScanForMissingBe_Label" xml:space="preserve">
+    <value>...TwistedMexi's Better Exceptions</value>
+  </data>
+  <data name="ScansToggler_ScanForMissingModGuard_Label" xml:space="preserve">
+    <value>...TwistedMexi's Mod Guard</value>
+  </data>
+  <data name="ScansToggler_ScanForMissingDependency_Label" xml:space="preserve">
+    <value>...a pack or mod required by another mod you have installed</value>
+  </data>
+  <data name="ScansToggler_ScanForCacheStaleness_Label" xml:space="preserve">
+    <value>...it is appropriate to clear the cache files</value>
+  </data>
+  <data name="ScansToggler_ScanForMultipleModVersions_Label" xml:space="preserve">
+    <value>...multiple versions of the same mod</value>
+  </data>
+  <data name="ScansToggler_ScanForMutuallyExclusiveMods_Label" xml:space="preserve">
+    <value>...one or more mutually-exclusive mods</value>
+  </data>
 </root>

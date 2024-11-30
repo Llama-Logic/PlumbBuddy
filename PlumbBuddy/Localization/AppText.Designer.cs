@@ -250,6 +250,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable All.
+        /// </summary>
+        internal static string Common_DisableAll {
+            get {
+                return ResourceManager.GetString("Common_DisableAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable All.
+        /// </summary>
+        internal static string Common_EnableAll {
+            get {
+                return ResourceManager.GetString("Common_EnableAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Finish.
         /// </summary>
         internal static string Common_Finish {
@@ -300,6 +318,15 @@ namespace PlumbBuddy.Localization {
         internal static string Common_Select {
             get {
                 return ResourceManager.GetString("Common_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set Default.
+        /// </summary>
+        internal static string Common_SetDefault {
+            get {
+                return ResourceManager.GetString("Common_SetDefault", resourceCulture);
             }
         }
         
@@ -2385,11 +2412,38 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Hash from Mod File....
+        /// </summary>
+        internal static string ModRequirementEditor_AddModFile_Label {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_AddModFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If a player installs your mod but does not have this requirement, these are the creators I may tell them about when describing the missing requirement to them..
         /// </summary>
         internal static string ModRequirementEditor_Creators_HelperText {
             get {
                 return ResourceManager.GetString("ModRequirementEditor_Creators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If a player needs to download this mod, this is the page I will send them to in order to do so..
+        /// </summary>
+        internal static string ModRequirementEditor_DownloadPageUrl_HelperText {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_DownloadPageUrl_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hashes.
+        /// </summary>
+        internal static string ModRequirementEditor_Hashes_Label {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Hashes_Label", resourceCulture);
             }
         }
         
@@ -2471,6 +2525,204 @@ namespace PlumbBuddy.Localization {
         internal static string ScanIssuesDisplay_MDCRefreshing_Warning {
             get {
                 return ResourceManager.GetString("ScanIssuesDisplay_MDCRefreshing_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...it is appropriate to clear the cache files.
+        /// </summary>
+        internal static string ScansToggler_ScanForCacheStaleness_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForCacheStaleness_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a corrupt .package file.
+        /// </summary>
+        internal static string ScansToggler_ScanForCorruptMods_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForCorruptMods_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a corrupt .ts4script file.
+        /// </summary>
+        internal static string ScansToggler_ScanForCorruptScriptMods_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForCorruptScriptMods_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a file that appears to contain error information.
+        /// </summary>
+        internal static string ScansToggler_ScanForErrorLogs_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForErrorLogs_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a .package file more than five subfolders deep.
+        /// </summary>
+        internal static string ScansToggler_ScanForInvalidModSubdirectoryDepth_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForInvalidModSubdirectoryDepth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a .ts4script file more than one subfolder deep.
+        /// </summary>
+        internal static string ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a .7z file.
+        /// </summary>
+        internal static string ScansToggler_ScanForLoose7ZipArchives_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForLoose7ZipArchives_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a .rar file.
+        /// </summary>
+        internal static string ScansToggler_ScanForLooseRarArchives_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForLooseRarArchives_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a .zip file.
+        /// </summary>
+        internal static string ScansToggler_ScanForLooseZipArchives_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForLooseZipArchives_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...TwistedMexi&apos;s Better Exceptions.
+        /// </summary>
+        internal static string ScansToggler_ScanForMissingBe_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMissingBe_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a pack or mod required by another mod you have installed.
+        /// </summary>
+        internal static string ScansToggler_ScanForMissingDependency_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMissingDependency_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...Deaderpool&apos;s MC Command Center.
+        /// </summary>
+        internal static string ScansToggler_ScanForMissingMccc_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMissingMccc_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...TwistedMexi&apos;s Mod Guard.
+        /// </summary>
+        internal static string ScansToggler_ScanForMissingModGuard_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMissingModGuard_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...Mods are disabled even though you have .package files.
+        /// </summary>
+        internal static string ScansToggler_ScanForModsDisabled_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForModsDisabled_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...multiple versions of the same mod.
+        /// </summary>
+        internal static string ScansToggler_ScanForMultipleModVersions_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMultipleModVersions_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...one or more mutually-exclusive mods.
+        /// </summary>
+        internal static string ScansToggler_ScanForMutuallyExclusiveMods_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMutuallyExclusiveMods_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...Script Mods are disabled even though you have .ts4script files.
+        /// </summary>
+        internal static string ScansToggler_ScanForScriptModsDisabled_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForScriptModsDisabled_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...Show At Startup is enabled in View Custom Content.
+        /// </summary>
+        internal static string ScansToggler_ScanForShowModsListAtStartupEnabled_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForShowModsListAtStartupEnabled_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod file analysis suggests....
+        /// </summary>
+        internal static string ScansToggler_SelectedAnalysisScans_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_SelectedAnalysisScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inside your Mods Folder, I find....
+        /// </summary>
+        internal static string ScansToggler_SelectedFoundScans_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_SelectedFoundScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In The Sims 4 game options....
+        /// </summary>
+        internal static string ScansToggler_SelectedGameOptionScans_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_SelectedGameOptionScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inside your Installation and Mods Folders, I DO NOT find....
+        /// </summary>
+        internal static string ScansToggler_SelectedNotFoundScans_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_SelectedNotFoundScans_Label", resourceCulture);
             }
         }
         
