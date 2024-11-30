@@ -124,7 +124,7 @@ partial class ModFileSelector
                 await dialogService.ShowErrorDialogAsync
                 (
                     AppText.ModFileSelector_SelectAModFileManifest_Error_NoManifests_Caption,
-                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text, Environment.NewLine, modFile.FullName)
+                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text, modFile.FullName)
                 ).ConfigureAwait(false);
                 return default;
             }
@@ -133,7 +133,7 @@ partial class ModFileSelector
                 await dialogService.ShowInfoDialogAsync
                 (
                     AppText.ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption,
-                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text, Environment.NewLine, modFile.FullName)
+                    string.Format(AppText.ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text, modFile.FullName)
                 ).ConfigureAwait(false);
                 if (manifests.TryGetValue(await dialogService.ShowSelectManifestDialogAsync(manifests), out var manifest))
                     return manifest;

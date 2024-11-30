@@ -74,8 +74,8 @@
                                                     <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
                                                     <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                         <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
-                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsNotToDo_Popover_1", Environment.NewLine]" />
-                                                            <MudMarkdown Value="@(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_2)" />
+                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsNotToDo_Popover_1"]" />
+                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsNotToDo_Popover_2"]" />
                                                         </MudAlert>
                                                     </MudPopover>
                                                 </MudTooltip>
@@ -83,7 +83,7 @@
                                                     <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
                                                     <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
                                                         <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
-                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsToDo_Popover", Environment.NewLine]" />
+                                                            <MudMarkdown Value="@StringLocalizer["ManifestEditor_Details_SeeThingsToDo_Popover"]" />
                                                         </MudAlert>
                                                     </MudPopover>
                                                 </MudTooltip>
@@ -200,7 +200,7 @@
                                         <MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
                                         <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight">
                                             <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
-                                                <MudMarkdown Value="@StringLocalizer["ManifestEditor_Requirements_AddRequiredMod_Popover", Environment.NewLine]" />
+                                                <MudMarkdown Value="@StringLocalizer["ManifestEditor_Requirements_AddRequiredMod_Popover"]" />
                                             </MudAlert>
                                         </MudPopover>
                                     </MudItem>

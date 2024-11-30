@@ -1,7 +1,9 @@
 @implements IDisposable
 @inject IDialogService DialogService
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Justify="Justify.Center" Class="scan-issues-container">
     @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
@@ -17,7 +19,9 @@
                             </MudAvatar>
                         </CardHeaderAvatar>
                         <CardHeaderContent>
-                            <MudTextM3 Typo="TypoM3.Title">@scanIssue.Caption</MudTextM3>
+                            <MudTextM3 Typo="TypoM3.Title">
+                                @(scanIssue.Caption)
+                            </MudTextM3>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
@@ -30,11 +34,15 @@
                             {
                                 if (resolution.Url is { } url)
                                 {
-                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" Href="@url.ToString()" Target="_blank" Disabled="@resolution.Disabled" Style="width: 100%;">@resolution.Label</MudButton>
+                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" Href="@url.ToString()" Target="_blank" Disabled="@resolution.Disabled" Style="width: 100%;">
+                                        @(resolution.Label)
+                                    </MudButton>
                                 }
                                 else
                                 {
-                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)" Disabled="@resolution.Disabled" Style="width: 100%;">@resolution.Label</MudButton>
+                                    <MudButton StartIcon="@resolution.Icon" Color="@resolution.Color" IconColor="@resolution.Color" OnClick="() => ResolveAsync(scanIssue, resolution)" Disabled="@resolution.Disabled" Style="width: 100%;">
+                                        @(resolution.Label)
+                                    </MudButton>
                                 }
                             }
                         </MudCardActions>
@@ -54,11 +62,15 @@
                         </MudAvatar>
                     </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudTextM3 Typo="TypoM3.Title">Game's Running... So Sleepy...</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer["ScanIssuesDisplay_MDCAsleep_Caption"]
+                        </MudTextM3>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTextM3 Typo="TypoM3.Body">Since we shouldn't be doing anything to your Mods folder while the game is running, I hope you won't mind if I catch a few winks while you play.</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Body">
+                        @MarkupLocalizer["ScanIssuesDisplay_MDCAsleep_Description"]
+                    </MudTextM3>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -74,12 +86,18 @@
                         </MudAvatar>
                     </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudTextM3 Typo="TypoM3.Title">I'm Looking at Your Mods Folder...</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer["ScanIssuesDisplay_MDCRefreshing_Caption"]
+                        </MudTextM3>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTextM3 Typo="TypoM3.Body">Once I'm done I'll let you know if there's anything to be concerned about. Don't worry, anything important will be at the top of the list!</MudTextM3>
-                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning" Class="mt-4">Please don't launch the game right now!</MudChip>
+                    <MudTextM3 Typo="TypoM3.Body">
+                        @MarkupLocalizer["ScanIssuesDisplay_MDCRefreshing_Description"]
+                    </MudTextM3>
+                    <MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning" Class="mt-4">
+                        @MarkupLocalizer["ScanIssuesDisplay_MDCRefreshing_Warning"]
+                    </MudChip>
                 </MudCardContent>
             </MudCard>
         </MudItem>

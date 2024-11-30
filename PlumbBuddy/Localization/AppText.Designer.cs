@@ -817,7 +817,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:{0}&gt; vyxated - Chalk&apos;d UI - Support - TMEX - Smarter Pie Menu.
+        ///   Looks up a localized string similar to **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:
+        ///&gt; vyxated - Chalk&apos;d UI - Support - TMEX - Smarter Pie Menu.
         /// </summary>
         internal static string ManifestComponentEditor_Exclusivities_Guidance {
             get {
@@ -1060,7 +1061,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following files had manifests that *did not need* to be updated:{0}{1}.
+        ///   Looks up a localized string similar to The following files had manifests that *did not need* to be updated:
+        ///{0}.
         /// </summary>
         internal static string ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated {
             get {
@@ -1069,7 +1071,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following files had manifests that *needed* to be updated:{0}{1}.
+        ///   Looks up a localized string similar to The following files had manifests that *needed* to be updated:
+        ///{0}.
         /// </summary>
         internal static string ManifestEditor_BatchUpdate_Report_ManifestsUpdated {
             get {
@@ -1078,7 +1081,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following files had no scaffolding and were therefore skipped:{0}{1}.
+        ///   Looks up a localized string similar to The following files had no scaffolding and were therefore skipped:
+        ///{0}.
         /// </summary>
         internal static string ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded {
             get {
@@ -1177,7 +1181,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You&apos;re about to remove your mod&apos;s requirement of {1}. If you change your mind you&apos;ll have to **Cancel** and start from scratch or add it back.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/qxCYGGPbQp3yj5aSsL&quot; width=&quot;480&quot; height=&quot;360&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to You&apos;re about to remove your mod&apos;s requirement of {0}. If you change your mind you&apos;ll have to **Cancel** and start from scratch or add it back.&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/qxCYGGPbQp3yj5aSsL&quot; width=&quot;480&quot; height=&quot;360&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Caution_RemoveRequiredMod_Text {
             get {
@@ -1330,7 +1335,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Whoops, it looks like you used the `{1}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.{0}{2}.
+        ///   Looks up a localized string similar to Whoops, it looks like you used the `{0}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.
+        ///{1}.
         /// </summary>
         internal static string ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames {
             get {
@@ -1366,7 +1372,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;{0}If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me  [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;
+        ///If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me t [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Note_BlankPromoCode {
             get {
@@ -1402,7 +1409,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.{0}* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... again... [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to *Your mod does not have a valid download page URL!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:
+        ///* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have no place to send them on the web if they need to download a fresh copy or an update.
+        ///* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it or needs to update it, that conversation gets even more awkward because... again... w [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankDownloadPageUrl {
             get {
@@ -1420,7 +1429,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:{0}* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.{0}* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
+        ///   Looks up a localized string similar to *Your mod has no name!* You can go back to the **Details** step and type one in, and probably should because if you don&apos;t:
+        ///* If a problem comes up and I need to discuss your mod with a player it will be awkward because I&apos;ll have to refer to file names when I could be using a more familiar name.
+        ///* If your mod is ever referenced as a dependency and then a player doesn&apos;t have it, that conversation gets even more awkward because I have to discuss them getting it without telling them what it&apos;s called..
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_BlankModName {
             get {
@@ -1645,7 +1656,11 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**{0}* your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);{0}* your Patreon feed (as opposed to a Patreon post devoted to this mod);{0}* your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,{0}* any other page which does not feat [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Because making players click through multiple pages to find your download is *rude and in bad form*, **DO NOT LINK TO:**
+        ///* your top-level domain (unless you got one only for this mod or its index page has the download for your mods files);
+        ///* your Patreon feed (as opposed to a Patreon post devoted to this mod);
+        ///* your profile on a hosting website such as Mod the Sims, CurseForge, or The Sims Resource (as opposed to the download page for this mod on that site); or,
+        ///* any other page which does not feature  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Details_SeeThingsNotToDo_Popover_1 {
             get {
@@ -1672,7 +1687,11 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to It is completely okay if on this same page you *also*:{0}* feature your other modding content;{0}* feature links to other creators;{0}* display ads to the player; and,{0}* solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts&apos; Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/)..
+        ///   Looks up a localized string similar to It is completely okay if on this same page you *also*:
+        ///* feature your other modding content;
+        ///* feature links to other creators;
+        ///* display ads to the player; and,
+        ///* solicit donations from the player—you should, you deserve it!—so long as they are not **required** to access your mod files outside the terms defined by [Electronic Arts&apos; Mods and Game Updates Policy for The Sims 4](https://help.ea.com/en-gb/help/the-sims/the-sims-4/mods-and-the-sims-4-game-updates/)..
         /// </summary>
         internal static string ManifestEditor_Details_SeeThingsToDo_Popover {
             get {
@@ -1699,7 +1718,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/1g2JyW7p6mtZc6bOEY&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
+        ///`{1}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/1g2JyW7p6mtZc6bOEY&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Error_InaccessiblePackage_Text {
             get {
@@ -1717,7 +1738,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I was unable to read this file as a valid ZIP archive with exclusive access:{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/3o72EYhVhAYFJ4rv68&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to I was unable to read this file as a valid ZIP archive with exclusive access:
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/3o72EYhVhAYFJ4rv68&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Error_InaccessibleScriptArchive_Text {
             get {
@@ -1753,7 +1776,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren&apos;t expecting to see this message, you should probably investigate.{0}`{otherModComponent.LocalAbsolutePath}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/6uGhT1O4sxpi8&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren&apos;t expecting to see this message, you should probably investigate.
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/6uGhT1O4sxpi8&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Error_ScaffoldingReferenceBroken_Text {
             get {
@@ -1789,7 +1814,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to What even is this?{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/WRQBXSCnEFJIuxktnw&quot; width=&quot;480&quot; height=&quot;307&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to What even is this?
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/WRQBXSCnEFJIuxktnw&quot; width=&quot;480&quot; height=&quot;307&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Error_UnrecognizedFileType_Text {
             get {
@@ -1951,7 +1978,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There are only a few reasons this might happen. In any case, you are seen.{0}1. *You are* the original creator of this mod and you don&apos;t back up your files (in which case, for shame). You&apos;re going to have to re-add all of your mod&apos;s components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.{0}2. You&apos;re a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/ [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to There are only a few reasons this might happen. In any case, you are seen.
+        ///1. *You are* the original creator of this mod and you don&apos;t back up your files (in which case, for shame). You&apos;re going to have to re-add all of your mod&apos;s components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
+        ///2. You&apos;re a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/co [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Info_MissingScaffolding_Text {
             get {
@@ -1969,7 +1998,10 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Just so you&apos;re aware... this file has multiple manifests. Frankly, not the best. Don&apos;t worry, I&apos;ll tidy things up and leave it with just one when we finish here.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}From the available **Manifest Snippet Tuning Resource Names**, I selected `{2}`. You can change that if you want by selecting this file on the **Components** step.&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/ifram [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Just so you&apos;re aware... this file has multiple manifests. Frankly, not the best. Don&apos;t worry, I&apos;ll tidy things up and leave it with just one when we finish here.
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`. You can change that if you want by selecting this file on the **Components** step.&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Info_SelectedMergedPackage_Text {
             get {
@@ -2014,7 +2046,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.{0}{0}If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don&apos;t worry! You can always go back!.
+        ///   Looks up a localized string similar to If *your whole mod* will only work with the presence of other mods, even under certain conditions, let me know about it here.
+        ///
+        ///If only *parts* of your mod need to be present or not based on whether packs or other mods are present or not, the step to tell me about that was **Components**. But don&apos;t worry! You can always go back!.
         /// </summary>
         internal static string ManifestEditor_Requirements_AddRequiredMod_Popover {
             get {
@@ -2302,7 +2336,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;m sorry, but the mod file you selected doesn&apos;t contain any manifests. For technical reasons, it simply isn&apos;t safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/3oEjI8D0T5KXgPZrTW&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/su [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to I&apos;m sorry, but the mod file you selected doesn&apos;t contain any manifests. For technical reasons, it simply isn&apos;t safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/3oEjI8D0T5KXgPZrTW&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/summ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text {
             get {
@@ -2320,7 +2356,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is embarassing, but I&apos;m going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn&apos;t update the manifests. 🤦{0}`{1}`&lt;br /&gt;&lt;br /&gt;{0}&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/8Fla28qk2RGlYa2nXr&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        ///   Looks up a localized string similar to This is embarassing, but I&apos;m going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn&apos;t update the manifests. 🤦
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/8Fla28qk2RGlYa2nXr&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text {
             get {
@@ -2388,6 +2426,51 @@ namespace PlumbBuddy.Localization {
         internal static string ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label {
             get {
                 return ResourceManager.GetString("ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
+        /// </summary>
+        internal static string ScanIssuesDisplay_MDCAsleep_Caption {
+            get {
+                return ResourceManager.GetString("ScanIssuesDisplay_MDCAsleep_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Since we shouldn&apos;t be doing anything to your Mods folder while the game is running, I hope you won&apos;t mind if I catch a few winks while you play..
+        /// </summary>
+        internal static string ScanIssuesDisplay_MDCAsleep_Description {
+            get {
+                return ResourceManager.GetString("ScanIssuesDisplay_MDCAsleep_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m Looking at Your Mods Folder....
+        /// </summary>
+        internal static string ScanIssuesDisplay_MDCRefreshing_Caption {
+            get {
+                return ResourceManager.GetString("ScanIssuesDisplay_MDCRefreshing_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Once I&apos;m done I&apos;ll let you know if there&apos;s anything to be concerned about. Don&apos;t worry, anything important will be at the top of the list!.
+        /// </summary>
+        internal static string ScanIssuesDisplay_MDCRefreshing_Description {
+            get {
+                return ResourceManager.GetString("ScanIssuesDisplay_MDCRefreshing_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please don&apos;t launch the game right now!.
+        /// </summary>
+        internal static string ScanIssuesDisplay_MDCRefreshing_Warning {
+            get {
+                return ResourceManager.GetString("ScanIssuesDisplay_MDCRefreshing_Warning", resourceCulture);
             }
         }
         

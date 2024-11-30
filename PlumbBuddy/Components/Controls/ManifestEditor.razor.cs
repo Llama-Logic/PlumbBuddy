@@ -180,7 +180,7 @@ partial class ManifestEditor
                 await DialogService.ShowErrorDialogAsync
                 (
                     AppText.ManifestEditor_Error_InaccessiblePackage_Caption,
-                    StringLocalizer["ManifestEditor_Error_InaccessiblePackage_Text", Environment.NewLine, modFile.FullName]
+                    StringLocalizer["ManifestEditor_Error_InaccessiblePackage_Text", modFile.FullName]
                 ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
@@ -195,7 +195,7 @@ partial class ManifestEditor
                 await DialogService.ShowInfoDialogAsync
                 (
                     AppText.ManifestEditor_Info_SelectedMergedPackage_Caption,
-                    StringLocalizer["ManifestEditor_Info_SelectedMergedPackage_Text", Environment.NewLine, modFile.FullName, manifestResourceName]
+                    StringLocalizer["ManifestEditor_Info_SelectedMergedPackage_Text", modFile.FullName, manifestResourceName]
                 ).ConfigureAwait(false);
             }
             fileObjectModel = dbpf;
@@ -215,7 +215,7 @@ partial class ManifestEditor
                 await DialogService.ShowErrorDialogAsync
                 (
                     AppText.ManifestEditor_Error_InaccessibleScriptArchive_Caption,
-                    StringLocalizer["ManifestEditor_Error_InaccessibleScriptArchive_Text", Environment.NewLine, modFile.FullName]
+                    StringLocalizer["ManifestEditor_Error_InaccessibleScriptArchive_Text", modFile.FullName]
                 ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
@@ -229,7 +229,7 @@ partial class ManifestEditor
             await DialogService.ShowErrorDialogAsync
             (
                 AppText.ManifestEditor_Error_UnrecognizedFileType_Caption,
-                StringLocalizer["ManifestEditor_Error_UnrecognizedFileType_Text", Environment.NewLine, modFile.FullName]
+                StringLocalizer["ManifestEditor_Error_UnrecognizedFileType_Text", modFile.FullName]
             ).ConfigureAwait(false);
             return AddFileResult.Unrecognized;
         }
@@ -764,7 +764,7 @@ partial class ManifestEditor
                             await DialogService.ShowErrorDialogAsync
                             (
                                 AppText.ManifestEditor_Error_ScaffoldingReferenceBroken_Caption,
-                                StringLocalizer["ManifestEditor_Error_ScaffoldingReferenceBroken_Text", Environment.NewLine, otherModComponent.LocalAbsolutePath]
+                                StringLocalizer["ManifestEditor_Error_ScaffoldingReferenceBroken_Text", otherModComponent.LocalAbsolutePath]
                             );
                         var otherComponent = components[^1];
                         RemoveComponentFromRequiredMods(otherComponent, addScaffoldedComponentResult);
@@ -784,7 +784,7 @@ partial class ManifestEditor
                         await DialogService.ShowInfoDialogAsync
                         (
                             AppText.ManifestEditor_Info_MissingScaffolding_Caption,
-                            StringLocalizer["ManifestEditor_Info_MissingScaffolding_Text", Environment.NewLine]
+                            StringLocalizer["ManifestEditor_Info_MissingScaffolding_Text"]
                         );
                 }
                 UpdateComponentsStructure();
@@ -918,7 +918,7 @@ partial class ManifestEditor
         if (!await DialogService.ShowCautionDialogAsync
             (
                 AppText.ManifestEditor_Caution_RemoveRequiredMod_Caption,
-                StringLocalizer["ManifestEditor_Caution_RemoveRequiredMod_Text", Environment.NewLine, requiredMod.Name ?? AppText.ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback]
+                StringLocalizer["ManifestEditor_Caution_RemoveRequiredMod_Text", requiredMod.Name ?? AppText.ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback]
             ))
             return;
         requiredMods.Remove(requiredMod);
@@ -1014,11 +1014,11 @@ partial class ManifestEditor
             var commonPathLength = Path.GetFullPath(processingDirectory.FullName).Length + 1;
             var reportElements = new List<string>();
             if (changedManifests.Count is > 0)
-                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsUpdated", Environment.NewLine, string.Join(Environment.NewLine, changedManifests.OrderBy(mf => mf.FullName).Select(cm => $"- {cm.FullName[commonPathLength..]}"))]);
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsUpdated", string.Join(Environment.NewLine, changedManifests.OrderBy(mf => mf.FullName).Select(cm => $"- {cm.FullName[commonPathLength..]}"))]);
             if (unchangedManifests.Count is > 0)
-                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated", Environment.NewLine, string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))]);
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ManifestsNotUpdated", string.Join(Environment.NewLine, unchangedManifests.OrderBy(mf => mf.FullName).Select(um => $"- {um.FullName[commonPathLength..]}"))]);
             if (unscaffolded.Count is > 0)
-                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded", Environment.NewLine, string.Join(Environment.NewLine, unscaffolded.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))]);
+                reportElements.Add(StringLocalizer["ManifestEditor_BatchUpdate_Report_ModFilesNotScaffolded", string.Join(Environment.NewLine, unscaffolded.OrderBy(mf => mf.FullName).Select(u => $"- {u.FullName[commonPathLength..]}"))]);
             var report = string.Join($"{Environment.NewLine}{Environment.NewLine}", reportElements);
             if (await DialogService.ShowQuestionDialogAsync(AppText.ManifestEditor_Question_CopyBatchUpdateReportToClipboard_Caption, report, false, true) ?? false)
             {
@@ -1051,7 +1051,7 @@ partial class ManifestEditor
             (
                 Severity.Error,
                 (string?)MaterialDesignIcons.Normal.FormatLetterMatches,
-                StringLocalizer["ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames", Environment.NewLine, componentsWithSameManifestName.Key!, string.Join(Environment.NewLine, componentsWithSameManifestName.Select(component => $"* `{component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]}`"))].Value
+                StringLocalizer["ManifestEditor_Confirm_Error_NonUniqueManifestSnippetTuningNames", componentsWithSameManifestName.Key!, string.Join(Environment.NewLine, componentsWithSameManifestName.Select(component => $"* `{component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..]}`"))].Value
             )));
         messages.AddRange(components
             .Where(component => component.FileObjectModel is DataBasePackedFile && string.IsNullOrWhiteSpace(component.ManifestResourceName))
@@ -1066,7 +1066,7 @@ partial class ManifestEditor
             ((
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.TagSearch,
-                StringLocalizer["ManifestEditor_Confirm_Warning_BlankModName", Environment.NewLine].Value
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankModName"].Value
             ));
         if (creators.Count is 0)
             messages.Add
@@ -1080,7 +1080,7 @@ partial class ManifestEditor
             ((
                 Severity.Warning,
                 (string?)MaterialDesignIcons.Normal.CloudSearch,
-                StringLocalizer["ManifestEditor_Confirm_Warning_BlankDownloadPageUrl", Environment.NewLine].Value
+                StringLocalizer["ManifestEditor_Confirm_Warning_BlankDownloadPageUrl"].Value
             ));
         messages.AddRange(requiredMods
             .Select((requiredMod, index) => (requiredMod, index))
@@ -1104,7 +1104,7 @@ partial class ManifestEditor
             ((
                 Severity.Normal,
                 (string?)MaterialDesignIcons.Normal.AccountCash,
-                StringLocalizer["ManifestEditor_Confirm_Note_BlankPromoCode", Environment.NewLine].Value
+                StringLocalizer["ManifestEditor_Confirm_Note_BlankPromoCode"].Value
             ));
 
         confirmationStepMessages = [..messages];
