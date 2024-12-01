@@ -27,7 +27,7 @@ partial class MainMenu
         if (version is not null)
             await UpdateManager.PresentUpdateAsync(version, releaseNotes, downloadUrl);
         else
-            await DialogService.ShowInfoDialogAsync("PlumbBuddy is Up to Date", "You're running the most current stable version. 😁");
+            await DialogService.ShowInfoDialogAsync(AppText.MainMenu_CheckForUpdate_UpToDate_Caption, AppText.MainMenu_CheckForUpdate_UpToDate_Text);
     }
 
     async Task HandleClearCacheOnClickAsync()
@@ -86,7 +86,7 @@ partial class MainMenu
     async Task HandleReonboardOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        if (await DialogService.ShowCautionDialogAsync("Get Reacquainted?", "Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we'll have to get to know each other all over again. Be sure that's what you want before you continue."))
+        if (await DialogService.ShowCautionDialogAsync(AppText.MainMenu_DevTools_GetReacquainted_Caution_Caption, AppText.MainMenu_DevTools_GetReacquainted_Caution_Text))
         {
             Settings.Forget(); // goodbye 😭
             await DialogService.ShowOnboardingDialogAsync();
@@ -103,7 +103,7 @@ partial class MainMenu
     {
         await CloseDrawer.InvokeAsync();
         if (Application.Current is { } app
-            && await DialogService.ShowCautionDialogAsync("Are You Sure?", "I can't monitor your Mods folder while I'm shut down. You won't receive any alerts about potential problems until you start me up again."))
+            && await DialogService.ShowCautionDialogAsync(AppText.MainMenu_Shutdown_Caution_Caption, AppText.MainMenu_Shutdown_Caution_Text))
         {
             AppLifecycleManager.PreventCasualClosing = false;
             app.CloseWindow(app.Windows[0]);
@@ -115,7 +115,7 @@ partial class MainMenu
         await CloseDrawer.InvokeAsync();
         if (Settings.ShowThemeManager)
             Settings.ShowThemeManager = false;
-        else if (await DialogService.ShowCautionDialogAsync("Toggle Theme Manager?", "Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒."))
+        else if (await DialogService.ShowCautionDialogAsync(AppText.MainMenu_DevTools_ToggleThemeManager_Caution_Caption, AppText.MainMenu_DevTools_ToggleThemeManager_Caution_Text))
         {
             Settings.Theme = null;
             Settings.ShowThemeManager = true;
@@ -128,27 +128,27 @@ partial class MainMenu
         {
             Settings.DevToolsUnlocked = false;
             Settings.ShowThemeManager = false;
-            Snackbar.Add("Dev Tools locked. 🔒 I'll still help you with your mods, but please don't play with my heart. 🥲", Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartBroken);
+            Snackbar.Add(AppText.MainMenu_DevTools_Snack_Locked, Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartBroken);
         }
         else
         {
             --devToolsUnlockProgress;
             if (devToolsUnlockProgress == 9)
             {
-                Snackbar.Add("Aww, I love you, too!", Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartPulse);
+                Snackbar.Add(AppText.MainMenu_DevTools_Snack_Unlocking_1, Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HeartPulse);
             }
             else if (devToolsUnlockProgress == 5)
             {
                 devToolsUnlockProgressBadgeVisible = true;
-                Snackbar.Add("🤚 Be careful, you're about to start a relationship.", Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.HeartHalfFull);
+                Snackbar.Add(AppText.MainMenu_DevTools_Snack_Unlocking_2, Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.HeartHalfFull);
             }
             else if (devToolsUnlockProgress == 0)
             {
                 Settings.DevToolsUnlocked = true;
                 devToolsUnlockProgressBadgeVisible = false;
                 devToolsUnlockProgress = 10;
-                Snackbar.Add("Marry me, you beautiful human. Dev Tools unlocked! 🔓", Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.Heart);
-                Snackbar.Add("An inversion of control change just occurred which cannot take effect until the application is restarted.", Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.RestartAlert);
+                Snackbar.Add(AppText.MainMenu_DevTools_Snack_Unlocked, Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.Heart);
+                Snackbar.Add(AppText.MainMenu_DevTools_Snack_InversionOfControlChange, Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.RestartAlert);
             }
         }
     }

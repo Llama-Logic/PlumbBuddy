@@ -916,6 +916,366 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Click here to start the process of requesting help with your game from a Community Support Venue..
+        /// </summary>
+        internal static string MainLayout_AskForHelp_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_AskForHelp_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you&apos;re looking for help with a particular mod, see if it&apos;s listed in the &lt;div class=&quot;mud-chip-container&quot;&gt;&lt;div tabindex=&quot;-1&quot; class=&quot;mud-chip mud-chip-outlined mud-chip-size-small mud-chip-color-default mud-chip-label&quot;&gt;&lt;svg class=&quot;mud-icon-root mud-svg-icon mud-icon-size-small mud-chip-icon&quot; focusable=&quot;false&quot; viewBox=&quot;0 0 24 24&quot; aria-hidden=&quot;true&quot; role=&quot;img&quot;&gt;{0}&lt;/svg&gt;&lt;span class=&quot;mud-chip-content&quot;&gt;Catalog&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; first. If it is, use the &lt;div class=&quot;mud-chip-container&quot;&gt;&lt;div tabindex=&quot;-1&quot; class=&quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MainLayout_AskForHelp_Tip_ModGuidance {
+            get {
+                return ResourceManager.GetString("MainLayout_AskForHelp_Tip_ModGuidance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to clear the game&apos;s cache files..
+        /// </summary>
+        internal static string MainLayout_ClearCache_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_ClearCache_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;d like to help you, but there simply aren&apos;t any cache files to clear at the moment..
+        /// </summary>
+        internal static string MainLayout_ClearCache_Tip_AlreadyClear {
+            get {
+                return ResourceManager.GetString("MainLayout_ClearCache_Tip_AlreadyClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t just do this willy-nilly, since it will cause your game to load more slowly the next time it starts as it rebuilds the cache. I&apos;ll change the color of this button when it&apos;s important that we clear the cache..
+        /// </summary>
+        internal static string MainLayout_ClearCache_Tip_Clearable {
+            get {
+                return ResourceManager.GetString("MainLayout_ClearCache_Tip_Clearable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sorry, Chief, the cache can&apos;t be cleared while it&apos;s in use! 🫢 You&apos;ll need to quit the game first..
+        /// </summary>
+        internal static string MainLayout_ClearCache_Tip_Sleeping {
+            get {
+                return ResourceManager.GetString("MainLayout_ClearCache_Tip_Sleeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The game&apos;s cache files are currently stale. You should clear them to avoid anomalies and glitches..
+        /// </summary>
+        internal static string MainLayout_ClearCache_Tip_Stale {
+            get {
+                return ResourceManager.GetString("MainLayout_ClearCache_Tip_Stale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manually Toggle Light/Dark Mode.
+        /// </summary>
+        internal static string MainLayout_DevTools_ThemeManager_ToggleMode_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_DevTools_ThemeManager_ToggleMode_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Manual Control of Light/Dark Mode.
+        /// </summary>
+        internal static string MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to open your Downloads folder..
+        /// </summary>
+        internal static string MainLayout_OpenDownloadsFolder_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_OpenDownloadsFolder_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to open your Mods folder..
+        /// </summary>
+        internal static string MainLayout_OpenModsFolder_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_OpenModsFolder_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hey, I&apos;m giving your Mods folder its much needed privacy while the game is running. 🫵 You should strongly consider doing the same!.
+        /// </summary>
+        internal static string MainLayout_OpenModsFolder_Tip_Sleeping {
+            get {
+                return ResourceManager.GetString("MainLayout_OpenModsFolder_Tip_Sleeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask for Help.
+        /// </summary>
+        internal static string MainMenu_AskForHelp_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_AskForHelp_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for Update.
+        /// </summary>
+        internal static string MainMenu_CheckForUpdate_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_CheckForUpdate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PlumbBuddy is Up to Date.
+        /// </summary>
+        internal static string MainMenu_CheckForUpdate_UpToDate_Caption {
+            get {
+                return ResourceManager.GetString("MainMenu_CheckForUpdate_UpToDate_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;re running the most current stable version. 😁.
+        /// </summary>
+        internal static string MainMenu_CheckForUpdate_UpToDate_Text {
+            get {
+                return ResourceManager.GetString("MainMenu_CheckForUpdate_UpToDate_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear Cache.
+        /// </summary>
+        internal static string MainMenu_ClearCache_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_ClearCache_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close Window.
+        /// </summary>
+        internal static string MainMenu_CloseWindow_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_CloseWindow_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Reacquainted?.
+        /// </summary>
+        internal static string MainMenu_DevTools_GetReacquainted_Caution_Caption {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_GetReacquainted_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we&apos;ll have to get to know each other all over again. Be sure that&apos;s what you want before you continue..
+        /// </summary>
+        internal static string MainMenu_DevTools_GetReacquainted_Caution_Text {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_GetReacquainted_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Reacquainted.
+        /// </summary>
+        internal static string MainMenu_DevTools_GetReacquainted_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_GetReacquainted_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dev Tools.
+        /// </summary>
+        internal static string MainMenu_DevTools_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Cache.
+        /// </summary>
+        internal static string MainMenu_DevTools_OpenCache_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_OpenCache_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Local Storage.
+        /// </summary>
+        internal static string MainMenu_DevTools_OpenLocalStorage_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_OpenLocalStorage_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An inversion of control change just occurred which cannot take effect until the application is restarted..
+        /// </summary>
+        internal static string MainMenu_DevTools_Snack_InversionOfControlChange {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Snack_InversionOfControlChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dev Tools locked. 🔒 I&apos;ll still help you with your mods, but please don&apos;t play with my heart. 🥲.
+        /// </summary>
+        internal static string MainMenu_DevTools_Snack_Locked {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Snack_Locked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marry me, you beautiful human. Dev Tools unlocked! 🔓.
+        /// </summary>
+        internal static string MainMenu_DevTools_Snack_Unlocked {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Snack_Unlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aww, I love you, too!.
+        /// </summary>
+        internal static string MainMenu_DevTools_Snack_Unlocking_1 {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Snack_Unlocking_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🤚 Be careful, you&apos;re about to start a relationship..
+        /// </summary>
+        internal static string MainMenu_DevTools_Snack_Unlocking_2 {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_Snack_Unlocking_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Theme Manager?.
+        /// </summary>
+        internal static string MainMenu_DevTools_ToggleThemeManager_Caution_Caption {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_ToggleThemeManager_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabling the Theme Manager impacts PlumbBuddy&apos;s performance. You should probably only do this if you&apos;re 🍒..
+        /// </summary>
+        internal static string MainMenu_DevTools_ToggleThemeManager_Caution_Text {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_ToggleThemeManager_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Theme Manager.
+        /// </summary>
+        internal static string MainMenu_DevTools_ToggleThemeManager_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_DevTools_ToggleThemeManager_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Downloads Folder.
+        /// </summary>
+        internal static string MainMenu_OpenDownloadsFolder_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_OpenDownloadsFolder_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Mods Folder.
+        /// </summary>
+        internal static string MainMenu_OpenModsFolder_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_OpenModsFolder_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string MainMenu_Settings_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_Settings_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are You Sure?.
+        /// </summary>
+        internal static string MainMenu_Shutdown_Caution_Caption {
+            get {
+                return ResourceManager.GetString("MainMenu_Shutdown_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I can&apos;t monitor your Mods folder while I&apos;m shut down. You won&apos;t receive any alerts about potential problems until you start me up again..
+        /// </summary>
+        internal static string MainMenu_Shutdown_Caution_Text {
+            get {
+                return ResourceManager.GetString("MainMenu_Shutdown_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shutdown PlumbBuddy.
+        /// </summary>
+        internal static string MainMenu_Shutdown_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_Shutdown_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The friendly helper for Sims 4 mods.
+        /// </summary>
+        internal static string MainMenu_TagLine {
+            get {
+                return ResourceManager.GetString("MainMenu_TagLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (Version {0}).
+        /// </summary>
+        internal static string MainMenu_Version {
+            get {
+                return ResourceManager.GetString("MainMenu_Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add subsumed hash from mod file....
         /// </summary>
         internal static string ManifestComponentEditor_AddSubsumedHashFromModFile_Local {
@@ -2837,7 +3197,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because anti-virus software doesn&apos;t check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard..
+        ///   Looks up a localized string similar to Because anti-virus software doesn&apos;t check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators&apos; accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard..
         /// </summary>
         internal static string OnboardingDialog_ModHealth_Casual_ModGuard_Description {
             get {

@@ -8,11 +8,13 @@
 @inject IJSRuntime JSRuntime
 @inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
-@inject ISettings Settings
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IPublicCatalogs PublicCatalogs
+@inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@Theme" />
 @if (Settings.ShowThemeManager)
@@ -40,11 +42,11 @@
         {
             if (@manualLightDarkModeToggleEnabled)
             {
-                <MudTooltip Arrow="true" Text="Manually Toggle Light/Dark Mode">
+                <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)]">
                     <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
                 </MudTooltip>
             }
-            <MudTooltip Arrow="true" Text="Toggle Manual Control of Light/Dark Mode">
+            <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)]">
                 <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
             </MudTooltip>
         }
@@ -56,11 +58,13 @@
                 <TooltipContent>
                     <MudStack Row="true">
                         <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
-                        <MudTextM3 Typo="TypoM3.Title">Open Download Folder</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer[nameof(AppText.MainMenu_OpenDownloadsFolder_Label)]
+                        </MudTextM3>
                     </MudStack>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        Click here to open your Downloads folder.
+                        @MarkupLocalizer[nameof(AppText.MainLayout_OpenDownloadsFolder_Tip)]
                     </MudTextM3>
                 </TooltipContent>
             </MudTooltip>
@@ -71,19 +75,21 @@
                 <TooltipContent>
                     <MudStack Row="true">
                         <MudIcon Icon="@MaterialDesignIcons.Normal.FolderPound" />
-                        <MudTextM3 Typo="TypoM3.Title">Open Mods Folder</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer[nameof(AppText.MainMenu_OpenModsFolder_Label)]
+                        </MudTextM3>
                     </MudStack>
                     <MudDivider />
                     @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                     {
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            Hey, I'm giving your Mods folder its much needed privacy while the game is running. 🫵 You should strongly consider doing the same!
+                            @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip_Sleeping)]
                         </MudTextM3>
                     }
                     @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
                     {
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            Click here to open your Mods folder.
+                            @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip)]
                         </MudTextM3>
                     }
                 </TooltipContent>
@@ -95,41 +101,41 @@
                 <TooltipContent>
                     <MudStack Row="true">
                         <MudIcon Icon="@MaterialDesignIcons.Normal.Eraser" />
-                        <MudTextM3 Typo="TypoM3.Title">Clear Cache</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
+                        </MudTextM3>
                     </MudStack>
                     <MudDivider />
                     @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                     {
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            Sorry, Chief, the cache can't be cleared while it's in use! 🫢 You'll need to quit the game first.
+                            @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Sleeping)]
                         </MudTextM3>
                     }
                     @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
                     {
                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            Click here to clear the game's cache files.
+                            @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip)]
                         </MudTextM3>
                         @if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                I'd like to help you, but there simply aren't any cache files to clear at the moment.
+                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_AlreadyClear)]
                             </MudTextM3>
                         }
                         @if (Settings.CacheStatus is SmartSimCacheStatus.Normal)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                Don't just do this willy-nilly, since it will cause your game to load more slowly the next time it starts as it rebuilds the cache.
-                                I'll change the color of this button when it's important that we clear the cache.
+                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Clearable)]
                             </MudTextM3>
                         }
                         @if (Settings.CacheStatus is SmartSimCacheStatus.Stale)
                         {
                             <MudDivider />
                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                                The game's cache files are currently stale.
-                                You should clear them to avoid anomalies and glitches.
+                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Stale)]
                             </MudTextM3>
                         }
                     }
@@ -142,17 +148,17 @@
                 <TooltipContent>
                     <MudStack Row="true">
                         <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" />
-                        <MudTextM3 Typo="TypoM3.Title">Ask for Help</MudTextM3>
+                        <MudTextM3 Typo="TypoM3.Title">
+                            @MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
+                        </MudTextM3>
                     </MudStack>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        Click here to start the process of requesting help with your game from a Community Support venue.
+                        @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip)]
                     </MudTextM3>
                     <MudDivider />
                     <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        If you're looking for help with a particular mod, see if it's listed in the
-                        <MudChip T="string" Icon="@MaterialDesignIcons.Normal.Book" Label="true" Variant="Variant.Outlined" Size="Size.Small">Catalog</MudChip>
-                        first. If it is, use the <MudChip T="string" Icon="@MaterialDesignIcons.Normal.FaceAgent" Label="true" Color="Color.Primary" Size="Size.Small">ASK FOR HELP</MudChip> button there instead.
+                        @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip_ModGuidance), MaterialDesignIcons.Normal.Book, MaterialDesignIcons.Normal.FaceAgent]
                     </MudTextM3>
                 </TooltipContent>
             </MudTooltip>

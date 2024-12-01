@@ -1214,7 +1214,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>&lt;strong&gt;Strongly&lt;/strong&gt; Recommended</value>
   </data>
   <data name="OnboardingDialog_ModHealth_Casual_ModGuard_Description" xml:space="preserve">
-    <value>Because anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard.</value>
+    <value>Because anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators' accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard.</value>
   </data>
   <data name="OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore" xml:space="preserve">
     <value>Learn more about Mod Guard</value>
@@ -1444,5 +1444,127 @@ Move available features on the left over to the required list on the right. What
   </data>
   <data name="SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Caption" xml:space="preserve">
     <value>I Couldn't Find Your Error File</value>
+  </data>
+  <data name="MainLayout_DevTools_ThemeManager_ToggleMode_Tip" xml:space="preserve">
+    <value>Manually Toggle Light/Dark Mode</value>
+  </data>
+  <data name="MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip" xml:space="preserve">
+    <value>Toggle Manual Control of Light/Dark Mode</value>
+  </data>
+  <data name="MainMenu_OpenDownloadsFolder_Label" xml:space="preserve">
+    <value>Open Downloads Folder</value>
+  </data>
+  <data name="MainMenu_TagLine" xml:space="preserve">
+    <value>The friendly helper for Sims 4 mods</value>
+  </data>
+  <data name="MainMenu_Version" xml:space="preserve">
+    <value>(Version {0})</value>
+    <comment>{0} = Version Number</comment>
+  </data>
+  <data name="MainMenu_OpenModsFolder_Label" xml:space="preserve">
+    <value>Open Mods Folder</value>
+  </data>
+  <data name="MainMenu_ClearCache_Label" xml:space="preserve">
+    <value>Clear Cache</value>
+  </data>
+  <data name="MainMenu_AskForHelp_Label" xml:space="preserve">
+    <value>Ask for Help</value>
+  </data>
+  <data name="MainMenu_CheckForUpdate_Label" xml:space="preserve">
+    <value>Check for Update</value>
+  </data>
+  <data name="MainMenu_Settings_Label" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="MainMenu_DevTools_Label" xml:space="preserve">
+    <value>Dev Tools</value>
+  </data>
+  <data name="MainMenu_DevTools_OpenLocalStorage_Label" xml:space="preserve">
+    <value>Open Local Storage</value>
+  </data>
+  <data name="MainMenu_DevTools_GetReacquainted_Label" xml:space="preserve">
+    <value>Get Reacquainted</value>
+  </data>
+  <data name="MainMenu_DevTools_OpenCache_Label" xml:space="preserve">
+    <value>Open Cache</value>
+  </data>
+  <data name="MainMenu_DevTools_ToggleThemeManager_Label" xml:space="preserve">
+    <value>Toggle Theme Manager</value>
+  </data>
+  <data name="MainMenu_CloseWindow_Label" xml:space="preserve">
+    <value>Close Window</value>
+  </data>
+  <data name="MainMenu_Shutdown_Label" xml:space="preserve">
+    <value>Shutdown PlumbBuddy</value>
+  </data>
+  <data name="MainMenu_CheckForUpdate_UpToDate_Caption" xml:space="preserve">
+    <value>PlumbBuddy is Up to Date</value>
+  </data>
+  <data name="MainMenu_CheckForUpdate_UpToDate_Text" xml:space="preserve">
+    <value>You're running the most current stable version. 😁</value>
+  </data>
+  <data name="MainMenu_DevTools_GetReacquainted_Caution_Caption" xml:space="preserve">
+    <value>Get Reacquainted?</value>
+  </data>
+  <data name="MainMenu_DevTools_GetReacquainted_Caution_Text" xml:space="preserve">
+    <value>Going through that process again will reset all of your preferences. I will forget who Peter Par-- I mean-- you are. It will really be as though you just installed me for the first time, and we'll have to get to know each other all over again. Be sure that's what you want before you continue.</value>
+  </data>
+  <data name="MainMenu_Shutdown_Caution_Caption" xml:space="preserve">
+    <value>Are You Sure?</value>
+  </data>
+  <data name="MainMenu_Shutdown_Caution_Text" xml:space="preserve">
+    <value>I can't monitor your Mods folder while I'm shut down. You won't receive any alerts about potential problems until you start me up again.</value>
+  </data>
+  <data name="MainMenu_DevTools_ToggleThemeManager_Caution_Caption" xml:space="preserve">
+    <value>Toggle Theme Manager?</value>
+  </data>
+  <data name="MainMenu_DevTools_ToggleThemeManager_Caution_Text" xml:space="preserve">
+    <value>Enabling the Theme Manager impacts PlumbBuddy's performance. You should probably only do this if you're 🍒.</value>
+  </data>
+  <data name="MainMenu_DevTools_Snack_Locked" xml:space="preserve">
+    <value>Dev Tools locked. 🔒 I'll still help you with your mods, but please don't play with my heart. 🥲</value>
+  </data>
+  <data name="MainMenu_DevTools_Snack_Unlocking_1" xml:space="preserve">
+    <value>Aww, I love you, too!</value>
+  </data>
+  <data name="MainMenu_DevTools_Snack_Unlocking_2" xml:space="preserve">
+    <value>🤚 Be careful, you're about to start a relationship.</value>
+  </data>
+  <data name="MainMenu_DevTools_Snack_Unlocked" xml:space="preserve">
+    <value>Marry me, you beautiful human. Dev Tools unlocked! 🔓</value>
+  </data>
+  <data name="MainMenu_DevTools_Snack_InversionOfControlChange" xml:space="preserve">
+    <value>An inversion of control change just occurred which cannot take effect until the application is restarted.</value>
+  </data>
+  <data name="MainLayout_OpenDownloadsFolder_Tip" xml:space="preserve">
+    <value>Click here to open your Downloads folder.</value>
+  </data>
+  <data name="MainLayout_OpenModsFolder_Tip" xml:space="preserve">
+    <value>Click here to open your Mods folder.</value>
+  </data>
+  <data name="MainLayout_OpenModsFolder_Tip_Sleeping" xml:space="preserve">
+    <value>Hey, I'm giving your Mods folder its much needed privacy while the game is running. 🫵 You should strongly consider doing the same!</value>
+  </data>
+  <data name="MainLayout_ClearCache_Tip_Sleeping" xml:space="preserve">
+    <value>Sorry, Chief, the cache can't be cleared while it's in use! 🫢 You'll need to quit the game first.</value>
+  </data>
+  <data name="MainLayout_ClearCache_Tip" xml:space="preserve">
+    <value>Click here to clear the game's cache files.</value>
+  </data>
+  <data name="MainLayout_ClearCache_Tip_AlreadyClear" xml:space="preserve">
+    <value>I'd like to help you, but there simply aren't any cache files to clear at the moment.</value>
+  </data>
+  <data name="MainLayout_ClearCache_Tip_Clearable" xml:space="preserve">
+    <value>Don't just do this willy-nilly, since it will cause your game to load more slowly the next time it starts as it rebuilds the cache. I'll change the color of this button when it's important that we clear the cache.</value>
+  </data>
+  <data name="MainLayout_ClearCache_Tip_Stale" xml:space="preserve">
+    <value>The game's cache files are currently stale. You should clear them to avoid anomalies and glitches.</value>
+  </data>
+  <data name="MainLayout_AskForHelp_Tip" xml:space="preserve">
+    <value>Click here to start the process of requesting help with your game from a Community Support Venue.</value>
+  </data>
+  <data name="MainLayout_AskForHelp_Tip_ModGuidance" xml:space="preserve">
+    <value>If you're looking for help with a particular mod, see if it's listed in the &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-outlined mud-chip-size-small mud-chip-color-default mud-chip-label"&gt;&lt;svg class="mud-icon-root mud-svg-icon mud-icon-size-small mud-chip-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"&gt;{0}&lt;/svg&gt;&lt;span class="mud-chip-content"&gt;Catalog&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; first. If it is, use the &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-filled mud-chip-size-small mud-chip-color-primary mud-chip-label"&gt;&lt;svg class="mud-icon-root mud-svg-icon mud-icon-size-small mud-chip-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"&gt;{1}&lt;/svg&gt;&lt;span class="mud-chip-content"&gt;ASK FOR HELP&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; button there instead.</value>
+    <comment>{0} = Catalog Icon Path; {1} = Ask for Help Icon Path</comment>
   </data>
 </root>

@@ -2,6 +2,7 @@
 @inject IAppLifecycleManager AppLifecycleManager
 @inject IDialogService DialogService
 @inject ILogger<MainMenu> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
@@ -9,38 +10,69 @@
 @inject ISmartSimObserver SmartSimObserver
 @inject ISnackbar Snackbar
 @inject IUpdateManager UpdateManager
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <div style="height: 100vh; position: fixed;">
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
         <MudImage Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>
     <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" Style="position: absolute; top: 0; right: 0;" OnClick="HandleCloseMenuOnClickAsync" />
-    <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">PlumbBuddy</MudTextM3>
-    <MudTextM3 Typo="TypoM3.Body" Size="Size.Small" Align="Align.Center">The friendly helper for Sims 4 mods</MudTextM3>
-    <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">(Version @(UpdateManager.CurrentVersion))</MudTextM3>
+    <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">
+        PlumbBuddy
+    </MudTextM3>
+    <MudTextM3 Typo="TypoM3.Body" Size="Size.Small" Align="Align.Center">
+        @MarkupLocalizer[nameof(AppText.MainMenu_TagLine)]
+    </MudTextM3>
+    <MudTextM3 Typo="TypoM3.Label" Size="Size.Small" Align="Align.Center">
+        @MarkupLocalizer[nameof(AppText.MainMenu_Version), UpdateManager.CurrentVersion]
+    </MudTextM3>
     <MudDivider Class="my-2" />
     <MudNavMenu Class="main-menu">
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">Open Downloads Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="HandleOpenModsFolderOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Open Mods Folder</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">Clear Cache</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">Ask for Help</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="HandleOpenDownloadsFolderOnClickAsync">
+            @MarkupLocalizer[nameof(AppText.MainMenu_OpenDownloadsFolder_Label)]
+        </MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="HandleOpenModsFolderOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">
+            @MarkupLocalizer[nameof(AppText.MainMenu_OpenModsFolder_Label)]
+        </MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)">
+            @MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
+        </MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">
+            @MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
+        </MudNavLink>
         <MudDivider Class="my-2" />
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Update" IconColor="Color.Info" OnClick="HandleCheckForUpdateAsync">Check for Update</MudNavLink>
-        <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">Settings</MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Update" IconColor="Color.Info" OnClick="HandleCheckForUpdateAsync">
+            @MarkupLocalizer[nameof(AppText.MainMenu_CheckForUpdate_Label)]
+        </MudNavLink>
+        <MudNavLink Icon="@MaterialDesignIcons.Normal.Cog" IconColor="Color.Tertiary" OnClick="HandleSettingsOnClickAsync">
+            @MarkupLocalizer[nameof(AppText.MainMenu_Settings_Label)]
+        </MudNavLink>
         @if (Settings.DevToolsUnlocked)
         {
-            <MudNavGroup Icon="@MaterialDesignIcons.Normal.Tools" IconColor="Color.Warning" Title="Dev Tools">
-                <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderCog" OnClick="HandleOpenPlumbBuddyStorageOnClickAsync">Open Local Storage</MudNavLink>
-                <MudNavLink Icon="@MaterialDesignIcons.Outline.FolderCog" OnClick="HandleOpenPlumbBuddyCacheOnClickAsync">Open Cache</MudNavLink>
-                <MudNavLink Icon="@MaterialDesignIcons.Normal.HumanGreeting" OnClick="HandleReonboardOnClickAsync">Get Reacquainted</MudNavLink>
-                <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="HandleToggleThemeManagerOnClickAsync">Toggle Theme Manager</MudNavLink>
+            <MudNavGroup Icon="@MaterialDesignIcons.Normal.Tools" IconColor="Color.Warning" Title="@StringLocalizer[nameof(AppText.MainMenu_DevTools_Label)]">
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.FolderCog" OnClick="HandleOpenPlumbBuddyStorageOnClickAsync">
+                    @MarkupLocalizer[nameof(AppText.MainMenu_DevTools_OpenLocalStorage_Label)]
+                </MudNavLink>
+                <MudNavLink Icon="@MaterialDesignIcons.Outline.FolderCog" OnClick="HandleOpenPlumbBuddyCacheOnClickAsync">
+                    @MarkupLocalizer[nameof(AppText.MainMenu_DevTools_OpenCache_Label)]
+                </MudNavLink>
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.HumanGreeting" OnClick="HandleReonboardOnClickAsync">
+                    @MarkupLocalizer[nameof(AppText.MainMenu_DevTools_GetReacquainted_Label)]
+                </MudNavLink>
+                <MudNavLink Icon="@MaterialDesignIcons.Normal.Palette" OnClick="HandleToggleThemeManagerOnClickAsync">
+                    @MarkupLocalizer[nameof(AppText.MainMenu_DevTools_ToggleThemeManager_Label)]
+                </MudNavLink>
             </MudNavGroup>
         }
         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
         {
-            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" OnClick="HandleCloseWindowOnClickAsync">Close Window</MudNavLink>
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.WindowClose" OnClick="HandleCloseWindowOnClickAsync">
+                @MarkupLocalizer[nameof(AppText.MainMenu_CloseWindow_Label)]
+            </MudNavLink>
             <MudDivider Class="my-2" />
-            <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="HandleShutdownPlumbBuddyOnClickAsync">Shutdown PlumbBuddy</MudNavLink>
+            <MudNavLink Icon="@MaterialDesignIcons.Normal.Power" IconColor="Color.Warning" OnClick="HandleShutdownPlumbBuddyOnClickAsync">
+                @MarkupLocalizer[nameof(AppText.MainMenu_Shutdown_Label)]
+            </MudNavLink>
         }
     </MudNavMenu>
 </div>
