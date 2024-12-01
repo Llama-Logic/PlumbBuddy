@@ -637,6 +637,42 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Catalog.
+        /// </summary>
+        internal static string Home_Catalog_Label {
+            get {
+                return ResourceManager.GetString("Home_Catalog_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manifest Editor.
+        /// </summary>
+        internal static string Home_ManifestEditor_Label {
+            get {
+                return ResourceManager.GetString("Home_ManifestEditor_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Health.
+        /// </summary>
+        internal static string Home_ModHealth_Label {
+            get {
+                return ResourceManager.GetString("Home_ModHealth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sample UI.
+        /// </summary>
+        internal static string Home_SampleUI_Label {
+            get {
+                return ResourceManager.GetString("Home_SampleUI_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Analyzing Topography.
         /// </summary>
         internal static string HUD_AnalyzingTopography_Tip_Caption {

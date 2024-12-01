@@ -2,20 +2,22 @@
 @implements IDisposable
 @inject ICustomThemes CustomThemes
 @inject IJSRuntime JSRuntime
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <div class="main-tabs-backdrop"></div>
 <MudTabs Centered="true" MinimumTabWidth="200px" KeepPanelsAlive Class="main-tabs">
-    <MudTabPanel Text="Mod Health" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
+    <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
         <div class="mod-health-tab-container">
             <div class="background"></div>
             <ScanIssuesDisplay />
         </div>
     </MudTabPanel>
-    <MudTabPanel Text="Catalog" Icon="@MaterialDesignIcons.Normal.Book">
+    <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_Catalog_Label)]" Icon="@MaterialDesignIcons.Normal.Book">
         <div class="catalog-tab-container">
             <div class="background"></div>
             <CatalogDisplay />
@@ -23,7 +25,7 @@
     </MudTabPanel>
     @if (Settings.Type is UserType.Creator)
     {
-        <MudTabPanel Text="Manifest Editor" Icon="@MaterialDesignIcons.Normal.TagEdit">
+        <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ManifestEditor_Label)]" Icon="@MaterialDesignIcons.Normal.TagEdit">
             <div class="manifest-editor-tab-container">
                 <div class="background"></div>
                 <ManifestEditor />
@@ -38,7 +40,7 @@
     }
     @if (Settings.DevToolsUnlocked && Settings.ShowThemeManager)
     {
-        <MudTabPanel Text="Sample UI" Icon="@MaterialDesignIcons.Normal.ApplicationEdit">
+        <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_SampleUI_Label)]" Icon="@MaterialDesignIcons.Normal.ApplicationEdit">
             <div class="mod-health-tab-container">
                 <div class="background"></div>
                 <SampleUserInterface />

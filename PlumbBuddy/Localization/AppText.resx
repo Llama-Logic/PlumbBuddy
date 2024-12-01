@@ -1567,4 +1567,16 @@ Move available features on the left over to the required list on the right. What
     <value>If you're looking for help with a particular mod, see if it's listed in the &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-outlined mud-chip-size-small mud-chip-color-default mud-chip-label"&gt;&lt;svg class="mud-icon-root mud-svg-icon mud-icon-size-small mud-chip-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"&gt;{0}&lt;/svg&gt;&lt;span class="mud-chip-content"&gt;Catalog&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; first. If it is, use the &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-filled mud-chip-size-small mud-chip-color-primary mud-chip-label"&gt;&lt;svg class="mud-icon-root mud-svg-icon mud-icon-size-small mud-chip-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"&gt;{1}&lt;/svg&gt;&lt;span class="mud-chip-content"&gt;ASK FOR HELP&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; button there instead.</value>
     <comment>{0} = Catalog Icon Path; {1} = Ask for Help Icon Path</comment>
   </data>
+  <data name="Home_ModHealth_Label" xml:space="preserve">
+    <value>Mod Health</value>
+  </data>
+  <data name="Home_Catalog_Label" xml:space="preserve">
+    <value>Catalog</value>
+  </data>
+  <data name="Home_ManifestEditor_Label" xml:space="preserve">
+    <value>Manifest Editor</value>
+  </data>
+  <data name="Home_SampleUI_Label" xml:space="preserve">
+    <value>Sample UI</value>
+  </data>
 </root>
