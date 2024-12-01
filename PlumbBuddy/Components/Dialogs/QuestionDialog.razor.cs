@@ -3,10 +3,10 @@ namespace PlumbBuddy.Components.Dialogs;
 partial class QuestionDialog
 {
     [Parameter]
-    public string Caption { get; set; } = "Would you rather?";
+    public string Caption { get; set; } = string.Empty;
 
     [Parameter]
-    public string Text { get; set; } = "I mean... 👉👈... I wouldn't mind...";
+    public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }

@@ -1,16 +1,20 @@
 @implements IDisposable
 @inject IDialogService DialogService
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudDialog Class="content-is-vertical-stepper info-dialog">
     <TitleContent>
         <MudStack Row Class="align-center">
             <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
-            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">@SupportDiscordName Guided Support Session</MudTextM3>
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">
+                @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_Caption), SupportDiscordName]
+            </MudTextM3>
             <MudSpacer />
-            <MudTooltip Arrow Text="End the Guided Support Session">
+            <MudTooltip Arrow Text="@StringLocalizer[nameof(AppText.SelectSupportDiscordDialog_EndSession_Tip)]">
                 <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" OnClick="CloseOnClickHandler" />
             </MudTooltip>
         </MudStack>
@@ -29,43 +33,55 @@
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowAppLogFileOnClickAsync">Show me your most recent log file</MudButton>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowAppLogFileOnClickAsync">
+                                        @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_HighlightAppLogs_Label)]
+                                    </MudButton>
                                 </MudItem>
                             }
                             @if (step.ShowGameVersionFileHighlighter)
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowGameVersionFileOnClickAsync">Show me my game version file</MudButton>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowGameVersionFileOnClickAsync">
+                                        @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_HighlightGameVersion_Label)]
+                                    </MudButton>
                                 </MudItem>
                             }
                             @if (step.ShowTextFileHighlighter)
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowErrorFileOnClickAsync">Show me the error file</MudButton>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FileFind" OnClick="HandleShowErrorFileOnClickAsync">
+                                        @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_HighlightErrorLog_Label)]
+                                    </MudButton>
                                 </MudItem>
                             }
                             @if (step.ShowClearCache)
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.Eraser" OnClick="HandleClearCacheOnClickAsync">Clear cache</MudButton>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.Eraser" OnClick="HandleClearCacheOnClickAsync">
+                                        @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_ClearCache_Label)]
+                                    </MudButton>
                                 </MudItem>
                             }
                             @if (step.ShowStartOver)
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.Restart" OnClick="HandleStartOverOnClick">Start over</MudButton>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.Restart" OnClick="HandleStartOverOnClick">
+                                        @MarkupLocalizer[nameof(AppText.SupportDiscordStepsDialog_StartOver_Label)]
+                                    </MudButton>
                                 </MudItem>
                             }
                             @if (step.ShowGlobalManifestGenerationToggle)
                             {
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudTooltip Arrow Color="Color.Primary" Text="Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it on. I'll do that for you. 💖">
-                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">Generate global manifest package</MudSwitchM3>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip)]">
+                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
+                                        </MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
                             }

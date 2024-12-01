@@ -1119,4 +1119,330 @@ If you don't have one, but you're interested in getting a commission for all the
   <data name="UserTypeSelector_ModCreator_Description" xml:space="preserve">
     <value>Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don't actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my packages.</value>
   </data>
+  <data name="DeleteErrorLogsDialog_Caption" xml:space="preserve">
+    <value>Delete Error Logs</value>
+  </data>
+  <data name="DeleteErrorLogsDialog_Text" xml:space="preserve">
+    <value>You actually have a number of pending error logs. Would you like to delete more than one?</value>
+  </data>
+  <data name="DeleteErrorLogsDialog_ErrorLogsToDelete_Label" xml:space="preserve">
+    <value>Error Logs to Delete</value>
+  </data>
+  <data name="Common_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialogs_Error_GetSupportDiscordsFailed_Caption" xml:space="preserve">
+    <value>Whoops, Something Went Wrong!</value>
+  </data>
+  <data name="Dialogs_Error_GetSupportDiscordsFailed_Text" xml:space="preserve">
+    <value>While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?</value>
+  </data>
+  <data name="Dialogs_Question_DownloadSupportDiscords_Caption" xml:space="preserve">
+    <value>Is it alright with you if I download the Community Support Venues list from plumbbuddy.app?</value>
+  </data>
+  <data name="Dialogs_Question_DownloadSupportDiscords_Text" xml:space="preserve">
+    <value>The people that made me defer to the people who run the Community Support Venues, so I need to get the latest list of available Community Support Venues and what they expect of us. But, I want your permission to connect to the Internet to do that.</value>
+  </data>
+  <data name="SelectFeaturesDialog_Caption" xml:space="preserve">
+    <value>Select {0} Features</value>
+    <comment>{0} = Name of the Mod</comment>
+  </data>
+  <data name="SelectFeaturesDialog_Caption_FallbackModName" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="SelectManifestDialog_Caption" xml:space="preserve">
+    <value>Select Manifest</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_Caption" xml:space="preserve">
+    <value>Select a Support Venue</value>
+  </data>
+  <data name="OnboardingDialog_EULA_Heading_1" xml:space="preserve">
+    <value>I hate to have to begin our relationship this way, but... 😔</value>
+  </data>
+  <data name="OnboardingDialog_EULA_Heading_2" xml:space="preserve">
+    <value>I need you to say you won't sue my parents.</value>
+  </data>
+  <data name="OnboardingDialog_EULA_Heading_3" xml:space="preserve">
+    <value>👇 Scroll to the bottom and click &lt;div class="mud-chip-container"&gt;&lt;div tabindex="-1" class="mud-chip mud-chip-filled mud-chip-size-medium mud-chip-color-primary mud-chip-label"&gt;&lt;span class="mud-chip-content"&gt;NEXT&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; to agree and continue. 👉</value>
+  </data>
+  <data name="OnboardingDialog_EULA_Label" xml:space="preserve">
+    <value>EULA</value>
+  </data>
+  <data name="OnboardingDialog_Theme_Label" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="OnboardingDialog_Theme_Heading_1" xml:space="preserve">
+    <value>Some of your favorite Creators have given me beautiful makeovers. 💄</value>
+  </data>
+  <data name="OnboardingDialog_Theme_Heading_2" xml:space="preserve">
+    <value>🤔 Will you decide for personal aesthetics or fandom reasons?</value>
+  </data>
+  <data name="OnboardingDialog_Theme_Heading_3" xml:space="preserve">
+    <value>Either way, how I look is up to you!</value>
+  </data>
+  <data name="OnboardingDialog_Introductions_Label" xml:space="preserve">
+    <value>Introductions</value>
+  </data>
+  <data name="OnboardingDialog_Introductions_Heading_1" xml:space="preserve">
+    <value>In order to serve you best, it helps me to know what kind of player you are.</value>
+  </data>
+  <data name="OnboardingDialog_Introductions_Heading_2" xml:space="preserve">
+    <value>Use the colored circles or arrows below to choose.</value>
+  </data>
+  <data name="OnboardingDialog_Folders_Label" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="OnboardingDialog_Folders_Heading_1" xml:space="preserve">
+    <value>Prepare for some Earth-shattering discoveries I've made about your computer. 😆</value>
+  </data>
+  <data name="OnboardingDialog_Folders_Heading_2" xml:space="preserve">
+    <value>This information tells me where to find important folders.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Label" xml:space="preserve">
+    <value>Mod Health</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_Heading_1" xml:space="preserve">
+    <value>Alrighty! You're almost all set, bud. 👍 Just a few more preferences...</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_Heading_2" xml:space="preserve">
+    <value>To promote Mod Health, what would you like me to do?</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ModGuard_Label" xml:space="preserve">
+    <value>Help you install TwistedMexi's ModGuard.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ModGuard_Recommendation" xml:space="preserve">
+    <value>&lt;strong&gt;Strongly&lt;/strong&gt; Recommended</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ModGuard_Description" xml:space="preserve">
+    <value>Because anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore" xml:space="preserve">
+    <value>Learn more about Mod Guard</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogs_Label" xml:space="preserve">
+    <value>Tell you about errors logged by the game or mods.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogs_Recommendation" xml:space="preserve">
+    <value>Helpful, but Optional</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogs_Description" xml:space="preserve">
+    <value>When your game or a mod logs an error, I'll let you know and we'll figure out where to take the error to get it looked at. Just so you know, this will be a Discord server. So, if you're unfamiliar with Discord or not interested in using it, you may want to turn this off.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogs_LearnMore" xml:space="preserve">
+    <value>Learn more about Discord</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_1" xml:space="preserve">
+    <value>Error Logging Options</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_2" xml:space="preserve">
+    <value>Having at least one of these installed will provide us with better error logs to share with creators.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_MCCC_Label" xml:space="preserve">
+    <value>Help you install Deaderpool's MC Command Center.</value>
+  </data>
+  <data name="Common_LearnMore" xml:space="preserve">
+    <value>Learn more</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_MCCC_Pros" xml:space="preserve">
+    <value>MCCC's logging is far more comprehensive than the game's and most Support Venues will happily review it.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_MCCC_Cons" xml:space="preserve">
+    <value>MCCC does alter your story progression by default (e.g. causing NPC Sims to marry, have children, move, etc.). If this would bother you, you can prevent MCCC from doing this, but that can be unwieldy for inexperienced players.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_BE_Label" xml:space="preserve">
+    <value>Help you install TwistedMexi's Better Exceptions.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_BE_Pros" xml:space="preserve">
+    <value>BE provides useful error logs without affecting game functions or story progression.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_Casual_BE_Cons" xml:space="preserve">
+    <value>Since it is less widespread than MCCC, many Support Venues will prefer its error logs a little less than those of MCCC. BE also makes a new report per error and freezes the game's clock while collecting information for reports.</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_NonCasual_Heading_1" xml:space="preserve">
+    <value>Alright, Chief. I heard you, loud and clear. 🫡</value>
+  </data>
+  <data name="OnboardingDialog_ModHealth_NonCasual_Heading_2" xml:space="preserve">
+    <value>For what issues should I get your attention?</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_Label" xml:space="preserve">
+    <value>PlumbBuddy</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_Heading_1" xml:space="preserve">
+    <value>😁 Well, this is it. The last page. After this you'll be fully on board!</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_Heading_2" xml:space="preserve">
+    <value>✔️ Do you want to change any of my default behaviors? ❌</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_DefaultCreators_Label" xml:space="preserve">
+    <value>Default Creators</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText" xml:space="preserve">
+    <value>This is the creators list I will pre-fill-in for you when you're manifesting a mod for the first time.</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip" xml:space="preserve">
+    <value>Don't worry, I won't download or install anything without your consent. I'll just let you know when an update for me is available.</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label" xml:space="preserve">
+    <value>Automatically check for updates</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label" xml:space="preserve">
+    <value>Generate global manifest package</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip" xml:space="preserve">
+    <value>This is a package file that lets Mod Creators know what I know about your manifested mods. It's basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy.</value>
+  </data>
+  <data name="OnboardingDialog_Caution_SpookingMacs_Caption" xml:space="preserve">
+    <value>I may be about to spook your Mac</value>
+  </data>
+  <data name="OnboardingDialog_Caution_SpookingMacs_Text" xml:space="preserve">
+    <value>It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.&lt;br /&gt;
+I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.&lt;br /&gt;
+*Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="OnboardingDialog_Folders_Loading" xml:space="preserve">
+    <value>☝️ Just a moment, I'm taking a looking at your computer...</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="SelectFeaturesDialog_Text" xml:space="preserve">
+    <value>**Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it's giving me more details about what issues could arise if things change later on.&lt;br /&gt;
+Move available features on the left over to the required list on the right. What will you have? 😏&lt;br /&gt;
+&lt;iframe src="https://giphy.com/embed/x49H7NdakLhNgLoy7v" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/archerfx-x49H7NdakLhNgLoy7v"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = Mod Creator's Name</comment>
+  </data>
+  <data name="SelectFeaturesDialog_Text_ModCreatorNameFallback" xml:space="preserve">
+    <value>This mod's creator</value>
+  </data>
+  <data name="SelectFeaturesDialog_StartTitle" xml:space="preserve">
+    <value>Available {0} Features</value>
+    <comment>{0} = Name of Required Mod</comment>
+  </data>
+  <data name="SelectFeaturesDialog_StartTitle_FallbackModName" xml:space="preserve">
+    <value>Required Mod</value>
+  </data>
+  <data name="SelectFeaturesDialog_EndTitle" xml:space="preserve">
+    <value>Features My Mod Needs</value>
+  </data>
+  <data name="SelectFeaturesDialog_Guidance" xml:space="preserve">
+    <value>If you're having any trouble picking from this list, you may want to visit [the download page for (0)]({1}), which may have more information or links to it.</value>
+    <comment>This text is in Markdown. {0} = Name of Required Mod; {1} = Download Page URL of Required Mod</comment>
+  </data>
+  <data name="SelectFeaturesDialog_Guidance_FallbackModName" xml:space="preserve">
+    <value>the mod</value>
+  </data>
+  <data name="SelectManifestDialog_ResourceKey_Label" xml:space="preserve">
+    <value>Resource Key</value>
+  </data>
+  <data name="SelectManifestDialog_DecimalInstance_Label" xml:space="preserve">
+    <value>Decimal Instance</value>
+  </data>
+  <data name="SelectManifestDialog_TuningResourceName_Label" xml:space="preserve">
+    <value>Tuning Resource Name</value>
+  </data>
+  <data name="SelectManifestDialog_Hash_Label" xml:space="preserve">
+    <value>Hash</value>
+  </data>
+  <data name="SelectFeaturesDialog_Caution_NoRequiredFeatures_Caption" xml:space="preserve">
+    <value>Proceeding with No Required Features</value>
+  </data>
+  <data name="SelectFeaturesDialog_Caution_NoRequiredFeatures_Text" xml:space="preserve">
+    <value>You didn't move any available features to the required section. If this was a mistake, click Cancel and you can do so.</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_EndSession_Tip" xml:space="preserve">
+    <value>End the Guided Support Session</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_GetHelpWithMe_Label" xml:space="preserve">
+    <value>Get Help with PlumbBuddy</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_GetHelpWithMe_Tip" xml:space="preserve">
+    <value>If you're looking for help with me instead of with the game or with a mod, click here.</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_Pick_Label" xml:space="preserve">
+    <value>Pick this Support Venue</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_NoAvailableOptions" xml:space="preserve">
+    <value>Whoops, sorry, I couldn't find any Community Support venues prepared to deal with this issue.</value>
+  </data>
+  <data name="SelectSupportDiscordDialog_Description_General" xml:space="preserve">
+    <value>Here are the Community Support Venues prepared to offer general support.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="SelectSupportDiscordDialog_Description_ModUpdates" xml:space="preserve">
+    <value>Here are the Community Support Venues which announce mod updates.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="SelectSupportDiscordDialog_Description_ErrorLog" xml:space="preserve">
+    <value>Here are the Community Support Venues I could find to help us with: `{0}`</value>
+    <comment>This text is in Markdown. {0} = Error log file name</comment>
+  </data>
+  <data name="SelectSupportDiscordDialog_Description_ModSpecific" xml:space="preserve">
+    <value>Here are the Community Support Venues which may offer support for this mod.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="SettingsDialog_General_Label" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_Caption" xml:space="preserve">
+    <value>{0} Guided Support Session</value>
+    <comment>This text is in Markdown. {0} = Name of Support Venue</comment>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightAppLogs_Label" xml:space="preserve">
+    <value>Show me your most recent log file</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightGameVersion_Label" xml:space="preserve">
+    <value>Show me my game version file</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightErrorLog_Label" xml:space="preserve">
+    <value>Show me the error file</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_ClearCache_Label" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_StartOver_Label" xml:space="preserve">
+    <value>Start over</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip" xml:space="preserve">
+    <value>Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it on. I'll do that for you. 💖</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption" xml:space="preserve">
+    <value>The Cache is Already Clear</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_ClearCache_AlreadyClear_Text" xml:space="preserve">
+    <value>Good on you for being thorough, though!</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_ClearCache_Success_Caption" xml:space="preserve">
+    <value>The Cache is Now Clear</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_ClearCache_Success_Text" xml:space="preserve">
+    <value>Well done, you now have a clean slate.</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Caption" xml:space="preserve">
+    <value>I Couldn't Find My Own App Data Directory</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Text" xml:space="preserve">
+    <value>Holy cow, how are you even getting to this error message?</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Caption" xml:space="preserve">
+    <value>I Couldn't Find My Most Recent Log File</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Text" xml:space="preserve">
+    <value>That uhh... shouldn't be a thing. So sorry.</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Caption" xml:space="preserve">
+    <value>I Couldn't Find Your Game Version File</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Text" xml:space="preserve">
+    <value>It looks like you need to launch The Sims 4 so that it will write that file. Once you've done that, come back here and click this button again.</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Text" xml:space="preserve">
+    <value>Something must have happened to it, I'm so sorry.</value>
+  </data>
+  <data name="SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Caption" xml:space="preserve">
+    <value>I Couldn't Find Your Error File</value>
+  </data>
 </root>

@@ -277,6 +277,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Learn more.
+        /// </summary>
+        internal static string Common_LearnMore {
+            get {
+                return ResourceManager.GetString("Common_LearnMore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         internal static string Common_Name {
@@ -291,6 +300,24 @@ namespace PlumbBuddy.Localization {
         internal static string Common_Next {
             get {
                 return ResourceManager.GetString("Common_Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string Common_No {
+            get {
+                return ResourceManager.GetString("Common_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string Common_Ok {
+            get {
+                return ResourceManager.GetString("Common_Ok", resourceCulture);
             }
         }
         
@@ -372,6 +399,78 @@ namespace PlumbBuddy.Localization {
         internal static string Common_Url {
             get {
                 return ResourceManager.GetString("Common_Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string Common_Yes {
+            get {
+                return ResourceManager.GetString("Common_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Error Logs.
+        /// </summary>
+        internal static string DeleteErrorLogsDialog_Caption {
+            get {
+                return ResourceManager.GetString("DeleteErrorLogsDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Logs to Delete.
+        /// </summary>
+        internal static string DeleteErrorLogsDialog_ErrorLogsToDelete_Label {
+            get {
+                return ResourceManager.GetString("DeleteErrorLogsDialog_ErrorLogsToDelete_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You actually have a number of pending error logs. Would you like to delete more than one?.
+        /// </summary>
+        internal static string DeleteErrorLogsDialog_Text {
+            get {
+                return ResourceManager.GetString("DeleteErrorLogsDialog_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, Something Went Wrong!.
+        /// </summary>
+        internal static string Dialogs_Error_GetSupportDiscordsFailed_Caption {
+            get {
+                return ResourceManager.GetString("Dialogs_Error_GetSupportDiscordsFailed_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to While I was trying to get the Support Discords list from my website, it just... didn&apos;t work. Umm... can we try this again later?.
+        /// </summary>
+        internal static string Dialogs_Error_GetSupportDiscordsFailed_Text {
+            get {
+                return ResourceManager.GetString("Dialogs_Error_GetSupportDiscordsFailed_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Is it alright with you if I download the Community Support Venues list from plumbbuddy.app?.
+        /// </summary>
+        internal static string Dialogs_Question_DownloadSupportDiscords_Caption {
+            get {
+                return ResourceManager.GetString("Dialogs_Question_DownloadSupportDiscords_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The people that made me defer to the people who run the Community Support Venues, so I need to get the latest list of available Community Support Venues and what they expect of us. But, I want your permission to connect to the Internet to do that..
+        /// </summary>
+        internal static string Dialogs_Question_DownloadSupportDiscords_Text {
+            get {
+                return ResourceManager.GetString("Dialogs_Question_DownloadSupportDiscords_Text", resourceCulture);
             }
         }
         
@@ -2493,6 +2592,431 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I may be about to spook your Mac.
+        /// </summary>
+        internal static string OnboardingDialog_Caution_SpookingMacs_Caption {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Caution_SpookingMacs_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It&apos;s awesome that you&apos;re using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that&apos;s where your mods are (or will be), so I pretty much need to do that.&lt;br /&gt;
+        ///I&apos;m going to poke in there now. If macOS pauses me to ask you if it&apos;s cool, please tell it that it&apos;s okay for me to be in there.&lt;br /&gt;
+        ///*Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I w [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string OnboardingDialog_Caution_SpookingMacs_Text {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Caution_SpookingMacs_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I hate to have to begin our relationship this way, but... 😔.
+        /// </summary>
+        internal static string OnboardingDialog_EULA_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_EULA_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I need you to say you won&apos;t sue my parents..
+        /// </summary>
+        internal static string OnboardingDialog_EULA_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_EULA_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 👇 Scroll to the bottom and click &lt;div class=&quot;mud-chip-container&quot;&gt;&lt;div tabindex=&quot;-1&quot; class=&quot;mud-chip mud-chip-filled mud-chip-size-medium mud-chip-color-primary mud-chip-label&quot;&gt;&lt;span class=&quot;mud-chip-content&quot;&gt;NEXT&lt;/span&gt;&lt;/div&gt;&lt;/div&gt; to agree and continue. 👉.
+        /// </summary>
+        internal static string OnboardingDialog_EULA_Heading_3 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_EULA_Heading_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EULA.
+        /// </summary>
+        internal static string OnboardingDialog_EULA_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_EULA_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prepare for some Earth-shattering discoveries I&apos;ve made about your computer. 😆.
+        /// </summary>
+        internal static string OnboardingDialog_Folders_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Folders_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This information tells me where to find important folders..
+        /// </summary>
+        internal static string OnboardingDialog_Folders_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Folders_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folders.
+        /// </summary>
+        internal static string OnboardingDialog_Folders_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Folders_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ☝️ Just a moment, I&apos;m taking a looking at your computer....
+        /// </summary>
+        internal static string OnboardingDialog_Folders_Loading {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Folders_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In order to serve you best, it helps me to know what kind of player you are..
+        /// </summary>
+        internal static string OnboardingDialog_Introductions_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Introductions_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use the colored circles or arrows below to choose..
+        /// </summary>
+        internal static string OnboardingDialog_Introductions_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Introductions_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Introductions.
+        /// </summary>
+        internal static string OnboardingDialog_Introductions_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Introductions_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Since it is less widespread than MCCC, many Support Venues will prefer its error logs a little less than those of MCCC. BE also makes a new report per error and freezes the game&apos;s clock while collecting information for reports..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_BE_Cons {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_BE_Cons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help you install TwistedMexi&apos;s Better Exceptions..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_BE_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_BE_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE provides useful error logs without affecting game functions or story progression..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_BE_Pros {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_BE_Pros", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Logging Options.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Having at least one of these installed will provide us with better error logs to share with creators..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When your game or a mod logs an error, I&apos;ll let you know and we&apos;ll figure out where to take the error to get it looked at. Just so you know, this will be a Discord server. So, if you&apos;re unfamiliar with Discord or not interested in using it, you may want to turn this off..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogs_Description {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogs_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tell you about errors logged by the game or mods..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogs_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogs_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Learn more about Discord.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogs_LearnMore {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogs_LearnMore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Helpful, but Optional.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ErrorLogs_Recommendation {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ErrorLogs_Recommendation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alrighty! You&apos;re almost all set, bud. 👍 Just a few more preferences....
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To promote Mod Health, what would you like me to do?.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MCCC does alter your story progression by default (e.g. causing NPC Sims to marry, have children, move, etc.). If this would bother you, you can prevent MCCC from doing this, but that can be unwieldy for inexperienced players..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_MCCC_Cons {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_MCCC_Cons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help you install Deaderpool&apos;s MC Command Center..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_MCCC_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_MCCC_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MCCC&apos;s logging is far more comprehensive than the game&apos;s and most Support Venues will happily review it..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_MCCC_Pros {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_MCCC_Pros", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because anti-virus software doesn&apos;t check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ModGuard_Description {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ModGuard_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help you install TwistedMexi&apos;s ModGuard..
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ModGuard_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ModGuard_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Learn more about Mod Guard.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;strong&gt;Strongly&lt;/strong&gt; Recommended.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Casual_ModGuard_Recommendation {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Casual_ModGuard_Recommendation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Health.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alright, Chief. I heard you, loud and clear. 🫡.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_NonCasual_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_NonCasual_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For what issues should I get your attention?.
+        /// </summary>
+        internal static string OnboardingDialog_ModHealth_NonCasual_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_ModHealth_NonCasual_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically check for updates.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t worry, I won&apos;t download or install anything without your consent. I&apos;ll just let you know when an update for me is available..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the creators list I will pre-fill-in for you when you&apos;re manifesting a mod for the first time..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Creators.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_DefaultCreators_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_DefaultCreators_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate global manifest package.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a package file that lets Mod Creators know what I know about your manifested mods. It&apos;s basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 😁 Well, this is it. The last page. After this you&apos;ll be fully on board!.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ✔️ Do you want to change any of my default behaviors? ❌.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PlumbBuddy.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some of your favorite Creators have given me beautiful makeovers. 💄.
+        /// </summary>
+        internal static string OnboardingDialog_Theme_Heading_1 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Theme_Heading_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🤔 Will you decide for personal aesthetics or fandom reasons?.
+        /// </summary>
+        internal static string OnboardingDialog_Theme_Heading_2 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Theme_Heading_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either way, how I look is up to you!.
+        /// </summary>
+        internal static string OnboardingDialog_Theme_Heading_3 {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Theme_Heading_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Theme.
+        /// </summary>
+        internal static string OnboardingDialog_Theme_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_Theme_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {
@@ -2732,6 +3256,422 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_SelectedNotFoundScans_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_SelectedNotFoundScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select {0} Features.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Caption {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Caption_FallbackModName {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Caption_FallbackModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Proceeding with No Required Features.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Caution_NoRequiredFeatures_Caption {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Caution_NoRequiredFeatures_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You didn&apos;t move any available features to the required section. If this was a mistake, click Cancel and you can do so..
+        /// </summary>
+        internal static string SelectFeaturesDialog_Caution_NoRequiredFeatures_Text {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Caution_NoRequiredFeatures_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Features My Mod Needs.
+        /// </summary>
+        internal static string SelectFeaturesDialog_EndTitle {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_EndTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you&apos;re having any trouble picking from this list, you may want to visit [the download page for (0)]({1}), which may have more information or links to it..
+        /// </summary>
+        internal static string SelectFeaturesDialog_Guidance {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Guidance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to the mod.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Guidance_FallbackModName {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Guidance_FallbackModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Available {0} Features.
+        /// </summary>
+        internal static string SelectFeaturesDialog_StartTitle {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_StartTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required Mod.
+        /// </summary>
+        internal static string SelectFeaturesDialog_StartTitle_FallbackModName {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_StartTitle_FallbackModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it&apos;s giving me more details about what issues could arise if things change later on.&lt;br /&gt;
+        ///Move available features on the left over to the required list on the right. What will you have? 😏&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/x49H7NdakLhNgLoy7v&quot; width=&quot;480&quot; height=&quot;307&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;htt [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Text {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This mod&apos;s creator.
+        /// </summary>
+        internal static string SelectFeaturesDialog_Text_ModCreatorNameFallback {
+            get {
+                return ResourceManager.GetString("SelectFeaturesDialog_Text_ModCreatorNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Manifest.
+        /// </summary>
+        internal static string SelectManifestDialog_Caption {
+            get {
+                return ResourceManager.GetString("SelectManifestDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decimal Instance.
+        /// </summary>
+        internal static string SelectManifestDialog_DecimalInstance_Label {
+            get {
+                return ResourceManager.GetString("SelectManifestDialog_DecimalInstance_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash.
+        /// </summary>
+        internal static string SelectManifestDialog_Hash_Label {
+            get {
+                return ResourceManager.GetString("SelectManifestDialog_Hash_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resource Key.
+        /// </summary>
+        internal static string SelectManifestDialog_ResourceKey_Label {
+            get {
+                return ResourceManager.GetString("SelectManifestDialog_ResourceKey_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tuning Resource Name.
+        /// </summary>
+        internal static string SelectManifestDialog_TuningResourceName_Label {
+            get {
+                return ResourceManager.GetString("SelectManifestDialog_TuningResourceName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a Support Venue.
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Caption {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are the Community Support Venues I could find to help us with: `{0}`.
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Description_ErrorLog {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Description_ErrorLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are the Community Support Venues prepared to offer general support..
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Description_General {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Description_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are the Community Support Venues which may offer support for this mod..
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Description_ModSpecific {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Description_ModSpecific", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are the Community Support Venues which announce mod updates..
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Description_ModUpdates {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Description_ModUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End the Guided Support Session.
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_EndSession_Tip {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_EndSession_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Help with PlumbBuddy.
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_GetHelpWithMe_Label {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_GetHelpWithMe_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you&apos;re looking for help with me instead of with the game or with a mod, click here..
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_GetHelpWithMe_Tip {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_GetHelpWithMe_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, sorry, I couldn&apos;t find any Community Support venues prepared to deal with this issue..
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_NoAvailableOptions {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_NoAvailableOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick this Support Venue.
+        /// </summary>
+        internal static string SelectSupportDiscordDialog_Pick_Label {
+            get {
+                return ResourceManager.GetString("SelectSupportDiscordDialog_Pick_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        internal static string SettingsDialog_General_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_General_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Guided Support Session.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Already Clear.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Good on you for being thorough, though!.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_ClearCache_AlreadyClear_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_ClearCache_AlreadyClear_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear cache.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_ClearCache_Label {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_ClearCache_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Now Clear.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_ClearCache_Success_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_ClearCache_Success_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Well done, you now have a clean slate..
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_ClearCache_Success_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_ClearCache_Success_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use this switch to temporarily disable generation of the global manifest package. Don&apos;t worry if you forget to turn this back on if you had it on. I&apos;ll do that for you. 💖.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me your most recent log file.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightAppLogs_Label {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightAppLogs_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Couldn&apos;t Find My Own App Data Directory.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Holy cow, how are you even getting to this error message?.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Couldn&apos;t Find My Most Recent Log File.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to That uhh... shouldn&apos;t be a thing. So sorry..
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me the error file.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightErrorLog_Label {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightErrorLog_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Couldn&apos;t Find Your Error File.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something must have happened to it, I&apos;m so sorry..
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me my game version file.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightGameVersion_Label {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightGameVersion_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Couldn&apos;t Find Your Game Version File.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Caption {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It looks like you need to launch The Sims 4 so that it will write that file. Once you&apos;ve done that, come back here and click this button again..
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Text {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start over.
+        /// </summary>
+        internal static string SupportDiscordStepsDialog_StartOver_Label {
+            get {
+                return ResourceManager.GetString("SupportDiscordStepsDialog_StartOver_Label", resourceCulture);
             }
         }
         

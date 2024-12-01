@@ -48,7 +48,7 @@ partial class SelectSupportDiscordDialog
         {
             var forCreatorsHashSet = forCreators.ToImmutableHashSet();
             var forManifestHash = forManifestHashHex.ToByteSequence().ToImmutableArray();
-            description = "Here are the Community Support venues which may offer support for this mod.";
+            description = AppText.SelectSupportDiscordDialog_Description_ModSpecific;
             var specificDiscordsToUseList = discordsToUse
                 .Where(kv => kv.Value.SpecificCreators.Any(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))))
                 .Select(kv => (name: kv.Key, creator: kv.Value.SpecificCreators.First(sc => forCreatorsHashSet.Contains(sc.Key) && !sc.Value.ExceptForHashes.Any(efh => efh.SequenceEqual(forManifestHash))).Key, discord: kv.Value))
@@ -66,7 +66,7 @@ partial class SelectSupportDiscordDialog
         }
         else if (ErrorFile is { } errorFile)
         {
-            description = $"Here are the Community Support methods I could find to help us with: `{errorFile.Name}`";
+            description = string.Format(AppText.SelectSupportDiscordDialog_Description_ErrorLog, errorFile.Name);
             var discordsToUseWeightedList = discordsToUse
                 .Where(kv => kv.Value.TextFileSubmissionSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, discord: kv.Value, recommendationWeight: kv.Value.SupportedTextFilePatterns.Sum(textFilePattern => Regex.IsMatch(errorFile.Name, textFilePattern.Pattern, textFilePattern.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None) ? 1D + textFilePattern.AdditionalRecommendationWeight : 0D)))
@@ -80,7 +80,7 @@ partial class SelectSupportDiscordDialog
         }
         else if (IsPatchDay)
         {
-            description = "Here are the Community Support methods which announce mod updates.";
+            description = AppText.SelectSupportDiscordDialog_Description_ModUpdates;
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.PatchDayHelpSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))
@@ -91,7 +91,7 @@ partial class SelectSupportDiscordDialog
         else
         {
             showAppSupport = true;
-            description = "Here are the Community Support methods prepared to offer general support.";
+            description = AppText.SelectSupportDiscordDialog_Description_General;
             var discordsToUseList = discordsToUse
                 .Where(kv => kv.Value.AskForHelpSteps.Count is > 0)
                 .Select(kv => (name: kv.Key, string.Empty, discord: kv.Value))

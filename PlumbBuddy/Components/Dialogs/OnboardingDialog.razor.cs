@@ -169,12 +169,11 @@ partial class OnboardingDialog
         {
             if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
             {
-                if (!await DialogService.ShowCautionDialogAsync("I may be about to spook your Mac",
-                    """
-                    It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.<br />
-                    I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.<br />
-                    *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*
-                    """))
+                if (!await DialogService.ShowCautionDialogAsync
+                (
+                    StringLocalizer[nameof(AppText.OnboardingDialog_Caution_SpookingMacs_Caption)],
+                    StringLocalizer[nameof(AppText.OnboardingDialog_Caution_SpookingMacs_Text)]
+                ))
                     return true;
             }
             if (defaultCreatorsChipSetField is not null)
@@ -218,7 +217,7 @@ partial class OnboardingDialog
     {
         if (foldersSelector is null)
             return;
-        loadingText = "☝️ Just a moment, I'm taking a looking at your computer...";
+        loadingText = StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Loading)];
         isLoading = true;
         StateHasChanged();
         await foldersSelector.ScanForFoldersAsync();

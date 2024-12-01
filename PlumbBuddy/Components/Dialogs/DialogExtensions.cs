@@ -13,7 +13,7 @@ static class DialogExtensions
     public static Task<IReadOnlyDictionary<string, SupportDiscord>?> GetSupportDiscordsAsync(this IDialogService dialogService, Microsoft.Extensions.Logging.ILogger logger, IPublicCatalogs publicCatalogs) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, "Is it alright with you if I download the Community Discords list from plumbbuddy.app?", "The people that made me defer to the people who run the Community Discord servers, so I need to get the latest list of available Community Discord servers and what they expect of us. But, I want your permission to connect to the Internet to do that.") ?? false))
+            if ((publicCatalogs.SupportDiscordsCacheTTL is not { } ttl || ttl < TimeSpan.FromMinutes(30)) && !(await ShowQuestionDialogAsync(dialogService, AppText.Dialogs_Question_DownloadSupportDiscords_Caption, AppText.Dialogs_Question_DownloadSupportDiscords_Text) ?? false))
                 return null;
             try
             {
@@ -22,7 +22,7 @@ static class DialogExtensions
             catch (Exception ex)
             {
                 logger.LogError(ex, "failed to retrieve Support Discords from PlumbBuddy.app");
-                await dialogService.ShowErrorDialogAsync("Whoops, Something Went Wrong!", "While I was trying to get the Support Discords list from my website, it just... didn't work. Umm... can we try this again later?");
+                await dialogService.ShowErrorDialogAsync(AppText.Dialogs_Error_GetSupportDiscordsFailed_Caption, AppText.Dialogs_Error_GetSupportDiscordsFailed_Text);
                 return null;
             }
         });
@@ -64,7 +64,7 @@ static class DialogExtensions
     public static Task<IReadOnlyList<string>> ShowDeleteErrorLogsDialogAsync(this IDialogService dialogService, IReadOnlyList<string> filePaths, IEnumerable<string> preselectedFilePaths) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<DeleteErrorLogsDialog>("Delete Error Logs", new DialogParameters<DeleteErrorLogsDialog>()
+            var dialog = await dialogService.ShowAsync<DeleteErrorLogsDialog>(AppText.DeleteErrorLogsDialog_Caption, new DialogParameters<DeleteErrorLogsDialog>()
             {
                 { x => x.FilePaths, filePaths },
                 { x => x.SelectedFilePaths, preselectedFilePaths }
@@ -140,7 +140,7 @@ static class DialogExtensions
     public static Task<IReadOnlyList<string>?> ShowSelectFeaturesDialogAsync(this IDialogService dialogService, ModFileManifestModel manifest) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<SelectFeaturesDialog>($"Select {manifest?.Name ?? "Mod"} Features", new DialogParameters<SelectFeaturesDialog>()
+            var dialog = await dialogService.ShowAsync<SelectFeaturesDialog>(string.Format(AppText.SelectFeaturesDialog_Caption, manifest?.Name ?? AppText.SelectFeaturesDialog_Caption_FallbackModName), new DialogParameters<SelectFeaturesDialog>()
             {
                 { x => x.Manifest, manifest }
             }, new DialogOptions
@@ -157,7 +157,7 @@ static class DialogExtensions
     public static Task<ResourceKey> ShowSelectManifestDialogAsync(this IDialogService dialogService, IReadOnlyDictionary<ResourceKey, ModFileManifestModel> manifests) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<SelectManifestDialog>("Select Manifest", new DialogParameters<SelectManifestDialog>()
+            var dialog = await dialogService.ShowAsync<SelectManifestDialog>(AppText.SelectManifestDialog_Caption, new DialogParameters<SelectManifestDialog>()
             {
                 { x => x.Manifests, manifests }
             }, new DialogOptions
@@ -197,7 +197,7 @@ static class DialogExtensions
     public static Task<(string? discordName, string? creatorName)> ShowSelectSupportDiscordDialogAsync(this IDialogService dialogService, IReadOnlyDictionary<string, SupportDiscord> supportDiscords, FileInfo? errorFile = null, bool isPatchDay = false, IReadOnlyList<string>? forCreators = null, string? forManifestHashHex = null) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<SelectSupportDiscordDialog>("Select a Support Venue", new DialogParameters<SelectSupportDiscordDialog>()
+            var dialog = await dialogService.ShowAsync<SelectSupportDiscordDialog>(AppText.SelectSupportDiscordDialog_Caption, new DialogParameters<SelectSupportDiscordDialog>()
             {
                 { x => x.ErrorFile, errorFile },
                 { x => x.ForCreators, forCreators },

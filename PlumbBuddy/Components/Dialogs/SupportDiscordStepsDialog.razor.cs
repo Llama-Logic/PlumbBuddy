@@ -39,7 +39,7 @@ partial class SupportDiscordStepsDialog
     public SupportDiscord? SupportDiscord { get; set; }
 
     [Parameter]
-    public string? SupportDiscordName { get; set; }
+    public string SupportDiscordName { get; set; } = string.Empty;
 
     void CloseOnClickHandler() =>
         MudDialog?.Close();
@@ -54,11 +54,11 @@ partial class SupportDiscordStepsDialog
     {
         if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
         {
-            await DialogService.ShowInfoDialogAsync("The Cache is Already Clear", "Good on you for being thorough, though!");
+            await DialogService.ShowInfoDialogAsync(AppText.SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption, AppText.SupportDiscordStepsDialog_ClearCache_AlreadyClear_Text);
             return;
         }
         if (SmartSimObserver.ClearCache())
-            await DialogService.ShowSuccessDialogAsync("The Cache is Now Clear", "Well done, you now have a clean slate.");
+            await DialogService.ShowSuccessDialogAsync(AppText.SupportDiscordStepsDialog_ClearCache_Success_Caption, AppText.SupportDiscordStepsDialog_ClearCache_Success_Text);
     }
 
     Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
@@ -73,7 +73,7 @@ partial class SupportDiscordStepsDialog
         var appDataDirectory = MauiProgram.AppDataDirectory;
         if (!appDataDirectory.Exists)
         {
-            await DialogService.ShowErrorDialogAsync("I Couldn't Find My Own App Data Directory", "Holy cow, how are you even getting to this error message?");
+            await DialogService.ShowErrorDialogAsync(AppText.SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Caption, AppText.SupportDiscordStepsDialog_HighlightAppLogs_NoAppData_Text);
             return;
         }
         var mostRecentLogFile = appDataDirectory
@@ -83,7 +83,7 @@ partial class SupportDiscordStepsDialog
             .FirstOrDefault();
         if (mostRecentLogFile is null || !mostRecentLogFile.Exists)
         {
-            await DialogService.ShowErrorDialogAsync("I Couldn't Find My Most Recent Log File", "That uhh... shouldn't be a thing. So sorry.");
+            await DialogService.ShowErrorDialogAsync(AppText.SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Caption, AppText.SupportDiscordStepsDialog_HighlightAppLogs_NoLogFile_Text);
             return;
         }
         PlatformFunctions.ViewFile(mostRecentLogFile);
@@ -94,7 +94,7 @@ partial class SupportDiscordStepsDialog
         var gameVersionFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "GameVersion.txt"));
         if (!gameVersionFile.Exists)
         {
-            await DialogService.ShowErrorDialogAsync("I Couldn't Find Your Game Version File", "It looks like you need to launch The Sims 4 so that it will write that file. Once you've done that, come back here and click this button again.");
+            await DialogService.ShowErrorDialogAsync(AppText.SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Caption, AppText.SupportDiscordStepsDialog_HighlightGameVersion_NotFound_Text);
             return;
         }
         PlatformFunctions.ViewFile(gameVersionFile);
@@ -106,7 +106,7 @@ partial class SupportDiscordStepsDialog
             return;
         if (!ErrorFile.Exists)
         {
-            await DialogService.ShowErrorDialogAsync("I Couldn't Find Your Error File", "Something must have happened to it, I'm so sorry.");
+            await DialogService.ShowErrorDialogAsync(AppText.SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Caption, AppText.SupportDiscordStepsDialog_HighlightErrorLog_NotFound_Text);
             return;
         }
         PlatformFunctions.ViewFile(ErrorFile);

@@ -3,10 +3,10 @@ namespace PlumbBuddy.Components.Dialogs;
 partial class CautionDialog
 {
     [Parameter]
-    public string Caption { get; set; } = "Caution";
+    public string Caption { get; set; } = string.Empty;
 
     [Parameter]
-    public string Text { get; set; } = "Are you sure you want to proceed?";
+    public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }

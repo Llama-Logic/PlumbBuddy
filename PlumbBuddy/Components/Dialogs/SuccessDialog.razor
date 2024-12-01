@@ -1,14 +1,20 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
 <MudDialog Class="success-dialog">
     <TitleContent>
         <MudStack Row="true">
             <MudIcon Icon="@MaterialDesignIcons.Outline.CheckboxMarkedCircle" Color="Color.Success" />
-            <MudTextM3 Typo="TypoM3.Title" Color="Color.Success">@Caption</MudTextM3>
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Success">
+                @Caption
+            </MudTextM3>
         </MudStack>
     </TitleContent>
     <DialogContent>
         <MudMarkdown Value="@Text" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OkOnClickHandler">Ok</MudButton>
+        <MudButton OnClick="OkOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Ok)]
+        </MudButton>
     </DialogActions>
 </MudDialog>

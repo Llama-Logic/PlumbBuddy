@@ -1,3 +1,5 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
 <MudDialog Class="warning-dialog">
     <TitleContent>
         <MudStack Row="true">
@@ -9,7 +11,11 @@
         <MudMarkdown Value="@Text" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="CancelOnClickHandler">Cancel</MudButton>
-        <MudButton Color="Color.Warning" OnClick="OkOnClickHandler">Ok</MudButton>
+        <MudButton OnClick="CancelOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Cancel)]
+        </MudButton>
+        <MudButton Color="Color.Warning" OnClick="OkOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Ok)]
+        </MudButton>
     </DialogActions>
 </MudDialog>

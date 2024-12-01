@@ -16,7 +16,7 @@ partial class SelectFeaturesDialog
 
     async Task OkOnClickHandlerAsync()
     {
-        if (requiredFeatures?.Count is 0 && !await DialogService.ShowCautionDialogAsync("Proceeding with No Required Features", "You didn't move any available features to the required section. If this was a mistake, click Cancel and you can do so."))
+        if (requiredFeatures?.Count is 0 && !await DialogService.ShowCautionDialogAsync(AppText.SelectFeaturesDialog_Caution_NoRequiredFeatures_Caption, AppText.SelectFeaturesDialog_Caution_NoRequiredFeatures_Text))
             return;
         MudDialog?.Close(DialogResult.Ok(requiredFeatures?.ToImmutableArray()));
     }

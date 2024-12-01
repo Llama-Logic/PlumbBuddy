@@ -3,10 +3,10 @@ namespace PlumbBuddy.Components.Dialogs;
 partial class SuccessDialog
 {
     [Parameter]
-    public string Caption { get; set; } = "Success";
+    public string Caption { get; set; } = string.Empty;
 
     [Parameter]
-    public string Text { get; set; } = "All done.";
+    public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }

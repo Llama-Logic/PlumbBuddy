@@ -1,10 +1,23 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IStringLocalizer<AppText> StringLocalizer
+
 <MudDialog Class="info-dialog">
     <TitleContent>
-        <MudStack Row Class="align-center">
+        <MudStack Row AlignItems="AlignItems.Center">
             <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" />
-            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">Select a Support Venue</MudTextM3>
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Info">
+                @MarkupLocalizer[nameof(AppText.SelectSupportDiscordDialog_Caption)]
+            </MudTextM3>
             <MudSpacer />
-            <MudTooltip Arrow Text="End the Guided Support Session">
+            @if (showAppSupport)
+            {
+                <MudTooltip Arrow Text="@StringLocalizer[nameof(AppText.SelectSupportDiscordDialog_GetHelpWithMe_Tip)]" Color="Color.Info">
+                    <MudButton StartIcon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" IconColor="Color.Info" OnClick="GetHelpWithMeOnClickHandler">
+                        @MarkupLocalizer[nameof(AppText.SelectSupportDiscordDialog_GetHelpWithMe_Label)]
+                    </MudButton>
+                </MudTooltip>
+            }
+            <MudTooltip Arrow Text="@StringLocalizer[nameof(AppText.SelectSupportDiscordDialog_EndSession_Tip)]">
                 <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" OnClick="CancelOnClickHandler" />
             </MudTooltip>
         </MudStack>
@@ -15,14 +28,6 @@
                 <MudItem>
                     <MudMarkdown Value="@description" />
                 </MudItem>
-                @if (showAppSupport)
-                {
-                    <MudItem>
-                        <MudTextM3>
-                            If you're looking for help with <strong>me</strong> instead of with the game or with a mod, <MudLink OnClick="GetHelpWithMeOnClickHandler">click here</MudLink>.
-                        </MudTextM3>
-                    </MudItem>
-                }
             </MudGrid>
             <MudPaper Elevation="0" Outlined Class="mud-background pa-4 rounded">
                 <MudGrid Justify="Justify.Center">
@@ -35,13 +40,17 @@
                                     <MudCard Elevation="0" Style="height: 100%;">
                                         <MudCardMedia Image="@supportDiscord.LogoMedia?.ToString()" Height="250" Style="background-size: contain;" />
                                         <MudCardHeader>
-                                            <MudTextM3 Typo="TypoM3.Title">@supportDiscordName</MudTextM3>
+                                            <MudTextM3 Typo="TypoM3.Title">
+                                                @supportDiscordName
+                                            </MudTextM3>
                                         </MudCardHeader>
                                         <MudCardContent>
                                             <MudMarkdown Value="@supportDiscord.Description.GetLanguageOptimalValue(() => string.Empty)" />
                                         </MudCardContent>
                                         <MudCardActions>
-                                            <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName, creatorName))">Pick this Support Venue</MudButton>
+                                            <MudButton StartIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" Color="Color.Primary" OnClick="@(() => SelectSupportDiscord(supportDiscordName, creatorName))">
+                                                @MarkupLocalizer[nameof(AppText.SelectSupportDiscordDialog_Pick_Label)]
+                                            </MudButton>
                                         </MudCardActions>
                                     </MudCard>
                                 </MudPaper>
@@ -53,7 +62,7 @@
                         <MudItem>
                             <MudPaper Class="rounded">
                                 <MudAlert Severity="Severity.Error" Icon="@MaterialDesignIcons.Normal.ServerOff">
-                                    Whoops, sorry, I couldn't find any Community Support venues prepared to deal with this issue.
+                                    @MarkupLocalizer[nameof(AppText.SelectSupportDiscordDialog_NoAvailableOptions)]
                                 </MudAlert>
                             </MudPaper>
                         </MudItem>

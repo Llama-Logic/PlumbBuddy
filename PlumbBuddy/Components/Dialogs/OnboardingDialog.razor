@@ -1,22 +1,24 @@
 @implements IDisposable
 @inject IDialogService DialogService
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISettings Settings
+@inject IStringLocalizer<AppText> StringLocalizer
 
 <MudLoading @bind-Loading="@isLoading" Text="@loadingText" Color="Color.Primary" LoaderType="LoaderType.Linear" Overlap>
     <MudDialog>
         <DialogContent>
-            <MudStepperExtended Class="mud-width-full mb-4" Color="Color.Primary" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled">
+            <MudStepperExtended Class="mud-width-full mb-4" Color="Color.Primary" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderSize="Size.Large" HeaderTextView="HeaderTextView.All" Linear LocalizedStrings="@(MarkupLocalizer.StepperLocalizedStrings)" PreventStepChangeAsync="HandlePreventStepChangeAsync" Variant="Variant.Filled">
                 <ChildContent>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.DrawPen" Title="EULA">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.DrawPen" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_EULA_Label)]">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                I hate to have to begin our relationship this way, but... 😔
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_EULA_Heading_1)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                I need you to say you won't sue my parents.
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_EULA_Heading_2)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                👇 Scroll to the bottom and click <MudChip T="string" Label="true" Color="Color.Primary">NEXT</MudChip> to agree and continue. 👉
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_EULA_Heading_3)]
                             </MudTextM3>
                             <div class="mt-4">
                                 <InlineMarkdown>
@@ -32,57 +34,57 @@
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Title="Theme" Optional="false">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.ThemeLightDark" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Optional="false">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Some of your favorite Creators have given me beautiful makeovers. 💄
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Theme_Heading_1)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                🤔 Will you decide for personal aesthetics or fandom reasons?
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Theme_Heading_2)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                Either way, how I look is up to you!
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Theme_Heading_3)]
                             </MudTextM3>
                             <div class="mt-4 mb-2 mx-n6 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 440px);">
                                 <ThemeSelector />
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="Introductions">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HumanGreeting" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_Introductions_Label)]">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                In order to serve you best, it helps me to know what kind of player you are.
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Introductions_Heading_1)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                Use the colored circles or arrows below to choose.
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Introductions_Heading_2)]
                             </MudTextM3>
                             <div class="mt-4">
                                 <UserTypeSelector @bind-Type="@Type" />
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.FolderMarker" Title="Folders" Optional="false">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.FolderMarker" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Label)]" Optional="false">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                Prepare for some Earth-shattering discoveries I've made about your computer. 😆
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Folders_Heading_1)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                This information tells me where to find important folders.
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_Folders_Heading_2)]
                             </MudTextM3>
                             <div class="mt-8">
                                 <FoldersSelector @ref="@foldersSelector" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" IsOnboarding="true" />
                             </div>
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" Title="Mod Health" Optional="false">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Label)]" Optional="false">
                         <ChildContent>
                             @if (Settings.Type is UserType.Casual)
                             {
                                 <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                    Alrighty! You're almost all set, bud. 👍 Just a few more preferences...
+                                    @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_Heading_1)]
                                 </MudTextM3>
                                 <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                    To promote Mod Health, what would you like me to do?
+                                    @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_Heading_2)]
                                 </MudTextM3>
                                 <MudGrid Justify="Justify.Center" Class="my-4">
                                     <MudItem xs="2" Style="align-content: center">
@@ -91,18 +93,18 @@
                                     <MudItem xs="10">
                                         <MudStack Row AlignItems="AlignItems.Center">
                                             <MudSwitchM3 @bind-Value="@ScanForMissingModGuard" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Security" ThumbOffIcon="@MaterialDesignIcons.Normal.ShieldOff" Class="flex-grow-1">
-                                                Help you install TwistedMexi's ModGuard.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ModGuard_Label)]
                                             </MudSwitchM3>
                                             <MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Outline.ShieldCheck" Dense>
-                                                <strong>Strongly</strong> Recommended
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ModGuard_Recommendation)]
                                             </MudAlert>
                                         </MudStack>
                                         <MudTextM3 Typo="TypoM3.Body" Style="padding-left: 4em;" Align="Align.Justify">
-                                            Because anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard.
-                                            Sometimes, creators accounts get hacked and dangerous mods are uploaded to sharing sites.
-                                            Protect yourself with ModGuard.
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ModGuard_Description)]
                                         </MudTextM3>
-                                        <MudLink Href="https://plumbbuddy.app/redirect?to=ModGuard" Target="_blank" Style="padding-left: 4em;">Learn more about Mod Guard</MudLink>
+                                        <MudLink Href="https://plumbbuddy.app/redirect?to=ModGuard" Target="_blank" Style="padding-left: 4em;">
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore)]
+                                        </MudLink>
                                     </MudItem>
                                     <MudItem xs="2" Style="align-content: center">
                                         <MudImage Src="/img/DiscordLogo.png" ObjectFit="ObjectFit.Contain" Width="120" />
@@ -110,25 +112,25 @@
                                     <MudItem xs="10">
                                         <MudStack Row AlignItems="AlignItems.Center">
                                             <MudSwitchM3 @bind-Value="@ScanForErrorLogs" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.FileDocumentAlert" ThumbOffIcon="@MaterialDesignIcons.Normal.FileDocumentRemove" Class="flex-grow-1">
-                                                Tell you about errors logged by the game or mods.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogs_Label)]
                                             </MudSwitchM3>
                                             <MudAlert Severity="Severity.Normal" Icon="@MaterialDesignIcons.Outline.HandHeart" Dense>
-                                                Helpful, but Optional
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogs_Recommendation)]
                                             </MudAlert>
                                         </MudStack>
                                         <MudTextM3 Typo="TypoM3.Body" Style="padding-left: 4em;" Align="Align.Justify">
-                                            When your game or a mod logs an error, I'll let you know and we'll figure out where to take the error to get it looked at.
-                                            Just so you know, this will be a Discord server.
-                                            So, if you're unfamiliar with Discord or not interested in using it, you may want to turn this off.
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogs_Description)]
                                         </MudTextM3>
-                                        <MudLink Href="https://discord.com/" Target="_blank" Style="padding-left: 4em;">Learn more about Discord</MudLink>
+                                        <MudLink Href="https://discord.com/" Target="_blank" Style="padding-left: 4em;">
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogs_LearnMore)]
+                                        </MudLink>
                                     </MudItem>
                                     <MudItem>
                                         <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                            Error Logging Options
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_1)]
                                         </MudTextM3>
                                         <MudTextM3 Typo="TypoM3.Body" Align="Align.Center">
-                                            Having at least one of these installed will provide us with better error logs to share with creators.
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_ErrorLogging_Heading_2)]
                                         </MudTextM3>
                                     </MudItem>
                                     <MudFlexBreak />
@@ -138,17 +140,18 @@
                                     <MudItem xs="10">
                                         <MudStack Row AlignItems="AlignItems.Center">
                                             <MudSwitchM3 @bind-Value="@ScanForMissingMccc" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Cog" ThumbOffIcon="@MaterialDesignIcons.Normal.CogOff" Class="flex-grow-1">
-                                                Help you install Deaderpool's MC Command Center.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_MCCC_Label)]
                                             </MudSwitchM3>
-                                            <MudLink Href="https://plumbbuddy.app/redirect?to=LearnAboutMCCommandCenter" Target="_blank">Learn more</MudLink>
+                                            <MudLink Href="https://plumbbuddy.app/redirect?to=LearnAboutMCCommandCenter" Target="_blank">
+                                                @MarkupLocalizer[nameof(AppText.Common_LearnMore)]
+                                            </MudLink>
                                         </MudStack>
                                         <MudStack Row>
                                             <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Outline.ThumbUp" Dense>
-                                                MCCC's logging is far more comprehensive than the game's and most Support Venues will happily review it.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_MCCC_Pros)]
                                             </MudAlert>
                                             <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Outline.BadgeAccountAlert" Dense>
-                                                MCCC does alter your story progression by default (e.g. causing NPC Sims to marry, have children, move, etc.).
-                                                If this would bother you, you can prevent MCCC from doing this, but that can be unwieldy for inexperienced players.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_MCCC_Cons)]
                                             </MudAlert>
                                         </MudStack>
                                     </MudItem>
@@ -158,17 +161,18 @@
                                     <MudItem xs="10">
                                         <MudStack Row AlignItems="AlignItems.Center">
                                             <MudSwitchM3 @bind-Value="@ScanForMissingBe" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Cog" ThumbOffIcon="@MaterialDesignIcons.Normal.CogOff" Class="flex-grow-1">
-                                                Help you install TwistedMexi's Better Exceptions.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_BE_Label)]
                                             </MudSwitchM3>
-                                            <MudLink Href="https://plumbbuddy.app/redirect?to=BetterExceptions" Target="_blank">Learn more</MudLink>
+                                            <MudLink Href="https://plumbbuddy.app/redirect?to=BetterExceptions" Target="_blank">
+                                                @MarkupLocalizer[nameof(AppText.Common_LearnMore)]
+                                            </MudLink>
                                         </MudStack>
                                         <MudStack Row>
                                             <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Outline.ThumbUp" Dense>
-                                                BE provides useful error logs without affecting game functions or story progression.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_BE_Pros)]
                                             </MudAlert>
                                             <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Outline.TimerAlert" Dense>
-                                                Since it is less widespread than MCCC, many Support Venues will prefer its error logs a little less than those of MCCC.
-                                                BE also makes a new report per error and freezes the game's clock while collecting information for reports.
+                                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Casual_BE_Cons)]
                                             </MudAlert>
                                         </MudStack>
                                     </MudItem>
@@ -177,10 +181,10 @@
                             else
                             {
                                 <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                    Alright, Chief. I heard you, loud and clear. 🫡
+                                    @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_NonCasual_Heading_1)]
                                 </MudTextM3>
                                 <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                    For what issues should I get your attention?
+                                    @MarkupLocalizer[nameof(AppText.OnboardingDialog_ModHealth_NonCasual_Heading_2)]
                                 </MudTextM3>
                                 <MudGrid Justify="Justify.Center" Class="mb-4">
                                     <MudItem xs="10">
@@ -190,31 +194,35 @@
                             }
                         </ChildContent>
                     </MudStepExtended>
-                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HeartSettings" Title="PlumbBuddy">
+                    <MudStepExtended Icon="@MaterialDesignIcons.Normal.HeartSettings" Title="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_Label)]">
                         <ChildContent>
                             <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                😁 Well, this is it. The last page. After this you'll be fully on board!
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_Heading_1)]
                             </MudTextM3>
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                ✔️ Do you want to change any of my default behaviors? ❌
+                                @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_Heading_2)]
                             </MudTextM3>
                             <MudGrid Justify="Justify.Center" Class="my-8">
                                 @if (Type is UserType.Creator)
                                 {
                                     <MudItem xs="12">
-                                        <ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="Default Creators" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="Enter a creator name here and press enter" HelperText="This is the creators list I will pre-fill-in for you when you're manifesting a mod for the first time." />
+                                        <ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
                                     </MudItem>
                                     <MudFlexBreak />
                                 }
                                 <MudItem>
-                                    <MudTooltip Arrow Color="Color.Primary" Text="Don't worry, I won't download or install anything without your consent. I'll just let you know when an update for me is available.">
-                                        <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">Automatically check for updates</MudSwitchM3>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip)]">
+                                        <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label)]
+                                        </MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
                                 <MudFlexBreak />
                                 <MudItem>
-                                    <MudTooltip Arrow Color="Color.Primary" Text="This is a package file that lets Mod Creators know what I know about your manifested mods. It's basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy.">
-                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">Generate global manifest package</MudSwitchM3>
+                                    <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
+                                        <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">
+                                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
+                                        </MudSwitchM3>
                                     </MudTooltip>
                                 </MudItem>
                             </MudGrid>
