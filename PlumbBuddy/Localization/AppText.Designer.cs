@@ -1866,6 +1866,30 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your Mod&apos;s Manifests are Now Up to Date.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Success_Caption {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Success_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your mod&apos;s files now contain all the information I would need to:
+        ///* show players a complete catalog entry for it;
+        ///* tell script mod creators about your mod when a player has it installed; and, most importantly,
+        ///* help players with installation problems involving it.
+        ///
+        ///##### Manifest Hashes Need to be Maintained
+        ///*Please do not forget to come back here and have me update your mod&apos;s manifests if you change anything*. I promise it won&apos;t take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ManifestEditor_Composing_Success_Text {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Composing_Success_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Whoops, it looks like you used the `{0}` **Manifest Snippet Tuning Resource Name** for each of the following mod files when they each need to be unique. You can go back to the **Components** step to fix this.
         ///{1}.
         /// </summary>

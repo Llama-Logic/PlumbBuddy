@@ -1579,4 +1579,19 @@ Move available features on the left over to the required list on the right. What
   <data name="Home_SampleUI_Label" xml:space="preserve">
     <value>Sample UI</value>
   </data>
+  <data name="ManifestEditor_Composing_Success_Text" xml:space="preserve">
+    <value>Your mod's files now contain all the information I would need to:
+* show players a complete catalog entry for it;
+* tell script mod creators about your mod when a player has it installed; and, most importantly,
+* help players with installation problems involving it.
+
+##### Manifest Hashes Need to be Maintained
+*Please do not forget to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.
+
+&lt;iframe src="https://giphy.com/embed/QC26L3oE3DEULQri7D" width="480" height="374" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/farmersinsurance-jk-simmons-farmers-insurance-professor-burke-QC26L3oE3DEULQri7D"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_Composing_Success_Caption" xml:space="preserve">
+    <value>Your Mod's Manifests are Now Up to Date</value>
+  </data>
 </root>

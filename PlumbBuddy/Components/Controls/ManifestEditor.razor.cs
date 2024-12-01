@@ -532,6 +532,9 @@ partial class ManifestEditor
         await updateStatusAsync(5, AppText.ManifestEditor_Composing_Status_Finished).ConfigureAwait(false);
         await Task.Delay(1000).ConfigureAwait(false);
 
+        if (!batchOverlayVisible)
+            await DialogService.ShowSuccessDialogAsync(AppText.ManifestEditor_Composing_Success_Caption, AppText.ManifestEditor_Composing_Success_Text).ConfigureAwait(false);
+
         await StaticDispatcher.DispatchAsync(async () =>
         {
             isComposing = false;
