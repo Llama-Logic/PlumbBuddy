@@ -1586,12 +1586,222 @@ Move available features on the left over to the required list on the right. What
 * help players with installation problems involving it.
 
 ##### Manifest Hashes Need to be Maintained
-*Please do not forget to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.
+*Please remember to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.
 
 &lt;iframe src="https://giphy.com/embed/QC26L3oE3DEULQri7D" width="480" height="374" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/farmersinsurance-jk-simmons-farmers-insurance-professor-burke-QC26L3oE3DEULQri7D"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Composing_Success_Caption" xml:space="preserve">
     <value>Your Mod's Manifests are Now Up to Date</value>
+  </data>
+  <data name="Scan_CacheStaleness_Stale_Caption" xml:space="preserve">
+    <value>The Cache is Stale</value>
+  </data>
+  <data name="Scan_CacheStaleness_Stale_Description_Casual" xml:space="preserve">
+    <value>Uhh, these cache files might be like the kids from that Offspring song — as in "not alright". We need to see to this and soon.</value>
+  </data>
+  <data name="Scan_CacheStaleness_Stale_Description_NonCasual" xml:space="preserve">
+    <value>The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed.</value>
+  </data>
+  <data name="Scan_CacheStaleness_Stale_Clear_Label" xml:space="preserve">
+    <value>Clear the cache</value>
+  </data>
+  <data name="Scan_Common_StopTellingMe_Label" xml:space="preserve">
+    <value>Stop telling me</value>
+  </data>
+  <data name="Scan_Common_StopTellingMe_CautionCaption" xml:space="preserve">
+    <value>Disable this scan?</value>
+  </data>
+  <data name="Scan_CacheStaleness_Stale_StopTellingMe_CautionText" xml:space="preserve">
+    <value>Umm, not clearing the cache files when they may have old junk hanging around in them can cause weird problems. Disabling this scan will make this warning go away, but it won't protect you from those problems.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_CacheStaleness_Fine_Caption" xml:space="preserve">
+    <value>The Cache is Fine</value>
+  </data>
+  <data name="Scan_CacheStaleness_Fine_Description_Casual" xml:space="preserve">
+    <value>There are cache files at the moment. They look fine to me, as cache files go. A little ordinary, but that's what you want in cache files!</value>
+  </data>
+  <data name="Scan_CacheStaleness_Fine_Description_NonCasual" xml:space="preserve">
+    <value>The cache files exist on disk in a normal state.</value>
+  </data>
+  <data name="Scan_CacheStaleness_Clear_Description_NonCasual" xml:space="preserve">
+    <value>There are currently no cache files on disk.</value>
+  </data>
+  <data name="Scan_CacheStaleness_Clear_Description_Casual" xml:space="preserve">
+    <value>There are no cache files at the moment. I mean... that's fine. The game's gonna load a little slower next time, but it's okay.</value>
+  </data>
+  <data name="Scan_Dependency_RequiredPack_Caption" xml:space="preserve">
+    <value>{0} is Missing {1}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Quantized Packs</comment>
+  </data>
+  <data name="Scan_Dependency_ModNameFallback" xml:space="preserve">
+    <value>A Mod</value>
+  </data>
+  <data name="Scan_Dependency_PackNoun" xml:space="preserve">
+    <value>Pack</value>
+  </data>
+  <data name="Scan_Dependency_RequiredPack_Description" xml:space="preserve">
+    <value>**{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing packs. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+*If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Missing Packs; {2} = Player's Distribution Platform</comment>
+  </data>
+  <data name="Common_Steam" xml:space="preserve">
+    <value>Steam</value>
+  </data>
+  <data name="Common_TheEAApp" xml:space="preserve">
+    <value>The EA app</value>
+  </data>
+  <data name="Scan_Dependency_RequiredPack_HelpMePurchase_Label" xml:space="preserve">
+    <value>Help me Purchase {0}</value>
+    <comment>{0} = Missing Pack Code</comment>
+  </data>
+  <data name="Scan_Common_ShowMeTheFile_Label" xml:space="preserve">
+    <value>Show me the file for {0}</value>
+    <comment>{0} = The Mod Name</comment>
+  </data>
+  <data name="Scan_Common_ShowMeTheFile_Label_ModNameFallback" xml:space="preserve">
+    <value>the mod</value>
+  </data>
+  <data name="Scan_CacheStaleness_Clear_Caption" xml:space="preserve">
+    <value>The Cache is Clear</value>
+  </data>
+  <data name="Scan_Dependency_RequiredPack_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Dependency_IncompatiblePack_Caption" xml:space="preserve">
+    <value>{0} is Incompatible with {1}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Quantized Packs</comment>
+  </data>
+  <data name="Scan_Dependency_IncompatiblePack_Description" xml:space="preserve">
+    <value>**{0}** is incompatible with **{1}**, purchasable downloadable content for The Sims 4 from Electronic Arts which you have installed.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Incompatible Packs</comment>
+  </data>
+  <data name="Scan_Dependency_IncompatiblePack_HelpMeDisable_Label" xml:space="preserve">
+    <value>Help me Disable or Remove Packs</value>
+  </data>
+  <data name="Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Dependency_BrokenFile_Caption" xml:space="preserve">
+    <value>A Mod Needs Another Mod Installed</value>
+  </data>
+  <data name="Scan_Dependency_FileNoun_LowerCase" xml:space="preserve">
+    <value>file</value>
+  </data>
+  <data name="Scan_Dependency_BrokenFile_Description" xml:space="preserve">
+    <value>I've found {0} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath =&gt; $"`{filePath}`").Humanize()}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱</value>
+    <comment>This text is in Markdown. {0} = The Number of Files; {1} = Enumeration of Mod Files</comment>
+  </data>
+  <data name="Scan_Dependency_ReinstallFile_Caption" xml:space="preserve">
+    <value>A Mod Needs Another Mod Installed</value>
+  </data>
+  <data name="Scan_Dependency_ReinstallFile_Description" xml:space="preserve">
+    <value>I've found {0} in your Mods folder ((1}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨</value>
+    <comment>This text is in Markdown. {0} = The Number of Files; {1} = Enumeration of Mod Files</comment>
+  </data>
+  <data name="Scan_Dependency_ReinstallFile_Download_Label" xml:space="preserve">
+    <value>Go Re-download {0}</value>
+    <comment>{0} = The Name of the Missing Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ReinstallMod_Caption" xml:space="preserve">
+    <value>{0} Needs Another Mod Installed</value>
+    <comment>{0} = The Name of the Dependent Mod</comment>
+  </data>
+  <data name="Scan_Common_ByLine" xml:space="preserve">
+    <value> by {0}</value>
+    <comment>This string is preceded by whitespace because it will be suffixed immediately to the end of the name of a mod. {0} = Enumeration of Mod Creator Names</comment>
+  </data>
+  <data name="Scan_Dependency_ReinstallMod_Description" xml:space="preserve">
+    <value>You have **{0}**{1} installed ({2}), which requires that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* **{0}** needs you to return to its web site to see if you can find this other mod it's missing. 😓</value>
+    <comment>This text is in Markdown. {0} = The Name of the Dependent Mod; {1} = The By Line of the Dependent Mod; {2} = The Files of the Dependent Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ReinstallMod_Redownload_Label" xml:space="preserve">
+    <value>Go Re-download {0}</value>
+    <comment>{0} = The Name of the Dependent Mod</comment>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDownload_Caption" xml:space="preserve">
+    <value>A Mod Needs Another Mod Installed</value>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDownload_Description" xml:space="preserve">
+    <value>I've found {0} in your Mods folder ({1}) needing another mod installed. I'm sorry that I can't tell you what either of these mods is called, but I can assure you that this is a problem. 😭</value>
+    <comment>This text is in Markdown. {0} = The Quantized Number of Dependent Mod Files; {1} = The Enumeration of Dependent Mod Files</comment>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDownload_Download_Label" xml:space="preserve">
+    <value>Go Download the Needed Mod</value>
+  </data>
+  <data name="Scan_Dependency_ModNeedsDownload_Caption" xml:space="preserve">
+    <value>{0} Needs Another Mod Installed</value>
+    <comment>{0} = The Name of the Dependent Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ModNeedsDownload_Description" xml:space="preserve">
+    <value>You have **{0}**{1} installed ({2}), which requires that you also have another mod installed. I'm sorry that I can't tell you what that other mod is called but I can assure you of one thing... I can't find it. 🤷</value>
+    <comment>This text is in Markdown. {0} = The Name of the Dependent Mod; {1} = The By Line of the Dependent Mod; {2} = The Enumeration of the Dependent Mod's Files</comment>
+  </data>
+  <data name="Scan_Dependency_ModNeedsDownload_Download_Label" xml:space="preserve">
+    <value>Go Download the Other Mod</value>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDependency_Caption" xml:space="preserve">
+    <value>Some Mods Need {0} Installed</value>
+    <comment>{0} = The Name of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDependency_Description" xml:space="preserve">
+    <value>I've found {0} in your Mods folder ({1}) needing **{2}**{3} installed, and unfortunately... I can't find it. 🤷</value>
+    <comment>This text is in Markdown. {0} = The Number of Dependent Mod Files; {1} The Enumeration of Dependent Mod Files; {2} = The Name of the Dependency Mod; {3} = The By Line of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_FileNeedsDependency_Download_Label" xml:space="preserve">
+    <value>Go Download {0}</value>
+    <comment>{0} = The Name of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_IdenticallyNamed_Caption" xml:space="preserve">
+    <value>{0} is Missing a File</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Dependency_IdenticallyNamed_Description" xml:space="preserve">
+    <value>You have **{0}**{1} installed ({2}), and it seems one of its files specified as necessary is not in your Mods folder. 🤷</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The By Line of the Mod; {2} = The Installed Files for the Mod</comment>
+  </data>
+  <data name="Scan_Dependency_IdenticallyNamed_Download_Label" xml:space="preserve">
+    <value>Go Re-download {0}</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ModNeedsMod_Caption" xml:space="preserve">
+    <value>{0} Needs {1} Installed</value>
+    <comment>{0} = The Name of the Dependent Mod; {1} = The Name of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ModNeedsMod_Description" xml:space="preserve">
+    <value>You have **{0}**{1} installed ({2}), which requires that you also have **{3}**{4} installed, and unfortunately... I can't find it. 🤷</value>
+    <comment>This text is in Markdown. {0} = The Name of the Dependent Mod; {1} = The By Line of the Dependent Mod; {2} = The Files of the Dependent Mod; {3} = The Name of the Dependency Mod; {4} = The By Line of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ModNeedsMod_Download_Label" xml:space="preserve">
+    <value>Go Download {0}</value>
+    <comment>{0} = The Name of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_MissingMod_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Dependency_UnmetRequirement_Caption" xml:space="preserve">
+    <value>{0} has an Unmet Requirement</value>
+    <comment>{0} = The Name of the Dependency Mod</comment>
+  </data>
+  <data name="Scan_Dependency_ModNameFallback_LowerCase" xml:space="preserve">
+    <value>a mod</value>
+  </data>
+  <data name="Scan_Dependency_UnmetRequirement_Description" xml:space="preserve">
+    <value>You have **{0}**{1} installed ({2}) which has an unmet requirement which it calls "{3}". {4}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Dependency Mod; {1} = The By Line of the Dependency Mod; {2} = The Files of the Dependency Mod; {3} = Requirement Identifier; {4} = Elaboration</comment>
+  </data>
+  <data name="Scan_Dependency_UnmetRequirement_Description_CauseMissingComponent" xml:space="preserve">
+    <value>Since all your options here involve going to the same website, I'm guessing maybe you forgot to pick and install a multiple-choice package for "{0}" from the original download when setting this up.</value>
+    <comment>{0} = Requirement Identifier</comment>
+  </data>
+  <data name="Scan_Dependency_UnmetRequirement_Description_CauseAlternative" xml:space="preserve">
+    <value>But, you know, it's kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷</value>
+  </data>
+  <data name="Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
   </data>
 </root>

@@ -385,11 +385,29 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Steam.
+        /// </summary>
+        internal static string Common_Steam {
+            get {
+                return ResourceManager.GetString("Common_Steam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stop.
         /// </summary>
         internal static string Common_Stop {
             get {
                 return ResourceManager.GetString("Common_Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The EA app.
+        /// </summary>
+        internal static string Common_TheEAApp {
+            get {
+                return ResourceManager.GetString("Common_TheEAApp", resourceCulture);
             }
         }
         
@@ -1881,7 +1899,7 @@ namespace PlumbBuddy.Localization {
         ///* help players with installation problems involving it.
         ///
         ///##### Manifest Hashes Need to be Maintained
-        ///*Please do not forget to come back here and have me update your mod&apos;s manifests if you change anything*. I promise it won&apos;t take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS  [rest of string was truncated]&quot;;.
+        ///*Please remember to come back here and have me update your mod&apos;s manifests if you change anything*. I promise it won&apos;t take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Composing_Success_Text {
             get {
@@ -3433,6 +3451,520 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_Theme_Label {
             get {
                 return ResourceManager.GetString("OnboardingDialog_Theme_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Clear.
+        /// </summary>
+        internal static string Scan_CacheStaleness_Clear_Caption {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Clear_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no cache files at the moment. I mean... that&apos;s fine. The game&apos;s gonna load a little slower next time, but it&apos;s okay..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Clear_Description_Casual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Clear_Description_Casual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are currently no cache files on disk..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Clear_Description_NonCasual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Clear_Description_NonCasual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Fine.
+        /// </summary>
+        internal static string Scan_CacheStaleness_Fine_Caption {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Fine_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are cache files at the moment. They look fine to me, as cache files go. A little ordinary, but that&apos;s what you want in cache files!.
+        /// </summary>
+        internal static string Scan_CacheStaleness_Fine_Description_Casual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Fine_Description_Casual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The cache files exist on disk in a normal state..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Fine_Description_NonCasual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Fine_Description_NonCasual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Stale.
+        /// </summary>
+        internal static string Scan_CacheStaleness_Stale_Caption {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Stale_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear the cache.
+        /// </summary>
+        internal static string Scan_CacheStaleness_Stale_Clear_Label {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Stale_Clear_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uhh, these cache files might be like the kids from that Offspring song — as in &quot;not alright&quot;. We need to see to this and soon..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Stale_Description_Casual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Stale_Description_Casual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Stale_Description_NonCasual {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Stale_Description_NonCasual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Umm, not clearing the cache files when they may have old junk hanging around in them can cause weird problems. Disabling this scan will make this warning go away, but it won&apos;t protect you from those problems..
+        /// </summary>
+        internal static string Scan_CacheStaleness_Stale_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_Stale_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  by {0}.
+        /// </summary>
+        internal static string Scan_Common_ByLine {
+            get {
+                return ResourceManager.GetString("Scan_Common_ByLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me the file for {0}.
+        /// </summary>
+        internal static string Scan_Common_ShowMeTheFile_Label {
+            get {
+                return ResourceManager.GetString("Scan_Common_ShowMeTheFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to the mod.
+        /// </summary>
+        internal static string Scan_Common_ShowMeTheFile_Label_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_Common_ShowMeTheFile_Label_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable this scan?.
+        /// </summary>
+        internal static string Scan_Common_StopTellingMe_CautionCaption {
+            get {
+                return ResourceManager.GetString("Scan_Common_StopTellingMe_CautionCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop telling me.
+        /// </summary>
+        internal static string Scan_Common_StopTellingMe_Label {
+            get {
+                return ResourceManager.GetString("Scan_Common_StopTellingMe_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod Needs Another Mod Installed.
+        /// </summary>
+        internal static string Scan_Dependency_BrokenFile_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_BrokenFile_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath =&gt; $&quot;`{filePath}`&quot;).Humanize()}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name and have no idea where to even send you to download a fresh copy of either. 😱.
+        /// </summary>
+        internal static string Scan_Dependency_BrokenFile_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_BrokenFile_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some Mods Need {0} Installed.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDependency_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDependency_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({1}) needing **{2}**{3} installed, and unfortunately... I can&apos;t find it. 🤷.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDependency_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDependency_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Download {0}.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDependency_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDependency_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod Needs Another Mod Installed.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDownload_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDownload_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({1}) needing another mod installed. I&apos;m sorry that I can&apos;t tell you what either of these mods is called, but I can assure you that this is a problem. 😭.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDownload_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDownload_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Download the Needed Mod.
+        /// </summary>
+        internal static string Scan_Dependency_FileNeedsDownload_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNeedsDownload_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to file.
+        /// </summary>
+        internal static string Scan_Dependency_FileNoun_LowerCase {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_FileNoun_LowerCase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is Missing a File.
+        /// </summary>
+        internal static string Scan_Dependency_IdenticallyNamed_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IdenticallyNamed_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have **{0}**{1} installed ({2}), and it seems one of its files specified as necessary is not in your Mods folder. 🤷.
+        /// </summary>
+        internal static string Scan_Dependency_IdenticallyNamed_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IdenticallyNamed_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Re-download {0}.
+        /// </summary>
+        internal static string Scan_Dependency_IdenticallyNamed_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IdenticallyNamed_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is Incompatible with {1}.
+        /// </summary>
+        internal static string Scan_Dependency_IncompatiblePack_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IncompatiblePack_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **{0}** is incompatible with **{1}**, purchasable downloadable content for The Sims 4 from Electronic Arts which you have installed..
+        /// </summary>
+        internal static string Scan_Dependency_IncompatiblePack_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IncompatiblePack_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help me Disable or Remove Packs.
+        /// </summary>
+        internal static string Scan_Dependency_IncompatiblePack_HelpMeDisable_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IncompatiblePack_HelpMeDisable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        /// </summary>
+        internal static string Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        /// </summary>
+        internal static string Scan_Dependency_MissingMod_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_MissingMod_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod.
+        /// </summary>
+        internal static string Scan_Dependency_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a mod.
+        /// </summary>
+        internal static string Scan_Dependency_ModNameFallback_LowerCase {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNameFallback_LowerCase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Needs Another Mod Installed.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsDownload_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsDownload_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have **{0}**{1} installed ({2}), which requires that you also have another mod installed. I&apos;m sorry that I can&apos;t tell you what that other mod is called but I can assure you of one thing... I can&apos;t find it. 🤷.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsDownload_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsDownload_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Download the Other Mod.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsDownload_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsDownload_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Needs {1} Installed.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsMod_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsMod_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have **{0}**{1} installed ({2}), which requires that you also have **{3}**{4} installed, and unfortunately... I can&apos;t find it. 🤷.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsMod_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsMod_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Download {0}.
+        /// </summary>
+        internal static string Scan_Dependency_ModNeedsMod_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ModNeedsMod_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pack.
+        /// </summary>
+        internal static string Scan_Dependency_PackNoun {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_PackNoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod Needs Another Mod Installed.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallFile_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallFile_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ((1}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallFile_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallFile_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Re-download {0}.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallFile_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallFile_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Needs Another Mod Installed.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallMod_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallMod_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have **{0}**{1} installed ({2}), which requires that you also have another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name, but I *do know* **{0}** needs you to return to its web site to see if you can find this other mod it&apos;s missing. 😓.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallMod_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallMod_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Re-download {0}.
+        /// </summary>
+        internal static string Scan_Dependency_ReinstallMod_Redownload_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_ReinstallMod_Redownload_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is Missing {1}.
+        /// </summary>
+        internal static string Scan_Dependency_RequiredPack_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_RequiredPack_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing packs. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+        ///*If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*..
+        /// </summary>
+        internal static string Scan_Dependency_RequiredPack_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_RequiredPack_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help me Purchase {0}.
+        /// </summary>
+        internal static string Scan_Dependency_RequiredPack_HelpMePurchase_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_RequiredPack_HelpMePurchase_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        /// </summary>
+        internal static string Scan_Dependency_RequiredPack_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_RequiredPack_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has an Unmet Requirement.
+        /// </summary>
+        internal static string Scan_Dependency_UnmetRequirement_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have **{0}**{1} installed ({2}) which has an unmet requirement which it calls &quot;{3}&quot;. {4}.
+        /// </summary>
+        internal static string Scan_Dependency_UnmetRequirement_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to But, you know, it&apos;s kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷.
+        /// </summary>
+        internal static string Scan_Dependency_UnmetRequirement_Description_CauseAlternative {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_Description_CauseAlternative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Since all your options here involve going to the same website, I&apos;m guessing maybe you forgot to pick and install a multiple-choice package for &quot;{0}&quot; from the original download when setting this up..
+        /// </summary>
+        internal static string Scan_Dependency_UnmetRequirement_Description_CauseMissingComponent {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_Description_CauseMissingComponent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        /// </summary>
+        internal static string Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText", resourceCulture);
             }
         }
         

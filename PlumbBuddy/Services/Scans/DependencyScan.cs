@@ -81,12 +81,8 @@ public sealed class DependencyScan :
         {
             yield return new ScanIssue
             {
-                Caption = $"{(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "A Mod" : modWithMissingPacks.Name)} is Missing {"Pack".ToQuantity(modWithMissingPacks.MissingPackCodes.Count, formatProvider: new CultureInfo("en-US"))}",
-                Description =
-                    $"""
-                    **{(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "A Mod" : modWithMissingPacks.Name)}** requires **{modWithMissingPacks.MissingPackCodes.Humanize()}**, which {(modWithMissingPacks.MissingPackCodes.Count is 1 ? "is" : "are")} purchasable downloadable content for The Sims 4 from Electronic Arts which you do not have installed.<br />
-                    *If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {(smartSimObserver.IsSteamInstallation ? "Steam" : "the EA app")}*.
-                    """,
+                Caption = string.Format(AppText.Scan_Dependency_RequiredPack_Caption, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithMissingPacks.MissingPackCodes.Count)),
+                Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, modWithMissingPacks.MissingPackCodes.Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -95,14 +91,14 @@ public sealed class DependencyScan :
                 [
                     ..modWithMissingPacks.MissingPackCodes.Select(missingPackCode => new ScanIssueResolution
                     {
-                        Label = $"Help me Purchase {missingPackCode}",
+                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, missingPackCode),
                         Icon = MaterialDesignIcons.Normal.Store,
                         Color = MudBlazor.Color.Primary,
                         Data = $"purchase-{missingPackCode}"
                     }),
                     ..modWithMissingPacks.FilePaths.Select(filePath => new ScanIssueResolution
                     {
-                        Label = $"Show me the file for {(string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? "the mod" : modWithMissingPacks.Name)}",
+                        Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback : modWithMissingPacks.Name),
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
@@ -110,9 +106,9 @@ public sealed class DependencyScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_Dependency_RequiredPack_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]
@@ -129,11 +125,8 @@ public sealed class DependencyScan :
             .AsAsyncEnumerable())
             yield return new ScanIssue
             {
-                Caption = $"{(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "A Mod" : modWithIncompatiblePacks.Name)} is Incompatible with {"Installed Pack".ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count, formatProvider: new CultureInfo("en-US"))}",
-                Description =
-                    $"""
-                    **{(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "A Mod" : modWithIncompatiblePacks.Name)}** is incompatible with **{modWithIncompatiblePacks.IncompatiblePackCodes.Humanize()}**, which {(modWithIncompatiblePacks.IncompatiblePackCodes.Count is 1 ? "is" : "are")} purchasable downloadable content for The Sims 4 from Electronic Arts which you have installed.
-                    """,
+                Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
+                Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, modWithIncompatiblePacks.IncompatiblePackCodes.Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonalTag,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -142,7 +135,7 @@ public sealed class DependencyScan :
                 [
                     new()
                     {
-                        Label = $"Help me Disable or Remove Packs",
+                        Label = AppText.Scan_Dependency_IncompatiblePack_HelpMeDisable_Label,
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = $"remove-packs",
@@ -150,7 +143,7 @@ public sealed class DependencyScan :
                     },
                     ..modWithIncompatiblePacks.FilePaths.Select(filePath => new ScanIssueResolution
                     {
-                        Label = $"Show me the file for {(string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? "the mod" : modWithIncompatiblePacks.Name)}",
+                        Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback : modWithIncompatiblePacks.Name),
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
@@ -158,9 +151,9 @@ public sealed class DependencyScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]
@@ -218,7 +211,7 @@ public sealed class DependencyScan :
             list.Add(modWithMissingDependencyMod);
         }
         static string getByLine(IReadOnlyList<string> creators) =>
-            creators.Any() ? $" by {creators.Humanize()}" : string.Empty;
+            creators.Any() ? string.Format(AppText.Scan_Common_ByLine, creators.Humanize()) : string.Empty;
         static (string caption, string description, ScanIssueResolution? resolution) getResolution(ModWithMissingDependencyMod modWithMissingDependencyMod)
         {
             var resolutionType = MissingDependencyModResolutionType.Normal;
@@ -236,21 +229,17 @@ public sealed class DependencyScan :
             {
                 MissingDependencyModResolutionType.BrokenFile =>
                 (
-                    $"A Mod Needs Another Mod Installed",
-                    $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱
-                    """,
+                    AppText.Scan_Dependency_BrokenFile_Caption,
+                    string.Format(AppText.Scan_Dependency_BrokenFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     null
                 ),
                 MissingDependencyModResolutionType.ReinstallFile =>
                 (
-                    $"A Mod Needs Another Mod Installed",
-                    $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨
-                    """,
+                    AppText.Scan_Dependency_ReinstallFile_Caption,
+                    string.Format(AppText.Scan_Dependency_ReinstallFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
-                        Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
+                        Label = string.Format(AppText.Scan_Dependency_ReinstallFile_Download_Label, modWithMissingDependencyMod.Name),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependent",
@@ -259,13 +248,11 @@ public sealed class DependencyScan :
                 ),
                 MissingDependencyModResolutionType.ReinstallMod =>
                 (
-                    $"{modWithMissingDependencyMod.Name} Needs Another Mod Installed",
-                    $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}), which requires that you also have another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* **{modWithMissingDependencyMod.Name}** needs you to return to its web site to see if you can find this other mod it's missing. 😓
-                    """,
+                    string.Format(AppText.Scan_Dependency_ReinstallMod_Caption, modWithMissingDependencyMod.Name),
+                    string.Format(AppText.Scan_Dependency_ReinstallMod_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
-                        Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
+                        Label = string.Format(AppText.Scan_Dependency_ReinstallMod_Redownload_Label, modWithMissingDependencyMod.Name),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependent",
@@ -274,13 +261,11 @@ public sealed class DependencyScan :
                 ),
                 MissingDependencyModResolutionType.FileNeedsDownload =>
                 (
-                    "A Mod Needs Another Mod Installed",
-                    $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have another mod installed. I'm sorry that I can't tell you what either of these mods is called, but I can assure you that this is a problem. 😭
-                    """,
+                    AppText.Scan_Dependency_FileNeedsDownload_Caption,
+                    string.Format(AppText.Scan_Dependency_FileNeedsDownload_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
-                        Label = $"Go Download the Needed Mod",
+                        Label = AppText.Scan_Dependency_FileNeedsDownload_Download_Label,
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
@@ -289,13 +274,11 @@ public sealed class DependencyScan :
                 ),
                 MissingDependencyModResolutionType.ModNeedsDownload =>
                 (
-                    $"{modWithMissingDependencyMod.Name} Needs Another Mod Installed",
-                    $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}), which requires that you also have another mod installed. I'm sorry that I can't tell you what that other mod is called but I can assure you of one thing... I can't find it. 🤷
-                    """,
+                    string.Format(AppText.Scan_Dependency_ModNeedsDownload_Caption, modWithMissingDependencyMod.Name),
+                    string.Format(AppText.Scan_Dependency_ModNeedsDownload_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
-                        Label = $"Go Download the Other Mod",
+                        Label = AppText.Scan_Dependency_ModNeedsDownload_Download_Label,
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
@@ -304,13 +287,11 @@ public sealed class DependencyScan :
                 ),
                 MissingDependencyModResolutionType.FileNeedsDependency =>
                 (
-                    $"Some Mods Need {modWithMissingDependencyMod.DependencyName} Installed",
-                    $"""
-                    I've found {"file".ToQuantity(modWithMissingDependencyMod.FilePaths.Count, formatProvider: new CultureInfo("en-US"))} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which require{(modWithMissingDependencyMod.FilePaths.Count is 1 ? "s" : string.Empty)} that you also have **{modWithMissingDependencyMod.DependencyName}**{getByLine(modWithMissingDependencyMod.DependencyCreators)} installed, and unfortunately... I can't find it. 🤷
-                    """,
+                    string.Format(AppText.Scan_Dependency_FileNeedsDependency_Caption, modWithMissingDependencyMod.DependencyName),
+                    string.Format(AppText.Scan_Dependency_FileNeedsDependency_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
                     new()
                     {
-                        Label = $"Go Download {modWithMissingDependencyMod.DependencyName}",
+                        Label = string.Format(AppText.Scan_Dependency_FileNeedsDependency_Download_Label),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
@@ -319,13 +300,11 @@ public sealed class DependencyScan :
                 ),
                 MissingDependencyModResolutionType type when type.HasFlag(MissingDependencyModResolutionType.IdenticallyNamed) =>
                 (
-                    $"{modWithMissingDependencyMod.Name} is Missing a File",
-                    $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}), and it seems one of its files specified as necessary is not in your Mods folder. 🤷
-                    """,
+                    string.Format(AppText.Scan_Dependency_IdenticallyNamed_Caption, modWithMissingDependencyMod.Name),
+                    string.Format(AppText.Scan_Dependency_IdenticallyNamed_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
-                        Label = $"Go Re-download {modWithMissingDependencyMod.Name}",
+                        Label = string.Format(AppText.Scan_Dependency_IdenticallyNamed_Download_Label, modWithMissingDependencyMod.Name),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadComponent",
@@ -334,13 +313,11 @@ public sealed class DependencyScan :
                 ),
                 _ =>
                 (
-                    $"{modWithMissingDependencyMod.Name} Needs {modWithMissingDependencyMod.DependencyName} Installed",
-                    $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}), which requires that you also have **{modWithMissingDependencyMod.DependencyName}**{getByLine(modWithMissingDependencyMod.DependencyCreators)} installed, and unfortunately... I can't find it. 🤷
-                    """,
+                    string.Format(AppText.Scan_Dependency_ModNeedsMod_Caption, modWithMissingDependencyMod.Name, modWithMissingDependencyMod.DependencyName),
+                    string.Format(AppText.Scan_Dependency_ModNeedsMod_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
                     new()
                     {
-                        Label = $"Go Download {modWithMissingDependencyMod.DependencyName}",
+                        Label = string.Format(AppText.Scan_Dependency_ModNeedsMod_Download_Label, modWithMissingDependencyMod.DependencyName),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",
@@ -372,7 +349,7 @@ public sealed class DependencyScan :
                         (
                             modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
                             {
-                                Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
+                                Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, modWithMissingDependencyMod.Name ?? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback),
                                 Icon = MaterialDesignIcons.Normal.FileFind,
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
@@ -381,9 +358,9 @@ public sealed class DependencyScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_Dependency_MissingMod_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]
@@ -398,11 +375,8 @@ public sealed class DependencyScan :
                 .ToImmutableArray();
             yield return new()
             {
-                Caption = $"{modWithMissingDependencyMod.Name} has an Unmet Requirement",
-                Description =
-                    $"""
-                    You have **{modWithMissingDependencyMod.Name}**{getByLine(modWithMissingDependencyMod.Creators)} installed ({modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}) which has an unmet requirement which it calls "{modWithMissingDependencyMod.RequirementIdentifier}". {(downloadResolutions.Length is 1 ? $"Since all your options here involve going to the same website, I'm guessing maybe you forgot to pick and install a multiple-choice package for \"{modWithMissingDependencyMod.RequirementIdentifier}\" from the original download when setting this up." : "But, you know, it's kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷")}
-                    """,
+                Caption = string.Format(AppText.Scan_Dependency_UnmetRequirement_Caption, modWithMissingDependencyMod.Name ?? AppText.Scan_Dependency_ModNameFallback),
+                Description = string.Format(AppText.Scan_Dependency_UnmetRequirement_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.RequirementIdentifier, downloadResolutions.Length is 1 ? string.Format(AppText.Scan_Dependency_UnmetRequirement_Description_CauseMissingComponent, modWithMissingDependencyMod.RequirementIdentifier) : AppText.Scan_Dependency_UnmetRequirement_Description_CauseAlternative),
                 Icon = MaterialDesignIcons.Outline.PuzzleRemove,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -414,7 +388,7 @@ public sealed class DependencyScan :
                         (
                             modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
                             {
-                                Label = $"Show me the file for {modWithMissingDependencyMod.Name ?? "the mod"}",
+                                Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, modWithMissingDependencyMod.Name ?? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback),
                                 Icon = MaterialDesignIcons.Normal.FileFind,
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
@@ -423,9 +397,9 @@ public sealed class DependencyScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]

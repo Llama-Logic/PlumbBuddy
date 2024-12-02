@@ -39,10 +39,10 @@ public sealed class CacheStalenessScan :
             SmartSimCacheStatus.Stale => new()
             {
                 Icon = MaterialDesignIcons.Normal.FridgeAlert,
-                Caption = "The Cache is Stale",
+                Caption = AppText.Scan_CacheStaleness_Stale_Caption,
                 Description = settings.Type is UserType.Casual
-                    ? "Uhh, these cache files might be like the kids from that Offspring song — as in \"not alright\". We need to see to this and soon."
-                    : "The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed.",
+                    ? AppText.Scan_CacheStaleness_Stale_Description_Casual
+                    : AppText.Scan_CacheStaleness_Stale_Description_NonCasual,
                 Origin = this,
                 Data = "stale",
                 Type = ScanIssueType.Sick,
@@ -51,16 +51,16 @@ public sealed class CacheStalenessScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Eraser,
-                        Label = "Clear the cache",
+                        Label = AppText.Scan_CacheStaleness_Stale_Clear_Label,
                         Color = MudBlazor.Color.Primary,
                         Data = "clear"
                     },
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "Umm, not clearing the cache files when they may have old junk hanging around in them can cause weird problems. Disabling this scan will make this warning go away, but it won't protect you from those problems.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_CacheStaleness_Stale_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]
@@ -68,19 +68,19 @@ public sealed class CacheStalenessScan :
             SmartSimCacheStatus.Normal => new()
             {
                 Icon = MaterialDesignIcons.Normal.Fridge,
-                Caption = "The Cache is Fine",
+                Caption = AppText.Scan_CacheStaleness_Fine_Caption,
                 Description = settings.Type is UserType.Casual
-                    ? "There are cache files at the moment. They look fine to me, as cache files go. A little ordinary, but that's what you want in cache files!"
-                    : "The cache files exist on disk in a normal state.",
+                    ? AppText.Scan_CacheStaleness_Fine_Description_Casual
+                    : AppText.Scan_CacheStaleness_Fine_Description_NonCasual,
                 Origin = this
             },
             _ => new()
             {
                 Icon = MaterialDesignIcons.Outline.Fridge,
-                Caption = "The Cache is Clear",
+                Caption = AppText.Scan_CacheStaleness_Clear_Caption,
                 Description = settings.Type is UserType.Casual
-                    ? "There are no cache files at the moment. I mean... that's fine. The game's gonna load a little slower next time, but it's okay."
-                    : "There are currently no cache files on disk.",
+                    ? AppText.Scan_CacheStaleness_Clear_Description_Casual
+                    : AppText.Scan_CacheStaleness_Clear_Description_NonCasual,
                 Origin = this
             }
         });
