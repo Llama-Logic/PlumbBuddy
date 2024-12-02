@@ -3896,7 +3896,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to **{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing packs. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+        ///   Looks up a localized string similar to **{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
         ///*If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*..
         /// </summary>
         internal static string Scan_Dependency_RequiredPack_Description {

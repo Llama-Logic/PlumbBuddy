@@ -1642,7 +1642,7 @@ Move available features on the left over to the required list on the right. What
     <value>Pack</value>
   </data>
   <data name="Scan_Dependency_RequiredPack_Description" xml:space="preserve">
-    <value>**{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing packs. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+    <value>**{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
 *If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*.</value>
     <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Missing Packs; {2} = Player's Distribution Platform</comment>
   </data>
