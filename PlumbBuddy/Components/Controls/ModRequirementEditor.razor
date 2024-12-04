@@ -16,7 +16,7 @@
         <MudTextField T="string" Value="@Url" ValueChanged="HandleUrlChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Download" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_Label)]" HelperText="@StringLocalizer[nameof(AppText.ModRequirementEditor_DownloadPageUrl_HelperText)]" />
     </MudItem>
     <MudItem xs="12">
-        <ChipSetField @ref="@(ModRequirement!.HashesField)" Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="@StringLocalizer[nameof(AppText.ModRequirementEditor_Hashes_Label)]" HelperText="@StringLocalizer[nameof(AppText.ModRequirementEditor_Hashes_Label)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_SubsumedHashes_Placeholder)]" />
+        <ChipSetField @ref="@(ModRequirement!.HashesField)" Values="@Hashes" ValuesChanged="HandleHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.FileMultiple" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="@StringLocalizer[nameof(AppText.ModRequirementEditor_Hashes_Label)]" HelperText="@StringLocalizer[nameof(AppText.ModRequirementEditor_Hashes_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_SubsumedHashes_Placeholder)]" />
     </MudItem>
     <MudItem>
         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">

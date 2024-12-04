@@ -2985,6 +2985,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don&apos;t worry about the required mod&apos;s requirements. It&apos;s responsible for those considerations..
+        /// </summary>
+        internal static string ModRequirementEditor_Hashes_HelperText {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Hashes_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hashes.
         /// </summary>
         internal static string ModRequirementEditor_Hashes_Label {

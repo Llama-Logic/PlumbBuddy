@@ -1804,4 +1804,7 @@ Move available features on the left over to the required list on the right. What
   <data name="Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText" xml:space="preserve">
     <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
   </data>
+  <data name="ModRequirementEditor_Hashes_HelperText" xml:space="preserve">
+    <value>There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don't worry about the required mod's requirements. It's responsible for those considerations.</value>
+  </data>
 </root>
