@@ -53,7 +53,7 @@ public sealed class ErrorLogScan :
                             .ToImmutableArray();
                         if (foundErrorLogs.Length is 1)
                         {
-                            if (await dialogService.ShowCautionDialogAsync("Are you sure?", "This file may contain important information about a problem with your Sims 4 setup, and it might even contain something critical which would help others, too. Once I delete it, all that potential will be gone forever.").ConfigureAwait(false))
+                            if (await dialogService.ShowCautionDialogAsync(AppText.Scan_ErrorLog_Delete_Caution_Caption, AppText.Scan_ErrorLog_Delete_Caution_Text).ConfigureAwait(false))
                                 file.Delete();
                             return;
                         }
@@ -89,10 +89,7 @@ public sealed class ErrorLogScan :
                 }
                 else
                 {
-                    await dialogService.ShowInfoDialogAsync("Whoops, that file has run off...",
-                        """
-                        I'm sorry, but it's just not there any more. I'm gonna go ahead and refresh this screen for you.
-                        """);
+                    await dialogService.ShowInfoDialogAsync(AppText.Scan_ErrorLog_Delete_Failure_Caption, AppText.Scan_ErrorLog_Delete_Failure_Text);
                     using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                     await pbDbContext.FilesOfInterest
                         .Where(foi => foi.Path == userDataRelativePath)
@@ -114,21 +111,12 @@ public sealed class ErrorLogScan :
             yield return new()
             {
                 Caption = settings.Type is UserType.Casual
-                    ? "The Game or one of Your Mods is Calling for Help!"
-                    : "A File Likely Containing an Error Has Been Found",
+                    ? AppText.Scan_ErrorLog_FileFound_Caption_Casual
+                    : AppText.Scan_ErrorLog_FileFound_Caption_NonCasual,
                 Description =
                     settings.Type is UserType.Casual
-                    ?
-                    $"""
-                    I found this file in your User Data folder and its presence is a signal that something went wrong.<br />
-                    `{errorFilePath}`<br />
-                    We could take the file to informed people in Discord who can help us figure out what it means and if there's anything we should do about it.
-                    """
-                    :
-                    $"""
-                    A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:<br />
-                    `{errorFilePath}`
-                    """,
+                    ? string.Format(AppText.Scan_ErrorLog_FileFound_Text_Casual, errorFilePath)
+                    : string.Format(AppText.Scan_ErrorLog_FileFound_Text_NonCasual, errorFilePath),
                 Icon = MaterialDesignIcons.Normal.FileDocumentAlert,
                 Type = ScanIssueType.Uncomfortable,
                 Origin = this,
@@ -137,20 +125,20 @@ public sealed class ErrorLogScan :
                 [
                     new()
                     {
-                        Label = "Select a Sims 4 Support Venue",
+                        Label = AppText.Scan_ErrorLog_FileFound_SelectSupportDiscord_Label,
                         Icon = MaterialDesignIcons.Normal.FaceAgent,
                         Color = MudBlazor.Color.Primary,
                         Data = "discord"
                     },
                     new()
                     {
-                        Label = "Show me this file",
+                        Label = AppText.Scan_ErrorLog_FileFound_ShowFile_Label,
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Data = "show"
                     },
                     new()
                     {
-                        Label = "Delete error files",
+                        Label = AppText.Scan_ErrorLog_FileFound_Delete_Label,
                         Icon = MaterialDesignIcons.Normal.FileCancel,
                         Color = MudBlazor.Color.Warning,
                         Data = "delete"
@@ -158,9 +146,9 @@ public sealed class ErrorLogScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "If you're experiencing trepidation about confronting this file or speaking with strangers about it, I understand. But if you tell me to choose a Discord, I'll be here with you the whole time to help you through the process. Disabling this scan will just hide the problem; it won't solve it.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_ErrorLog_FileFound_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]

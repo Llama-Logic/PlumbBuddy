@@ -3978,6 +3978,117 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure?.
+        /// </summary>
+        internal static string Scan_ErrorLog_Delete_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_Delete_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This file may contain important information about a problem with your Sims 4 setup, and it might even contain something critical which would help others, too. Once I delete it, all that potential will be gone forever..
+        /// </summary>
+        internal static string Scan_ErrorLog_Delete_Caution_Text {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_Delete_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, that file has run off....
+        /// </summary>
+        internal static string Scan_ErrorLog_Delete_Failure_Caption {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_Delete_Failure_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m sorry, but it&apos;s just not there any more. I&apos;m gonna go ahead and refresh this screen for you..
+        /// </summary>
+        internal static string Scan_ErrorLog_Delete_Failure_Text {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_Delete_Failure_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Game or one of Your Mods is Calling for Help!.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_Caption_Casual {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_Caption_Casual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A File Likely Containing an Error Has Been Found.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_Caption_NonCasual {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_Caption_NonCasual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete error files.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_Delete_Label {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_Delete_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a Sims 4 Support Venue.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_SelectSupportDiscord_Label {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_SelectSupportDiscord_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me this file.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_ShowFile_Label {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_ShowFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you&apos;re experiencing trepidation about confronting this file or speaking with strangers about it, I understand. But if you tell me to choose a Discord, I&apos;ll be here with you the whole time to help you through the process. Disabling this scan will just hide the problem; it won&apos;t solve it..
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this file in your User Data folder and its presence is a signal that something went wrong.&lt;br /&gt;
+        ///`{0}`&lt;br /&gt;
+        ///We could take the file to informed people in Discord who can help us figure out what it means and if there&apos;s anything we should do about it..
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_Text_Casual {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_Text_Casual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:&lt;br /&gt;
+        ///`{0}`.
+        /// </summary>
+        internal static string Scan_ErrorLog_FileFound_Text_NonCasual {
+            get {
+                return ResourceManager.GetString("Scan_ErrorLog_FileFound_Text_NonCasual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {
