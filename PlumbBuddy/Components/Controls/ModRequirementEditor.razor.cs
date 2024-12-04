@@ -71,9 +71,17 @@ partial class ModRequirementEditor
             <iframe src="https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc" width="270" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc">via GIPHY</a></p>
             """);
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
-        if (!hash.IsDefaultOrEmpty)
-            HandleHashesChanged(Hashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
+        var manifest = await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService);
+        if (manifest is not null && !manifest.Hash.IsDefaultOrEmpty)
+            HandleHashesChanged
+            (
+                Hashes
+                    .Except(manifest.SubsumedHashes.Select(sh => sh.ToHexString()), StringComparer.OrdinalIgnoreCase)
+                    .Concat([manifest.Hash.ToHexString()])
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+                    .AsReadOnly()
+            );
     }
 
     async Task HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync()
