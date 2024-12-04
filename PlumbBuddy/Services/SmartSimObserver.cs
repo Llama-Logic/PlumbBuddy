@@ -365,9 +365,16 @@ public partial class SmartSimObserver :
 
     void ConnectToInstallationDirectory()
     {
-        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-        if (fileSystemWatcherConnectionLockHeld is null)
+        try
+        {
+            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+            if (fileSystemWatcherConnectionLockHeld is null)
+                return;
+        }
+        catch (OperationCanceledException)
+        {
             return;
+        }
         if (settings.Onboarded && Directory.Exists(settings.InstallationFolderPath))
         {
             if (installationDirectoryWatcher is null)
@@ -417,9 +424,16 @@ public partial class SmartSimObserver :
 
     async void ConnectToUserDataDirectory()
     {
-        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-        if (fileSystemWatcherConnectionLockHeld is null)
+        try
+        {
+            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+            if (fileSystemWatcherConnectionLockHeld is null)
+                return;
+        }
+        catch (OperationCanceledException)
+        {
             return;
+        }
         if (settings.Onboarded && Directory.Exists(settings.UserDataFolderPath))
         {
             ResampleGameOptions();
@@ -495,9 +509,16 @@ public partial class SmartSimObserver :
 
     void DisconnectFromInstallationDirectoryWatcher()
     {
-        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-        if (fileSystemWatcherConnectionLockHeld is null)
+        try
+        {
+            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+            if (fileSystemWatcherConnectionLockHeld is null)
+                return;
+        }
+        catch (OperationCanceledException)
+        {
             return;
+        }
         if (installationDirectoryWatcher is not null)
         {
             installationDirectoryWatcher.Changed -= InstallationDirectoryFileSystemEntryChangedHandler;
@@ -522,9 +543,16 @@ public partial class SmartSimObserver :
 
     void DisconnectFromUserDataDirectoryWatcher()
     {
-        using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-        if (fileSystemWatcherConnectionLockHeld is null)
+        try
+        {
+            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+            if (fileSystemWatcherConnectionLockHeld is null)
+                return;
+        }
+        catch (OperationCanceledException)
+        {
             return;
+        }
         if (userDataDirectoryWatcher is not null)
         {
             var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
