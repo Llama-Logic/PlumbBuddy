@@ -11,6 +11,8 @@
         <MudMarkdown Value="@Text" />
     </DialogContent>
     <DialogActions>
-        @MarkupLocalizer[nameof(AppText.Common_Ok)]
+        <MudButton OnClick="OkOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Ok)]
+        </MudButton>
     </DialogActions>
 </MudDialog>
