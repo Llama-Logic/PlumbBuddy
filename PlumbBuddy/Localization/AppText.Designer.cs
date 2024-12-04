@@ -4089,6 +4089,61 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple Mods Claim &quot;{0}&quot;.
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you&apos;ve installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.&lt;br /&gt;
+        ///*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_Description {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to * **{0}**{1} located at {2}.
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_Description_ListItem {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_Description_ListItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some Mod.
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_Description_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_Description_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me the {0} file.
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_ShowFile_Label {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_ShowFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when you have conflicting mods installed and... you&apos;re just disinterested? Disable this scan all you want... won&apos;t fix the problem, though..
+        /// </summary>
+        internal static string Scan_Exclusivity_ConflicingClaim_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Exclusivity_ConflicingClaim_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {

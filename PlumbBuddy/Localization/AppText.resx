@@ -1850,4 +1850,30 @@ We could take the file to informed people in Discord who can help us figure out 
   <data name="Scan_ErrorLog_FileFound_StopTellingMe_CautionText" xml:space="preserve">
     <value>If you're experiencing trepidation about confronting this file or speaking with strangers about it, I understand. But if you tell me to choose a Discord, I'll be here with you the whole time to help you through the process. Disabling this scan will just hide the problem; it won't solve it.</value>
   </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_Caption" xml:space="preserve">
+    <value>Multiple Mods Claim "{0}"</value>
+    <comment>{0} = The Name of the Exclusivity</comment>
+  </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_Description" xml:space="preserve">
+    <value>"{0}" is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you've installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.&lt;br /&gt;
+*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This **usually** means that they will be okay with just one of them, so you don't have to worry about an impossible choice in their case.*&lt;br /&gt;
+Here are the mod files each claiming "{0}":
+{1}</value>
+    <comment>{0} = The Name of the Exclusivity; {1} = The List of Mods Claiming the Exclusivity</comment>
+  </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_Description_ListItem" xml:space="preserve">
+    <value>* **{0}**{1} located at {2}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The By Line of the Mod; {2} = The List of the Mod's Files</comment>
+  </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_Description_ModNameFallback" xml:space="preserve">
+    <value>Some Mod</value>
+  </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_ShowFile_Label" xml:space="preserve">
+    <value>Show me the {0} file</value>
+    <comment>{0} = The Orindalized Number of the File</comment>
+  </data>
+  <data name="Scan_Exclusivity_ConflicingClaim_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when you have conflicting mods installed and... you're just disinterested? Disable this scan all you want... won't fix the problem, though.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
 </root>
