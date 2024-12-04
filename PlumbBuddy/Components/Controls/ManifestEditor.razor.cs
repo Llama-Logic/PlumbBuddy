@@ -660,12 +660,13 @@ partial class ManifestEditor
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
+        var activeIndex = stepper?.GetActiveIndex();
         if (targetIndex is 0)
         {
-            await CancelAtUserRequestAsync();
+            if (activeIndex is not 0)
+                await CancelAtUserRequestAsync();
             return true;
         }
-        var activeIndex = stepper?.GetActiveIndex();
         if (activeIndex is 2)
         {
             UrlProhibitiveGuidanceOpen = false;
