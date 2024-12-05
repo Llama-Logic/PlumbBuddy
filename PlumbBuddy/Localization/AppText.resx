@@ -1870,10 +1870,57 @@ Here are the mod files each claiming "{0}":
   </data>
   <data name="Scan_Exclusivity_ConflicingClaim_ShowFile_Label" xml:space="preserve">
     <value>Show me the {0} file</value>
-    <comment>{0} = The Orindalized Number of the File</comment>
+    <comment>{0} = The Ordinalized Number of the File</comment>
   </data>
   <data name="Scan_Exclusivity_ConflicingClaim_StopTellingMe_CautionText" xml:space="preserve">
     <value>So the creators went to all this trouble to embed metadata so that I can tell you when you have conflicting mods installed and... you're just disinterested? Disable this scan all you want... won't fix the problem, though.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Caption" xml:space="preserve">
+    <value>I Found Multiple Versions of {0} Installed</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Caption_ModNameFallback" xml:space="preserve">
+    <value>the Same Mod</value>
+  </data>
+  <data name="Scan_MultipleModVersions_Description" xml:space="preserve">
+    <value>I don't mean to be pushy, but you need to remove all but one of these.&lt;br /&gt;&lt;br /&gt;
+{0}</value>
+    <comment>This text is in Markdown. {0} = List of Multiple Mod Versions</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Description_ListItem" xml:space="preserve">
+    <value>* **{0}**{1}{2} located at {3}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Version of the Mod; {2} = The By Line of the Mod; {3} = The Files of the Mod</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Description_ListItem_ModNameFallback" xml:space="preserve">
+    <value>Some Mod</value>
+  </data>
+  <data name="Scan_MultipleModVersions_Description_ListItem_VersionFormat" xml:space="preserve">
+    <value> ({0})</value>
+    <comment>This text is in Markdown. {0} = The Version of the Mod</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Description_ListItem_ByLineFormat" xml:space="preserve">
+    <value> by {0}</value>
+    <comment>This text is in Markdown. {0} = The List of Mod Creators</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Download_Label" xml:space="preserve">
+    <value>Go to the Download Page{0}</value>
+    <comment>{0} = Optionally, the name of the Mod</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_Download_Label_ModNameFormat" xml:space="preserve">
+    <value> for {0}</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_DownloadOneOfMultiple_Label" xml:space="preserve">
+    <value>Go to the Download Page for the {0} version</value>
+    <comment>{0} = Ordinalized Version Number</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_ShowOneOfMultiple_Label" xml:space="preserve">
+    <value>Show me the {0} file</value>
+    <comment>{0} = Ordinalized Version Number</comment>
+  </data>
+  <data name="Scan_MultipleModVersions_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing and twice *and will have problems as a result*... and you can't be bothered?</value>
     <comment>This text is in Markdown.</comment>
   </data>
 </root>

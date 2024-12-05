@@ -4144,6 +4144,115 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I Found Multiple Versions of {0} Installed.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Caption {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to the Same Mod.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Caption_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Caption_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I don&apos;t mean to be pushy, but you need to remove all but one of these.&lt;br /&gt;&lt;br /&gt;
+        ///{0}.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Description {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to * **{0}**{1}{2} located at {3}.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Description_ListItem {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Description_ListItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  by {0}.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Description_ListItem_ByLineFormat {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Description_ListItem_ByLineFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some Mod.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Description_ListItem_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Description_ListItem_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  ({0}).
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Description_ListItem_VersionFormat {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Description_ListItem_VersionFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to the Download Page{0}.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  for {0}.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_Download_Label_ModNameFormat {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_Download_Label_ModNameFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to the Download Page for the {0} version.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_DownloadOneOfMultiple_Label {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_DownloadOneOfMultiple_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me the {0} file.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_ShowOneOfMultiple_Label {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_ShowOneOfMultiple_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you&apos;ve installed the same thing and twice *and will have problems as a result*... and you can&apos;t be bothered?.
+        /// </summary>
+        internal static string Scan_MultipleModVersions_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_MultipleModVersions_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {

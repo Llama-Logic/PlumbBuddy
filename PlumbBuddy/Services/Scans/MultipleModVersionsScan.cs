@@ -55,7 +55,7 @@ public sealed class MultipleModVersionsScan :
             if (distinctUrls.Length is 1)
                 urlResolutions.Add(new()
                 {
-                    Label = $"Go to the Download Page{(distinctNames.Length is 1 ? $" for {distinctNames[0]}" : string.Empty)}",
+                    Label = string.Format(AppText.Scan_MultipleModVersions_Download_Label, distinctNames.Length is 1 ? string.Format(AppText.Scan_MultipleModVersions_Download_Label_ModNameFormat, distinctNames[0]) : string.Empty),
                     Icon = MaterialDesignIcons.Normal.Web,
                     Color = MudBlazor.Color.Primary,
                     Data = $"visit-mod-download",
@@ -66,7 +66,7 @@ public sealed class MultipleModVersionsScan :
                 (
                     duplicates.Select((duplicate, index) => new ScanIssueResolution()
                     {
-                        Label = $"Go to the Download Page for the {(index + 1).ToOrdinalWords(new CultureInfo("en-US"))} version",
+                        Label = string.Format(AppText.Scan_MultipleModVersions_DownloadOneOfMultiple_Label, (index + 1).ToOrdinalWords()),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"visit-mod-{index}",
@@ -75,12 +75,8 @@ public sealed class MultipleModVersionsScan :
                 );
             yield return new()
             {
-                Caption = $"I Found Multiple Versions of {(distinctNames.Length is 1 ? distinctNames[0] : "the Same Mod")} Installed",
-                Description =
-                    $"""
-                    I don't mean to be pushy, but you need to remove all but one of these.<br /><br />
-                    {string.Join(Environment.NewLine, duplicates.Select(mod => $"* **{mod.Name ?? "Some Mod"}**{(string.IsNullOrWhiteSpace(mod.Version) ? string.Empty : $" ({mod.Version})")}{(mod.Creators.Any() ? $" by {mod.Creators.Humanize()}" : string.Empty)} located at {mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()}"))}
-                    """,
+                Caption = string.Format(AppText.Scan_MultipleModVersions_Caption, distinctNames.Length is 1 ? distinctNames[0] : AppText.Scan_MultipleModVersions_Caption_ModNameFallback),
+                Description = string.Format(AppText.Scan_MultipleModVersions_Description, string.Join(Environment.NewLine, duplicates.Select(mod => string.Format(AppText.Scan_MultipleModVersions_Description_ListItem, mod.Name ?? AppText.Scan_MultipleModVersions_Description_ListItem_ModNameFallback, string.IsNullOrWhiteSpace(mod.Version) ? string.Empty : string.Format(AppText.Scan_MultipleModVersions_Description_ListItem_VersionFormat, mod.Version), mod.Creators.Any() ? string.Format(AppText.Scan_MultipleModVersions_Description_ListItem_ByLineFormat, mod.Creators.Humanize()) : string.Empty, mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize())))),
                 Icon = MaterialDesignIcons.Normal.TimelineAlert,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -90,7 +86,7 @@ public sealed class MultipleModVersionsScan :
                     ..urlResolutions,
                     ..duplicates.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()
                     {
-                        Label = $"Show me the {(index + 1).ToOrdinalWords(new CultureInfo("en-US"))} file",
+                        Label = string.Format(AppText.Scan_MultipleModVersions_ShowOneOfMultiple_Label, (index + 1).ToOrdinalWords()),
                         Icon = MaterialDesignIcons.Normal.FileFind,
                         Color = MudBlazor.Color.Secondary,
                         Data = $"showfile-{filePath}"
@@ -98,9 +94,9 @@ public sealed class MultipleModVersionsScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = "So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing and twice *and will have problems as a result*... and you can't be bothered?",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_MultipleModVersions_StopTellingMe_CautionText,
                         Data = "stopTellingMe"
                     }
                 ]
