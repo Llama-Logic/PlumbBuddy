@@ -65,7 +65,7 @@
                     @if (creators.Length is > 0)
                     {
                         <MudItem>
-                            <MudStack Row>
+                            <MudStack Row Spacing="0">
                                 @foreach (var creator in creators)
                                 {
                                     <MudChip T="string" Text="@creator" Icon="@MaterialDesignIcons.Normal.Account" Color="Color.Primary" />
