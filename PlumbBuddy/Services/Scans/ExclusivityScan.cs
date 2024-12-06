@@ -53,7 +53,7 @@ public class ExclusivityScan :
             yield return new()
             {
                 Caption = string.Format(AppText.Scan_Exclusivity_ConflicingClaim_Caption, exclusivity),
-                Description = string.Format(AppText.Scan_Exclusivity_ConflicingClaim_Description, string.Join(Environment.NewLine, conflictedMods.Select(mod => string.Format(AppText.Scan_Exclusivity_ConflicingClaim_Description_ListItem, mod.Name ?? AppText.Scan_Exclusivity_ConflicingClaim_Description_ModNameFallback, mod.Creators.Any() ? string.Format(AppText.Scan_Common_ByLine, mod.Creators.Humanize()) : string.Empty, mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize())))),
+                Description = string.Format(AppText.Scan_Exclusivity_ConflicingClaim_Description, exclusivity, string.Join(Environment.NewLine, conflictedMods.Select(mod => string.Format(AppText.Scan_Exclusivity_ConflicingClaim_Description_ListItem, mod.Name ?? AppText.Scan_Exclusivity_ConflicingClaim_Description_ModNameFallback, mod.Creators.Any() ? string.Format(AppText.Scan_Common_ByLine, mod.Creators.Humanize()) : string.Empty, mod.FilePaths.Select(filePath => $"`{filePath}`").Humanize())))),
                 Icon = MaterialDesignIcons.Normal.Fencing,
                 Type = ScanIssueType.Sick,
                 Origin = this,
