@@ -45,14 +45,14 @@
                     var files = selectedMod.SelectMany(t => t.files).DistinctBy(fi => fi.FullName).OrderBy(fi => fi.FullName).ToImmutableArray();
                     var dependencies = selectedMod.SelectMany(t => t.dependencies).Distinct().OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
                     var indexableDependents = selectedMod.SelectMany(t => t.dependents).Distinct().Where(mods.ContainsKey).OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
-                    <MudItem>
-                        <MudStack Row AlignItems="AlignItems.Baseline">
-                            <MudTextM3 Typo="TypoM3.Headline">@(selectedModKey.Name)</MudTextM3>
+                    <MudItem Style="text-align: center;">
+                        <MudTextM3 Typo="TypoM3.Headline">
+                            @(selectedModKey.Name)
                             @if (!string.IsNullOrWhiteSpace(version))
                             {
-                                <MudTextM3 Typo="TypoM3.Headline" Size="Size.Small">@version</MudTextM3>
+                                <small>&#x20;@version</small>
                             }
-                        </MudStack>
+                        </MudTextM3>
                     </MudItem>
                     <MudFlexBreak />
                     @if (selectedModKey.Url is { } url)
