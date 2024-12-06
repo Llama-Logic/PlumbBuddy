@@ -33,6 +33,7 @@ public sealed class MultipleModVersionsScan :
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var uniqueConflictedFilesSignatures = new HashSet<string>();
         foreach (var modFileManfiestHashId in await pbDbContext.ModFileManifestHashes
             .Where(mfmh => mfmh.ManifestsByCalculation!.Concat(mfmh.ManifestsBySubsumption!).Distinct().Sum(mfm => mfm.ModFileHash!.ModFiles!.Count()) > 1)
             .Select(mfmh => mfmh.Id)
@@ -49,6 +50,8 @@ public sealed class MultipleModVersionsScan :
                     FilePaths = mfm.ModFileHash!.ModFiles!.Select(mf => mf.Path!).ToList()
                 })
                 .ToListAsync().ConfigureAwait(false);
+            if (!uniqueConflictedFilesSignatures.Add(string.Join("|", duplicates.SelectMany(d => d.FilePaths).Distinct().Order())))
+                continue;
             var distinctNames = duplicates.Select(mod => mod.Name).Where(name => !string.IsNullOrWhiteSpace(name)).Distinct().ToImmutableArray();
             var distinctUrls = duplicates.Select(mod => mod.Url).Where(url => url is not null).Distinct().ToImmutableArray();
             var urlResolutions = new List<ScanIssueResolution>();
