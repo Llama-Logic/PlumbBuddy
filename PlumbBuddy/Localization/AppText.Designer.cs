@@ -223,6 +223,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;li&gt;&amp;bull; {0}&lt;/li&gt;.
+        /// </summary>
+        internal static string Common_BulletListItem {
+            get {
+                return ResourceManager.GetString("Common_BulletListItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string Common_Cancel {
@@ -363,6 +372,15 @@ namespace PlumbBuddy.Localization {
         internal static string Common_SetDefault {
             get {
                 return ResourceManager.GetString("Common_SetDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me.
+        /// </summary>
+        internal static string Common_ShowMe {
+            get {
+                return ResourceManager.GetString("Common_ShowMe", resourceCulture);
             }
         }
         
@@ -3572,6 +3590,16 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Boy, did that *not* work. Your computer&apos;s operating system said:&lt;br /&gt;
+        ///`{0}: {1}`.
+        /// </summary>
+        internal static string Scan_Common_Error_CannotMove {
+            get {
+                return ResourceManager.GetString("Scan_Common_Error_CannotMove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show me the file for {0}.
         /// </summary>
         internal static string Scan_Common_ShowMeTheFile_Label {
@@ -3644,31 +3672,11 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Boy, did that *not* work. Your computer&apos;s operating system said:
-        ///
-        ///`{0}: {1}`.
-        /// </summary>
-        internal static string Scan_Corrupt_MoveToDownloads_Error_CannotMove {
-            get {
-                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Error_CannotMove", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there..
         /// </summary>
         internal static string Scan_Corrupt_MoveToDownloads_Success {
             get {
                 return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Success", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show me.
-        /// </summary>
-        internal static string Scan_Corrupt_MoveToDownloads_Success_Action {
-            get {
-                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Success_Action", resourceCulture);
             }
         }
         
@@ -3709,6 +3717,15 @@ namespace PlumbBuddy.Localization {
         internal static string Scan_Corrupt_Package_NoneFound_Description {
             get {
                 return ResourceManager.GetString("Scan_Corrupt_Package_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the file done wandered off..
+        /// </summary>
+        internal static string Scan_Corrupt_ShowFile_Error_NotFound {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_ShowFile_Error_NotFound", resourceCulture);
             }
         }
         
@@ -4119,6 +4136,172 @@ namespace PlumbBuddy.Localization {
         internal static string Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText {
             get {
                 return ResourceManager.GetString("Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the file done wandered off..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Error_CannotFind {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Error_CannotFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hmm. I was unable to locate the folder this file is in... for some reason. Given that, I feel uncomfortable trying to move it..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Error_CannotFindFolder {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Error_CannotFindFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the game is currently using the Mods folder. You&apos;ll need to close the game first..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I want to move &lt;strong&gt;{0}&lt;/strong&gt; to &lt;strong&gt;{1}&lt;/strong&gt; in order for it to work properly.
+        ///That also means moving everything that&apos;s in the same folder so I don&apos;t break anything.
+        ///But, unfortunately, that would cause me to overwrite the following files or folders which already exist at the destination:
+        ///&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///&lt;ul&gt;
+        ///{2}
+        ///&lt;/ul&gt;
+        ///&lt;br /&gt;
+        ///I don&apos;t want to accidentally cause you to lose important files! You may need to sort this out for yourself. I&apos;m sorry..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I don&apos;t know how, but I sort of... ran out of folders figuring out where to move this mod. I think you&apos;re going to have to work this out on your own..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Error_WalkedBelowRoot {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Error_WalkedBelowRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You got it, Chief. The file (and any of its pals) has been safely moved to a new home closer to the root of your Mods folder where the game shouldn&apos;t have any trouble with it..
+        /// </summary>
+        internal static string Scan_Depth_MoveCloserToModsRoot_Success {
+            get {
+                return ResourceManager.GetString("Scan_Depth_MoveCloserToModsRoot_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Packages are Too Deep.
+        /// </summary>
+        internal static string Scan_Depth_Package_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Package_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any package files more than five folders deep in your Mods folder. That&apos;s good because if I did, I can assure you the game would not have..
+        /// </summary>
+        internal static string Scan_Depth_Package_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Package_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this package file too deep in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///We need to move it closer to the root of your Mods folder so the game can find it..
+        /// </summary>
+        internal static string Scan_Depth_Package_TooDeep_Description {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Package_TooDeep_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me this package.
+        /// </summary>
+        internal static string Scan_Depth_Package_TooDeep_ShowMe_Label {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Package_TooDeep_ShowMe_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod File is Too Deep: {0}.
+        /// </summary>
+        internal static string Scan_Depth_TooDeep_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Depth_TooDeep_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move it closer to the root of my Mods folder.
+        /// </summary>
+        internal static string Scan_Depth_TooDeep_MoveCloserToModsRoot_Label {
+            get {
+                return ResourceManager.GetString("Scan_Depth_TooDeep_MoveCloserToModsRoot_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I understand that this might be annoying, but the game has its limitations. And turning this scan off doesn&apos;t change that. All it will do is hide this warning..
+        /// </summary>
+        internal static string Scan_Depth_TooDeep_StopTellingMe_CautionCaption {
+            get {
+                return ResourceManager.GetString("Scan_Depth_TooDeep_StopTellingMe_CautionCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Script Archives are Too Deep.
+        /// </summary>
+        internal static string Scan_Depth_Ts4Script_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Ts4Script_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any script archives more than one folder deep in your Mods folder. That&apos;s good because if I did, I can assure you the game would not have..
+        /// </summary>
+        internal static string Scan_Depth_Ts4Script_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Ts4Script_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this script archive too deep in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///We need to move it closer to the root of your Mods folder so the game can find it..
+        /// </summary>
+        internal static string Scan_Depth_Ts4Script_TooDeep_Description {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Ts4Script_TooDeep_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me this script archive.
+        /// </summary>
+        internal static string Scan_Depth_Ts4Script_TooDeep_ShowMe_Label {
+            get {
+                return ResourceManager.GetString("Scan_Depth_Ts4Script_TooDeep_ShowMe_Label", resourceCulture);
             }
         }
         

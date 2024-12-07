@@ -1923,9 +1923,8 @@ Here are the mod files each claiming "{0}":
     <value>So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing and twice *and will have problems as a result*... and you can't be bothered?</value>
     <comment>This text is in Markdown.</comment>
   </data>
-  <data name="Scan_Corrupt_MoveToDownloads_Error_CannotMove" xml:space="preserve">
-    <value>Boy, did that *not* work. Your computer's operating system said:
-
+  <data name="Scan_Common_Error_CannotMove" xml:space="preserve">
+    <value>Boy, did that *not* work. Your computer's operating system said:&lt;br /&gt;
 `{0}: {1}`</value>
     <comment>{0} = The Type of Error; {1} = The Error Message</comment>
   </data>
@@ -1935,9 +1934,6 @@ Here are the mod files each claiming "{0}":
   <data name="Scan_Corrupt_MoveToDownloads_Success" xml:space="preserve">
     <value>Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there.</value>
     <comment>{0} = The File's Name</comment>
-  </data>
-  <data name="Scan_Corrupt_MoveToDownloads_Success_Action" xml:space="preserve">
-    <value>Show me</value>
   </data>
   <data name="Scan_Corrupt_Found_Caption" xml:space="preserve">
     <value>A Mod File is Corrupt: {0}</value>
@@ -1984,5 +1980,84 @@ Thankfully, its also at an invalid depth for the game to find it. Still though, 
   </data>
   <data name="Scan_Corrupt_Ts4Script_NoneFound_Description" xml:space="preserve">
     <value>I didn't find any corrupt script archives in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning" xml:space="preserve">
+    <value>I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first.</value>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Error_CannotFind" xml:space="preserve">
+    <value>I couldn't do that because the file done wandered off.</value>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Error_CannotFindFolder" xml:space="preserve">
+    <value>Hmm. I was unable to locate the folder this file is in... for some reason. Given that, I feel uncomfortable trying to move it.</value>
+  </data>
+  <data name="Common_ShowMe" xml:space="preserve">
+    <value>Show me</value>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Error_WalkedBelowRoot" xml:space="preserve">
+    <value>I don't know how, but I sort of... ran out of folders figuring out where to move this mod. I think you're going to have to work this out on your own.</value>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard" xml:space="preserve">
+    <value>I want to move &lt;strong&gt;{0}&lt;/strong&gt; to &lt;strong&gt;{1}&lt;/strong&gt; in order for it to work properly.
+That also means moving everything that's in the same folder so I don't break anything.
+But, unfortunately, that would cause me to overwrite the following files or folders which already exist at the destination:
+&lt;br /&gt;
+&lt;br /&gt;
+&lt;ul&gt;
+{2}
+&lt;/ul&gt;
+&lt;br /&gt;
+I don't want to accidentally cause you to lose important files! You may need to sort this out for yourself. I'm sorry.</value>
+    <comment>{0} = The Name of the Mod File; {1} = The Path to the Target Directory; {2} = The List of Pre-Existing Files</comment>
+  </data>
+  <data name="Common_BulletListItem" xml:space="preserve">
+    <value>&lt;li&gt;&amp;bull; {0}&lt;/li&gt;</value>
+    <comment>{0} = The Text of the Bullet List Item</comment>
+  </data>
+  <data name="Scan_Depth_MoveCloserToModsRoot_Success" xml:space="preserve">
+    <value>You got it, Chief. The file (and any of its pals) has been safely moved to a new home closer to the root of your Mods folder where the game shouldn't have any trouble with it.</value>
+  </data>
+  <data name="Scan_Corrupt_ShowFile_Error_NotFound" xml:space="preserve">
+    <value>I couldn't do that because the file done wandered off.</value>
+  </data>
+  <data name="Scan_Depth_Package_NoneFound_Caption" xml:space="preserve">
+    <value>No Packages are Too Deep</value>
+  </data>
+  <data name="Scan_Depth_Package_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any package files more than five folders deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
+  </data>
+  <data name="Scan_Depth_Ts4Script_NoneFound_Caption" xml:space="preserve">
+    <value>No Script Archives are Too Deep</value>
+  </data>
+  <data name="Scan_Depth_Ts4Script_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any script archives more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
+  </data>
+  <data name="Scan_Depth_TooDeep_Caption" xml:space="preserve">
+    <value>A Mod File is Too Deep: {0}</value>
+    <comment>{0} = The Name of the Mod File</comment>
+  </data>
+  <data name="Scan_Depth_Package_TooDeep_Description" xml:space="preserve">
+    <value>I found this package file too deep in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+We need to move it closer to the root of your Mods folder so the game can find it.</value>
+    <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
+  </data>
+  <data name="Scan_Depth_Ts4Script_TooDeep_Description" xml:space="preserve">
+    <value>I found this script archive too deep in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+We need to move it closer to the root of your Mods folder so the game can find it.</value>
+    <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
+  </data>
+  <data name="Scan_Depth_Package_TooDeep_ShowMe_Label" xml:space="preserve">
+    <value>Show me this package</value>
+  </data>
+  <data name="Scan_Depth_Ts4Script_TooDeep_ShowMe_Label" xml:space="preserve">
+    <value>Show me this script archive</value>
+  </data>
+  <data name="Scan_Depth_TooDeep_MoveCloserToModsRoot_Label" xml:space="preserve">
+    <value>Move it closer to the root of my Mods folder</value>
+  </data>
+  <data name="Scan_Depth_TooDeep_StopTellingMe_CautionCaption" xml:space="preserve">
+    <value>I understand that this might be annoying, but the game has its limitations. And turning this scan off doesn't change that. All it will do is hide this warning.</value>
+    <comment>This text is in Markdown.</comment>
   </data>
 </root>

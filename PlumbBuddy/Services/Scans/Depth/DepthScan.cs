@@ -40,21 +40,21 @@ public abstract class DepthScan :
             {
                 if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FolderLock);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FolderLock);
                     return Task.CompletedTask;
                 }
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_CannotFind), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
                     return Task.CompletedTask;
                 }
                 if (file.Directory is not { } originDirectory)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("Hmm. I was unable to locate the folder this file is in... for some reason. Given that, I feel uncomfortable trying to move it."), Severity.Error, options =>
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_CannotFindFolder), Severity.Error, options =>
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderQuestion;
-                        options.Action = "Show me";
+                        options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 30000;
                         options.Onclick = _ =>
                         {
@@ -70,10 +70,10 @@ public abstract class DepthScan :
                     targetDirectory = nextTargetDirectory;
                 if (targetDirectory is null)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I don't know how, but I sort of... ran out of folders figuring out where to move this mod. I think you're going to have to work this out on your own."), Severity.Error, options =>
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_WalkedBelowRoot), Severity.Error, options =>
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderSwap;
-                        options.Action = "Show me";
+                        options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 30000;
                         options.Onclick = _ =>
                         {
@@ -95,22 +95,10 @@ public abstract class DepthScan :
                 var conflicts = originEntriesByConflicted[true].ToImmutableArray();
                 if (conflicts.Any())
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(
-                        $"""
-                        I want to move <strong>{file.Name}</strong> to <strong>{targetDirectory.FullName}</strong> in order for it to work properly.
-                        That also means moving everything that's in the same folder so I don't break anything.
-                        But, unfortunately, that would cause me to overwrite the following files or folders which already exist at the destination:
-                        <br />
-                        <br />
-                        <ul>
-                        {string.Join(Environment.NewLine, conflicts.Select(conflict => $"<li>&bull; {conflict.Name}</li>"))}
-                        </ul>
-                        <br />
-                        I don't want to accidentally cause you to lose important files! You may need to sort this out for yourself. I'm sorry.
-                        """), Severity.Error, options =>
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard, file.Name, targetDirectory.FullName, string.Join(Environment.NewLine, conflicts.Select(conflict => string.Format(AppText.Common_BulletListItem, conflict.Name))))), Severity.Error, options =>
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderAlert;
-                        options.Action = "Show me";
+                        options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 60000;
                         options.Onclick = _ =>
                         {
@@ -137,19 +125,14 @@ public abstract class DepthScan :
                 }
                 catch (Exception moveEx)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(
-                        $"""
-                        Boy, did that *not* work. Your computer's operating system said:
-
-                        `{moveEx.GetType().Name}: {moveEx.Message}`
-                        """), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
                     return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(Path.Combine(targetDirectory.FullName, file.Name));
-                superSnacks.OfferRefreshments(new MarkupString($"You got it, Chief. The file (and any of its pals) has been safely moved to a new home closer to the root of your Mods folder where the game shouldn't have any trouble with it."), Severity.Success, options =>
+                superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Success), Severity.Success, options =>
                 {
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
-                    options.Action = "Show me";
+                    options.Action = AppText.Common_ShowMe;
                     options.VisibleStateDuration = 30000;
                     options.Onclick = _ =>
                     {
@@ -164,7 +147,7 @@ public abstract class DepthScan :
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
                     return Task.CompletedTask;
                 }
                 platformFunctions.ViewFile(file);

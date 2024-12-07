@@ -48,25 +48,20 @@ public abstract class CorruptScan :
                 var dupeCount = 1;
                 while (File.Exists(prospectiveTargetPath))
                     prospectiveTargetPath = Path.Combine(downloads, $"{file.Name[..^file.Extension.Length]} {++dupeCount}{file.Extension}");
-                Exception? moveEx = null;
                 try
                 {
                     file.MoveTo(prospectiveTargetPath);
                 }
-                catch (Exception ex)
+                catch (Exception moveEx)
                 {
-                    moveEx = ex;
-                }
-                if (moveEx is not null)
-                {
-                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Corrupt_MoveToDownloads_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
                     return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(prospectiveTargetPath);
                 superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Corrupt_MoveToDownloads_Success, newFile.Name)), Severity.Success, options =>
                 {
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
-                    options.Action = AppText.Scan_Corrupt_MoveToDownloads_Success_Action;
+                    options.Action = AppText.Common_ShowMe;
                     options.VisibleStateDuration = 30000;
                     options.Onclick = _ =>
                     {
