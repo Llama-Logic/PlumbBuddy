@@ -687,11 +687,12 @@ public partial class SmartSimObserver :
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IModsDirectoryCataloger.State)
-            && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+        if (e.PropertyName == nameof(IModsDirectoryCataloger.State))
         {
-            FreshenGlobalManifest(force: true);
-            Scan();
+            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging)
+                FreshenGlobalManifest(force: true);
+            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging or ModsDirectoryCatalogerState.Idle)
+                Scan();
         }
     }
 
@@ -996,7 +997,7 @@ public partial class SmartSimObserver :
         {
             using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
             enqueuedScanningTaskLockPotentiallyHeld.Dispose();
-            if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle)
+            if (modsDirectoryCataloger.State is not (ModsDirectoryCatalogerState.Cataloging or ModsDirectoryCatalogerState.Idle))
                 return;
             IsScanning = true;
             var scanIssues = new ConcurrentBag<ScanIssue>();

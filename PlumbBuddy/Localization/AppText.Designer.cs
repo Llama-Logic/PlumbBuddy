@@ -709,20 +709,20 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Analyzing Topography.
+        ///   Looks up a localized string similar to Analyzing Topology.
         /// </summary>
-        internal static string HUD_AnalyzingTopography_Tip_Caption {
+        internal static string HUD_AnalyzingTopology_Tip_Caption {
             get {
-                return ResourceManager.GetString("HUD_AnalyzingTopography_Tip_Caption", resourceCulture);
+                return ResourceManager.GetString("HUD_AnalyzingTopology_Tip_Caption", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to I&apos;m taking a closer look at your package load order and reviewing how your mods are interacting with each other to see if I need to warn you about anything. 😏.
         /// </summary>
-        internal static string HUD_AnalyzingTopography_Tip_Description {
+        internal static string HUD_AnalyzingTopology_Tip_Description {
             get {
-                return ResourceManager.GetString("HUD_AnalyzingTopography_Tip_Description", resourceCulture);
+                return ResourceManager.GetString("HUD_AnalyzingTopology_Tip_Description", resourceCulture);
             }
         }
         
@@ -3478,6 +3478,15 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_Theme_Label {
             get {
                 return ResourceManager.GetString("OnboardingDialog_Theme_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache is Being Examined.
+        /// </summary>
+        internal static string Scan_CacheStaleness_AwaitingAnalysis_Caption {
+            get {
+                return ResourceManager.GetString("Scan_CacheStaleness_AwaitingAnalysis_Caption", resourceCulture);
             }
         }
         

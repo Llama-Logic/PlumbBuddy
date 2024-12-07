@@ -252,22 +252,22 @@
         </MudTooltip>
     }
 }
-@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopography)
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology)
 {
     <MudTooltip Arrow="true" Color="Color.Secondary">
         <ChildContent>
             <MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
-                <ChildContent>@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopography_Tip_Caption)]</ChildContent>
+                <ChildContent>@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Caption)]</ChildContent>
             </MudChip>
         </ChildContent>
         <TooltipContent>
             <MudStack Row="true">
                 <MudIcon Icon="@MaterialDesignIcons.Normal.SelectCompare" />
-                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopography_Tip_Caption)]</MudTextM3>
+                <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Caption)]</MudTextM3>
             </MudStack>
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                @MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopography_Tip_Description)]
+                @MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Description)]
             </MudTextM3>
         </TooltipContent>
     </MudTooltip>

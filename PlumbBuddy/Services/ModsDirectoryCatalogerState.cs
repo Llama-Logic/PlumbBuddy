@@ -7,5 +7,5 @@ public enum ModsDirectoryCatalogerState
     Composing,
     Debouncing,
     Cataloging,
-    AnalyzingTopography
+    AnalyzingTopology
 }

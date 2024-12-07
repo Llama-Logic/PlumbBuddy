@@ -6,7 +6,7 @@
 @inject IStringLocalizer<AppText> StringLocalizer
 
 <MudGrid Justify="Justify.Center" Class="scan-issues-container">
-    @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+    @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
     {
         foreach (var scanIssue in SmartSimObserver.ScanIssues)
         {
