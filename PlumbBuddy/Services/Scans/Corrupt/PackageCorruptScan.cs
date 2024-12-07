@@ -13,13 +13,8 @@ public sealed class PackageCorruptScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
-            Caption = $"A Mod File is Corrupt: {file.Name}",
-            Description =
-                $"""
-                I found this corrupt package file in your Mods folder, specifically at this path:
-                `{modFile.Path}`<br />
-                Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.
-                """,
+            Caption = string.Format(AppText.Scan_Corrupt_Found_Caption, file.Name),
+            Description = string.Format(AppText.Scan_Corrupt_Package_Found_Description, modFile.Path),
             Origin = this,
             Type = ScanIssueType.Dead,
             Data = modFile.Path,
@@ -28,16 +23,16 @@ public sealed class PackageCorruptScan :
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.FolderMove,
-                    Label = "Move it to the Downloads folder",
+                    Label = AppText.Scan_Corrupt_Found_Move_Label,
                     Color = MudBlazor.Color.Primary,
                     Data = "moveToDownloads"
                 },
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.Cancel,
-                    Label = "Stop telling me",
-                    CautionCaption = "Disable this scan?",
-                    CautionText = "I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn't change that. If you don't believe me, just trying launching your game right now. You're in for a rude surprise.",
+                    Label = AppText.Scan_Common_StopTellingMe_Label,
+                    CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                    CautionText = AppText.Scan_Corrupt_Found_StopTellingMe_CautionText,
                     Data = "stopTellingMe"
                 }
             ]
@@ -47,8 +42,8 @@ public sealed class PackageCorruptScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedCheck,
-            Caption = "No Packages are Corrupt",
-            Description = "I didn't find any corrupt package files in your Mods folder. That's good because if I did, the game would crash if it found them.",
+            Caption = AppText.Scan_Corrupt_Package_NoneFound_Caption,
+            Description = AppText.Scan_Corrupt_Package_NoneFound_Description,
             Origin = this,
             Type = ScanIssueType.Healthy
         };
@@ -57,13 +52,8 @@ public sealed class PackageCorruptScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
-            Caption = $"A Mod File is Corrupt: {file.Name}",
-            Description =
-                $"""
-                I found this corrupt package file in your Mods folder, specifically at this path:
-                `{modFile.Path}`<br />
-                Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.
-                """,
+            Caption = string.Format(AppText.Scan_Corrupt_Found_Caption, file.Name),
+            Description = string.Format(AppText.Scan_Corrupt_Package_FoundOutOfRange_Description, modFile.Path),
             Origin = this,
             Type = ScanIssueType.Uncomfortable,
             Data = modFile.Path,
@@ -72,16 +62,16 @@ public sealed class PackageCorruptScan :
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.FolderMove,
-                    Label = "Move it to the Downloads folder",
+                    Label = AppText.Scan_Corrupt_Found_Move_Label,
                     Color = MudBlazor.Color.Primary,
                     Data = "moveToDownloads"
                 },
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.Cancel,
-                    Label = "Stop telling me",
-                    CautionCaption = "Disable this scan?",
-                    CautionText = "I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn't change that. All it will do is hide this warning so that you can get a very nasty surprise from the game later.",
+                    Label = AppText.Scan_Common_StopTellingMe_Label,
+                    CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                    CautionText = AppText.Scan_Corrupt_Found_StopTellingMe_CautionText,
                     Data = "stopTellingMe"
                 }
             ]

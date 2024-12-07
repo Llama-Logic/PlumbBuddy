@@ -40,7 +40,7 @@ public abstract class CorruptScan :
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", looseArchiveRelativePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the file done wandered off."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_MoveToDownloads_Error_CannotFind), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
                     return Task.CompletedTask;
                 }
                 var downloads = settings.DownloadsFolderPath;
@@ -59,19 +59,14 @@ public abstract class CorruptScan :
                 }
                 if (moveEx is not null)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(
-                        $"""
-                        Boy, did that *not* work. Your computer's operating system said:
-
-                        `{moveEx.GetType().Name}: {moveEx.Message}`
-                        """), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Corrupt_MoveToDownloads_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
                     return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(prospectiveTargetPath);
-                superSnacks.OfferRefreshments(new MarkupString($"Okay, the file has been safely moved to its new home in your Downloads folder and is called <strong>{newFile.Name}</strong> there."), Severity.Success, options =>
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Corrupt_MoveToDownloads_Success, newFile.Name)), Severity.Success, options =>
                 {
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
-                    options.Action = "Show me";
+                    options.Action = AppText.Scan_Corrupt_MoveToDownloads_Success_Action;
                     options.VisibleStateDuration = 30000;
                     options.Onclick = _ =>
                     {
