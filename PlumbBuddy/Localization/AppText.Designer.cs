@@ -3608,6 +3608,151 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A Mod File is Corrupt: {0}.
+        /// </summary>
+        internal static string Scan_Corrupt_Found_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Found_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move it to the Downloads folder.
+        /// </summary>
+        internal static string Scan_Corrupt_Found_Move_Label {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Found_Move_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn&apos;t change that. If you don&apos;t believe me, just trying launching your game right now. You&apos;re in for a rude surprise..
+        /// </summary>
+        internal static string Scan_Corrupt_Found_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Found_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the file done wandered off..
+        /// </summary>
+        internal static string Scan_Corrupt_MoveToDownloads_Error_CannotFind {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Error_CannotFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boy, did that *not* work. Your computer&apos;s operating system said:
+        ///
+        ///`{0}: {1}`.
+        /// </summary>
+        internal static string Scan_Corrupt_MoveToDownloads_Error_CannotMove {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Error_CannotMove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there..
+        /// </summary>
+        internal static string Scan_Corrupt_MoveToDownloads_Success {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me.
+        /// </summary>
+        internal static string Scan_Corrupt_MoveToDownloads_Success_Action {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_MoveToDownloads_Success_Action", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this corrupt package file in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///Your game is not going to be able to start with this file here. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
+        /// </summary>
+        internal static string Scan_Corrupt_Package_Found_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Package_Found_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this corrupt package file in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///Thankfully, its also at an invalid depth for the game to find it. Still though, it&apos;s a time bomb waiting to go off. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
+        /// </summary>
+        internal static string Scan_Corrupt_Package_FoundOutOfRange_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Package_FoundOutOfRange_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Packages are Corrupt.
+        /// </summary>
+        internal static string Scan_Corrupt_Package_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Package_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any corrupt package files in your Mods folder. That&apos;s good because if I did, the game would crash if it found them..
+        /// </summary>
+        internal static string Scan_Corrupt_Package_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Package_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this corrupt script archive in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///Your game is not going to be able to start with this file here. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
+        /// </summary>
+        internal static string Scan_Corrupt_Ts4Script_Found_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Ts4Script_Found_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this corrupt script archive in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///Thankfully, its also at an invalid depth for the game to find it. Still though, it&apos;s a time bomb waiting to go off. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
+        /// </summary>
+        internal static string Scan_Corrupt_Ts4Script_FoundOutOfRange_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Ts4Script_FoundOutOfRange_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Script Archives are Corrupt.
+        /// </summary>
+        internal static string Scan_Corrupt_Ts4Script_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Ts4Script_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any corrupt script archives in your Mods folder. That&apos;s good because if I did, the game would crash if it found them..
+        /// </summary>
+        internal static string Scan_Corrupt_Ts4Script_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_Corrupt_Ts4Script_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A Mod Needs Another Mod Installed.
         /// </summary>
         internal static string Scan_Dependency_BrokenFile_Caption {

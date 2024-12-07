@@ -1923,4 +1923,66 @@ Here are the mod files each claiming "{0}":
     <value>So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing and twice *and will have problems as a result*... and you can't be bothered?</value>
     <comment>This text is in Markdown.</comment>
   </data>
+  <data name="Scan_Corrupt_MoveToDownloads_Error_CannotMove" xml:space="preserve">
+    <value>Boy, did that *not* work. Your computer's operating system said:
+
+`{0}: {1}`</value>
+    <comment>{0} = The Type of Error; {1} = The Error Message</comment>
+  </data>
+  <data name="Scan_Corrupt_MoveToDownloads_Error_CannotFind" xml:space="preserve">
+    <value>I couldn't do that because the file done wandered off.</value>
+  </data>
+  <data name="Scan_Corrupt_MoveToDownloads_Success" xml:space="preserve">
+    <value>Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there.</value>
+    <comment>{0} = The File's Name</comment>
+  </data>
+  <data name="Scan_Corrupt_MoveToDownloads_Success_Action" xml:space="preserve">
+    <value>Show me</value>
+  </data>
+  <data name="Scan_Corrupt_Found_Caption" xml:space="preserve">
+    <value>A Mod File is Corrupt: {0}</value>
+    <comment>{0} = The File's Name</comment>
+  </data>
+  <data name="Scan_Corrupt_Package_Found_Description" xml:space="preserve">
+    <value>I found this corrupt package file in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
+    <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
+  </data>
+  <data name="Scan_Corrupt_Found_Move_Label" xml:space="preserve">
+    <value>Move it to the Downloads folder</value>
+  </data>
+  <data name="Scan_Corrupt_Found_StopTellingMe_CautionText" xml:space="preserve">
+    <value>I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn't change that. If you don't believe me, just trying launching your game right now. You're in for a rude surprise.</value>
+  </data>
+  <data name="Scan_Corrupt_Package_NoneFound_Caption" xml:space="preserve">
+    <value>No Packages are Corrupt</value>
+  </data>
+  <data name="Scan_Corrupt_Package_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any corrupt package files in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
+  </data>
+  <data name="Scan_Corrupt_Package_FoundOutOfRange_Description" xml:space="preserve">
+    <value>I found this corrupt package file in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
+    <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
+  </data>
+  <data name="Scan_Corrupt_Ts4Script_Found_Description" xml:space="preserve">
+    <value>I found this corrupt script archive in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
+    <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
+  </data>
+  <data name="Scan_Corrupt_Ts4Script_FoundOutOfRange_Description" xml:space="preserve">
+    <value>I found this corrupt script archive in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
+    <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
+  </data>
+  <data name="Scan_Corrupt_Ts4Script_NoneFound_Caption" xml:space="preserve">
+    <value>No Script Archives are Corrupt</value>
+  </data>
+  <data name="Scan_Corrupt_Ts4Script_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any corrupt script archives in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
+  </data>
 </root>
