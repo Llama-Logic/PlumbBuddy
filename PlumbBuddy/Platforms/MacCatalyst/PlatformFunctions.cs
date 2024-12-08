@@ -37,6 +37,10 @@ partial class PlatformFunctions :
 
     #endregion
 
+    static readonly PropertyChangedEventArgs progressMaximumChangedEventArgs = new(nameof(ProgressMaximum));
+    static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
+    static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
+
     public PlatformFunctions()
     {
         userNotificationCenter = UNUserNotificationCenter.Current;
@@ -44,6 +48,9 @@ partial class PlatformFunctions :
     }
 
     DateTimeOffset? lastGameProcessScan;
+    int progressMaximum;
+    AppProgressState progressState;
+    int progressValue;
     bool userNotificationsAllowed;
     readonly UNUserNotificationCenter userNotificationCenter;
 
@@ -72,6 +79,56 @@ partial class PlatformFunctions :
         GetIconCacheDotDbPattern(),
         GetThumbsDotDbPattern()
     ];
+
+    public int ProgressMaximum
+    {
+        get => progressMaximum;
+        set
+        {
+            var inDomainValue = Math.Max(0, value);
+            if (progressMaximum == inDomainValue)
+                return;
+            ProgressValue = Math.Min(progressValue, inDomainValue);
+            progressMaximum = inDomainValue;
+            OnPropertyChanged(progressMaximumChangedEventArgs);
+            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+        }
+    }
+
+    public AppProgressState ProgressState
+    {
+        get => progressState;
+        set
+        {
+            if (progressState == value)
+                return;
+            if (value.HasFlag(AppProgressState.Indeterminate))
+            {
+                ProgressValue = 0;
+                ProgressMaximum = 1;
+            }
+            progressState = value;
+            OnPropertyChanged(progressStateChangedEventArgs);
+            TaskbarManager.Instance.SetProgressState((TaskbarProgressBarState)progressState);
+        }
+    }
+
+    public int ProgressValue
+    {
+        get => progressValue;
+        set
+        {
+            var inDomainValue = Math.Max(0, value);
+            if (progressValue == inDomainValue)
+                return;
+            ProgressMaximum = Math.Max(progressMaximum, inDomainValue);
+            progressValue = inDomainValue;
+            OnPropertyChanged(progressValueChangedEventArgs);
+            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public async Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
@@ -107,6 +164,12 @@ partial class PlatformFunctions :
         if (userNotificationsAllowed)
             userNotificationCenter.Delegate = new NotificationCenterDelegate();
     }
+
+    void OnPropertyChanged(PropertyChangedEventArgs e) =>
+        PropertyChanged?.Invoke(this, e);
+
+    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     public async Task<bool> SendLocalNotificationAsync(string caption, string text)
     {

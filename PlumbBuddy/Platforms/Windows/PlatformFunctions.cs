@@ -1,3 +1,4 @@
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Windows.UI.Notifications;
 
 namespace PlumbBuddy.Platforms.Windows;
@@ -34,6 +35,10 @@ partial class PlatformFunctions :
 
     #endregion
 
+    static readonly PropertyChangedEventArgs progressMaximumChangedEventArgs = new(nameof(ProgressMaximum));
+    static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
+    static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
+
     public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
@@ -47,6 +52,9 @@ partial class PlatformFunctions :
     readonly BadgeUpdater badgeUpdater;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<PlatformFunctions> logger;
+    int progressMaximum;
+    AppProgressState progressState;
+    int progressValue;
     readonly ToastNotifier toastNotifier;
 
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
@@ -75,6 +83,56 @@ partial class PlatformFunctions :
         GetDotLocalizedPattern()
     ];
 
+    public int ProgressMaximum
+    {
+        get => progressMaximum;
+        set
+        {
+            var inDomainValue = Math.Max(0, value);
+            if (progressMaximum == inDomainValue)
+                return;
+            ProgressValue = Math.Min(progressValue, inDomainValue);
+            progressMaximum = inDomainValue;
+            OnPropertyChanged(progressMaximumChangedEventArgs);
+            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+        }
+    }
+
+    public AppProgressState ProgressState
+    {
+        get => progressState;
+        set
+        {
+            if (progressState == value)
+                return;
+            if (value.HasFlag(AppProgressState.Indeterminate))
+            {
+                ProgressValue = 0;
+                ProgressMaximum = 1;
+            }
+            progressState = value;
+            OnPropertyChanged(progressStateChangedEventArgs);
+            TaskbarManager.Instance.SetProgressState((TaskbarProgressBarState)progressState);
+        }
+    }
+
+    public int ProgressValue
+    {
+        get => progressValue;
+        set
+        {
+            var inDomainValue = Math.Max(0, value);
+            if (progressValue == inDomainValue)
+                return;
+            ProgressMaximum = Math.Max(progressMaximum, inDomainValue);
+            progressValue = inDomainValue;
+            OnPropertyChanged(progressValueChangedEventArgs);
+            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
         ArgumentNullException.ThrowIfNull(installationDirectory);
@@ -89,6 +147,12 @@ partial class PlatformFunctions :
 
     void HandleToastActivated(ToastNotification toastNotification, object args) =>
         lifetimeScope.Resolve<IAppLifecycleManager>().ShowWindow();
+
+    void OnPropertyChanged(PropertyChangedEventArgs e) =>
+        PropertyChanged?.Invoke(this, e);
+
+    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     public Task<bool> SendLocalNotificationAsync(string caption, string text)
     {

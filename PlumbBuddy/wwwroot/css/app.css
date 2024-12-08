@@ -42,6 +42,32 @@ article:last-child > * {
     font-family: var(--mud-typography-body1-family);
 }
 
+.full-window-semiotic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+    .full-window-semiotic img {
+        width: min(75vw, 75vh);
+        height: min(75vw, 75vh);
+    }
+
+    .full-window-semiotic svg {
+        width: min(100vw, 100vh);
+        height: min(100vw, 100vh);
+    }
+
+    .full-window-semiotic .mud-progress-circular, .full-window-semiotic .mud-progress-circular svg {
+        width: min(83vw, 83vh);
+        height: min(83vw, 83vh);
+    }
+
 div.mud-input-control.no-material-variant .mud-input-outlined-border {
     display: none;
 }

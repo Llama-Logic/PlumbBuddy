@@ -446,6 +446,7 @@ public class ModsDirectoryCataloger :
                 }
             }
             State = ModsDirectoryCatalogerState.Cataloging;
+            platformFunctions.ProgressState = AppProgressState.Indeterminate;
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             while (nomNom.TryDequeue(out var path))
             {
@@ -462,6 +463,8 @@ public class ModsDirectoryCataloger :
                     var filesToCatalog = modsDirectoryFiles.Length;
                     ProgressValue = 0;
                     ProgressMax = filesToCatalog;
+                    platformFunctions.ProgressState = AppProgressState.Normal;
+                    platformFunctions.ProgressMaximum = progressMax!.Value;
                     var preservedModFilePaths = new ConcurrentBag<string>();
                     var preservedFileOfInterestPaths = new ConcurrentBag<string>();
                     using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
@@ -475,6 +478,7 @@ public class ModsDirectoryCataloger :
                                 await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
                                 var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
                                 ProgressValue = newFilesCataloged;
+                                platformFunctions.ProgressValue = progressValue;
                                 if (newFilesCataloged % estimateBackwardSample is 0)
                                 {
                                     timeAtCataloged.TryAdd(newFilesCataloged, DateTimeOffset.Now);
@@ -519,8 +523,9 @@ public class ModsDirectoryCataloger :
             }
             EstimatedStateTimeRemaining = null;
             await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
-            State = ModsDirectoryCatalogerState.AnalyzingTopography;
+            State = ModsDirectoryCatalogerState.AnalyzingTopology;
             ProgressMax = null;
+            platformFunctions.ProgressState = AppProgressState.Indeterminate;
             var resourceWasRemovedOrReplaced = false;
             var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
             var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
@@ -560,23 +565,26 @@ public class ModsDirectoryCataloger :
             ).ConfigureAwait(false);
             if (latestTopologySnapshot is not null)
             {
-                resourceWasRemovedOrReplaced = (await pbDbContext.Database.SqlQueryRaw<int>
-                (
-                    $"""
-                    SELECT COUNT(*)
-                    FROM (
-                        SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
-                        EXCEPT
-                        SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
-                    )
-                    """
-                ).ToListAsync().ConfigureAwait(false))[0] > 0;
+                resourceWasRemovedOrReplaced =
+                    (await pbDbContext.Database.SqlQueryRaw<int>
+                    (
+                        $"""
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
+                            EXCEPT
+                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
+                        )
+                        """
+                    ).ToListAsync().ConfigureAwait(false))[0] > 0;
                 await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
             }
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection
             if (resourceWasRemovedOrReplaced && settings.CacheStatus is SmartSimCacheStatus.Normal)
                 settings.CacheStatus = SmartSimCacheStatus.Stale;
             State = ModsDirectoryCatalogerState.Idle;
+            platformFunctions.ProgressState = AppProgressState.None;
+            platformFunctions.ProgressMaximum = 0;
             busyManualResetEvent.Reset();
             idleManualResetEvent.Set();
         }

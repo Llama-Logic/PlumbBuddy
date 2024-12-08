@@ -1,6 +1,7 @@
 namespace PlumbBuddy.Services;
 
-public interface IAppLifecycleManager
+public interface IAppLifecycleManager :
+    INotifyPropertyChanged
 {
     /// <summary>
     /// Gets whether to hide the main window at launch

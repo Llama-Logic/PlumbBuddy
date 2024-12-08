@@ -26,6 +26,7 @@ class AppLifecycleManager :
         Dispose(false);
 
     AppWindow? appWindow;
+    bool isVisible;
     bool isWindowActive;
     bool preventCasualClosing = true;
     readonly AsyncManualResetEvent? startupTaskTrap;
@@ -33,23 +34,36 @@ class AppLifecycleManager :
 
     public bool HideMainWindowAtLaunch { get; }
 
-    public bool IsVisible =>
-        appWindow is { } nonNullAppWindow
-        && nonNullAppWindow.IsVisible;
+    public bool IsVisible
+    {
+        get => isVisible;
+        set
+        {
+            if (isVisible == value)
+                return;
+            isVisible = value;
+            OnPropertyChanged(nameof(IsVisible));
+        }
+    }
 
     public bool PreventCasualClosing
     {
         get => preventCasualClosing;
         set
         {
+            if (preventCasualClosing == value)
+                return;
             preventCasualClosing = value;
             if (!preventCasualClosing)
                 SaveWindowPlacement();
+            OnPropertyChanged(nameof(PreventCasualClosing));
         }
     }
 
     public Task UiReleaseSignal =>
         startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Dispose()
     {
@@ -75,6 +89,12 @@ class AppLifecycleManager :
         ? value
         : defaultValue;
 
+    void HandleAppWindowChanged(AppWindow sender, AppWindowChangedEventArgs e) =>
+        IsVisible =
+            sender.IsVisible
+            && xamlWindow is not null
+            && !PInvoke.IsIconic(new HWND(WindowNative.GetWindowHandle(xamlWindow)));
+
     void HandleAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs e)
     {
         if (isWindowActive && PreventCasualClosing)
@@ -91,6 +111,12 @@ class AppLifecycleManager :
 
     public void HideWindow() =>
         appWindow?.Hide();
+
+    void OnPropertyChanged(PropertyChangedEventArgs e) =>
+        PropertyChanged?.Invoke(this, e);
+
+    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     void SaveWindowPlacement()
     {
@@ -147,7 +173,9 @@ class AppLifecycleManager :
             if (startupTaskTrap is not null)
                 this.xamlWindow.Activate();
             appWindow = xamlWindow.AppWindow;
+            appWindow.Changed += HandleAppWindowChanged;
             appWindow.Closing += HandleAppWindowClosing;
+            IsVisible = appWindow.IsVisible;
             if (GetLocalSetting("WindowPlacementSaved", 0) is not 0)
             {
                 var windowPlacement = new WINDOWPLACEMENT

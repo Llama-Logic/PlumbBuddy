@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @implements IDisposable
+@inject IAppLifecycleManager AppLifecycleManager
 @inject IBlazorFramework BlazorFramework
 @inject ICustomThemes CustomThemes
 @inject IDialogService DialogService
@@ -34,138 +35,145 @@
 
 <MudAnimate Selector=".plumbbuddy-is-thinking" AnimationType="AnimationType.Fade" Value="1" ValueSecondary="0.5" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseOut" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
 
-<MudLayout>
-    <MudAppBar>
-        <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudImage Src="/img/PlumbBuddyLogo.svg" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
-        @if (Settings.ShowThemeManager)
-        {
-            if (@manualLightDarkModeToggleEnabled)
+@if (!AppLifecycleManager.IsVisible)
+{
+    <FullWindowSemiotic />
+}
+else
+{
+    <MudLayout>
+        <MudAppBar>
+            <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+            <MudImage Src="/img/PlumbBuddyLogo.svg" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+            @if (Settings.ShowThemeManager)
             {
-                <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)]">
-                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
+                if (@manualLightDarkModeToggleEnabled)
+                {
+                    <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)]">
+                        <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
+                    </MudTooltip>
+                }
+                <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)]">
+                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
                 </MudTooltip>
             }
-            <MudTooltip Arrow="true" Text="@StringLocalizer[nameof(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)]">
-                <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
-            </MudTooltip>
-        }
-        <MudPaper Elevation="0" Outlined Class="rounded-pill mx-4" Style="padding: 0 5px;">
-            <MudTooltip Arrow="true">
-                <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolderAsync" />
-                </ChildContent>
-                <TooltipContent>
-                    <MudStack Row="true">
-                        <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
-                        <MudTextM3 Typo="TypoM3.Title">
-                            @MarkupLocalizer[nameof(AppText.MainMenu_OpenDownloadsFolder_Label)]
-                        </MudTextM3>
-                    </MudStack>
-                    <MudDivider />
-                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        @MarkupLocalizer[nameof(AppText.MainLayout_OpenDownloadsFolder_Tip)]
-                    </MudTextM3>
-                </TooltipContent>
-            </MudTooltip>
-            <MudTooltip Arrow="true">
-                <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="SmartSimObserver.OpenModsFolder" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
-                </ChildContent>
-                <TooltipContent>
-                    <MudStack Row="true">
-                        <MudIcon Icon="@MaterialDesignIcons.Normal.FolderPound" />
-                        <MudTextM3 Typo="TypoM3.Title">
-                            @MarkupLocalizer[nameof(AppText.MainMenu_OpenModsFolder_Label)]
-                        </MudTextM3>
-                    </MudStack>
-                    <MudDivider />
-                    @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
-                    {
-                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip_Sleeping)]
-                        </MudTextM3>
-                    }
-                    @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
-                    {
-                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip)]
-                        </MudTextM3>
-                    }
-                </TooltipContent>
-            </MudTooltip>
-            <MudTooltip Arrow="true">
-                <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="@(() => SmartSimObserver.ClearCache())" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
-                </ChildContent>
-                <TooltipContent>
-                    <MudStack Row="true">
-                        <MudIcon Icon="@MaterialDesignIcons.Normal.Eraser" />
-                        <MudTextM3 Typo="TypoM3.Title">
-                            @MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
-                        </MudTextM3>
-                    </MudStack>
-                    <MudDivider />
-                    @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
-                    {
-                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Sleeping)]
-                        </MudTextM3>
-                    }
-                    @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
-                    {
-                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                            @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip)]
-                        </MudTextM3>
-                        @if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
-                        {
-                            <MudDivider />
-                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_AlreadyClear)]
+            <MudPaper Elevation="0" Outlined Class="rounded-pill mx-4" Style="padding: 0 5px;">
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolderAsync" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
+                            <MudTextM3 Typo="TypoM3.Title">
+                                @MarkupLocalizer[nameof(AppText.MainMenu_OpenDownloadsFolder_Label)]
                             </MudTextM3>
-                        }
-                        @if (Settings.CacheStatus is SmartSimCacheStatus.Normal)
-                        {
-                            <MudDivider />
-                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Clearable)]
-                            </MudTextM3>
-                        }
-                        @if (Settings.CacheStatus is SmartSimCacheStatus.Stale)
-                        {
-                            <MudDivider />
-                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
-                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Stale)]
-                            </MudTextM3>
-                        }
-                    }
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            @MarkupLocalizer[nameof(AppText.MainLayout_OpenDownloadsFolder_Tip)]
+                        </MudTextM3>
                     </TooltipContent>
-            </MudTooltip>
-            <MudTooltip Arrow="true">
-                <ChildContent>
-                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" OnClick="HandleAskForHelpOnClickAsync" />
-                </ChildContent>
-                <TooltipContent>
-                    <MudStack Row="true">
-                        <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" />
-                        <MudTextM3 Typo="TypoM3.Title">
-                            @MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
+                </MudTooltip>
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudIconButton Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="SmartSimObserver.OpenModsFolder" Disabled="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.FolderPound" />
+                            <MudTextM3 Typo="TypoM3.Title">
+                                @MarkupLocalizer[nameof(AppText.MainMenu_OpenModsFolder_Label)]
+                            </MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+                        {
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip_Sleeping)]
+                            </MudTextM3>
+                        }
+                        @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
+                        {
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                @MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip)]
+                            </MudTextM3>
+                        }
+                    </TooltipContent>
+                </MudTooltip>
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Settings.CacheStatus is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="@(() => SmartSimObserver.ClearCache())" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.Eraser" />
+                            <MudTextM3 Typo="TypoM3.Title">
+                                @MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
+                            </MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        @if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+                        {
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Sleeping)]
+                            </MudTextM3>
+                        }
+                        @if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
+                        {
+                            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip)]
+                            </MudTextM3>
+                            @if (Settings.CacheStatus is SmartSimCacheStatus.Clear)
+                            {
+                                <MudDivider />
+                                <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                    @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_AlreadyClear)]
+                                </MudTextM3>
+                            }
+                            @if (Settings.CacheStatus is SmartSimCacheStatus.Normal)
+                            {
+                                <MudDivider />
+                                <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                                    @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Clearable)]
+                                </MudTextM3>
+                            }
+                            @if (Settings.CacheStatus is SmartSimCacheStatus.Stale)
+                            {
+                                <MudDivider />
+                                <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+                                    @MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Stale)]
+                                </MudTextM3>
+                            }
+                        }
+                        </TooltipContent>
+                </MudTooltip>
+                <MudTooltip Arrow="true">
+                    <ChildContent>
+                        <MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" OnClick="HandleAskForHelpOnClickAsync" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudStack Row="true">
+                            <MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" />
+                            <MudTextM3 Typo="TypoM3.Title">
+                                @MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
+                            </MudTextM3>
+                        </MudStack>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip)]
                         </MudTextM3>
-                    </MudStack>
-                    <MudDivider />
-                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip)]
-                    </MudTextM3>
-                    <MudDivider />
-                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                        @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip_ModGuidance), MaterialDesignIcons.Normal.Book, MaterialDesignIcons.Normal.FaceAgent]
-                    </MudTextM3>
-                </TooltipContent>
-            </MudTooltip>
-            <HUD />
-        </MudPaper>
-    </MudAppBar>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+                        <MudDivider />
+                        <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                            @MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip_ModGuidance), MaterialDesignIcons.Normal.Book, MaterialDesignIcons.Normal.FaceAgent]
+                        </MudTextM3>
+                    </TooltipContent>
+                </MudTooltip>
+                <HUD />
+            </MudPaper>
+        </MudAppBar>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+}
