@@ -2136,4 +2136,81 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
     <value>I mean, I get that this is nit picky, but it's bad Mods folder hygiene to have that RAR file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause.</value>
     <comment>This text is in Markdown.</comment>
   </data>
+  <data name="Scan_Missing_Utility_ModGuard" xml:space="preserve">
+    <value>protection from hacking, phishing, and other malware attacks which may occur if a modder's online accounts are compromised</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_Utility_MCCommandCenter" xml:space="preserve">
+    <value>your Sims 4 game experience, NPC story progression options, and error logging</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_Utility_BetterExceptions" xml:space="preserve">
+    <value>detailed exception, mod conflict, and patch day analyses</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_ModName_BetterExceptions" xml:space="preserve">
+    <value>Better Exceptions</value>
+  </data>
+  <data name="Scan_Missing_ModName_MCCommandCenter" xml:space="preserve">
+    <value>MC Command Center</value>
+  </data>
+  <data name="Scan_Missing_ModName_ModGuard" xml:space="preserve">
+    <value>ModGuard</value>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Caption" xml:space="preserve">
+    <value>{0} May Not Load</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Missing_Caption" xml:space="preserve">
+    <value>{0} is Missing</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Installed_Caption" xml:space="preserve">
+    <value>{0} is Installed</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Installed_Description" xml:space="preserve">
+    <value>Enjoy the awesome improvements to {0}. 😁</value>
+    <comment>This text is in Markdown. {0} = The utility of the mod</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Scan_ModsGameOption" xml:space="preserve">
+    <value>Mods Game Option</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Scan_ScriptModsGameOption" xml:space="preserve">
+    <value>Script Mods Game Option</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Scan_PackageDepthScan" xml:space="preserve">
+    <value>`.package` Depth Scan</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Scan_Ts4ScriptDepthScan" xml:space="preserve">
+    <value>`.ts4script` Depth Scan</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Description" xml:space="preserve">
+    <value>Because the **{0}** scan is disabled, I can't be sure {1} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Scan PB wants to enable; {1} = The Name of the Mod PB is looking for</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_EnableScan_Label" xml:space="preserve">
+    <value>Enable {0} Scan</value>
+    <comment>{0} = The Name of the Scan PB wants to enable</comment>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_StopTellingMe_CautionText" xml:space="preserve">
+    <value>{0} can be quite helpful with {1}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod PB wants installed; {1} = The utility brought by the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Missing_Description" xml:space="preserve">
+    <value>You should totally go get it, though, because it does a great deal to improve {0}.</value>
+    <comment>This text is in Markdown. {0} = The utility brought by the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Missing_GoGet_Label" xml:space="preserve">
+    <value>Go Get {0}</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Missing_Missing_StopTellingMe_CautionText" xml:space="preserve">
+    <value>Turning off this scan will prevent me from getting on your case about not having {0}, but... you know... you will still miss out on the awesome improvements it makes to {1}.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Utility brought by the Mod</comment>
+  </data>
 </root>

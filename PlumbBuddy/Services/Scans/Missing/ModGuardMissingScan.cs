@@ -9,14 +9,14 @@ public sealed class ModGuardMissingScan :
     {
     }
 
-    protected override string ModName { get; } =
-        "ModGuard";
+    protected override string ModName =>
+        AppText.Scan_Missing_ModName_ModGuard;
 
     protected override Uri ModUrl { get; } =
         new("https://plumbbuddy.app/redirect?to=ModGuard", UriKind.Absolute);
 
-    protected override string ModUtility { get; } =
-        "protection from hacking, phishing, and other malware attacks which may occur if a modder's online accounts are compromised";
+    protected override string ModUtility =>
+        AppText.Scan_Missing_Utility_ModGuard;
 
     protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } =
         null;

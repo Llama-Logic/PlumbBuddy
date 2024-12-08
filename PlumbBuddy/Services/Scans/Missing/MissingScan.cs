@@ -56,8 +56,8 @@ public abstract class MissingScan :
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
-                Caption = $"{ModName} May Not Load",
-                Description = $"Because the <strong>Mods Game Option</strong> scan is disabled, I can't be sure {ModName} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on.",
+                Caption = string.Format(AppText.Scan_Missing_MayNotLoad_Caption, ModName),
+                Description = string.Format(AppText.Scan_Missing_MayNotLoad_Description, AppText.Scan_Missing_MayNotLoad_Scan_ModsGameOption, ModName),
                 Origin = this,
                 Type = ScanIssueType.Sick,
                 Data = "modsGameOptionScanDisabled",
@@ -66,16 +66,16 @@ public abstract class MissingScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.ToggleSwitch,
-                        Label = "Enable Mods Game Option Scan",
+                        Label = string.Format(AppText.Scan_Missing_MayNotLoad_EnableScan_Label, AppText.Scan_Missing_MayNotLoad_Scan_ModsGameOption),
                         Color = MudBlazor.Color.Primary,
                         Data = "enable"
                     },
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = $"{ModName} can be quite helpful with {ModUtility}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = string.Format(AppText.Scan_Missing_MayNotLoad_StopTellingMe_CautionText, ModName, ModUtility),
                         Data = "stopTellingMe"
                     }
                 ]
@@ -84,8 +84,8 @@ public abstract class MissingScan :
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
-                Caption = $"{ModName} May Not Load",
-                Description = $"Because the <strong>Script Mods Game Option</strong> scan is disabled, I can't be sure {ModName} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on.",
+                Caption = string.Format(AppText.Scan_Missing_MayNotLoad_Caption, ModName),
+                Description = string.Format(AppText.Scan_Missing_MayNotLoad_Description, AppText.Scan_Missing_MayNotLoad_Scan_ScriptModsGameOption, ModName),
                 Origin = this,
                 Type = ScanIssueType.Sick,
                 Data = "scriptModsGameOptionScanDisabled",
@@ -94,16 +94,16 @@ public abstract class MissingScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.ToggleSwitch,
-                        Label = "Enable Script Mods Game Option Scan",
+                        Label = string.Format(AppText.Scan_Missing_MayNotLoad_EnableScan_Label, AppText.Scan_Missing_MayNotLoad_Scan_ScriptModsGameOption),
                         Color = MudBlazor.Color.Primary,
                         Data = "enable"
                     },
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = $"{ModName} can be quite helpful with {ModUtility}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = string.Format(AppText.Scan_Missing_MayNotLoad_StopTellingMe_CautionText, ModName, ModUtility),
                         Data = "stopTellingMe"
                     }
                 ]
@@ -112,8 +112,8 @@ public abstract class MissingScan :
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
-                Caption = $"{ModName} May Not Load",
-                Description = $"Because the <strong>`.package` Depth Scan</strong> scan is disabled, I can't be sure {ModName} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on.",
+                Caption = string.Format(AppText.Scan_Missing_MayNotLoad_Caption, ModName),
+                Description = string.Format(AppText.Scan_Missing_MayNotLoad_Description, AppText.Scan_Missing_MayNotLoad_Scan_PackageDepthScan, ModName),
                 Origin = this,
                 Type = ScanIssueType.Sick,
                 Data = "packageDepthScanDisabled",
@@ -122,16 +122,16 @@ public abstract class MissingScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.ToggleSwitch,
-                        Label = "Enable Package Depth Scan",
+                        Label = string.Format(AppText.Scan_Missing_MayNotLoad_EnableScan_Label, AppText.Scan_Missing_MayNotLoad_Scan_PackageDepthScan),
                         Color = MudBlazor.Color.Primary,
                         Data = "enable"
                     },
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = $"{ModName} can be quite helpful with {ModUtility}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = string.Format(AppText.Scan_Missing_MayNotLoad_StopTellingMe_CautionText, ModName, ModUtility),
                         Data = "stopTellingMe"
                     }
                 ]
@@ -140,8 +140,8 @@ public abstract class MissingScan :
             yield return new()
             {
                 Icon = MaterialDesignIcons.Normal.CubeScan,
-                Caption = $"{ModName} May Not Load",
-                Description = $"Because the <strong>`.ts4script` Depth Scan</strong> scan is disabled, I can't be sure {ModName} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on.",
+                Caption = string.Format(AppText.Scan_Missing_MayNotLoad_Caption, ModName),
+                Description = string.Format(AppText.Scan_Missing_MayNotLoad_Description, AppText.Scan_Missing_MayNotLoad_Scan_Ts4ScriptDepthScan, ModName),
                 Origin = this,
                 Type = ScanIssueType.Sick,
                 Data = "ts4scriptDepthScanDisabled",
@@ -150,16 +150,16 @@ public abstract class MissingScan :
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.ToggleSwitch,
-                        Label = "Enable TS4Script Depth Scan",
+                        Label = string.Format(AppText.Scan_Missing_MayNotLoad_EnableScan_Label, AppText.Scan_Missing_MayNotLoad_Scan_Ts4ScriptDepthScan),
                         Color = MudBlazor.Color.Primary,
                         Data = "enable"
                     },
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,
-                        Label = "Stop telling me",
-                        CautionCaption = "Disable this scan?",
-                        CautionText = $"{ModName} can be quite helpful with {ModUtility}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it.",
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = string.Format(AppText.Scan_Missing_MayNotLoad_StopTellingMe_CautionText, ModName, ModUtility),
                         Data = "stopTellingMe"
                     }
                 ]
@@ -193,8 +193,8 @@ public abstract class MissingScan :
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantClosedPlus,
-                    Caption = $"{ModName} is Missing",
-                    Description = $"You should totally go get it, though, because it does a great deal to improve {ModUtility}.",
+                    Caption = string.Format(AppText.Scan_Missing_Missing_Caption, ModName),
+                    Description = string.Format(AppText.Scan_Missing_Missing_Description, ModUtility),
                     Origin = this,
                     Type = ScanIssueType.Uncomfortable,
                     Data = "missing",
@@ -203,7 +203,7 @@ public abstract class MissingScan :
                         new()
                         {
                             Icon = MaterialDesignIcons.Normal.Web,
-                            Label = $"Go Get {ModName}",
+                            Label = string.Format(AppText.Scan_Missing_Missing_GoGet_Label, ModName),
                             Color = MudBlazor.Color.Primary,
                             Data = "get",
                             Url = ModUrl
@@ -211,9 +211,9 @@ public abstract class MissingScan :
                         new()
                         {
                             Icon = MaterialDesignIcons.Normal.Cancel,
-                            Label = "Stop telling me",
-                            CautionCaption = "Disable this scan?",
-                            CautionText = $"Turning off this scan will prevent me from getting on your case about not having {ModName}, but... you know... you will still miss out on the awesome improvements it makes to {ModUtility}.",
+                            Label = AppText.Scan_Common_StopTellingMe_Label,
+                            CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                            CautionText = string.Format(AppText.Scan_Missing_Missing_StopTellingMe_CautionText, ModName, ModUtility),
                             Data = "stopTellingMe"
                         }
                     ]
@@ -222,8 +222,8 @@ public abstract class MissingScan :
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantClosedCheck,
-                    Caption = $"{ModName} is Installed",
-                    Description = $"Enjoy the awesome improvements to {ModUtility}. 😁",
+                    Caption = string.Format(AppText.Scan_Missing_Installed_Caption, ModName),
+                    Description = string.Format(AppText.Scan_Missing_Installed_Description, ModUtility),
                     Origin = this,
                     Type = ScanIssueType.Healthy
                 };

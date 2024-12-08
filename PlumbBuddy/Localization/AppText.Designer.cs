@@ -4649,6 +4649,186 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is Installed.
+        /// </summary>
+        internal static string Scan_Missing_Installed_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Installed_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enjoy the awesome improvements to {0}. 😁.
+        /// </summary>
+        internal static string Scan_Missing_Installed_Description {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Installed_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} May Not Load.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Because the **{0}** scan is disabled, I can&apos;t be sure {1} would be loaded if *you did* have it installed. Therefore, we need to turn that scan back on..
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Description {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable {0} Scan.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_EnableScan_Label {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_EnableScan_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods Game Option.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Scan_ModsGameOption {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Scan_ModsGameOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to `.package` Depth Scan.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Scan_PackageDepthScan {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Scan_PackageDepthScan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script Mods Game Option.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Scan_ScriptModsGameOption {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Scan_ScriptModsGameOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to `.ts4script` Depth Scan.
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_Scan_Ts4ScriptDepthScan {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_Scan_Ts4ScriptDepthScan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} can be quite helpful with {1}. Turning off this scan will prevent me from getting on your case about not having it, but... you know... you may not have it..
+        /// </summary>
+        internal static string Scan_Missing_MayNotLoad_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Missing_MayNotLoad_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is Missing.
+        /// </summary>
+        internal static string Scan_Missing_Missing_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Missing_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You should totally go get it, though, because it does a great deal to improve {0}..
+        /// </summary>
+        internal static string Scan_Missing_Missing_Description {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Missing_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go Get {0}.
+        /// </summary>
+        internal static string Scan_Missing_Missing_GoGet_Label {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Missing_GoGet_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turning off this scan will prevent me from getting on your case about not having {0}, but... you know... you will still miss out on the awesome improvements it makes to {1}..
+        /// </summary>
+        internal static string Scan_Missing_Missing_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Missing_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Better Exceptions.
+        /// </summary>
+        internal static string Scan_Missing_ModName_BetterExceptions {
+            get {
+                return ResourceManager.GetString("Scan_Missing_ModName_BetterExceptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MC Command Center.
+        /// </summary>
+        internal static string Scan_Missing_ModName_MCCommandCenter {
+            get {
+                return ResourceManager.GetString("Scan_Missing_ModName_MCCommandCenter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ModGuard.
+        /// </summary>
+        internal static string Scan_Missing_ModName_ModGuard {
+            get {
+                return ResourceManager.GetString("Scan_Missing_ModName_ModGuard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to detailed exception, mod conflict, and patch day analyses.
+        /// </summary>
+        internal static string Scan_Missing_Utility_BetterExceptions {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Utility_BetterExceptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to your Sims 4 game experience, NPC story progression options, and error logging.
+        /// </summary>
+        internal static string Scan_Missing_Utility_MCCommandCenter {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Utility_MCCommandCenter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to protection from hacking, phishing, and other malware attacks which may occur if a modder&apos;s online accounts are compromised.
+        /// </summary>
+        internal static string Scan_Missing_Utility_ModGuard {
+            get {
+                return ResourceManager.GetString("Scan_Missing_Utility_ModGuard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I Found Multiple Versions of {0} Installed.
         /// </summary>
         internal static string Scan_MultipleModVersions_Caption {

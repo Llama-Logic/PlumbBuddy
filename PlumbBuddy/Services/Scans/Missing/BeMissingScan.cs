@@ -9,14 +9,14 @@ public sealed class BeMissingScan :
     {
     }
 
-    protected override string ModName { get; } =
-        "Better Exceptions";
+    protected override string ModName =>
+        AppText.Scan_Missing_ModName_BetterExceptions;
 
     protected override Uri ModUrl { get; } =
         new("https://plumbbuddy.app/redirect?to=BetterExceptions", UriKind.Absolute);
 
     protected override string ModUtility =>
-        "detailed exception, mod conflict, and patch day analyses";
+        AppText.Scan_Missing_Utility_BetterExceptions;
 
     protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } = null;
 

@@ -9,14 +9,14 @@ public sealed class McccMissingScan :
     {
     }
 
-    protected override string ModName { get; } =
-        "MC Command Center";
+    protected override string ModName =>
+        AppText.Scan_Missing_ModName_MCCommandCenter;
 
     protected override Uri ModUrl { get; } =
         new("https://plumbbuddy.app/redirect?to=GetMCCommandCenter", UriKind.Absolute);
 
-    protected override string ModUtility { get; } =
-        "your Sims 4 game experience, NPC story progression options, and error logging";
+    protected override string ModUtility =>
+        AppText.Scan_Missing_Utility_MCCommandCenter;
 
     protected override IReadOnlyList<ResourceKey>? RequiredPackageKeys { get; } =
     [
