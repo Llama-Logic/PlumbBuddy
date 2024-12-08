@@ -4481,6 +4481,174 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I Found a 7-Zip File: {0}.
+        /// </summary>
+        internal static string Scan_LooseArchive_7Zip_Found_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_7Zip_Found_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this 7-Zip file in your Mods folder, specifically at this path:
+        ///`{fileOfInterest.Path}`&lt;br /&gt;
+        ///While it&apos;s not *technically* causing a problem, it makes me uncomfortable since it can&apos;t be used by the game in there and it could trick you into thinking you&apos;ve installed a mod when you really haven&apos;t..
+        /// </summary>
+        internal static string Scan_LooseArchive_7Zip_Found_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_7Zip_Found_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No 7-Zip Files.
+        /// </summary>
+        internal static string Scan_LooseArchive_7Zip_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_7Zip_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any 7-Zip files in your Mods folder, which is a good thing. It&apos;s best to keep them out of there!.
+        /// </summary>
+        internal static string Scan_LooseArchive_7Zip_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_7Zip_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I mean, I get that this is nit picky, but it&apos;s bad Mods folder hygiene to have that 7-Zip file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause..
+        /// </summary>
+        internal static string Scan_LooseArchive_7Zip_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_7Zip_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the file done wandered off..
+        /// </summary>
+        internal static string Scan_LooseArchive_MoveToDownloads_Error_CannotFind {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_MoveToDownloads_Error_CannotFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move it to the Downloads folder.
+        /// </summary>
+        internal static string Scan_LooseArchive_MoveToDownloads_Label {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_MoveToDownloads_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there..
+        /// </summary>
+        internal static string Scan_LooseArchive_MoveToDownloads_Success {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_MoveToDownloads_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Found a RAR File: {0}.
+        /// </summary>
+        internal static string Scan_LooseArchive_Rar_Found_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Rar_Found_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this RAR file in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///While it&apos;s not *technically* causing a problem, it makes me uncomfortable since it can&apos;t be used by the game in there and it could trick you into thinking you&apos;ve installed a mod when you really haven&apos;t..
+        /// </summary>
+        internal static string Scan_LooseArchive_Rar_Found_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Rar_Found_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No RAR Files.
+        /// </summary>
+        internal static string Scan_LooseArchive_Rar_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Rar_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any RAR files in your Mods folder, which is a good thing. It&apos;s best to keep them out of there!.
+        /// </summary>
+        internal static string Scan_LooseArchive_Rar_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Rar_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I mean, I get that this is nit picky, but it&apos;s bad Mods folder hygiene to have that RAR file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause..
+        /// </summary>
+        internal static string Scan_LooseArchive_Rar_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Rar_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Found a ZIP File: {0}.
+        /// </summary>
+        internal static string Scan_LooseArchive_Zip_Found_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Zip_Found_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this ZIP file in your Mods folder, specifically at this path:
+        ///`{0}`&lt;br /&gt;
+        ///You may believe that it&apos;s not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be &lt;strong&gt;very bad&lt;/strong&gt;. Let&apos;s move it to your Downloads folder right away..
+        /// </summary>
+        internal static string Scan_LooseArchive_Zip_Found_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Zip_Found_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No ZIP Files.
+        /// </summary>
+        internal static string Scan_LooseArchive_Zip_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Zip_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any ZIP files in your Mods folder, which is a good thing. It&apos;s best to keep them out of there!.
+        /// </summary>
+        internal static string Scan_LooseArchive_Zip_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Zip_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Look, this ZIP file being in your Mods folder can&apos;t do any good and it just might do harm. Turning off this scan is just hiding this warning about it, not prevent that potential harm..
+        /// </summary>
+        internal static string Scan_LooseArchive_Zip_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_LooseArchive_Zip_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I Found Multiple Versions of {0} Installed.
         /// </summary>
         internal static string Scan_MultipleModVersions_Caption {

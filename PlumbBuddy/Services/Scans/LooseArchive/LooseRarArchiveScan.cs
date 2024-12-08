@@ -13,8 +13,8 @@ public sealed class LooseRarArchiveScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.ZipBox,
-            Caption = "No RAR Files",
-            Description = "I didn't find any RAR files in your Mods folder, which is a good thing. It's best to keep them out of there!",
+            Caption = AppText.Scan_LooseArchive_Rar_NoneFound_Caption,
+            Description = AppText.Scan_LooseArchive_Rar_NoneFound_Description,
             Origin = this,
             Type = ScanIssueType.Healthy
         };
@@ -23,13 +23,8 @@ public sealed class LooseRarArchiveScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.ZipBox,
-            Caption = $"I Found a RAR File: {file.Name}",
-            Description =
-                $"""
-                I found this RAR file in your Mods folder, specifically at this path:
-                `{fileOfInterest.Path}`<br />
-                While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.
-                """,
+            Caption = string.Format(AppText.Scan_LooseArchive_Rar_Found_Caption, file.Name),
+            Description = string.Format(AppText.Scan_LooseArchive_Rar_Found_Description, fileOfInterest.Path),
             Origin = this,
             Type = ScanIssueType.Uncomfortable,
             Data = fileOfInterest.Path,
@@ -38,16 +33,16 @@ public sealed class LooseRarArchiveScan :
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.FolderMove,
-                    Label = "Move it to the Downloads folder",
+                    Label = AppText.Scan_LooseArchive_MoveToDownloads_Label,
                     Color = MudBlazor.Color.Primary,
                     Data = "moveToDownloads"
                 },
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.Cancel,
-                    Label = "Stop telling me",
-                    CautionCaption = "Disable this scan?",
-                    CautionText = "I mean, I get that this is nit picky, but it's bad Mods folder hygiene to have that RAR file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause.",
+                    Label = AppText.Scan_Common_StopTellingMe_Label,
+                    CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                    CautionText = AppText.Scan_LooseArchive_Rar_StopTellingMe_CautionText,
                     Data = "stopTellingMe"
                 }
             ]

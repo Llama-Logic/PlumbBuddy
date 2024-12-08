@@ -2063,4 +2063,77 @@ We need to move it closer to the root of your Mods folder so the game can find i
     <value>I understand that this might be annoying, but the game has its limitations. And turning this scan off doesn't change that. All it will do is hide this warning.</value>
     <comment>This text is in Markdown.</comment>
   </data>
+  <data name="Scan_LooseArchive_MoveToDownloads_Error_CannotFind" xml:space="preserve">
+    <value>I couldn't do that because the file done wandered off.</value>
+  </data>
+  <data name="Scan_LooseArchive_MoveToDownloads_Success" xml:space="preserve">
+    <value>Okay, the file has been safely moved to its new home in your Downloads folder and is called &lt;strong&gt;{0}&lt;/strong&gt; there.</value>
+    <comment>{0} = The Name of the Mod File</comment>
+  </data>
+  <data name="Scan_LooseArchive_MoveToDownloads_Label" xml:space="preserve">
+    <value>Move it to the Downloads folder</value>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_NoneFound_Caption" xml:space="preserve">
+    <value>No 7-Zip Files</value>
+  </data>
+  <data name="Scan_LooseArchive_Rar_NoneFound_Caption" xml:space="preserve">
+    <value>No RAR Files</value>
+  </data>
+  <data name="Scan_LooseArchive_Zip_NoneFound_Caption" xml:space="preserve">
+    <value>No ZIP Files</value>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any 7-Zip files in your Mods folder, which is a good thing. It's best to keep them out of there!</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any ZIP files in your Mods folder, which is a good thing. It's best to keep them out of there!</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_NoneFound_Description" xml:space="preserve">
+    <value>I didn't find any RAR files in your Mods folder, which is a good thing. It's best to keep them out of there!</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_Found_Caption" xml:space="preserve">
+    <value>I Found a RAR File: {0}</value>
+    <comment>{0} = The Name of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_Found_Caption" xml:space="preserve">
+    <value>I Found a ZIP File: {0}</value>
+    <comment>{0} = The Name of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_Found_Caption" xml:space="preserve">
+    <value>I Found a 7-Zip File: {0}</value>
+    <comment>{0} = The Name of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_Found_Description" xml:space="preserve">
+    <value>I found this RAR file in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.</value>
+    <comment>This text is in Markdown. {0} = The Path of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_Found_Description" xml:space="preserve">
+    <value>I found this ZIP file in your Mods folder, specifically at this path:
+`{0}`&lt;br /&gt;
+You may believe that it's not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be &lt;strong&gt;very bad&lt;/strong&gt;. Let's move it to your Downloads folder right away.</value>
+    <comment>This text is in Markdown. {0} = The Path of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_Found_Description" xml:space="preserve">
+    <value>I found this 7-Zip file in your Mods folder, specifically at this path:
+`{fileOfInterest.Path}`&lt;br /&gt;
+While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.</value>
+    <comment>This text is in Markdown. {0} = The Path of the File</comment>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_StopTellingMe_CautionText" xml:space="preserve">
+    <value>I mean, I get that this is nit picky, but it's bad Mods folder hygiene to have that 7-Zip file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_StopTellingMe_CautionText" xml:space="preserve">
+    <value>Look, this ZIP file being in your Mods folder can't do any good and it just might do harm. Turning off this scan is just hiding this warning about it, not prevent that potential harm.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_StopTellingMe_CautionText" xml:space="preserve">
+    <value>I mean, I get that this is nit picky, but it's bad Mods folder hygiene to have that RAR file in there. And turning off this scan is just hiding this warning about it, not addressing the root cause.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
 </root>
