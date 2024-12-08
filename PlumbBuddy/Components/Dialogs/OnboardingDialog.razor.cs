@@ -89,6 +89,12 @@ partial class OnboardingDialog
         set => Settings.ScanForLooseZipArchives = value;
     }
 
+    bool ScanForMismatchedInscribedHashes
+    {
+        get => Settings.ScanForMismatchedInscribedHashes;
+        set => Settings.ScanForMismatchedInscribedHashes = value;
+    }
+
     bool ScanForMissingBe
     {
         get => Settings.ScanForMissingBe;
@@ -248,10 +254,11 @@ partial class OnboardingDialog
                 Settings.ScanForCorruptMods = false;
                 Settings.ScanForCorruptScriptMods = false;
                 Settings.ScanForErrorLogs = false;
-                Settings.ScanForMissingMccc = false;
+                Settings.ScanForMismatchedInscribedHashes = true;
                 Settings.ScanForMissingBe = false;
-                Settings.ScanForMissingModGuard = false;
                 Settings.ScanForMissingDependency = false;
+                Settings.ScanForMissingMccc = false;
+                Settings.ScanForMissingModGuard = false;
                 Settings.ScanForCacheStaleness = false;
                 Settings.ScanForMultipleModVersions = false;
                 Settings.ScanForMutuallyExclusiveMods = false;
@@ -268,10 +275,11 @@ partial class OnboardingDialog
                 Settings.ScanForCorruptMods = ScanAttribute.Get(typeof(IPackageCorruptScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForCorruptScriptMods = ScanAttribute.Get(typeof(ITs4ScriptCorruptScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForErrorLogs = ScanAttribute.Get(typeof(IErrorLogScan))?.IsEnabledByDefault ?? false;
-                Settings.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMismatchedInscribedHashes = ScanAttribute.Get(typeof(IMismatchedInscribedHashesScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;
-                Settings.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForMissingModGuard = ScanAttribute.Get(typeof(IModGuardMissingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForCacheStaleness = ScanAttribute.Get(typeof(ICacheStalenessScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;

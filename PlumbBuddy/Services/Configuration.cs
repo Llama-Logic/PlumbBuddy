@@ -15,6 +15,7 @@ static class Configuration
         services.AddSingleton<ISuperSnacks, SuperSnacks>();
         services.AddSingleton<IGlobalExceptionCatcher, GlobalExceptionCatcher>();
         services.AddSingleton<IUpdateManager, UpdateManager>();
+        services.AddSingleton<IUserInterfaceMessaging, UserInterfaceMessaging>();
         return services;
     }
 }

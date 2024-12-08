@@ -1,5 +1,6 @@
 @implements IDisposable
 @inject IDialogService DialogService
+@inject IDispatcher Dispatcher
 @inject IFolderPicker FolderPicker
 @inject IJSRuntime JSRuntime
 @inject ILogger<ManifestEditor> Logger
@@ -9,6 +10,7 @@
 @inject ISettings Settings
 @inject IPublicCatalogs PublicCatalogs
 @inject IStringLocalizer<AppText> StringLocalizer
+@inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <div class="relative" style="height: 100%;">
     <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>

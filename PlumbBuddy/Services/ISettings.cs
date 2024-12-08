@@ -20,6 +20,7 @@ public interface ISettings :
     bool ScanForLoose7ZipArchives { get; set; }
     bool ScanForLooseRarArchives { get; set; }
     bool ScanForLooseZipArchives { get; set; }
+    bool ScanForMismatchedInscribedHashes { get; set; }
     bool ScanForMissingBe { get; set; }
     bool ScanForMissingDependency { get; set; }
     bool ScanForMissingMccc { get; set; }

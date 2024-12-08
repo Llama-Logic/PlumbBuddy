@@ -215,6 +215,18 @@ class Settings :
         }
     }
 
+    public bool ScanForMismatchedInscribedHashes
+    {
+        get => preferences.Get(nameof(ScanForMismatchedInscribedHashes), true);
+        set
+        {
+            if (ScanForMismatchedInscribedHashes == value)
+                return;
+            preferences.Set(nameof(ScanForMismatchedInscribedHashes), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ScanForMissingBe
     {
         get => preferences.Get(nameof(ScanForMissingBe), false);
@@ -241,7 +253,7 @@ class Settings :
 
     public bool ScanForMissingMccc
     {
-        get => preferences.Get(nameof(ScanForMissingMccc), true);
+        get => preferences.Get(nameof(ScanForMissingMccc), false);
         set
         {
             if (ScanForMissingMccc == value)

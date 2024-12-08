@@ -2,12 +2,15 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
+    int activePanelIndex;
+
     /// <inheritdoc />
     public void Dispose()
     {
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
+        UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -32,6 +35,15 @@ partial class Home
             StaticDispatcher.Dispatch(StateHasChanged);
     }
 
+    void HandleUserInterfaceMessagingBeginManifestingModRequested(object? sender, BeginManifestingModRequestedEventArgs e)
+    {
+        if (Settings.Type is UserType.Creator)
+        {
+            activePanelIndex = 2;
+            StateHasChanged();
+        }
+    }
+
     /// <inheritdoc />
     protected override void OnInitialized()
     {
@@ -39,6 +51,7 @@ partial class Home
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
+        UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
     }
 
     protected override async Task OnInitializedAsync()

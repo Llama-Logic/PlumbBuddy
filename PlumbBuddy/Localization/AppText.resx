@@ -2294,4 +2294,32 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
   <data name="OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip" xml:space="preserve">
     <value>I will hide my icon from the Windows Taskbar and keep monitoring your Sims 4 installation for you when you close my window. If you toggle this option, I will always display an icon in your computer's system tray even if you've closed my window.</value>
   </data>
+  <data name="Scan_MismatchedInscribedHashes_Caption" xml:space="preserve">
+    <value>{0} has been Altered</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_Caption_ModNameFallback" xml:space="preserve">
+    <value>A Mod</value>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_Description" xml:space="preserve">
+    <value>**{0}**{1} was inscribed with a manifest specifying what was unique about it at the time it was being published and... something has changed. This could be a problem, especially if you didn't download this mod from the mod's original creator's official download page.</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} The by line of the Mod</comment>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_StopTellingMe_CautionText" xml:space="preserve">
+    <value>This might be difficult to understand, but this issue is a sign this mod has been tampered with. I cannot stress enough how important it is to look into this, and disabling this scan is just making me not check for these kinds of issues which... I mean, it's dangerous.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_ShowFile_Label" xml:space="preserve">
+    <value>Show me the mod's {0} file</value>
+    <comment>{0} = The Ordinalized Number of the Mod File</comment>
+  </data>
+  <data name="ScansToggler_ScanForMismatchedInscribedHashes_Label" xml:space="preserve">
+    <value>...mismatched inscribed mod manifest hashes</value>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_UpdateManifest_Label" xml:space="preserve">
+    <value>Update Manifest</value>
+  </data>
+  <data name="Scan_MismatchedInscribedHashes_Download_Label" xml:space="preserve">
+    <value>Re-Download the Mod</value>
+  </data>
 </root>

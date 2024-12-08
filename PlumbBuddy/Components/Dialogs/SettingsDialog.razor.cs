@@ -37,6 +37,8 @@ partial class SettingsDialog
 
     bool ScanForLooseZipArchives { get; set; }
 
+    bool ScanForMismatchedInscribedHashes { get; set; }
+
     bool ScanForMissingBe { get; set; }
 
     bool ScanForMissingDependency { get; set; }
@@ -92,6 +94,7 @@ partial class SettingsDialog
         ScanForLoose7ZipArchives = Settings.ScanForLoose7ZipArchives;
         ScanForLooseRarArchives = Settings.ScanForLooseRarArchives;
         ScanForLooseZipArchives = Settings.ScanForLooseZipArchives;
+        ScanForMismatchedInscribedHashes = Settings.ScanForMismatchedInscribedHashes;
         ScanForMissingBe = Settings.ScanForMissingBe;
         ScanForMissingDependency = Settings.ScanForMissingDependency;
         ScanForMissingMccc = Settings.ScanForMissingMccc;
@@ -138,6 +141,7 @@ partial class SettingsDialog
         Settings.ScanForLoose7ZipArchives = ScanForLoose7ZipArchives;
         Settings.ScanForLooseRarArchives = ScanForLooseRarArchives;
         Settings.ScanForLooseZipArchives = ScanForLooseZipArchives;
+        Settings.ScanForMismatchedInscribedHashes = ScanForMismatchedInscribedHashes;
         Settings.ScanForMissingBe = ScanForMissingBe;
         Settings.ScanForMissingDependency = ScanForMissingDependency;
         Settings.ScanForMissingMccc = ScanForMissingMccc;

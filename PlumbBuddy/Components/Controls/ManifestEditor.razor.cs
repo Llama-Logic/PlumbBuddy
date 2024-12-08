@@ -552,7 +552,8 @@ partial class ManifestEditor
     {
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
-        GC.SuppressFinalize(this);
+        UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
+        UserInterfaceMessaging.IsModScaffoldedInquired -= HandleUserInterfaceMessagingIsModScaffoldedInquired;
     }
 
     async Task HandleAddFilesClickedAsync()
@@ -1034,6 +1035,23 @@ partial class ManifestEditor
             await DialogService.ShowInfoDialogAsync(AppText.ManifestEditor_Info_BatchUpdateNoModFilesManifested_Caption, AppText.ManifestEditor_Info_BatchUpdateNoModFilesManifested_Text);
     }
 
+    async void HandleUserInterfaceMessagingBeginManifestingModRequested(object? sender, BeginManifestingModRequestedEventArgs e)
+    {
+        if (stepper is null || stepper.GetActiveIndex() is not 0)
+            return;
+        selectStepFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", e.ModFilePath));
+        await stepper.SetActiveIndex(6);
+        StateHasChanged();
+    }
+
+    void HandleUserInterfaceMessagingIsModScaffoldedInquired(object? sender, IsModScaffoldedInquiredEventArgs e) =>
+        e.IsModScaffolded =
+            ManifestedModFileScaffolding.IsModFileScaffolded
+            (
+                new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", e.ModFilePath)),
+                Settings
+            );
+
     Task<bool> OfferToCancelAsync() =>
         DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_OfferToCancel_Caption, AppText.ManifestEditor_Caution_OfferToCancel_Text);
 
@@ -1042,6 +1060,8 @@ partial class ManifestEditor
         base.OnInitialized();
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
+        UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
+        UserInterfaceMessaging.IsModScaffoldedInquired += HandleUserInterfaceMessagingIsModScaffoldedInquired;
     }
 
     void RefreshCompositionStepMessages()

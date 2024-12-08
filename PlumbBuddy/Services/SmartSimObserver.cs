@@ -361,6 +361,7 @@ public partial class SmartSimObserver :
         containerBuilder.RegisterType<ExclusivityScan>().As<IExclusivityScan>();
         containerBuilder.RegisterType<CacheStalenessScan>().As<ICacheStalenessScan>();
         containerBuilder.RegisterType<MultipleModVersionsScan>().As<IMultipleModVersionsScan>();
+        containerBuilder.RegisterType<MismatchedInscribedHashesScan>().As<IMismatchedInscribedHashesScan>();
     }
 
     void ConnectToInstallationDirectory()
@@ -1115,6 +1116,7 @@ public partial class SmartSimObserver :
                 initializationChange |= checkScanInitialization(settings.ScanForMutuallyExclusiveMods, typeof(IExclusivityScan));
                 initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
+                initializationChange |= checkScanInitialization(settings.ScanForMismatchedInscribedHashes, typeof(IMismatchedInscribedHashesScan));
                 if (initializationChange)
                     Scan();
             }

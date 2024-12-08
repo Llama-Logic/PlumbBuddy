@@ -11,6 +11,22 @@ public sealed class ManifestedModFileScaffolding :
         return Path.Combine(modFile.DirectoryName!, fileName);
     }
 
+    public static bool IsModFileScaffolded(FileInfo modFile, ISettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(modFile);
+        ArgumentNullException.ThrowIfNull(settings);
+        modFile.Refresh();
+        if (!modFile.Exists)
+            return false;
+        var scaffoldingPath = GetScaffoldingPath(modFile, settings.WriteScaffoldingToSubdirectory);
+        if (File.Exists(scaffoldingPath))
+            return true;
+        scaffoldingPath = GetScaffoldingPath(modFile, !settings.WriteScaffoldingToSubdirectory);
+        if (File.Exists(scaffoldingPath))
+            return true;
+        return false;
+    }
+
     public static ManifestedModFileScaffolding Parse(string s) =>
         Parse(s, null);
 

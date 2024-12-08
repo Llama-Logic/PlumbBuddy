@@ -56,13 +56,15 @@ partial class ScansToggler
         {
             { nameof(ScanForCacheStaleness), AppText.ScansToggler_ScanForCacheStaleness_Label },
             { nameof(ScanForMultipleModVersions), AppText.ScansToggler_ScanForMultipleModVersions_Label },
-            { nameof(ScanForMutuallyExclusiveMods), AppText.ScansToggler_ScanForMutuallyExclusiveMods_Label }
+            { nameof(ScanForMutuallyExclusiveMods), AppText.ScansToggler_ScanForMutuallyExclusiveMods_Label },
+            { nameof(ScanForMismatchedInscribedHashes), AppText.ScansToggler_ScanForMismatchedInscribedHashes_Label }
         }.ToImmutableDictionary();
         analysisScanLabels =
         [
             analysisScanLabelByName[nameof(ScanForCacheStaleness)],
             analysisScanLabelByName[nameof(ScanForMultipleModVersions)],
-            analysisScanLabelByName[nameof(ScanForMutuallyExclusiveMods)]
+            analysisScanLabelByName[nameof(ScanForMutuallyExclusiveMods)],
+            analysisScanLabelByName[nameof(ScanForMismatchedInscribedHashes)]
         ];
     }
 
@@ -128,6 +130,12 @@ partial class ScansToggler
 
     [Parameter]
     public EventCallback<bool> ScanForLooseZipArchivesChanged { get; set; }
+
+    [Parameter]
+    public bool ScanForMismatchedInscribedHashes { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForMismatchedInscribedHashesChanged { get; set; }
 
     [Parameter]
     public bool ScanForMissingBe { get; set; }
@@ -218,6 +226,7 @@ partial class ScansToggler
         ScanForLoose7ZipArchives = false;
         ScanForLooseRarArchives = false;
         ScanForLooseZipArchives = false;
+        ScanForMismatchedInscribedHashes = false;
         ScanForMissingBe = false;
         ScanForMissingDependency = false;
         ScanForMissingMccc = false;
@@ -241,6 +250,7 @@ partial class ScansToggler
         ScanForLoose7ZipArchives = true;
         ScanForLooseRarArchives = true;
         ScanForLooseZipArchives = true;
+        ScanForMismatchedInscribedHashes = true;
         ScanForMissingBe = true;
         ScanForMissingDependency = true;
         ScanForMissingMccc = true;
@@ -273,6 +283,7 @@ partial class ScansToggler
         ScanForLoose7ZipArchives = ScanAttribute.Get(typeof(ILoose7ZipArchiveScan))?.IsEnabledByDefault ?? false;
         ScanForLooseRarArchives = ScanAttribute.Get(typeof(ILooseRarArchiveScan))?.IsEnabledByDefault ?? false;
         ScanForLooseZipArchives = ScanAttribute.Get(typeof(ILooseZipArchiveScan))?.IsEnabledByDefault ?? false;
+        ScanForMismatchedInscribedHashes = ScanAttribute.Get(typeof(IMismatchedInscribedHashesScan))?.IsEnabledByDefault ?? false;
         ScanForMissingBe = ScanAttribute.Get(typeof(IBeMissingScan))?.IsEnabledByDefault ?? false;
         ScanForMissingDependency = ScanAttribute.Get(typeof(IDependencyScan))?.IsEnabledByDefault ?? false;
         ScanForMissingMccc = ScanAttribute.Get(typeof(IMcccMissingScan))?.IsEnabledByDefault ?? false;

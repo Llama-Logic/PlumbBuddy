@@ -4667,6 +4667,69 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} has been Altered.
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_Caption {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Mod.
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_Caption_ModNameFallback {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_Caption_ModNameFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **{0}**{1} was inscribed with a manifest specifying what was unique about it at the time it was being published and... something has changed. This could be a problem, especially if you didn&apos;t download this mod from the mod&apos;s original creator&apos;s official download page..
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_Description {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Re-Download the Mod.
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_Download_Label {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_Download_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show me the mod&apos;s {0} file.
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_ShowFile_Label {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_ShowFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This might be difficult to understand, but this issue is a sign this mod has been tampered with. I cannot stress enough how important it is to look into this, and disabling this scan is just making me not check for these kinds of issues which... I mean, it&apos;s dangerous..
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Manifest.
+        /// </summary>
+        internal static string Scan_MismatchedInscribedHashes_UpdateManifest_Label {
+            get {
+                return ResourceManager.GetString("Scan_MismatchedInscribedHashes_UpdateManifest_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is Installed.
         /// </summary>
         internal static string Scan_Missing_Installed_Caption {
@@ -5267,6 +5330,15 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_ScanForLooseZipArchives_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_ScanForLooseZipArchives_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...mismatched inscribed mod manifest hashes.
+        /// </summary>
+        internal static string ScansToggler_ScanForMismatchedInscribedHashes_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForMismatchedInscribedHashes_Label", resourceCulture);
             }
         }
         
