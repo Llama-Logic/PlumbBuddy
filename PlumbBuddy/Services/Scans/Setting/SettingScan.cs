@@ -52,19 +52,19 @@ public abstract class SettingScan :
                 var optionsIniFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Options.ini"));
                 if (!optionsIniFile.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because your Game Options file is missing. You need to launch the game, close it, and check back here."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_OptionsMissing), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
                     return;
                 }
                 if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString("I couldn't do that because the game is currently running. You need to close it and check back here."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.LockAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_GameIsRunning), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.LockAlert);
                     return;
                 }
                 var parser = new IniDataParser();
                 var data = parser.Parse(await File.ReadAllTextAsync(optionsIniFile.FullName).ConfigureAwait(false));
                 CorrectIniOptions(data["options"]);
                 await File.WriteAllTextAsync(optionsIniFile.FullName, data.ToString()).ConfigureAwait(false);
-                superSnacks.OfferRefreshments(new MarkupString("I have changed your Game Options for you at your request."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.AutoFix);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Success), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.AutoFix);
                 return;
             }
             if (resolutionDataStr == undesirableScanIssueStopResolutionData)

@@ -2213,4 +2213,76 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
     <value>Turning off this scan will prevent me from getting on your case about not having {0}, but... you know... you will still miss out on the awesome improvements it makes to {1}.</value>
     <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Utility brought by the Mod</comment>
   </data>
+  <data name="Scan_Setting_Fix_Error_OptionsMissing" xml:space="preserve">
+    <value>I couldn't do that because your Game Options file is missing. You need to launch the game, close it, and check back here.</value>
+  </data>
+  <data name="Scan_Setting_Fix_Error_GameIsRunning" xml:space="preserve">
+    <value>I couldn't do that because the game is currently running. You need to close it and check back here.</value>
+  </data>
+  <data name="Scan_Setting_Fix_Success" xml:space="preserve">
+    <value>I have changed your Game Options for you at your request.</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Okay_Caption" xml:space="preserve">
+    <value>Mods Game Option is Fine</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Okay_Description" xml:space="preserve">
+    <value>The **Enable Custom Content and Mods** box in **Game Options** isn't causing any problems at all at the moment.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Okay_Description" xml:space="preserve">
+    <value>The **Script Mods Allowed** box in **Game Options** isn't causing any problems at all at the moment.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Okay_Caption" xml:space="preserve">
+    <value>Script Mods Game Option is Fine</value>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_Okay_Caption" xml:space="preserve">
+    <value>Show Mod List Option is Fine</value>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_Okay_Description" xml:space="preserve">
+    <value>Either you have no mods or the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is not checked, which means your game isn't loading slowly just to open that list when you launch it. That's great. Any time you want to see your mods, just click the convenient button on the top of my window to open your Mods folder right up.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_Incorrect_Caption" xml:space="preserve">
+    <value>Show Mod List is Enabled in Options</value>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_Incorrect_Description" xml:space="preserve">
+    <value>You have mod packages installed and the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is checked. This can make your game load very slowly, especially on older computers or those with hard disk drives.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_Correct_Label" xml:space="preserve">
+    <value>Uncheck the box for me</value>
+  </data>
+  <data name="Scan_Setting_ShowModsListGameOption_StopTellingMe_CautionText" xml:space="preserve">
+    <value>You can just open your mods folder and look at the mods you have with the convenient button right on the top of my window, so you really don't need the game doing this. Disabling this scan won't cause your game to load any faster.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_StopTellingMe_CautionText" xml:space="preserve">
+    <value>Your script mods will not work at all without these Game Options enabled, whether or not I am running this scan. By telling me not to, you're just getting rid of this warning, not fixing the problem.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Correct_Label" xml:space="preserve">
+    <value>Check the boxes for me</value>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Description" xml:space="preserve">
+    <value>You have script archives installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Caption" xml:space="preserve">
+    <value>Script Mods are Disabled in Options</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Incorrect_Caption" xml:space="preserve">
+    <value>Mods are Disabled in Options</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Incorrect_Description" xml:space="preserve">
+    <value>You have mod packages installed, but the **Enable Custom Content and Mods** box is unchecked in **Game Options**.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Correct_Label" xml:space="preserve">
+    <value>Check the box for me</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_StopTellingMe_CautionText" xml:space="preserve">
+    <value>Your custom content and mods will not work at all without this Game Option enabled, whether or not I am running this scan. By telling me not to, you're just getting rid of this warning, not fixing the problem.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
 </root>

@@ -29,8 +29,8 @@ public class ShowModListStartupSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.SpeedometerSlow,
-            Caption = "Show Mod List is Enabled in Options",
-            Description = "You have mod packages installed and the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is checked. This can make your game load very slowly, especially on older computers or those with hard disk drives.",
+            Caption = AppText.Scan_Setting_ShowModsListGameOption_Incorrect_Caption,
+            Description = AppText.Scan_Setting_ShowModsListGameOption_Incorrect_Description,
             Origin = this,
             Type = ScanIssueType.Uncomfortable,
             Data = uncomfortableScanIssueData,
@@ -39,16 +39,16 @@ public class ShowModListStartupSettingScan :
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.AutoFix,
-                    Label = "Uncheck the box for me",
+                    Label = AppText.Scan_Setting_ShowModsListGameOption_Correct_Label,
                     Color = MudBlazor.Color.Primary,
                     Data = uncomfortableScanIssueFixResolutionData
                 },
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.Cancel,
-                    Label = "Stop telling me",
-                    CautionCaption = "Disable this scan?",
-                    CautionText = "You can just open your mods folder and look at the mods you have with the convenient button right on the top of my window, so you really don't need the game doing this. Disabling this scan won't cause your game to load any faster.",
+                    Label = AppText.Scan_Common_StopTellingMe_Label,
+                    CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                    CautionText = AppText.Scan_Setting_ShowModsListGameOption_StopTellingMe_CautionText,
                     Data = uncomfortableScanIssueStopResolutionData
                 }
             ]
@@ -58,8 +58,8 @@ public class ShowModListStartupSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.Speedometer,
-            Caption = "Show Mod List Option is Fine",
-            Description = "Either you have no mods or the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is not checked, which means your game isn't loading slowly just to open that list when you launch it. That's great. Any time you want to see your mods, just click the convenient button on the top of my window to open your Mods folder right up.",
+            Caption = AppText.Scan_Setting_ShowModsListGameOption_Okay_Caption,
+            Description = AppText.Scan_Setting_ShowModsListGameOption_Okay_Description,
             Origin = this,
             Type = ScanIssueType.Healthy
         };

@@ -4938,6 +4938,195 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because the game is currently running. You need to close it and check back here..
+        /// </summary>
+        internal static string Scan_Setting_Fix_Error_GameIsRunning {
+            get {
+                return ResourceManager.GetString("Scan_Setting_Fix_Error_GameIsRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I couldn&apos;t do that because your Game Options file is missing. You need to launch the game, close it, and check back here..
+        /// </summary>
+        internal static string Scan_Setting_Fix_Error_OptionsMissing {
+            get {
+                return ResourceManager.GetString("Scan_Setting_Fix_Error_OptionsMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I have changed your Game Options for you at your request..
+        /// </summary>
+        internal static string Scan_Setting_Fix_Success {
+            get {
+                return ResourceManager.GetString("Scan_Setting_Fix_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check the box for me.
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_Correct_Label {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_Correct_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods are Disabled in Options.
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_Incorrect_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_Incorrect_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have mod packages installed, but the **Enable Custom Content and Mods** box is unchecked in **Game Options**..
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_Incorrect_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_Incorrect_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods Game Option is Fine.
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_Okay_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_Okay_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The **Enable Custom Content and Mods** box in **Game Options** isn&apos;t causing any problems at all at the moment..
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_Okay_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_Okay_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your custom content and mods will not work at all without this Game Option enabled, whether or not I am running this scan. By telling me not to, you&apos;re just getting rid of this warning, not fixing the problem..
+        /// </summary>
+        internal static string Scan_Setting_ModsGameOption_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ModsGameOption_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check the boxes for me.
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_Correct_Label {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_Correct_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script Mods are Disabled in Options.
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_Incorrect_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_Incorrect_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have script archives installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**..
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_Incorrect_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_Incorrect_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script Mods Game Option is Fine.
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_Okay_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_Okay_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The **Script Mods Allowed** box in **Game Options** isn&apos;t causing any problems at all at the moment..
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_Okay_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_Okay_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your script mods will not work at all without these Game Options enabled, whether or not I am running this scan. By telling me not to, you&apos;re just getting rid of this warning, not fixing the problem..
+        /// </summary>
+        internal static string Scan_Setting_ScriptModsGameOption_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ScriptModsGameOption_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uncheck the box for me.
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_Correct_Label {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_Correct_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Mod List is Enabled in Options.
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_Incorrect_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_Incorrect_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have mod packages installed and the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is checked. This can make your game load very slowly, especially on older computers or those with hard disk drives..
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_Incorrect_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_Incorrect_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Mod List Option is Fine.
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_Okay_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_Okay_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either you have no mods or the **Show At Startup** box inside the **View Custom Content** button in **Game Options** is not checked, which means your game isn&apos;t loading slowly just to open that list when you launch it. That&apos;s great. Any time you want to see your mods, just click the convenient button on the top of my window to open your Mods folder right up..
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_Okay_Description {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_Okay_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can just open your mods folder and look at the mods you have with the convenient button right on the top of my window, so you really don&apos;t need the game doing this. Disabling this scan won&apos;t cause your game to load any faster..
+        /// </summary>
+        internal static string Scan_Setting_ShowModsListGameOption_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Setting_ShowModsListGameOption_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {

@@ -23,8 +23,8 @@ public sealed class ModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedRemove,
-            Caption = "Mods are Disabled in Options",
-            Description = "You have mod packages installed, but the **Enable Custom Content and Mods** box is unchecked in **Game Options**.",
+            Caption = AppText.Scan_Setting_ModsGameOption_Incorrect_Caption,
+            Description = AppText.Scan_Setting_ModsGameOption_Incorrect_Description,
             Origin = this,
             Type = ScanIssueType.Dead,
             Data = deadScanIssueData,
@@ -33,16 +33,16 @@ public sealed class ModSettingScan :
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.AutoFix,
-                    Label = "Check the box for me",
+                    Label = AppText.Scan_Setting_ModsGameOption_Correct_Label,
                     Color = MudBlazor.Color.Primary,
                     Data = deadScanIssueFixResolutionData
                 },
                 new()
                 {
                     Icon = MaterialDesignIcons.Normal.Cancel,
-                    Label = "Stop telling me",
-                    CautionCaption = "Disable this scan?",
-                    CautionText = "Your custom content and mods will not work at all without this Game Option enabled, whether or not I am running this scan. By telling me not to, you're just getting rid of this warning, not fixing the problem.",
+                    Label = AppText.Scan_Common_StopTellingMe_Label,
+                    CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                    CautionText = AppText.Scan_Setting_ModsGameOption_StopTellingMe_CautionText,
                     Data = deadScanIssueStopResolutionData
                 }
             ]
@@ -52,8 +52,8 @@ public sealed class ModSettingScan :
         new()
         {
             Icon = MaterialDesignIcons.Normal.PackageVariantClosedCheck,
-            Caption = "Mods Game Option is Fine",
-            Description = "The **Enable Custom Content and Mods** box in **Game Options** isn't causing any problems at all at the moment.",
+            Caption = AppText.Scan_Setting_ModsGameOption_Okay_Caption,
+            Description = AppText.Scan_Setting_ModsGameOption_Okay_Description,
             Origin = this,
             Type = ScanIssueType.Healthy
         };
