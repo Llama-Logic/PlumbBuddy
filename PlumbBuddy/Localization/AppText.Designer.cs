@@ -3446,6 +3446,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show an icon in the system tray.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will hide my icon from the Windows Taskbar and keep monitoring your Sims 4 installation for you when you close my window. If you toggle this option, I will always display an icon in your computer&apos;s system tray even if you&apos;ve closed my window..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some of your favorite Creators have given me beautiful makeovers. 💄.
         /// </summary>
         internal static string OnboardingDialog_Theme_Heading_1 {
@@ -5782,6 +5800,15 @@ namespace PlumbBuddy.Localization {
         internal static string SupportDiscordStepsDialog_StartOver_Label {
             get {
                 return ResourceManager.GetString("SupportDiscordStepsDialog_StartOver_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Window.
+        /// </summary>
+        internal static string SystemTray_ContextMenu_ShowWindow {
+            get {
+                return ResourceManager.GetString("SystemTray_ContextMenu_ShowWindow", resourceCulture);
             }
         }
         

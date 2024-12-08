@@ -55,6 +55,8 @@ partial class SettingsDialog
 
     bool ScanForShowModsListAtStartupEnabled { get; set; }
 
+    bool ShowSystemTrayIcon { get; set; }
+
     UserType Type { get; set; }
 
     string UserDataFolderPath { get; set; } = string.Empty;
@@ -99,6 +101,7 @@ partial class SettingsDialog
         ScanForMutuallyExclusiveMods = Settings.ScanForMutuallyExclusiveMods;
         ScanForScriptModsDisabled = Settings.ScanForScriptModsDisabled;
         ScanForShowModsListAtStartupEnabled = Settings.ScanForShowModsListAtStartupEnabled;
+        ShowSystemTrayIcon = Settings.ShowSystemTrayIcon;
         Type = Settings.Type;
     }
 
@@ -144,6 +147,7 @@ partial class SettingsDialog
         Settings.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
         Settings.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
         Settings.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
+        Settings.ShowSystemTrayIcon = ShowSystemTrayIcon;
         Settings.Type = Type;
         Settings.UserDataFolderPath = UserDataFolderPath;
         MudDialog?.Close(DialogResult.Ok(true));

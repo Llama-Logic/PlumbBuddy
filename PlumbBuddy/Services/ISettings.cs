@@ -31,6 +31,7 @@ public interface ISettings :
     bool ScanForMultipleModVersions { get; set; }
     bool ScanForScriptModsDisabled { get; set; }
     bool ScanForShowModsListAtStartupEnabled { get; set; }
+    bool ShowSystemTrayIcon { get; set; }
     bool ShowThemeManager { get; set; }
     Version? SkipUpdateVersion { get; set; }
     string? Theme { get; set; }

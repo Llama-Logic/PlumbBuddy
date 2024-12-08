@@ -347,6 +347,18 @@ class Settings :
         }
     }
 
+    public bool ShowSystemTrayIcon
+    {
+        get => preferences.Get(nameof(ShowSystemTrayIcon), false);
+        set
+        {
+            if (ShowSystemTrayIcon == value)
+                return;
+            preferences.Set(nameof(ShowSystemTrayIcon), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ShowThemeManager
     {
         get

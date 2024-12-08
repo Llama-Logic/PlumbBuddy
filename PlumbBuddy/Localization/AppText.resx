@@ -2285,4 +2285,13 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
     <value>Your custom content and mods will not work at all without this Game Option enabled, whether or not I am running this scan. By telling me not to, you're just getting rid of this warning, not fixing the problem.</value>
     <comment>This text is in Markdown.</comment>
   </data>
+  <data name="SystemTray_ContextMenu_ShowWindow" xml:space="preserve">
+    <value>Show Window</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label" xml:space="preserve">
+    <value>Show an icon in the system tray</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip" xml:space="preserve">
+    <value>I will hide my icon from the Windows Taskbar and keep monitoring your Sims 4 installation for you when you close my window. If you toggle this option, I will always display an icon in your computer's system tray even if you've closed my window.</value>
+  </data>
 </root>

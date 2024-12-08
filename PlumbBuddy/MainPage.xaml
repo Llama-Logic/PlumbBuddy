@@ -1,19 +1,54 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:PlumbBuddy"
-             x:Class="PlumbBuddy.MainPage">
-    <Grid>
-        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" IsVisible="Hidden">
+<ContentPage
+    x:Class="PlumbBuddy.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:local="clr-namespace:PlumbBuddy"
+    xmlns:localization="clr-namespace:PlumbBuddy.Localization"
+    xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    >
+    <Grid
+        x:Name="pageContainer"
+        >
+        <BlazorWebView
+            x:Name="blazorWebView"
+            HostPage="wwwroot/index.html"
+            IsVisible="Hidden"
+            >
             <BlazorWebView.RootComponents>
-                <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
+                <RootComponent
+                    Selector="#app"
+                    ComponentType="{x:Type local:Components.Routes}"
+                    />
             </BlazorWebView.RootComponents>
         </BlazorWebView>
-        <StackLayout x:Name="pleaseWait" HorizontalOptions="Center" VerticalOptions="Center">
-            <Image Source="plumbbuddy_logo.png" Aspect="AspectFit" WidthRequest="256" HeightRequest="256" HorizontalOptions="Center" />
-            <StackLayout Orientation="Horizontal" VerticalOptions="Center" Margin="0,20,0,0">
-                <ActivityIndicator IsRunning="True" />
-                <Label x:DataType="{x:Type local:MainPage}" Text="{Binding LoadingLabel}" Margin="20,0,0,0" FontSize="Medium" TextColor="{x:Static local:MainPage.TextColor}" />
+        <StackLayout
+            x:Name="pleaseWait"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            >
+            <Image
+                Source="plumbbuddy_logo.png"
+                Aspect="AspectFit"
+                WidthRequest="256"
+                HeightRequest="256"
+                HorizontalOptions="Center"
+                />
+            <StackLayout
+                Orientation="Horizontal"
+                VerticalOptions="Center"
+                Margin="0,20,0,0"
+                >
+                <ActivityIndicator
+                    IsRunning="True"
+                    />
+                <Label
+                    x:DataType="{x:Type local:MainPage}"
+                    Text="{Binding LoadingLabel}"
+                    Margin="20,0,0,0"
+                    FontSize="Medium"
+                    TextColor="{x:Static local:MainPage.TextColor}"
+                    />
             </StackLayout>
         </StackLayout>
     </Grid>

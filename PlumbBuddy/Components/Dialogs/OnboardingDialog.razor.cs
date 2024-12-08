@@ -143,6 +143,12 @@ partial class OnboardingDialog
         set => Settings.ScanForShowModsListAtStartupEnabled = value;
     }
 
+    bool ShowSystemTrayIcon
+    {
+        get => Settings.ShowSystemTrayIcon;
+        set => Settings.ShowSystemTrayIcon = value;
+    }
+
     UserType Type
     {
         get => Settings.Type;
