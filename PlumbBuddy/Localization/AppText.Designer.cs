@@ -6133,6 +6133,89 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PlumbBuddy {0} is now available to download..
+        /// </summary>
+        internal static string UpdateManager_Info_Available {
+            get {
+                return ResourceManager.GetString("UpdateManager_Info_Available", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An Update is Available.
+        /// </summary>
+        internal static string UpdateManager_Notification_Available_Caption {
+            get {
+                return ResourceManager.GetString("UpdateManager_Notification_Available_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oh my, there&apos;s a better version of me than me now! Click here to see more..
+        /// </summary>
+        internal static string UpdateManager_Notification_Available_Text {
+            get {
+                return ResourceManager.GetString("UpdateManager_Notification_Available_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to download PlumbBuddy {0}?.
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_Caption {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Planning to skip {0}?.
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_OfferToSkipVersion_Caption {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_OfferToSkipVersion_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There will be no further periodic notifications regarding {0}. You can still use the &lt;strong&gt;Check for Update&lt;/strong&gt; function in the main menu if you change your mind..
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_OfferToSkipVersion_Success {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_OfferToSkipVersion_Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you don&apos;t want me to remind you about this update in particular, I can make a note of that and not ask again until there&apos;s an even newer version. Would you like me to do that?.
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_OfferToSkipVersion_Text {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_OfferToSkipVersion_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Here are the release notes for this new version:
+        ///
+        ///{0}.
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_Text {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I was unable to get the release notes for this version..
+        /// </summary>
+        internal static string UpdateManager_PresentUpdate_Text_NoReleaseNotes {
+            get {
+                return ResourceManager.GetString("UpdateManager_PresentUpdate_Text_NoReleaseNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Sims 4.
         /// </summary>
         internal static string UserDataFolderName {

@@ -2430,4 +2430,40 @@ Brief technical details:&lt;br /&gt;
 More detailed technical information is available in my log.</value>
     <comment>{0} = Error Type; {1} = Error Message</comment>
   </data>
+  <data name="UpdateManager_Notification_Available_Caption" xml:space="preserve">
+    <value>An Update is Available</value>
+  </data>
+  <data name="UpdateManager_Notification_Available_Text" xml:space="preserve">
+    <value>Oh my, there's a better version of me than me now! Click here to see more.</value>
+  </data>
+  <data name="UpdateManager_Info_Available" xml:space="preserve">
+    <value>PlumbBuddy {0} is now available to download.</value>
+    <comment>{0} = The New Version Number</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_Caption" xml:space="preserve">
+    <value>Would you like to download PlumbBuddy {0}?</value>
+    <comment>{0} = The New Version Number</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_Text" xml:space="preserve">
+    <value>Here are the release notes for this new version:
+
+{0}</value>
+    <comment>This text is in Markdown. {0} = The Release Notes (you may choose to warn the user that the notes will always be in English)</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_Text_NoReleaseNotes" xml:space="preserve">
+    <value>I was unable to get the release notes for this version.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_OfferToSkipVersion_Caption" xml:space="preserve">
+    <value>Planning to skip {0}?</value>
+    <comment>{0} = The New Version Number</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_OfferToSkipVersion_Text" xml:space="preserve">
+    <value>If you don't want me to remind you about this update in particular, I can make a note of that and not ask again until there's an even newer version. Would you like me to do that?</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="UpdateManager_PresentUpdate_OfferToSkipVersion_Success" xml:space="preserve">
+    <value>There will be no further periodic notifications regarding {0}. You can still use the &lt;strong&gt;Check for Update&lt;/strong&gt; function in the main menu if you change your mind.</value>
+    <comment>{0} = The New Version Number</comment>
+  </data>
 </root>

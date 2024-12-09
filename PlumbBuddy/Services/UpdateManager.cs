@@ -140,8 +140,8 @@ public sealed class UpdateManager :
                         continue;
                     settings.SkipUpdateVersion = null;
                 }
-                await platformFunctions.SendLocalNotificationAsync("An Update is Available", "Oh my, there's a better version of me than me now! Click here to see more.").ConfigureAwait(false);
-                superSnacks.OfferRefreshments(new MarkupString($"PlumbBuddy {version} is now available to download."), Severity.Info, options =>
+                await platformFunctions.SendLocalNotificationAsync(AppText.UpdateManager_Notification_Available_Caption, AppText.UpdateManager_Notification_Available_Text).ConfigureAwait(false);
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.UpdateManager_Info_Available, version)), Severity.Info, options =>
                 {
                     options.Icon = MaterialDesignIcons.Normal.Update;
                     options.Onclick = async _ => await PresentUpdateAsync(version, releaseNotes, downloadUrl);
@@ -167,10 +167,7 @@ public sealed class UpdateManager :
         {
             if (downloadUrl is null)
             {
-                if (await dialogService.ShowQuestionDialogAsync($"Would you like to download PlumbBuddy {version}?",
-                    $"""
-                        I was unable to get the release notes for this version.
-                        """) is { } saidYes && saidYes)
+                if (await dialogService.ShowQuestionDialogAsync(string.Format(AppText.UpdateManager_PresentUpdate_Caption, version), AppText.UpdateManager_PresentUpdate_Text_NoReleaseNotes) is { } saidYes && saidYes)
                 {
                     await Browser.OpenAsync("https://plumbbuddy.app/download", BrowserLaunchMode.External);
                     return;
@@ -178,10 +175,7 @@ public sealed class UpdateManager :
             }
             else
             {
-                if (await dialogService.ShowQuestionDialogAsync($"Would you like to download PlumbBuddy {version}?",
-                    $"""
-                        I was unable to get the release notes for this version.
-                        """) is { } saidYes && saidYes)
+                if (await dialogService.ShowQuestionDialogAsync(string.Format(AppText.UpdateManager_PresentUpdate_Caption, version), AppText.UpdateManager_PresentUpdate_Text_NoReleaseNotes) is { } saidYes && saidYes)
                 {
                     await Browser.OpenAsync(downloadUrl.ToString(), BrowserLaunchMode.External);
                     return;
@@ -192,12 +186,7 @@ public sealed class UpdateManager :
         {
             if (downloadUrl is null)
             {
-                if (await dialogService.ShowQuestionDialogAsync($"Would you like to download PlumbBuddy {version}?",
-                    $"""
-                        Here are the release notes for this new version:
-
-                        {releaseNotes}
-                        """, big: true) is { } saidYes && saidYes)
+                if (await dialogService.ShowQuestionDialogAsync(string.Format(AppText.UpdateManager_PresentUpdate_Caption, version), string.Format(AppText.UpdateManager_PresentUpdate_Text, releaseNotes), big: true) is { } saidYes && saidYes)
                 {
                     await Browser.OpenAsync("https://plumbbuddy.app/download", BrowserLaunchMode.External);
                     return;
@@ -205,22 +194,17 @@ public sealed class UpdateManager :
             }
             else
             {
-                if (await dialogService.ShowQuestionDialogAsync($"Would you like to download PlumbBuddy {version}?",
-                    $"""
-                        Here are the release notes for this new version:
-
-                        {releaseNotes}
-                        """, big: true) is { } saidYes && saidYes)
+                if (await dialogService.ShowQuestionDialogAsync(string.Format(AppText.UpdateManager_PresentUpdate_Caption, version), string.Format(AppText.UpdateManager_PresentUpdate_Text, releaseNotes), big: true) is { } saidYes && saidYes)
                 {
                     await Browser.OpenAsync(downloadUrl.ToString(), BrowserLaunchMode.External);
                     return;
                 }
             }
         }
-        if (await dialogService.ShowQuestionDialogAsync($"Planning to skip {version}?", "If you don't want me to remind you about this update in particular, I can make a note of that and not ask again until there's an even newer version. Would you like me to do that?") ?? false)
+        if (await dialogService.ShowQuestionDialogAsync(string.Format(AppText.UpdateManager_PresentUpdate_OfferToSkipVersion_Caption, version), AppText.UpdateManager_PresentUpdate_OfferToSkipVersion_Text) ?? false)
         {
             settings.SkipUpdateVersion = version;
-            superSnacks.OfferRefreshments(new MarkupString($"There will be no further periodic notifications regarding {version}. You can still use the <strong>Check for Update</strong> function in the main menu if you change your mind."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.DownloadOff);
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.UpdateManager_PresentUpdate_OfferToSkipVersion_Success, version)), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.DownloadOff);
         }
     }
 }
