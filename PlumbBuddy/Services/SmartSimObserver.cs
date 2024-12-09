@@ -682,7 +682,7 @@ public partial class SmartSimObserver :
         {
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging)
                 FreshenGlobalManifest(force: true);
-            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging or ModsDirectoryCatalogerState.Idle)
+            if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
                 Scan();
         }
     }
@@ -960,7 +960,7 @@ public partial class SmartSimObserver :
         {
             using var scanningTaskLockHeld = await scanningTaskLock.LockAsync().ConfigureAwait(false);
             enqueuedScanningTaskLockPotentiallyHeld.Dispose();
-            if (modsDirectoryCataloger.State is not (ModsDirectoryCatalogerState.Cataloging or ModsDirectoryCatalogerState.Idle))
+            if (modsDirectoryCataloger.State is not (ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle))
                 return;
             IsScanning = true;
             var scanIssues = new ConcurrentBag<ScanIssue>();

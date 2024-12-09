@@ -39,7 +39,7 @@ public sealed class CacheStalenessScan :
     public override IAsyncEnumerable<ScanIssue> ScanAsync() =>
         AsyncEnumerable.Empty<ScanIssue>().Append
         (
-            modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging
+            modsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology
             ?
             new()
             {
