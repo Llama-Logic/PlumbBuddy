@@ -3057,6 +3057,22 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to catalog the mod file at this location in your Mods folder:&lt;br /&gt;
+        ///&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string ModsDirectoryCataloger_Warning_CannotReadModFile {
+            get {
+                return ResourceManager.GetString("ModsDirectoryCataloger_Warning_CannotReadModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I may be about to spook your Mac.
         /// </summary>
         internal static string OnboardingDialog_Caution_SpookingMacs_Caption {

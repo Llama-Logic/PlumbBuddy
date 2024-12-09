@@ -830,21 +830,11 @@ public class ModsDirectoryCataloger :
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", path);
-            superSnacks.OfferRefreshments(new MarkupString(
-                $"""
-                <h3>Whoops!</h3>
-                I ran into a problem trying to catalog the package at this location in your Mods folder:<br />
-                <strong>{path}</strong><br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """), Severity.Warning, options =>
-                {
-                    options.RequireInteraction = true;
-                    options.Icon = MaterialDesignIcons.Normal.PackageVariantRemove;
-                });
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModsDirectoryCataloger_Warning_CannotReadModFile, path, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+            {
+                options.RequireInteraction = true;
+                options.Icon = MaterialDesignIcons.Normal.PackageVariantRemove;
+            });
         }
     }
 

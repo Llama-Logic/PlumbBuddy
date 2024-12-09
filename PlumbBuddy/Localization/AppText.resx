@@ -2328,4 +2328,15 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
   <data name="OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip" xml:space="preserve">
     <value>When I notice the game is patched, I'll offer to see if we can find a Support Venue which features news about updates to mods so that you can learn which mods you're running may need updates, and where to get those updates.</value>
   </data>
+  <data name="ModsDirectoryCataloger_Warning_CannotReadModFile" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to catalog the mod file at this location in your Mods folder:&lt;br /&gt;
+&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>This text is in Markdown. {0} = Relative Path to the Mod File; {1} = Error Type; {2} = Error Message</comment>
+  </data>
 </root>
