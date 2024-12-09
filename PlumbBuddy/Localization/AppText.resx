@@ -2322,4 +2322,10 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
   <data name="Scan_MismatchedInscribedHashes_Download_Label" xml:space="preserve">
     <value>Re-Download the Mod</value>
   </data>
+  <data name="OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label" xml:space="preserve">
+    <value>Offer to help find mod update news when the game is patched</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip" xml:space="preserve">
+    <value>When I notice the game is patched, I'll offer to see if we can find a Support Venue which features news about updates to mods so that you can learn which mods you're running may need updates, and where to get those updates.</value>
+  </data>
 </root>

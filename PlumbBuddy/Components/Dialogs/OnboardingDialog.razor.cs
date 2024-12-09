@@ -32,6 +32,12 @@ partial class OnboardingDialog
         set => Settings.InstallationFolderPath = value;
     }
 
+    bool OfferPatchDayModUpdatesHelp
+    {
+        get => Settings.OfferPatchDayModUpdatesHelp;
+        set => Settings.OfferPatchDayModUpdatesHelp = value;
+    }
+
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
@@ -244,6 +250,7 @@ partial class OnboardingDialog
         switch (value)
         {
             case UserType.Creator:
+                Settings.OfferPatchDayModUpdatesHelp = false;
                 Settings.ScanForModsDisabled = false;
                 Settings.ScanForScriptModsDisabled = false;
                 Settings.ScanForInvalidModSubdirectoryDepth = false;
@@ -265,6 +272,7 @@ partial class OnboardingDialog
                 Settings.ScanForShowModsListAtStartupEnabled = false;
                 break;
             default:
+                Settings.OfferPatchDayModUpdatesHelp = value is UserType.Casual;
                 Settings.ScanForModsDisabled = ScanAttribute.Get(typeof(IModSettingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForInvalidModSubdirectoryDepth = ScanAttribute.Get(typeof(IPackageDepthScan))?.IsEnabledByDefault ?? false;

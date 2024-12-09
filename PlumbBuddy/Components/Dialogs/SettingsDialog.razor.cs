@@ -16,6 +16,8 @@ partial class SettingsDialog
 
     string InstallationFolderPath { get; set; } = string.Empty;
 
+    bool OfferPatchDayModUpdatesHelp { get; set; }
+
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
@@ -85,6 +87,7 @@ partial class SettingsDialog
         await base.OnParametersSetAsync();
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
+        OfferPatchDayModUpdatesHelp = Settings.OfferPatchDayModUpdatesHelp;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
         ScanForCorruptMods = Settings.ScanForCorruptMods;
         ScanForCorruptScriptMods = Settings.ScanForCorruptScriptMods;
@@ -132,6 +135,7 @@ partial class SettingsDialog
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
+        Settings.OfferPatchDayModUpdatesHelp = OfferPatchDayModUpdatesHelp;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
         Settings.ScanForCorruptMods = ScanForCorruptMods;
         Settings.ScanForCorruptScriptMods = ScanForCorruptScriptMods;

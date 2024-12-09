@@ -12,6 +12,7 @@ public interface ISettings :
     string InstallationFolderPath { get; set; }
     DateTimeOffset? LastCheckForUpdate { get; set; }
     Version? LastGameVersion { get; set; }
+    bool OfferPatchDayModUpdatesHelp { get; set; }
     bool Onboarded { get; set; }
     bool ScanForCacheStaleness { get; set; }
     bool ScanForCorruptMods { get; set; }

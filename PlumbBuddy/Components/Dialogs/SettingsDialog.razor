@@ -50,6 +50,11 @@
                         @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label)]
                     </MudSwitchM3>
                 </MudTooltip>
+                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip)]">
+                    <MudSwitchM3 @bind-Value="@OfferPatchDayModUpdatesHelp" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Newspaper">
+                        @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label)]
+                    </MudSwitchM3>
+                </MudTooltip>
                 <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
                     <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">
                         @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]

@@ -42,6 +42,22 @@ public sealed class UpdateManager :
                         options.RequireInteraction = true;
                     });
                 }
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 1 } && settings.Type is UserType.Creator)
+                {
+                    settings.OfferPatchDayModUpdatesHelp = false;
+                    superSnacks.OfferRefreshments(new MarkupString("My offer to help you with mod patch day updates is now optional, but since you've a self-identified as a Mod Creator, I have turned it off by default."), Severity.Info, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.NewBox;
+                        options.Action = "Turn It On";
+                        options.ActionColor = MudBlazor.Color.Success;
+                        options.Onclick = _ =>
+                        {
+                            settings.OfferPatchDayModUpdatesHelp = true;
+                            return Task.CompletedTask;
+                        };
+                        options.RequireInteraction = true;
+                    });
+                }
             }
             else
                 logger.LogInformation("This is the first time this installation is starting.");

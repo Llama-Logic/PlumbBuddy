@@ -119,6 +119,18 @@ class Settings :
         }
     }
 
+    public bool OfferPatchDayModUpdatesHelp
+    {
+        get => preferences.Get(nameof(OfferPatchDayModUpdatesHelp), true);
+        set
+        {
+            if (OfferPatchDayModUpdatesHelp == value)
+                return;
+            preferences.Set(nameof(OfferPatchDayModUpdatesHelp), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool Onboarded
     {
         get => preferences.Get(nameof(Onboarded), false);

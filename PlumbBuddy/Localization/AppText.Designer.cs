@@ -3446,6 +3446,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Offer to help find mod update news when the game is patched.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When I notice the game is patched, I&apos;ll offer to see if we can find a Support Venue which features news about updates to mods so that you can learn which mods you&apos;re running may need updates, and where to get those updates..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show an icon in the system tray.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label {

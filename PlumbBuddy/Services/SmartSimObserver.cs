@@ -133,7 +133,7 @@ public partial class SmartSimObserver :
             {
                 var truncatedLastGameVersion = new Version(lastGameVersion.Major, lastGameVersion.Minor);
                 var truncatedGameVersion = new Version(gameVersion.Major, gameVersion.Minor);
-                if (!EqualityComparer<Version>.Default.Equals(truncatedLastGameVersion, truncatedGameVersion))
+                if (!EqualityComparer<Version>.Default.Equals(truncatedLastGameVersion, truncatedGameVersion) && settings.OfferPatchDayModUpdatesHelp)
                 {
                     using var pbDbContext = pbDbContextFactory.CreateDbContext();
                     if (!IsModsDisabledGameSettingOn
