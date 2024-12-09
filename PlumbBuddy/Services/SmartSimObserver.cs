@@ -1,3 +1,5 @@
+using PlumbBuddy.Components.Dialogs;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -141,19 +143,16 @@ public partial class SmartSimObserver :
                         || IsScriptModsEnabledGameSettingOn
                         && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.ScriptArchive))
                     {
-                        superSnacks.OfferRefreshments(new MarkupString(
-                            $"""
-                            You just successfully upgraded The Sims 4 from {truncatedLastGameVersion} to {truncatedGameVersion}! Well done! Would you like help joining a Discord server which announces updates for mods? There are probably at least a few important updates headed your way from creators.
-                            """), Severity.Success, options =>
-                            {
-                                options.Icon = MaterialDesignIcons.Normal.TimelineCheck;
-                                options.RequireInteraction = true;
-                                var lifetimeScope = blazorFramework.MainLayoutLifetimeScope!;
-                                var dialogService = lifetimeScope.Resolve<IDialogService>();
-                                var publicCatalogs = lifetimeScope.Resolve<IPublicCatalogs>();
-                                options.Onclick = async _ => await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, isPatchDay: true);
-                            });
-                        _ = Task.Run(async () => await platformFunctions.SendLocalNotificationAsync("Major Game Update Detected", "Please click here if you're interested in updating your mods for the new patch!"));
+                        superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Success_OfferPatchDayModUpdatesHelp, truncatedLastGameVersion, truncatedGameVersion)), Severity.Success, options =>
+                        {
+                            options.Icon = MaterialDesignIcons.Normal.TimelineCheck;
+                            options.RequireInteraction = true;
+                            var lifetimeScope = blazorFramework.MainLayoutLifetimeScope!;
+                            var dialogService = lifetimeScope.Resolve<IDialogService>();
+                            var publicCatalogs = lifetimeScope.Resolve<IPublicCatalogs>();
+                            options.Onclick = async _ => await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, isPatchDay: true);
+                        });
+                        _ = Task.Run(async () => await platformFunctions.SendLocalNotificationAsync(AppText.SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption, AppText.SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Text));
                     }
                 }
             }
@@ -316,16 +315,7 @@ public partial class SmartSimObserver :
         {
             logger.LogWarning(ex, "a user-initiated attempt to clear the cache failed");
             superSnacks.OfferRefreshments(new MarkupString(
-                $"""
-                <h3>Whoops!</h3>
-                I ran into a problem trying to clear your cache for you.<br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
-                <br />
-                There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents.
-                Click me to start Guided Support for the PlumbBuddy Discord and we can get that log file looked at, if you want.
-                """), Severity.Warning, options =>
+                string.Format(AppText.SmartSimObserver_Error_ClearingCacheFailed, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
                 {
                     options.RequireInteraction = true;
                     options.Icon = MaterialDesignIcons.Normal.EraserVariant;
@@ -734,25 +724,12 @@ public partial class SmartSimObserver :
     {
         if (!IsSteamInstallation && creators?.Count is > 0 && electronicArtsPromoCode is not null)
         {
-            if (await dialogService.ShowQuestionDialogAsync("An Opportunity Has Presented Itself...",
-                    $"""
-                    Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {creators.Humanize()} {(creators.Count is 1 ? "has" : "have")} a Promo Code for this program:
-                    `{electronicArtsPromoCode}`<br />
-                    Since you're interested in **{packCode}** because of how it works with this mod, would you like to support {creators.Humanize()} by entering this Promo Code at check-out?<br />
-                    Doing so **will not cost you any more**, but it will cause {creators.Humanize()} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!
-                    """,
-                    true) is not { } copyToClipboardPreference)
+            if (await dialogService.ShowQuestionDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text, creators.Humanize(), electronicArtsPromoCode, packCode), true) is not { } copyToClipboardPreference)
                 return;
             if (copyToClipboardPreference)
             {
                 await Clipboard.SetTextAsync(electronicArtsPromoCode);
-                await dialogService.ShowSuccessDialogAsync("Thanks for Supporting Creators! 🥰",
-                    $"""
-                    I've just copied this Promo Code to your computer's clipboard:
-                    `{electronicArtsPromoCode}`<br />                    
-                    You can now just paste it right in to the Promo Code field during check-out and help support {creators.Humanize()}!<br /><br />
-                    <iframe src="https://giphy.com/embed/rlQgaKAzFj21hivpE8" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/blkbok-rlQgaKAzFj21hivpE8">via GIPHY</a></p>
-                    """);
+                await dialogService.ShowSuccessDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Text, electronicArtsPromoCode, creators.Humanize()));
             }
         }
         await Browser.OpenAsync($"https://plumbbuddy.app/redirect?purchase-pack={packCode}{(IsSteamInstallation ? "&from=steam" : string.Empty)}", BrowserLaunchMode.External);
@@ -810,12 +787,7 @@ public partial class SmartSimObserver :
             platformFunctions.ViewDirectory(downloadsFolder);
             return;
         }
-        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowErrorDialogAsync("Umm, Whoops",
-            $"""
-            The Downloads folder I have on file for you does not exist:<br />
-            `{settings.DownloadsFolderPath}`<br /><br />
-            You may want to go into Settings and change that.
-            """).ConfigureAwait(false);
+        await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowErrorDialogAsync(AppText.SmartSimObserver_OpenDownloadsFolder_Error_Caption, string.Format(AppText.SmartSimObserver_OpenDownloadsFolder_Error_Text, settings.DownloadsFolderPath)).ConfigureAwait(false);
     }
 
     public void OpenModsFolder()
@@ -906,21 +878,11 @@ public partial class SmartSimObserver :
             {
                 // eww, a bad INI file?
                 logger.LogWarning(ex, "attempting to parse the game options INI file at {path} failed", optionsIniFile.FullName);
-                superSnacks.OfferRefreshments(new MarkupString(
-                    $"""
-                    <h3>Whoops!</h3>
-                    I ran into a problem trying to read the file which contains your game options for The Sims 4:<br />
-                    <strong>{optionsIniFile.FullName}</strong><br />
-                    <br />
-                    Brief technical details:<br />
-                    <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
-                    <br />
-                    There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents.
-                    """), Severity.Warning, options =>
-                    {
-                        options.RequireInteraction = true;
-                        options.Icon = MaterialDesignIcons.Normal.CogOff;
-                    });
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Error_CannotReadGameSettings, optionsIniFile.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+                {
+                    options.RequireInteraction = true;
+                    options.Icon = MaterialDesignIcons.Normal.CogOff;
+                });
             }
         }
         if (!parsedSuccessfully)
@@ -1025,13 +987,13 @@ public partial class SmartSimObserver :
                 var distinctAttentionWorthyScanIssueCaptions = attentionWorthyScanIssues.Select(si => si.Caption).Distinct().ToImmutableArray();
                 string modHealthStatusSummary;
                 if (distinctAttentionWorthyScanIssueCaptions.Length is <= 3)
-                    modHealthStatusSummary = $"Click here to get help with the problem{(distinctAttentionWorthyScanIssueCaptions.Length is 1 ? string.Empty : "s")} that {distinctAttentionWorthyScanIssueCaptions.Humanize()}.";
+                    modHealthStatusSummary = distinctAttentionWorthyScanIssueCaptions.Humanize();
                 else
-                    modHealthStatusSummary = $"Click here to get help with the problems that {distinctAttentionWorthyScanIssueCaptions.Take(2).Append("other issue".ToQuantity(distinctAttentionWorthyScanIssueCaptions.Length - 2, ShowQuantityAs.Words)).Humanize()}.";
+                    modHealthStatusSummary = distinctAttentionWorthyScanIssueCaptions.Take(2).Append(AppText.SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue.ToQuantity(distinctAttentionWorthyScanIssueCaptions.Length - 2, ShowQuantityAs.Words)).Humanize();
                 if (modHealthStatusSummary != lastModHealthStatusSummary)
                 {
                     if (!appLifecycleManager.IsVisible)
-                        await platformFunctions.SendLocalNotificationAsync("Your Sims 4 Setup Needs Attention", modHealthStatusSummary).ConfigureAwait(false);
+                        await platformFunctions.SendLocalNotificationAsync(AppText.SmartSimObserver_Notification_UnhealthyMods_Caption, string.Format(AppText.SmartSimObserver_Notification_UnhealthyMods_Text, modHealthStatusSummary)).ConfigureAwait(false);
                     lastModHealthStatusSummary = modHealthStatusSummary;
                 }
             }
@@ -1042,20 +1004,11 @@ public partial class SmartSimObserver :
         catch (Exception ex)
         {
             logger.LogError(ex, "unexpected exception encountered while scanning");
-            superSnacks.OfferRefreshments(new MarkupString(
-                $"""
-                <h3>Whoops!</h3>
-                I ran into a show-stopping problem while trying to check the health of your Mods folder.<br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """), Severity.Error, options =>
-                {
-                    options.RequireInteraction = true;
-                    options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
-                });
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Error_ModsHealthScanFailed, ex.GetType().Name, ex.Message)), Severity.Error, options =>
+            {
+                options.RequireInteraction = true;
+                options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+            });
             await platformFunctions.SetBadgeNumberAsync(0).ConfigureAwait(false);
         }
         finally
@@ -1124,20 +1077,11 @@ public partial class SmartSimObserver :
         catch (Exception ex)
         {
             logger.LogError(ex, "unexpected exception encountered while initializing scans");
-            superSnacks.OfferRefreshments(new MarkupString(
-                $"""
-                <h3>Whoops!</h3>
-                I ran into a show-stopping problem while trying to check the health of your Mods folder.<br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{ex.GetType().Name}: {ex.Message}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """), Severity.Error, options =>
-                {
-                    options.RequireInteraction = true;
-                    options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
-                });
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Error_InitializingScansFailed, ex.GetType().Name, ex.Message)), Severity.Error, options =>
+            {
+                options.RequireInteraction = true;
+                options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+            });
             platformFunctions.SetBadgeNumberAsync(0).Wait();
         }
     }

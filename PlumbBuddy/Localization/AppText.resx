@@ -2339,4 +2339,95 @@ Brief technical details:&lt;br /&gt;
 More detailed technical information is available in my log.</value>
     <comment>This text is in Markdown. {0} = Relative Path to the Mod File; {1} = Error Type; {2} = Error Message</comment>
   </data>
+  <data name="SmartSimObserver_Success_OfferPatchDayModUpdatesHelp" xml:space="preserve">
+    <value>You just successfully upgraded The Sims 4 from {0} to {1}! Well done! Would you like help joining a Discord server which announces updates for mods? There are probably at least a few important updates headed your way from creators.</value>
+    <comment>This text is in Markdown. {0} = The Version of the Game Formerly Installed; {1} = The Version of the Game Currently Installed</comment>
+  </data>
+  <data name="SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption" xml:space="preserve">
+    <value>Major Game Update Detected</value>
+  </data>
+  <data name="SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Text" xml:space="preserve">
+    <value>Please click here if you're interested in updating your mods for the new patch!</value>
+  </data>
+  <data name="SmartSimObserver_Error_ClearingCacheFailed" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to clear your cache for you.&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+There is more detailed technical information available in my log.
+Click me to start Guided Support for the PlumbBuddy Discord and we can get that log file looked at, if you want.</value>
+    <comment>{0} = Type of the Error; {1} = Error Message</comment>
+  </data>
+  <data name="SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text" xml:space="preserve">
+    <value>Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
+`{1}`&lt;br /&gt;
+Since you're interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?&lt;br /&gt;
+Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!</value>
+    <comment>This text is in Markdown. {0} = List of Creators; {1} = EA Promo Code; {2} = Pack Code</comment>
+  </data>
+  <data name="SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption" xml:space="preserve">
+    <value>An Opportunity Has Presented Itself...</value>
+  </data>
+  <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Caption" xml:space="preserve">
+    <value>Thanks for Supporting Creators! 🥰</value>
+  </data>
+  <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Text" xml:space="preserve">
+    <value>I've just copied this Promo Code to your computer's clipboard:
+`{0}`&lt;br /&gt;                    
+You can now just paste it right in to the Promo Code field during check-out and help support {1}!&lt;br /&gt;&lt;br /&gt;
+&lt;iframe src="https://giphy.com/embed/rlQgaKAzFj21hivpE8" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/blkbok-rlQgaKAzFj21hivpE8"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown. {0} = EA Promo Code; {1} = List of Creators</comment>
+  </data>
+  <data name="SmartSimObserver_OpenDownloadsFolder_Error_Text" xml:space="preserve">
+    <value>The Downloads folder I have on file for you does not exist:&lt;br /&gt;
+`{0}`&lt;br /&gt;&lt;br /&gt;
+You may want to go into Settings and change that.</value>
+    <comment>This text is in Markdown. {0} = Downloads Folder Path</comment>
+  </data>
+  <data name="SmartSimObserver_OpenDownloadsFolder_Error_Caption" xml:space="preserve">
+    <value>Umm, Whoops</value>
+  </data>
+  <data name="SmartSimObserver_Error_CannotReadGameSettings" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to read the file which contains your game options for The Sims 4:&lt;br /&gt;
+&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents.</value>
+    <comment>{0} = Path to the Game Settings File; {1} = Error Type; {2} = Error Message</comment>
+  </data>
+  <data name="SmartSimObserver_Notification_UnhealthyMods_Caption" xml:space="preserve">
+    <value>Your Sims 4 Setup Needs Attention</value>
+  </data>
+  <data name="SmartSimObserver_Notification_UnhealthyMods_Text" xml:space="preserve">
+    <value>Click here to get help with {0}.</value>
+    <comment>{0} = The List of Problems Found</comment>
+  </data>
+  <data name="SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue" xml:space="preserve">
+    <value>other issue</value>
+  </data>
+  <data name="SmartSimObserver_Error_ModsHealthScanFailed" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a show-stopping problem while trying to check the health of your Mods folder.&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>{0} = Error Type; {1} = Error Message</comment>
+  </data>
+  <data name="SmartSimObserver_Error_InitializingScansFailed" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a show-stopping problem while trying to check the health of your Mods folder.&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>{0} = Error Type; {1} = Error Message</comment>
+  </data>
 </root>

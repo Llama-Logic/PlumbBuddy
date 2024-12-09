@@ -5739,6 +5739,184 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to read the file which contains your game options for The Sims 4:&lt;br /&gt;
+        ///&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///There is more detailed technical information available in the log I write to the PlumbBuddy folder in your Documents..
+        /// </summary>
+        internal static string SmartSimObserver_Error_CannotReadGameSettings {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Error_CannotReadGameSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to clear your cache for you.&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///There is more detailed technical information available in my log.
+        ///Click me to start Guided Support for the PlumbBuddy Discord and we can get that log file looked at, if you want..
+        /// </summary>
+        internal static string SmartSimObserver_Error_ClearingCacheFailed {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Error_ClearingCacheFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a show-stopping problem while trying to check the health of your Mods folder.&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string SmartSimObserver_Error_InitializingScansFailed {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Error_InitializingScansFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a show-stopping problem while trying to check the health of your Mods folder.&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{0}: {1}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string SmartSimObserver_Error_ModsHealthScanFailed {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Error_ModsHealthScanFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An Opportunity Has Presented Itself....
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
+        ///`{1}`&lt;br /&gt;
+        ///Since you&apos;re interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?&lt;br /&gt;
+        ///Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!.
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thanks for Supporting Creators! 🥰.
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_Thanks_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve just copied this Promo Code to your computer&apos;s clipboard:
+        ///`{0}`&lt;br /&gt;                    
+        ///You can now just paste it right in to the Promo Code field during check-out and help support {1}!&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/rlQgaKAzFj21hivpE8&quot; width=&quot;480&quot; height=&quot;360&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/blkbok-rlQgaKAzFj21hivpE8&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_Thanks_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Major Game Update Detected.
+        /// </summary>
+        internal static string SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please click here if you&apos;re interested in updating your mods for the new patch!.
+        /// </summary>
+        internal static string SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Sims 4 Setup Needs Attention.
+        /// </summary>
+        internal static string SmartSimObserver_Notification_UnhealthyMods_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Notification_UnhealthyMods_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to get help with {0}..
+        /// </summary>
+        internal static string SmartSimObserver_Notification_UnhealthyMods_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Notification_UnhealthyMods_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to other issue.
+        /// </summary>
+        internal static string SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Umm, Whoops.
+        /// </summary>
+        internal static string SmartSimObserver_OpenDownloadsFolder_Error_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_OpenDownloadsFolder_Error_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Downloads folder I have on file for you does not exist:&lt;br /&gt;
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///You may want to go into Settings and change that..
+        /// </summary>
+        internal static string SmartSimObserver_OpenDownloadsFolder_Error_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_OpenDownloadsFolder_Error_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You just successfully upgraded The Sims 4 from {0} to {1}! Well done! Would you like help joining a Discord server which announces updates for mods? There are probably at least a few important updates headed your way from creators..
+        /// </summary>
+        internal static string SmartSimObserver_Success_OfferPatchDayModUpdatesHelp {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Success_OfferPatchDayModUpdatesHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} Guided Support Session.
         /// </summary>
         internal static string SupportDiscordStepsDialog_Caption {
