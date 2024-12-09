@@ -475,6 +475,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Just a moment, I&apos;ll will be right with you....
+        /// </summary>
+        internal static string DesktopInterface_Loading {
+            get {
+                return ResourceManager.GetString("DesktopInterface_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting Sims 4 Mods monitoring....
+        /// </summary>
+        internal static string DesktopInterface_Loading_HideMainWindow {
+            get {
+                return ResourceManager.GetString("DesktopInterface_Loading_HideMainWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Whoops, Something Went Wrong!.
         /// </summary>
         internal static string Dialogs_Error_GetSupportDiscordsFailed_Caption {

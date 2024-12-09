@@ -30,8 +30,8 @@ public partial class MainPage :
         settings.ShowSystemTrayIcon;
 
     public string LoadingLabel => appLifecycleManager.HideMainWindowAtLaunch
-        ? "Starting Sims 4 Mods monitoring..."
-        : "Just a moment, I'll will be right with you...";
+        ? AppText.DesktopInterface_Loading_HideMainWindow
+        : AppText.DesktopInterface_Loading;
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

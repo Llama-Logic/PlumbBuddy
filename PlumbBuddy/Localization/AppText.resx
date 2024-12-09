@@ -2466,4 +2466,10 @@ More detailed technical information is available in my log.</value>
     <value>There will be no further periodic notifications regarding {0}. You can still use the &lt;strong&gt;Check for Update&lt;/strong&gt; function in the main menu if you change your mind.</value>
     <comment>{0} = The New Version Number</comment>
   </data>
+  <data name="DesktopInterface_Loading" xml:space="preserve">
+    <value>Just a moment, I'll will be right with you...</value>
+  </data>
+  <data name="DesktopInterface_Loading_HideMainWindow" xml:space="preserve">
+    <value>Starting Sims 4 Mods monitoring...</value>
+  </data>
 </root>
