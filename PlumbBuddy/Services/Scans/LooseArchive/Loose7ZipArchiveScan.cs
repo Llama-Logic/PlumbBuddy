@@ -39,6 +39,13 @@ public sealed class Loose7ZipArchiveScan :
                 },
                 new()
                 {
+                    Icon = MaterialDesignIcons.Normal.FileFind,
+                    Label = AppText.Scan_Common_ShowMeThisFile_Label,
+                    Color = MudBlazor.Color.Secondary,
+                    Data = "show"
+                },
+                new()
+                {
                     Icon = MaterialDesignIcons.Normal.Cancel,
                     Label = AppText.Scan_Common_StopTellingMe_Label,
                     CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,

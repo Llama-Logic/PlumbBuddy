@@ -72,6 +72,17 @@ public abstract class LooseArchiveScan :
                 });
                 return Task.CompletedTask;
             }
+            if (resolutionCmd is "show")
+            {
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, looseArchiveRelativePath));
+                if (!file.Exists)
+                {
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    return Task.CompletedTask;
+                }
+                platformFunctions.ViewFile(file);
+                return Task.CompletedTask;
+            }
             if (resolutionCmd is "stopTellingMe")
             {
                 StopScanning(settings);

@@ -1,3 +1,5 @@
+using PlumbBuddy.Data;
+
 namespace PlumbBuddy.Services.Scans.Corrupt;
 
 public abstract class CorruptScan :
@@ -33,11 +35,11 @@ public abstract class CorruptScan :
 
     public override Task ResolveIssueAsync(object issueData, object resolutionData)
     {
-        if (issueData is string looseArchiveRelativePath && resolutionData is string resolutionCmd)
+        if (issueData is string corruptModFilePath && resolutionData is string resolutionCmd)
         {
             if (resolutionCmd is "moveToDownloads")
             {
-                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", looseArchiveRelativePath));
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", corruptModFilePath));
                 if (!file.Exists)
                 {
                     superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_MoveToDownloads_Error_CannotFind), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
@@ -69,6 +71,17 @@ public abstract class CorruptScan :
                         return Task.CompletedTask;
                     };
                 });
+                return Task.CompletedTask;
+            }
+            if (resolutionCmd is "show")
+            {
+                var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", corruptModFilePath));
+                if (!file.Exists)
+                {
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    return Task.CompletedTask;
+                }
+                platformFunctions.ViewFile(file);
                 return Task.CompletedTask;
             }
             if (resolutionCmd is "stopTellingMe")

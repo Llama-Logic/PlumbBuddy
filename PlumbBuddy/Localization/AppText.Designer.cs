@@ -3772,6 +3772,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show me this file.
+        /// </summary>
+        internal static string Scan_Common_ShowMeThisFile_Label {
+            get {
+                return ResourceManager.GetString("Scan_Common_ShowMeThisFile_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disable this scan?.
         /// </summary>
         internal static string Scan_Common_StopTellingMe_CautionCaption {

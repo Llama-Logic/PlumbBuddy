@@ -2502,4 +2502,7 @@ More detailed technical information is available in my log.</value>
   <data name="DesktopInterface_DragAndDrop_Cancel_Label" xml:space="preserve">
     <value>...or click here to cancel</value>
   </data>
+  <data name="Scan_Common_ShowMeThisFile_Label" xml:space="preserve">
+    <value>Show me this file</value>
+  </data>
 </root>
