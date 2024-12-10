@@ -63,17 +63,11 @@ public partial class MainPage :
         return Task.CompletedTask;
     }
 
-    void HandleLoaded(object sender, EventArgs e) =>
-        fileDropZone.AddFileDragAndDropHandler(Handler!.MauiContext!, HandleFileDropZoneDragAndDrop);
-
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
     }
-
-    void HandleUnloaded(object sender, EventArgs e) =>
-        fileDropZone.RemoveFileDragAndDropHandler(Handler!.MauiContext!, HandleFileDropZoneDragAndDrop);
 
     void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -167,6 +161,33 @@ public partial class MainPage :
             pageContainer.Remove(trayIcon);
             trayIcon.Dispose();
             trayIcon = null;
+        }
+    }
+
+    void HandleDragOver(object sender, DragEventArgs e)
+    {
+        if (e.PlatformArgs is { } args)
+        {
+#if WINDOWS
+            e.AcceptedOperation = args.DragEventArgs.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems)
+                ? DataPackageOperation.Copy
+                : DataPackageOperation.None;
+#endif
+        }
+    }
+
+    async void HandleDrop(object sender, DropEventArgs e)
+    {
+        if (e.PlatformArgs is { } args)
+        {
+#if WINDOWS
+            var dataView = args.DragEventArgs.DataView;
+            if (dataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+                userInterfaceMessaging.DropFiles((await dataView.GetStorageItemsAsync())
+                    .OfType<Windows.Storage.IStorageItem>()
+                    .Select(file => file.Path)
+                    .ToImmutableArray());
+#endif
         }
     }
 }

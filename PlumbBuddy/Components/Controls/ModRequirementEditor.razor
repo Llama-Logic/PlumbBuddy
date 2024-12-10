@@ -24,7 +24,10 @@
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">
                 @MarkupLocalizer[nameof(AppText.ModRequirementEditor_AddModFile_Label)]
             </MudButton>
-            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Tertiary" OnClick="HandleDropAModFileForAddedHashOnClickAsync" />
+            @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+            {
+                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Tertiary" OnClick="HandleDropAModFileForAddedHashOnClickAsync" />
+            }
         </MudStack>
     </MudItem>
     <MudFlexBreak />
@@ -36,7 +39,10 @@
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync">
                 @MarkupLocalizer[nameof(AppText.ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label)]
             </MudButton>
-            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" Color="Color.Tertiary" OnClick="HandleDropAModFileForManifestFeatureSelectionOnClickAsync" />
+            @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+            {
+                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" Color="Color.Tertiary" OnClick="HandleDropAModFileForManifestFeatureSelectionOnClickAsync" />
+            }
         </MudStack>
     </MudItem>
     <MudFlexBreak />
@@ -73,7 +79,10 @@
                     <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
                         @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                     </MudButton>
-                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                    @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                    {
+                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                    }
                 </MudStack>
             </AdornmentEnd>
         </MudTextFieldExtended>
@@ -88,7 +97,10 @@
                     <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
                         @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                     </MudButton>
-                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                    @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                    {
+                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                    }
                 </MudStack>
             </AdornmentEnd>
         </MudTextFieldExtended>

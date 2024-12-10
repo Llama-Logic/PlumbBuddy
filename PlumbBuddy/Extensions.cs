@@ -1,20 +1,7 @@
-#if WINDOWS
-using PlumbBuddy.Platforms.Windows;
-#endif
-
 namespace PlumbBuddy;
 
 static partial class Extensions
 {
-    public static void AddFileDragAndDropHandler(this IElement element, IMauiContext mauiContext, Func<IReadOnlyList<string>, Task> dropHandler)
-    {
-        ArgumentNullException.ThrowIfNull(element);
-        ArgumentNullException.ThrowIfNull(mauiContext);
-        #if WINDOWS
-        FileDragAndDrop.AddHandler(element.ToPlatform(mauiContext), dropHandler);
-        #endif
-    }
-
     [GeneratedRegex(@"[^\da-f]", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetNonHexStringCharacterPattern();
 
@@ -31,15 +18,6 @@ static partial class Extensions
         if (dictionary.TryGetValue(string.Empty, out var invariant))
             return invariant;
         return createEmptyValue();
-    }
-
-    public static void RemoveFileDragAndDropHandler(this IElement element, IMauiContext mauiContext, Func<IReadOnlyList<string>, Task> dropHandler)
-    {
-        ArgumentNullException.ThrowIfNull(element);
-        ArgumentNullException.ThrowIfNull(mauiContext);
-        #if WINDOWS
-        FileDragAndDrop.RemoveHandler(element.ToPlatform(mauiContext), dropHandler);
-        #endif
     }
 
     public static IEnumerable<byte> ToByteSequence(this string hex)

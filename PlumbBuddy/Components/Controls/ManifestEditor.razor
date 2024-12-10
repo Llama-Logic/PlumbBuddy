@@ -153,7 +153,10 @@
                                 <MudItem xs="4" Class="pl-8">
                                     <MudStack Row>
                                         <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
-                                        <MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
+                                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                                        {
+                                            <MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
+                                        }
                                         <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
                                     </MudStack>
                                 </MudItem>
@@ -199,7 +202,10 @@
                                     <MudItem>
                                         <MudStack Row>
                                             <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
-                                            <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
+                                            @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                                            {
+                                                <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
+                                            }
                                         </MudStack>
                                     </MudItem>
                                     <MudItem Class="ml-n4">

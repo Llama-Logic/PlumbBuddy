@@ -51,7 +51,10 @@
                         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
                             @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                         </MudButton>
-                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                        {
+                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                        }
                     </MudStack>
                 </AdornmentEnd>
             </MudTextFieldExtended>
@@ -66,7 +69,10 @@
                         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
                             @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                         </MudButton>
-                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                        {
+                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                        }
                     </MudStack>
                 </AdornmentEnd>
             </MudTextFieldExtended>
@@ -98,7 +104,10 @@
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Warning" OnClick="HandleBrowseForAddSubsumedHashOnClickAsync">
                 @MarkupLocalizer[nameof(AppText.ManifestComponentEditor_AddSubsumedHashFromModFile_Local)]
             </MudButton>
-            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Warning" OnClick="HandleDropAnForAddSubsumedHashOnClickAsync" />
+            @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+            {
+                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Warning" OnClick="HandleDropAnForAddSubsumedHashOnClickAsync" />
+            }
         </MudStack>
     </MudItem>
     <MudFlexBreak />
