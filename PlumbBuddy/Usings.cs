@@ -20,6 +20,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Localization;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.JSInterop;
+global using Microsoft.Maui.Platform;
 global using Microsoft.Maui.Storage;
 global using MudBlazor;
 global using MudBlazor.Services;

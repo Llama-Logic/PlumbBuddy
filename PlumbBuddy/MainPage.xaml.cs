@@ -1,30 +1,51 @@
-
 namespace PlumbBuddy;
 
 [SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
 public partial class MainPage :
     ContentPage
 {
+    public static Microsoft.Maui.Graphics.Color OverlayColor =>
+        Application.Current is { } app && app.RequestedTheme is AppTheme.Dark
+            ? Microsoft.Maui.Graphics.Colors.Black
+            : Microsoft.Maui.Graphics.Colors.White;
+
     public static Microsoft.Maui.Graphics.Color TextColor =>
         Application.Current is { } app && app.RequestedTheme is AppTheme.Dark
             ? Microsoft.Maui.Graphics.Colors.White
             : Microsoft.Maui.Graphics.Colors.Black;
 
-    public MainPage(ISettings settings, IAppLifecycleManager appLifecycleManager)
+    public MainPage(ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         this.settings = settings;
         this.appLifecycleManager = appLifecycleManager;
+        this.userInterfaceMessaging = userInterfaceMessaging;
         InitializeComponent();
         BindingContext = this;
         UpdateTrayIconVisibility();
+        ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
     readonly ISettings settings;
+    bool showFileDropInterface;
     TaskbarIcon? trayIcon;
+    readonly IUserInterfaceMessaging userInterfaceMessaging;
     bool webViewShownBefore;
+
+    public bool ShowFileDropInterface
+    {
+        get => showFileDropInterface;
+        private set
+        {
+            if (showFileDropInterface == value)
+                return;
+            showFileDropInterface = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool ShowSystemTrayIcon =>
         settings.ShowSystemTrayIcon;
@@ -33,17 +54,44 @@ public partial class MainPage :
         ? AppText.DesktopInterface_Loading_HideMainWindow
         : AppText.DesktopInterface_Loading;
 
+    void HandleCancelFileDropClicked(object sender, EventArgs e) =>
+        userInterfaceMessaging.IsFileDroppingEnabled = false;
+
+    Task HandleFileDropZoneDragAndDrop(IReadOnlyList<string> paths)
+    {
+        userInterfaceMessaging.DropFiles(paths);
+        return Task.CompletedTask;
+    }
+
+    void HandleLoaded(object sender, EventArgs e) =>
+        fileDropZone.AddFileDragAndDropHandler(Handler!.MauiContext!, HandleFileDropZoneDragAndDrop);
+
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
     }
 
-    protected override void OnAppearing() =>
-        settings.PropertyChanged += HandleSettingsPropertyChanged;
+    void HandleUnloaded(object sender, EventArgs e) =>
+        fileDropZone.RemoveFileDragAndDropHandler(Handler!.MauiContext!, HandleFileDropZoneDragAndDrop);
 
-    protected override void OnDisappearing() =>
+    void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IUserInterfaceMessaging.IsFileDroppingEnabled))
+            ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
+    }
+
+    protected override void OnAppearing()
+    {
+        settings.PropertyChanged += HandleSettingsPropertyChanged;
+        userInterfaceMessaging.PropertyChanged += HandleUserInterfaceMessagingPropertyChanged;
+    }
+
+    protected override void OnDisappearing()
+    {
         settings.PropertyChanged -= HandleSettingsPropertyChanged;
+        userInterfaceMessaging.PropertyChanged -= HandleUserInterfaceMessagingPropertyChanged;
+    }
 
     protected override void OnHandlerChanged()
     {

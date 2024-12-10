@@ -5,6 +5,7 @@
 @inject IPublicCatalogs PublicCatalogs
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
+@inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <MudGrid Justify="Justify.Center" Spacing="4">
     <MudItem xs="12">
@@ -46,9 +47,12 @@
                     <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
-                        @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
-                    </MudButton>
+                    <MudStack Row>
+                        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
+                            @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
+                        </MudButton>
+                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                    </MudStack>
                 </AdornmentEnd>
             </MudTextFieldExtended>
         </MudItem>
@@ -58,10 +62,13 @@
                     <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
                 </AdornmentStart>
                 <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
-                        @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
-                    </MudButton>
-            </AdornmentEnd>
+                    <MudStack Row>
+                        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
+                            @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
+                        </MudButton>
+                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                    </MudStack>
+                </AdornmentEnd>
             </MudTextFieldExtended>
         </MudItem>
     }
@@ -87,9 +94,12 @@
         <ChipSetField @ref="@subsumedHashesField" Values="@SubsumedHashes" ValuesChanged="HandleSubsumedHashesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.History" ChipIcon="@MaterialDesignIcons.Normal.BarcodeScan" Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_SubsumedHashes_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_SubsumedHashes_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_SubsumedHashes_Placeholder)]" />
     </MudItem>
     <MudItem>
-        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Warning" OnClick="HandleBrowseForAddSubsumedHashOnClickAsync">
-            @MarkupLocalizer[nameof(AppText.ManifestComponentEditor_AddSubsumedHashFromModFile_Local)]
-        </MudButton>
+        <MudStack Row>
+            <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Warning" OnClick="HandleBrowseForAddSubsumedHashOnClickAsync">
+                @MarkupLocalizer[nameof(AppText.ManifestComponentEditor_AddSubsumedHashFromModFile_Local)]
+            </MudButton>
+            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Warning" OnClick="HandleDropAnForAddSubsumedHashOnClickAsync" />
+        </MudStack>
     </MudItem>
     <MudFlexBreak />
 </MudGrid>

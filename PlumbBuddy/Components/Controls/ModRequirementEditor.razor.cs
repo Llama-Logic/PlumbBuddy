@@ -65,11 +65,7 @@ partial class ModRequirementEditor
 
     async Task HandleBrowseForAddModFileOnClickAsync()
     {
-        await DialogService.ShowInfoDialogAsync("Please keep in mind ☝️",
-            """
-            Only pick another mod file in this mod if you're certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod's requirements.<br /><br />
-            <iframe src="https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc" width="270" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc">via GIPHY</a></p>
-            """);
+        await DialogService.ShowInfoDialogAsync(AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption, AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text);
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var manifest = await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService);
         if (manifest is not null && !manifest.Hash.IsDefaultOrEmpty)
@@ -108,11 +104,56 @@ partial class ModRequirementEditor
             return;
         if (manifest.Features.Count is 0)
         {
-            await DialogService.ShowErrorDialogAsync("Whoops, this mod file has no offered features",
-                """
-                There are apparently no features on offer. If you didn't make a mistake picking the mod file just now, definitely clear out the required features!<br /><br />
-                <iframe src="https://giphy.com/embed/l2JehQ2GitHGdVG9y" width="480" height="362" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/season-16-the-simpsons-16x9-l2JehQ2GitHGdVG9y">via GIPHY</a></p>
-                """);
+            await DialogService.ShowErrorDialogAsync(AppText.ModRequirementEditor_Error_NoManifestedFeatures_Caption, AppText.ModRequirementEditor_Error_NoManifestedFeatures_Text);
+            return;
+        }
+        if (await DialogService.ShowSelectFeaturesDialogAsync(manifest!) is not { } selectedFeatures)
+            return;
+        HandleRequiredFeaturesChanged(selectedFeatures);
+    }
+
+    async Task HandleDropAModFileForAddedHashOnClickAsync()
+    {
+        await DialogService.ShowInfoDialogAsync(AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption, AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var manifest = await ModFileSelector.GetADroppedModFileManifestAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (manifest is not null && !manifest.Hash.IsDefaultOrEmpty)
+            HandleHashesChanged
+            (
+                Hashes
+                    .Except(manifest.SubsumedHashes.Select(sh => sh.ToHexString()), StringComparer.OrdinalIgnoreCase)
+                    .Concat([manifest.Hash.ToHexString()])
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+                    .AsReadOnly()
+            );
+    }
+
+    async Task HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (!hash.IsDefaultOrEmpty)
+            HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (!hash.IsDefaultOrEmpty)
+            HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleDropAModFileForManifestFeatureSelectionOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var manifest = await ModFileSelector.GetADroppedModFileManifestAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (manifest is null)
+            return;
+        if (manifest.Features.Count is 0)
+        {
+            await DialogService.ShowErrorDialogAsync(AppText.ModRequirementEditor_Error_NoManifestedFeatures_Caption, AppText.ModRequirementEditor_Error_NoManifestedFeatures_Text);
             return;
         }
         if (await DialogService.ShowSelectFeaturesDialogAsync(manifest!) is not { } selectedFeatures)

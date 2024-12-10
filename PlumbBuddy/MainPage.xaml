@@ -6,6 +6,8 @@
     xmlns:localization="clr-namespace:PlumbBuddy.Localization"
     xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Loaded="HandleLoaded"
+    Unloaded="HandleUnloaded"
     >
     <Grid
         x:Name="pageContainer"
@@ -51,5 +53,41 @@
                     />
             </StackLayout>
         </StackLayout>
+        <Grid
+            IsVisible="{Binding ShowFileDropInterface, Mode=OneWay}"
+            >
+            <Grid
+                BackgroundColor="{x:Static local:MainPage.OverlayColor}"
+                Opacity="0.75"
+                >
+            </Grid>
+            <StackLayout
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                >
+                <Grid
+                    x:Name="fileDropZone"
+                    >
+                    <Border
+                        Stroke="{x:Static local:MainPage.TextColor}"
+                        StrokeThickness="4"
+                        StrokeShape="RoundRectangle 20"
+                        Padding="40"
+                        >
+                        <Label
+                            x:DataType="{x:Type local:MainPage}"
+                            Text="{x:Static localization:AppText.DesktopInterface_DragAndDrop_Label}"
+                            FontSize="Medium"
+                            TextColor="{x:Static local:MainPage.TextColor}"
+                            />
+                    </Border>
+                </Grid>
+                <Button
+                    Margin="0,20,0,0"
+                    Text="{x:Static localization:AppText.DesktopInterface_DragAndDrop_Cancel_Label}"
+                    Clicked="HandleCancelFileDropClicked"
+                    />
+            </StackLayout>
+        </Grid>
     </Grid>
 </ContentPage>

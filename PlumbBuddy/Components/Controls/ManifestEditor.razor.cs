@@ -180,7 +180,7 @@ partial class ManifestEditor
                 await DialogService.ShowErrorDialogAsync
                 (
                     AppText.ManifestEditor_Error_InaccessiblePackage_Caption,
-                    StringLocalizer["ManifestEditor_Error_InaccessiblePackage_Text", modFile.FullName]
+                    string.Format(AppText.ManifestEditor_Error_InaccessiblePackage_Text, modFile.FullName)
                 ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
@@ -195,7 +195,7 @@ partial class ManifestEditor
                 await DialogService.ShowInfoDialogAsync
                 (
                     AppText.ManifestEditor_Info_SelectedMergedPackage_Caption,
-                    StringLocalizer["ManifestEditor_Info_SelectedMergedPackage_Text", modFile.FullName, manifestResourceName]
+                    string.Format(AppText.ManifestEditor_Info_SelectedMergedPackage_Text, modFile.FullName, manifestResourceName)
                 ).ConfigureAwait(false);
             }
             fileObjectModel = dbpf;
@@ -215,7 +215,7 @@ partial class ManifestEditor
                 await DialogService.ShowErrorDialogAsync
                 (
                     AppText.ManifestEditor_Error_InaccessibleScriptArchive_Caption,
-                    StringLocalizer["ManifestEditor_Error_InaccessibleScriptArchive_Text", modFile.FullName]
+                    string.Format(AppText.ManifestEditor_Error_InaccessibleScriptArchive_Text, modFile.FullName)
                 ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
@@ -269,6 +269,48 @@ partial class ManifestEditor
             }
         }
         return filesAdded;
+    }
+
+    async Task AddRequiredManifestAsync(ModFileManifestModel manifest)
+    {
+        var requiredFeatures = string.Empty;
+        if (manifest.Features.Count is > 0)
+        {
+            if (await DialogService.ShowSelectFeaturesDialogAsync(manifest) is not { } selectedFeatures)
+                return;
+            requiredFeatures = string.Join(Environment.NewLine, selectedFeatures);
+        }
+        var requiredMod = new ModRequirement
+        (
+            manifest.Name,
+            manifest.Hash.ToHexString(),
+            requiredFeatures,
+            null,
+            null,
+            null,
+            null,
+            null,
+            string.Join(Environment.NewLine, manifest.Creators),
+            manifest.Url?.ToString(),
+            manifest.Version
+        );
+        requiredMod.PropertyChanged += HandleRequiredModPropertyChanged;
+        requiredMods.Add(requiredMod);
+        StateHasChanged();
+    }
+
+    async Task AddSelectedFilesAsync(IReadOnlyList<FileInfo> modFiles)
+    {
+        loadingText = AppText.ManifestEditor_Loading_ReadingModFiles;
+        isLoading = true;
+        StateHasChanged();
+        if (await Task.Run(async () => await AddFilesAsync(modFiles).ConfigureAwait(false)))
+        {
+            ComponentsStepSelectedComponent = null;
+            UpdateComponentsStructure();
+        }
+        isLoading = false;
+        StateHasChanged();
     }
 
     async Task<bool> CancelAtUserRequestAsync()
@@ -561,48 +603,14 @@ partial class ManifestEditor
         var modFiles = await ModFileSelector.SelectModFilesAsync();
         if (modFiles is null || modFiles.Count is 0)
             return;
-        loadingText = AppText.ManifestEditor_Loading_ReadingModFiles;
-        isLoading = true;
-        StateHasChanged();
-        if (await Task.Run(async () => await AddFilesAsync(modFiles).ConfigureAwait(false)))
-        {
-            ComponentsStepSelectedComponent = null;
-            UpdateComponentsStructure();
-        }
-        isLoading = false;
-        StateHasChanged();
+        await AddSelectedFilesAsync(modFiles);
     }
 
     async Task HandleAddRequiredModOnClickedAsync()
     {
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         if (await ModFileSelector.SelectAModFileManifestAsync(pbDbContext, DialogService) is { } manifest)
-        {
-            var requiredFeatures = string.Empty;
-            if (manifest.Features.Count is > 0)
-            {
-                if (await DialogService.ShowSelectFeaturesDialogAsync(manifest) is not { } selectedFeatures)
-                    return;
-                requiredFeatures = string.Join(Environment.NewLine, selectedFeatures);
-            }
-            var requiredMod = new ModRequirement
-            (
-                manifest.Name,
-                manifest.Hash.ToHexString(),
-                requiredFeatures,
-                null,
-                null,
-                null,
-                null,
-                null,
-                string.Join(Environment.NewLine, manifest.Creators),
-                manifest.Url?.ToString(),
-                manifest.Version
-            );
-            requiredMod.PropertyChanged += HandleRequiredModPropertyChanged;
-            requiredMods.Add(requiredMod);
-            StateHasChanged();
-        }
+            await AddRequiredManifestAsync(manifest);
     }
 
     void HandleCancelBatchProcess() =>
@@ -615,6 +623,37 @@ partial class ManifestEditor
     {
         if (e.PropertyName is nameof(ModComponent.File))
             StateHasChanged();
+    }
+
+    async Task HandleDropFilesClickedAsync()
+    {
+        static IEnumerable<FileInfo> scanPath(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                foreach (var entry in Directory.GetFileSystemEntries(path))
+                    foreach (var modFile in scanPath(entry))
+                        yield return modFile;
+                yield break;
+            }
+            var fileInfo = new FileInfo(path);
+            if (fileInfo.Exists
+                && (fileInfo.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase) || fileInfo.Extension.Equals(".ts4script", StringComparison.OrdinalIgnoreCase)))
+                yield return fileInfo;
+        }
+        var modFiles = new List<FileInfo>();
+        foreach (var path in await UserInterfaceMessaging.GetFilesFromDragAndDropAsync())
+            modFiles.AddRange(scanPath(path));
+        if (modFiles.Count is 0)
+            return;
+        await AddSelectedFilesAsync(modFiles);
+    }
+
+    async Task HandleDropRequiredModOnClickedAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await ModFileSelector.GetADroppedModFileManifestAsync(UserInterfaceMessaging, pbDbContext, DialogService) is { } manifest)
+            await AddRequiredManifestAsync(manifest);
     }
 
     async Task HandleDuplicateComponentSettingsClickedAsync()

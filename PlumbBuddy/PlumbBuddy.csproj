@@ -153,6 +153,9 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
+        <Compile Update="Platforms\MacCatalyst\FileDragAndDrop.cs">
+          <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>

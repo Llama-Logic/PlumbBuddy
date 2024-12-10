@@ -285,8 +285,6 @@ public class ModsDirectoryCataloger :
     ModsDirectoryCatalogerState state;
     readonly ISuperSnacks superSnacks;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
     public TimeSpan? EstimatedStateTimeRemaining
     {
         get => estimatedStateTimeRemaining;
@@ -394,6 +392,8 @@ public class ModsDirectoryCataloger :
             PropertyChanged?.Invoke(this, statePropertyChangedEventArgs);
         }
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Catalog(string path) =>
         pathsProcessingQueue.Enqueue(path);

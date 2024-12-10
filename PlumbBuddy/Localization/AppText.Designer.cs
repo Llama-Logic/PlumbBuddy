@@ -475,6 +475,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ...or click here to cancel.
+        /// </summary>
+        internal static string DesktopInterface_DragAndDrop_Cancel_Label {
+            get {
+                return ResourceManager.GetString("DesktopInterface_DragAndDrop_Cancel_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drag and drop files here....
+        /// </summary>
+        internal static string DesktopInterface_DragAndDrop_Label {
+            get {
+                return ResourceManager.GetString("DesktopInterface_DragAndDrop_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Just a moment, I&apos;ll will be right with you....
         /// </summary>
         internal static string DesktopInterface_Loading {
@@ -1371,6 +1389,25 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestComponentEditor_AddSubsumedHashFromModFile_Local {
             get {
                 return ResourceManager.GetString("ManifestComponentEditor_AddSubsumedHashFromModFile_Local", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tread lightly here 🤚.
+        /// </summary>
+        internal static string ManifestComponentEditor_Caution_AddSubsumedHash_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Caution_AddSubsumedHash_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What you&apos;re *about to do* is tell me that this mod file counts for the one you&apos;re about to select in the file picker. Be **sure** you understand the ramifications of that before you do it.
+        ///&lt;iframe src=&quot;https://giphy.com/embed/4DvP1HK8UviaOuRcCY&quot; width=&quot;480&quot; height=&quot;480&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/SPTV-be-careful-cordell-walker-texas-ranger-4DvP1HK8UviaOuRcCY&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ManifestComponentEditor_Caution_AddSubsumedHash_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_Caution_AddSubsumedHash_Text", resourceCulture);
             }
         }
         
@@ -2328,7 +2365,7 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
-        ///`{1}`&lt;br /&gt;&lt;br /&gt;
+        ///`{0}`&lt;br /&gt;&lt;br /&gt;
         ///&lt;iframe src=&quot;https://giphy.com/embed/1g2JyW7p6mtZc6bOEY&quot; width=&quot;480&quot; height=&quot;269&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
         internal static string ManifestEditor_Error_InaccessiblePackage_Text {
@@ -3021,6 +3058,25 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Whoops, this mod file has no offered features.
+        /// </summary>
+        internal static string ModRequirementEditor_Error_NoManifestedFeatures_Caption {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Error_NoManifestedFeatures_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are apparently no features on offer. If you didn&apos;t make a mistake picking the mod file just now, definitely clear out the required features!&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/l2JehQ2GitHGdVG9y&quot; width=&quot;480&quot; height=&quot;362&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/season-16-the-simpsons-16x9-l2JehQ2GitHGdVG9y&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ModRequirementEditor_Error_NoManifestedFeatures_Text {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Error_NoManifestedFeatures_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don&apos;t worry about the required mod&apos;s requirements. It&apos;s responsible for those considerations..
         /// </summary>
         internal static string ModRequirementEditor_Hashes_HelperText {
@@ -3035,6 +3091,25 @@ namespace PlumbBuddy.Localization {
         internal static string ModRequirementEditor_Hashes_Label {
             get {
                 return ResourceManager.GetString("ModRequirementEditor_Hashes_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please keep in mind ☝️.
+        /// </summary>
+        internal static string ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only pick another mod file in this mod if you&apos;re certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod&apos;s requirements.&lt;br /&gt;&lt;br /&gt;
+        ///&lt;iframe src=&quot;https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc&quot; width=&quot;270&quot; height=&quot;480&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
+        /// </summary>
+        internal static string ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text {
+            get {
+                return ResourceManager.GetString("ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text", resourceCulture);
             }
         }
         

@@ -639,7 +639,7 @@ If only *parts* of your mod need to be present or not based on whether packs or 
   </data>
   <data name="ManifestEditor_Error_InaccessiblePackage_Text" xml:space="preserve">
     <value>I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
-`{1}`&lt;br /&gt;&lt;br /&gt;
+`{0}`&lt;br /&gt;&lt;br /&gt;
 &lt;iframe src="https://giphy.com/embed/1g2JyW7p6mtZc6bOEY" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File</comment>
   </data>
@@ -2471,5 +2471,35 @@ More detailed technical information is available in my log.</value>
   </data>
   <data name="DesktopInterface_Loading_HideMainWindow" xml:space="preserve">
     <value>Starting Sims 4 Mods monitoring...</value>
+  </data>
+  <data name="ManifestComponentEditor_Caution_AddSubsumedHash_Caption" xml:space="preserve">
+    <value>Tread lightly here 🤚</value>
+  </data>
+  <data name="ManifestComponentEditor_Caution_AddSubsumedHash_Text" xml:space="preserve">
+    <value>What you're *about to do* is tell me that this mod file counts for the one you're about to select in the file picker. Be **sure** you understand the ramifications of that before you do it.
+&lt;iframe src="https://giphy.com/embed/4DvP1HK8UviaOuRcCY" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/SPTV-be-careful-cordell-walker-texas-ranger-4DvP1HK8UviaOuRcCY"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ModRequirementEditor_Error_NoManifestedFeatures_Caption" xml:space="preserve">
+    <value>Whoops, this mod file has no offered features</value>
+  </data>
+  <data name="ModRequirementEditor_Error_NoManifestedFeatures_Text" xml:space="preserve">
+    <value>There are apparently no features on offer. If you didn't make a mistake picking the mod file just now, definitely clear out the required features!&lt;br /&gt;&lt;br /&gt;
+&lt;iframe src="https://giphy.com/embed/l2JehQ2GitHGdVG9y" width="480" height="362" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/season-16-the-simpsons-16x9-l2JehQ2GitHGdVG9y"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption" xml:space="preserve">
+    <value>Please keep in mind ☝️</value>
+  </data>
+  <data name="ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text" xml:space="preserve">
+    <value>Only pick another mod file in this mod if you're certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod's requirements.&lt;br /&gt;&lt;br /&gt;
+&lt;iframe src="https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc" width="270" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="DesktopInterface_DragAndDrop_Label" xml:space="preserve">
+    <value>Drag and drop files here...</value>
+  </data>
+  <data name="DesktopInterface_DragAndDrop_Cancel_Label" xml:space="preserve">
+    <value>...or click here to cancel</value>
   </data>
 </root>

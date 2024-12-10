@@ -83,11 +83,7 @@ partial class ModComponentEditor
 
     async Task HandleBrowseForAddSubsumedHashOnClickAsync()
     {
-        if (!await DialogService.ShowCautionDialogAsync("Tread lightly here 🤚",
-            """
-            What you're *about to do* is tell me that this mod file counts for the one you're about to select in the file picker. Be **sure** you understand the ramifications of that before you do it.
-            <iframe src="https://giphy.com/embed/4DvP1HK8UviaOuRcCY" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/SPTV-be-careful-cordell-walker-texas-ranger-4DvP1HK8UviaOuRcCY">via GIPHY</a></p>
-            """))
+        if (!await DialogService.ShowCautionDialogAsync(AppText.ManifestComponentEditor_Caution_AddSubsumedHash_Caption, AppText.ManifestComponentEditor_Caution_AddSubsumedHash_Text))
             return;
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
@@ -107,6 +103,32 @@ partial class ModComponentEditor
     {
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var hash = await ModFileSelector.SelectAModFileManifestHashAsync(pbDbContext, DialogService);
+        if (!hash.IsDefaultOrEmpty)
+            HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleDropAnForAddSubsumedHashOnClickAsync()
+    {
+        if (!await DialogService.ShowCautionDialogAsync(AppText.ManifestComponentEditor_Caution_AddSubsumedHash_Caption, AppText.ManifestComponentEditor_Caution_AddSubsumedHash_Text))
+            return;
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (!hash.IsDefaultOrEmpty)
+            HandleSubsumedHashesChanged(SubsumedHashes.Concat([hash.ToHexString()]).Distinct(StringComparer.OrdinalIgnoreCase).ToList().AsReadOnly());
+    }
+
+    async Task HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
+        if (!hash.IsDefaultOrEmpty)
+            HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
     }
