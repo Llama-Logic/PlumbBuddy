@@ -1240,7 +1240,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An inversion of control change just occurred which cannot take effect until the application is restarted..
+        ///   Looks up a localized string similar to Some of the changes just made, such as enabling user interface inspection, will only take effect when I&apos;m completely restarted. If you want to use them, shut me down completely and then relaunch me..
         /// </summary>
         internal static string MainMenu_DevTools_Snack_InversionOfControlChange {
             get {

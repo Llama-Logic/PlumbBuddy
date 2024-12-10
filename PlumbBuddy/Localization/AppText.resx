@@ -1534,7 +1534,7 @@ Move available features on the left over to the required list on the right. What
     <value>Marry me, you beautiful human. Dev Tools unlocked! 🔓</value>
   </data>
   <data name="MainMenu_DevTools_Snack_InversionOfControlChange" xml:space="preserve">
-    <value>An inversion of control change just occurred which cannot take effect until the application is restarted.</value>
+    <value>Some of the changes just made, such as enabling user interface inspection, will only take effect when I'm completely restarted. If you want to use them, shut me down completely and then relaunch me.</value>
   </data>
   <data name="MainLayout_OpenDownloadsFolder_Tip" xml:space="preserve">
     <value>Click here to open your Downloads folder.</value>
