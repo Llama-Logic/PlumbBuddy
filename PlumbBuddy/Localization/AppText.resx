@@ -274,28 +274,28 @@
     <value>Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Caption" xml:space="preserve">
-    <value>Script File</value>
+    <value>Script Mod File</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Description" xml:space="preserve">
-    <value>This is the number of script files I was able to catalog in your Mods folder.</value>
+    <value>This is the number of .ts4script files I was able to catalog in your Mods folder.</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_ModsDisabled" xml:space="preserve">
-    <value>Because Script Mods are disabled in your Game Options, these script files will not be opened and executed by The Sims 4.</value>
+    <value>Because Script Mods are disabled in your Game Options, these script mod files will not be opened and executed by The Sims 4.</value>
   </data>
   <data name="HUD_PythonScripts_Tip_Caption" xml:space="preserve">
     <value>Python Scripts</value>
   </data>
   <data name="HUD_PythonScripts_Tip_Description" xml:space="preserve">
-    <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script files in your Mods folder.</value>
+    <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script mod files in your Mods folder.</value>
   </data>
   <data name="HUD_PythonScripts_Tip_CreatorsNote" xml:space="preserve">
-    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
+    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in .script mod files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_Caption" xml:space="preserve">
     <value>Python Byte Code Files</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_Description" xml:space="preserve">
-    <value>This is the number of compiled Python byte code files I found in script files in your Mods folder.</value>
+    <value>This is the number of compiled Python byte code files I found in script mod files in your Mods folder.</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_ModsDisabled" xml:space="preserve">
     <value>Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4.</value>
@@ -346,7 +346,7 @@
     <value>It will be &lt;em&gt;manifestly&lt;/em&gt; awesome. 😏</value>
   </data>
   <data name="ManifestEditor_Select_Guidance" xml:space="preserve">
-    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script file. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files later in this process.</value>
+    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a .ts4script file. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files later in this process.</value>
   </data>
   <data name="ManifestEditor_Select_CheckForScaffoldingLocation_Label" xml:space="preserve">
     <value>Check for scaffolding in a "PlumbBuddy" subfolder first.</value>
@@ -654,7 +654,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <comment>This text is in Markdown. {0} = Full path to Mod File; {1} = Selected manifest resource name</comment>
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Caption" xml:space="preserve">
-    <value>Script file corrupt, damaged, or locked</value>
+    <value>Script mod file corrupt, damaged, or locked</value>
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Text" xml:space="preserve">
     <value>I was unable to read this file as a valid ZIP archive with exclusive access:
@@ -970,7 +970,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>There is no file at this location.</value>
   </data>
   <data name="ModFileSelector_Validate_InvalidFormat" xml:space="preserve">
-    <value>This is not a Maxis DBPF package or a TS4 script file.</value>
+    <value>This is not a Maxis DBPF package or a .ts4script file.</value>
   </data>
   <data name="ModRequirementEditor_Name_HelperText" xml:space="preserve">
     <value>If a player installs your mod but does not have this requirement, this is the name I will use to describe the missing requirement to them.</value>
@@ -1967,22 +1967,22 @@ Thankfully, its also at an invalid depth for the game to find it. Still though, 
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_Found_Description" xml:space="preserve">
-    <value>I found this corrupt script file in your Mods folder, specifically at this path:
+    <value>I found this corrupt .ts4script file in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_FoundOutOfRange_Description" xml:space="preserve">
-    <value>I found this corrupt script file in your Mods folder, specifically at this path:
+    <value>I found this corrupt .ts4script file in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_NoneFound_Caption" xml:space="preserve">
-    <value>No Script Files are Corrupt</value>
+    <value>No Script Mod Files are Corrupt</value>
   </data>
   <data name="Scan_Corrupt_Ts4Script_NoneFound_Description" xml:space="preserve">
-    <value>I didn't find any corrupt script files in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
+    <value>I didn't find any corrupt .ts4script files in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
   </data>
   <data name="Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning" xml:space="preserve">
     <value>I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first.</value>
@@ -2029,10 +2029,10 @@ I don't want to accidentally cause you to lose important files! You may need to 
     <value>I didn't find any package files more than five folders deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
   </data>
   <data name="Scan_Depth_Ts4Script_NoneFound_Caption" xml:space="preserve">
-    <value>No Script Files are Too Deep</value>
+    <value>No Script Mod Files are Too Deep</value>
   </data>
   <data name="Scan_Depth_Ts4Script_NoneFound_Description" xml:space="preserve">
-    <value>I didn't find any script files more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
+    <value>I didn't find any script mod files more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
   </data>
   <data name="Scan_Depth_TooDeep_Caption" xml:space="preserve">
     <value>A Mod File is Too Deep: {0}</value>
@@ -2045,7 +2045,7 @@ We need to move it closer to the root of your Mods folder so the game can find i
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
   </data>
   <data name="Scan_Depth_Ts4Script_TooDeep_Description" xml:space="preserve">
-    <value>I found this script file too deep in your Mods folder, specifically at this path:
+    <value>I found this script mod file too deep in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 We need to move it closer to the root of your Mods folder so the game can find it.</value>
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
@@ -2054,7 +2054,7 @@ We need to move it closer to the root of your Mods folder so the game can find i
     <value>Show me this package</value>
   </data>
   <data name="Scan_Depth_Ts4Script_TooDeep_ShowMe_Label" xml:space="preserve">
-    <value>Show me this script file</value>
+    <value>Show me this script mod file</value>
   </data>
   <data name="Scan_Depth_TooDeep_MoveCloserToModsRoot_Label" xml:space="preserve">
     <value>Move it closer to the root of my Mods folder</value>
@@ -2265,7 +2265,7 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
     <value>Check the boxes for me</value>
   </data>
   <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Description" xml:space="preserve">
-    <value>You have script files installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.</value>
+    <value>You have script mod files installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Caption" xml:space="preserve">
