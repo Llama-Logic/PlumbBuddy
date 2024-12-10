@@ -91,7 +91,6 @@ partial class PlatformFunctions :
             ProgressValue = Math.Min(progressValue, inDomainValue);
             progressMaximum = inDomainValue;
             OnPropertyChanged(progressMaximumChangedEventArgs);
-            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
         }
     }
 
@@ -109,7 +108,6 @@ partial class PlatformFunctions :
             }
             progressState = value;
             OnPropertyChanged(progressStateChangedEventArgs);
-            TaskbarManager.Instance.SetProgressState((TaskbarProgressBarState)progressState);
         }
     }
 
@@ -124,7 +122,6 @@ partial class PlatformFunctions :
             ProgressMaximum = Math.Max(progressMaximum, inDomainValue);
             progressValue = inDomainValue;
             OnPropertyChanged(progressValueChangedEventArgs);
-            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
         }
     }
 

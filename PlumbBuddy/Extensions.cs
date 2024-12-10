@@ -1,6 +1,4 @@
-#if MACCATALYST
-using PlumbBuddy.Platforms.MacCatalyst;
-#elif WINDOWS
+#if WINDOWS
 using PlumbBuddy.Platforms.Windows;
 #endif
 
@@ -12,7 +10,9 @@ static partial class Extensions
     {
         ArgumentNullException.ThrowIfNull(element);
         ArgumentNullException.ThrowIfNull(mauiContext);
+        #if WINDOWS
         FileDragAndDrop.AddHandler(element.ToPlatform(mauiContext), dropHandler);
+        #endif
     }
 
     [GeneratedRegex(@"[^\da-f]", RegexOptions.IgnoreCase, "en-US")]
@@ -37,7 +37,9 @@ static partial class Extensions
     {
         ArgumentNullException.ThrowIfNull(element);
         ArgumentNullException.ThrowIfNull(mauiContext);
+        #if WINDOWS
         FileDragAndDrop.RemoveHandler(element.ToPlatform(mauiContext), dropHandler);
+        #endif
     }
 
     public static IEnumerable<byte> ToByteSequence(this string hex)
