@@ -3,21 +3,11 @@ namespace PlumbBuddy.Platforms.MacCatalyst;
 public class AppLifecycleManager :
     IAppLifecycleManager
 {
-    bool isVisible;
+    public bool HideMainWindowAtLaunch =>
+        false;
 
-    public bool HideMainWindowAtLaunch { get; } = false;
-
-    public bool IsVisible
-    {
-        get => isVisible;
-        internal set
-        {
-            if (isVisible == value)
-                return;
-            isVisible = value;
-            OnPropertyChanged();
-        }
-    }
+    public bool IsVisible =>
+        true;
 
     public bool PreventCasualClosing { get; set; }
 
@@ -29,12 +19,6 @@ public class AppLifecycleManager :
     public void HideWindow()
     {
     }
-
-    void OnPropertyChanged(PropertyChangedEventArgs e) =>
-        PropertyChanged?.Invoke(this, e);
-
-    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     public void ShowWindow()
     {

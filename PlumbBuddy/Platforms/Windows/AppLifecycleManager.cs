@@ -42,7 +42,6 @@ class AppLifecycleManager :
             if (isVisible == value)
                 return;
             isVisible = value;
-            OnPropertyChanged(nameof(IsVisible));
         }
     }
 
@@ -56,14 +55,11 @@ class AppLifecycleManager :
             preventCasualClosing = value;
             if (!preventCasualClosing)
                 SaveWindowPlacement();
-            OnPropertyChanged(nameof(PreventCasualClosing));
         }
     }
 
     public Task UiReleaseSignal =>
         startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Dispose()
     {
@@ -111,12 +107,6 @@ class AppLifecycleManager :
 
     public void HideWindow() =>
         appWindow?.Hide();
-
-    void OnPropertyChanged(PropertyChangedEventArgs e) =>
-        PropertyChanged?.Invoke(this, e);
-
-    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     void SaveWindowPlacement()
     {

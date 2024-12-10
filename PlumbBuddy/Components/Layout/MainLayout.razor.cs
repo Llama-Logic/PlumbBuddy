@@ -125,7 +125,6 @@ public partial class MainLayout
     /// <inheritdoc/>
     public void Dispose()
     {
-        AppLifecycleManager.PropertyChanged -= HandleAppLifecycleManagerPropertyChanged;
         ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
@@ -146,12 +145,6 @@ public partial class MainLayout
                 return true;
         }
         return null;
-    }
-
-    void HandleAppLifecycleManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(IAppLifecycleManager.IsVisible))
-            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task HandleAskForHelpOnClickAsync() =>
@@ -226,7 +219,6 @@ public partial class MainLayout
             app.Windows[0].Title = "PlumbBuddy";
         if (Settings.ShowThemeManager)
             StateHasChanged();
-        AppLifecycleManager.PropertyChanged += HandleAppLifecycleManagerPropertyChanged;
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SuperSnacks.RefreshmentsOffered += HandleSuperSnacksRefreshmentsOffered;
