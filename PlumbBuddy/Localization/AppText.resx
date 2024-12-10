@@ -143,7 +143,7 @@
     <comment>{0} = Mod Name; {1} = Incompatible Pack Code</comment>
   </data>
   <data name="CatalogDisplay_RequiredPack_Installed_Tip" xml:space="preserve">
-    <value>{0} requires that {1} is installed. You do have {1} installed. Click here to view the store page for {1}.</value>
+    <value>{0} requires that {1} is installed. You do have {1} installed. This message is for information only. You do not need to make any changes.</value>
     <comment>{0} = Mod Name; {1} = Required Pack Code</comment>
   </data>
   <data name="CatalogDisplay_RequiredPack_NotInstalled_Tip" xml:space="preserve">
@@ -241,7 +241,7 @@
     <value>👏 Very ambitious for taking me right to your Mods folder, but I actually need your User Data Folder (go up one, please!).</value>
   </data>
   <data name="FoldersSelector_ValidateUserDataFolder_NoOptionsIni" xml:space="preserve">
-    <value>Hey, Silly! That's not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again...</value>
+    <value>Hey, Silly! That's not your Sims 4 User Data Folder. 😏 If you can't find it, you may need to launch the game once then exit and try this again...</value>
   </data>
   <data name="FoldersSelector_ValidateInstallationFolder_NoBinary" xml:space="preserve">
     <value>That's not a valid The Sims 4 installation. 🙄</value>
@@ -274,28 +274,28 @@
     <value>Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Caption" xml:space="preserve">
-    <value>Script Archives</value>
+    <value>Script File</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Description" xml:space="preserve">
-    <value>This is the number of script archives I was able to catalog in your Mods folder.</value>
+    <value>This is the number of script files I was able to catalog in your Mods folder.</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_ModsDisabled" xml:space="preserve">
-    <value>Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4.</value>
+    <value>Because Script Mods are disabled in your Game Options, these script files will not be opened and executed by The Sims 4.</value>
   </data>
   <data name="HUD_PythonScripts_Tip_Caption" xml:space="preserve">
     <value>Python Scripts</value>
   </data>
   <data name="HUD_PythonScripts_Tip_Description" xml:space="preserve">
-    <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script archives in your Mods folder.</value>
+    <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script files in your Mods folder.</value>
   </data>
   <data name="HUD_PythonScripts_Tip_CreatorsNote" xml:space="preserve">
-    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script archives. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
+    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_Caption" xml:space="preserve">
     <value>Python Byte Code Files</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_Description" xml:space="preserve">
-    <value>This is the number of compiled Python byte code files I found in script archives in your Mods folder.</value>
+    <value>This is the number of compiled Python byte code files I found in script files in your Mods folder.</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_ModsDisabled" xml:space="preserve">
     <value>Because Script Mods are disabled in your Game Options, these compiled Python byte code files will not be loaded and executed by The Sims 4.</value>
@@ -346,7 +346,7 @@
     <value>It will be &lt;em&gt;manifestly&lt;/em&gt; awesome. 😏</value>
   </data>
   <data name="ManifestEditor_Select_Guidance" xml:space="preserve">
-    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files later in this process.</value>
+    <value>Let's start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script file. If there's more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You'll be able to specify any remaining files later in this process.</value>
   </data>
   <data name="ManifestEditor_Select_CheckForScaffoldingLocation_Label" xml:space="preserve">
     <value>Check for scaffolding in a "PlumbBuddy" subfolder first.</value>
@@ -535,7 +535,7 @@ If only *parts* of your mod need to be present or not based on whether packs or 
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Hashing_Warning" xml:space="preserve">
-    <value>The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention.</value>
+    <value>The inclination to increase this setting because the thought of players altering your mods upsets you is valid; but please do consider that some players may have a good reason for this, such as using your mod in a language for which you do not provide a translation, and arbitrary strictness here will punish them when that may not be your intention.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Hashing_HashingElements_Label" xml:space="preserve">
@@ -654,7 +654,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <comment>This text is in Markdown. {0} = Full path to Mod File; {1} = Selected manifest resource name</comment>
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Caption" xml:space="preserve">
-    <value>Script archive corrupt, damaged, or locked</value>
+    <value>Script file corrupt, damaged, or locked</value>
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Text" xml:space="preserve">
     <value>I was unable to read this file as a valid ZIP archive with exclusive access:
@@ -931,7 +931,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>Manifest Snippet Tuning Resource Name</value>
   </data>
   <data name="ManifestComponentEditor_ManifestSnippetTuningResourceName_HelperText" xml:space="preserve">
-    <value>Because this component of your mod is a package file, its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set.</value>
+    <value>This component of your mod is a package file, so its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set. You can change it if you are feeling brave, but make it unique.</value>
   </data>
   <data name="ManifestComponentEditor_SubsumedHashes_Label" xml:space="preserve">
     <value>Subsumed Hashes</value>
@@ -961,7 +961,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>Mod file contains multiple manifests</value>
   </data>
   <data name="ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text" xml:space="preserve">
-    <value>This is embarassing, but I'm going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn't update the manifests. 🤦
+    <value>This is embarassing, but because some bozo merged their files and didn't update the manifests 🤦, I'm going to have to ask you to select precisely which of the multiple manifests in this mod file you want to use.
 `{0}`&lt;br /&gt;&lt;br /&gt;
 &lt;iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
     <comment>This text is in Markdown. {0} = Full path to the Mod File</comment>
@@ -970,7 +970,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>There is no file at this location.</value>
   </data>
   <data name="ModFileSelector_Validate_InvalidFormat" xml:space="preserve">
-    <value>This is not a Maxis DBPF package or a TS4 script archive.</value>
+    <value>This is not a Maxis DBPF package or a TS4 script file.</value>
   </data>
   <data name="ModRequirementEditor_Name_HelperText" xml:space="preserve">
     <value>If a player installs your mod but does not have this requirement, this is the name I will use to describe the missing requirement to them.</value>
@@ -1117,7 +1117,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>Mod Creator</value>
   </data>
   <data name="UserTypeSelector_ModCreator_Description" xml:space="preserve">
-    <value>Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don't actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my packages.</value>
+    <value>Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don't actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my mods.</value>
   </data>
   <data name="DeleteErrorLogsDialog_Caption" xml:space="preserve">
     <value>Delete Error Logs</value>
@@ -1214,7 +1214,7 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>&lt;strong&gt;Strongly&lt;/strong&gt; Recommended</value>
   </data>
   <data name="OnboardingDialog_ModHealth_Casual_ModGuard_Description" xml:space="preserve">
-    <value>Because anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators' accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard.</value>
+    <value>Since anti-virus software doesn't check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators' accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard.</value>
   </data>
   <data name="OnboardingDialog_ModHealth_Casual_ModGuard_LearnMore" xml:space="preserve">
     <value>Learn more about Mod Guard</value>
@@ -1407,7 +1407,7 @@ Move available features on the left over to the required list on the right. What
     <value>Start over</value>
   </data>
   <data name="SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip" xml:space="preserve">
-    <value>Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it on. I'll do that for you. 💖</value>
+    <value>Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it enabled. I'll do that for you. 💖</value>
   </data>
   <data name="SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption" xml:space="preserve">
     <value>The Cache is Already Clear</value>
@@ -1601,7 +1601,7 @@ Move available features on the left over to the required list on the right. What
     <value>Uhh, these cache files might be like the kids from that Offspring song — as in "not alright". We need to see to this and soon.</value>
   </data>
   <data name="Scan_CacheStaleness_Stale_Description_NonCasual" xml:space="preserve">
-    <value>The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed.</value>
+    <value>The cache may contain resources which are no longer being loaded for various reasons, such as mods that may have been replaced or removed.</value>
   </data>
   <data name="Scan_CacheStaleness_Stale_Clear_Label" xml:space="preserve">
     <value>Clear the cache</value>
@@ -1923,7 +1923,7 @@ Here are the mod files each claiming "{0}":
     <comment>{0} = Ordinalized Version Number</comment>
   </data>
   <data name="Scan_MultipleModVersions_StopTellingMe_CautionText" xml:space="preserve">
-    <value>So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing and twice *and will have problems as a result*... and you can't be bothered?</value>
+    <value>So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you've installed the same thing twice *and will have problems as a result*... and you can't be bothered?</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="Scan_Common_Error_CannotMove" xml:space="preserve">
@@ -1967,22 +1967,22 @@ Thankfully, its also at an invalid depth for the game to find it. Still though, 
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_Found_Description" xml:space="preserve">
-    <value>I found this corrupt script archive in your Mods folder, specifically at this path:
+    <value>I found this corrupt script file in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_FoundOutOfRange_Description" xml:space="preserve">
-    <value>I found this corrupt script archive in your Mods folder, specifically at this path:
+    <value>I found this corrupt script file in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_NoneFound_Caption" xml:space="preserve">
-    <value>No Script Archives are Corrupt</value>
+    <value>No Script Files are Corrupt</value>
   </data>
   <data name="Scan_Corrupt_Ts4Script_NoneFound_Description" xml:space="preserve">
-    <value>I didn't find any corrupt script archives in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
+    <value>I didn't find any corrupt script files in your Mods folder. That's good because if I did, the game would crash if it found them.</value>
   </data>
   <data name="Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning" xml:space="preserve">
     <value>I couldn't do that because the game is currently using the Mods folder. You'll need to close the game first.</value>
@@ -2029,10 +2029,10 @@ I don't want to accidentally cause you to lose important files! You may need to 
     <value>I didn't find any package files more than five folders deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
   </data>
   <data name="Scan_Depth_Ts4Script_NoneFound_Caption" xml:space="preserve">
-    <value>No Script Archives are Too Deep</value>
+    <value>No Script Files are Too Deep</value>
   </data>
   <data name="Scan_Depth_Ts4Script_NoneFound_Description" xml:space="preserve">
-    <value>I didn't find any script archives more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
+    <value>I didn't find any script files more than one folder deep in your Mods folder. That's good because if I did, I can assure you the game would not have.</value>
   </data>
   <data name="Scan_Depth_TooDeep_Caption" xml:space="preserve">
     <value>A Mod File is Too Deep: {0}</value>
@@ -2045,7 +2045,7 @@ We need to move it closer to the root of your Mods folder so the game can find i
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
   </data>
   <data name="Scan_Depth_Ts4Script_TooDeep_Description" xml:space="preserve">
-    <value>I found this script archive too deep in your Mods folder, specifically at this path:
+    <value>I found this script file too deep in your Mods folder, specifically at this path:
 `{0}`&lt;br /&gt;
 We need to move it closer to the root of your Mods folder so the game can find it.</value>
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
@@ -2054,7 +2054,7 @@ We need to move it closer to the root of your Mods folder so the game can find i
     <value>Show me this package</value>
   </data>
   <data name="Scan_Depth_Ts4Script_TooDeep_ShowMe_Label" xml:space="preserve">
-    <value>Show me this script archive</value>
+    <value>Show me this script file</value>
   </data>
   <data name="Scan_Depth_TooDeep_MoveCloserToModsRoot_Label" xml:space="preserve">
     <value>Move it closer to the root of my Mods folder</value>
@@ -2265,7 +2265,7 @@ While it's not *technically* causing a problem, it makes me uncomfortable since 
     <value>Check the boxes for me</value>
   </data>
   <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Description" xml:space="preserve">
-    <value>You have script archives installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.</value>
+    <value>You have script files installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="Scan_Setting_ScriptModsGameOption_Incorrect_Caption" xml:space="preserve">
