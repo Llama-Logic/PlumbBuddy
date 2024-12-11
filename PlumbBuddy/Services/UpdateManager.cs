@@ -42,10 +42,10 @@ public sealed class UpdateManager :
                         options.RequireInteraction = true;
                     });
                 }
-                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 1 } && settings.Type is UserType.Creator)
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 1 } && settings.Type is UserType.Enthusiast)
                 {
                     settings.OfferPatchDayModUpdatesHelp = false;
-                    superSnacks.OfferRefreshments(new MarkupString("My offer to help you with mod patch day updates is now optional, but since you've a self-identified as a Mod Creator, I have turned it off by default."), Severity.Info, options =>
+                    superSnacks.OfferRefreshments(new MarkupString("My offer to help you with mod patch day updates is now optional, but since you've self-identified as non-casual, I have turned it off by default."), Severity.Info, options =>
                     {
                         options.Icon = MaterialDesignIcons.Normal.NewBox;
                         options.Action = "Turn It On";
