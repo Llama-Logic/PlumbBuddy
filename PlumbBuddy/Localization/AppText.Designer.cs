@@ -214,7 +214,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accept a Dragged and Dropped Mod File.
+        ///   Looks up a localized string similar to Drag and Drop Mod Files.
         /// </summary>
         internal static string Common_AcceptADraggedAndDroppedModFile {
             get {

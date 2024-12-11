@@ -2527,6 +2527,6 @@ More detailed technical information is available in my log.</value>
     <value>Select a Mod File from the Catalog</value>
   </data>
   <data name="Common_AcceptADraggedAndDroppedModFile" xml:space="preserve">
-    <value>Accept a Dragged and Dropped Mod File</value>
+    <value>Drag and Drop Mod Files</value>
   </data>
 </root>
