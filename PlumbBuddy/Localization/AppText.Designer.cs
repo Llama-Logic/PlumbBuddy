@@ -178,7 +178,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} requires that {1} is installed. You do have {1} installed. Click here to view the store page for {1}..
+        ///   Looks up a localized string similar to {0} requires that {1} is installed. You do have {1} installed. This message is for information only. You do not need to make any changes..
         /// </summary>
         internal static string CatalogDisplay_RequiredPack_Installed_Tip {
             get {
@@ -691,7 +691,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hey, Silly! That&apos;s not your Sims 4 User Data Folder. 😏 Or you need to launch the game once and try again....
+        ///   Looks up a localized string similar to Hey, Silly! That&apos;s not your Sims 4 User Data Folder. 😏 If you can&apos;t find it, you may need to launch the game once then exit and try this again....
         /// </summary>
         internal static string FoldersSelector_ValidateUserDataFolder_NoOptionsIni {
             get {
@@ -781,7 +781,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is the number of compiled Python byte code files I found in script archives in your Mods folder..
+        ///   Looks up a localized string similar to This is the number of compiled Python byte code files I found in script mod files in your Mods folder..
         /// </summary>
         internal static string HUD_ByteCodeFiles_Tip_Description {
             get {
@@ -916,7 +916,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis&apos; SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script archives. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script archives, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;.
+        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis&apos; SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in .script mod files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;.
         /// </summary>
         internal static string HUD_PythonScripts_Tip_CreatorsNote {
             get {
@@ -925,7 +925,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script archives in your Mods folder..
+        ///   Looks up a localized string similar to This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script mod files in your Mods folder..
         /// </summary>
         internal static string HUD_PythonScripts_Tip_Description {
             get {
@@ -970,7 +970,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Script Archives.
+        ///   Looks up a localized string similar to Script Mod File.
         /// </summary>
         internal static string HUD_ScriptArchives_Tip_Caption {
             get {
@@ -979,7 +979,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is the number of script archives I was able to catalog in your Mods folder..
+        ///   Looks up a localized string similar to This is the number of .ts4script files I was able to catalog in your Mods folder..
         /// </summary>
         internal static string HUD_ScriptArchives_Tip_Description {
             get {
@@ -988,7 +988,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because Script Mods are disabled in your Game Options, these script archives will not be opened and executed by The Sims 4..
+        ///   Looks up a localized string similar to Because Script Mods are disabled in your Game Options, these script mod files will not be opened and executed by The Sims 4..
         /// </summary>
         internal static string HUD_ScriptArchives_Tip_ModsDisabled {
             get {
@@ -1620,7 +1620,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because this component of your mod is a package file, its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set..
+        ///   Looks up a localized string similar to This component of your mod is a package file, so its manifest will be will be a snippet tuning resource in your package. This is the name of that resource and it should be unique. I will generate the full instance for the snippet tuning resource on my own using the Sims 4 modding community standard implementation of the 64-bit Fowler–Noll–Vo hash function with the highest-order bit set. You can change it if you are feeling brave, but make it unique..
         /// </summary>
         internal static string ManifestComponentEditor_ManifestSnippetTuningResourceName_HelperText {
             get {
@@ -2384,7 +2384,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Script archive corrupt, damaged, or locked.
+        ///   Looks up a localized string similar to Script mod file corrupt, damaged, or locked.
         /// </summary>
         internal static string ManifestEditor_Error_InaccessibleScriptArchive_Caption {
             get {
@@ -2597,7 +2597,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The inclination to increase this setting because the thought of players altering your mods upsets you is valid. But please do consider that some players may be using your mod in a language for which you do not provide a translation, for example, and arbitrary strictness here will punish them when that may not be your intention..
+        ///   Looks up a localized string similar to The inclination to increase this setting because the thought of players altering your mods upsets you is valid; but please do consider that some players may have a good reason for this, such as using your mod in a language for which you do not provide a translation, and arbitrary strictness here will punish them when that may not be your intention..
         /// </summary>
         internal static string ManifestEditor_Hashing_Warning {
             get {
@@ -2874,7 +2874,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Let&apos;s start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a script archive. If there&apos;s more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You&apos;ll be able to specify any remaining files later in this process..
+        ///   Looks up a localized string similar to Let&apos;s start by selecting &lt;strong&gt;any&lt;/strong&gt; file for your mod.&lt;br /&gt;&lt;br /&gt;It doesn’t matter if it’s a package or a .ts4script file. If there&apos;s more than one file for your mod, you can just pick the most prominent one, the first one you made, the one that’s first alphabetically, or pick one at random. Doesn’t really matter 🤷. You&apos;ll be able to specify any remaining files later in this process..
         /// </summary>
         internal static string ManifestEditor_Select_Guidance {
             get {
@@ -3011,7 +3011,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is embarassing, but I&apos;m going to have to ask you to select precisely which of the manifests this mod file contains that you mean because some bozo merged their files and didn&apos;t update the manifests. 🤦
+        ///   Looks up a localized string similar to This is embarassing, but because some bozo merged their files and didn&apos;t update the manifests 🤦, I&apos;m going to have to ask you to select precisely which of the multiple manifests in this mod file you want to use.
         ///`{0}`&lt;br /&gt;&lt;br /&gt;
         ///&lt;iframe src=&quot;https://giphy.com/embed/8Fla28qk2RGlYa2nXr&quot; width=&quot;480&quot; height=&quot;259&quot; style=&quot;&quot; frameBorder=&quot;0&quot; class=&quot;giphy-embed&quot; allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href=&quot;https://giphy.com/gifs/8Fla28qk2RGlYa2nXr&quot;&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;.
         /// </summary>
@@ -3031,7 +3031,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is not a Maxis DBPF package or a TS4 script archive..
+        ///   Looks up a localized string similar to This is not a Maxis DBPF package or a .ts4script file..
         /// </summary>
         internal static string ModFileSelector_Validate_InvalidFormat {
             get {
@@ -3420,7 +3420,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Because anti-virus software doesn&apos;t check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators&apos; accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard..
+        ///   Looks up a localized string similar to Since anti-virus software doesn&apos;t check for malware which can be in mods, TwistedMexi created ModGuard. Sometimes, creators&apos; accounts get hacked and dangerous mods are uploaded to sharing sites. Protect yourself with ModGuard..
         /// </summary>
         internal static string OnboardingDialog_ModHealth_Casual_ModGuard_Description {
             get {
@@ -3726,7 +3726,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The cache may contain resources which are no longer being loaded because they are no longer the victors of override conflicts or their mods have been replaced or removed..
+        ///   Looks up a localized string similar to The cache may contain resources which are no longer being loaded for various reasons, such as mods that may have been replaced or removed..
         /// </summary>
         internal static string Scan_CacheStaleness_Stale_Description_NonCasual {
             get {
@@ -3902,7 +3902,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I found this corrupt script archive in your Mods folder, specifically at this path:
+        ///   Looks up a localized string similar to I found this corrupt .ts4script file in your Mods folder, specifically at this path:
         ///`{0}`&lt;br /&gt;
         ///Your game is not going to be able to start with this file here. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
@@ -3913,7 +3913,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I found this corrupt script archive in your Mods folder, specifically at this path:
+        ///   Looks up a localized string similar to I found this corrupt .ts4script file in your Mods folder, specifically at this path:
         ///`{0}`&lt;br /&gt;
         ///Thankfully, its also at an invalid depth for the game to find it. Still though, it&apos;s a time bomb waiting to go off. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
@@ -3924,7 +3924,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Script Archives are Corrupt.
+        ///   Looks up a localized string similar to No Script Mod Files are Corrupt.
         /// </summary>
         internal static string Scan_Corrupt_Ts4Script_NoneFound_Caption {
             get {
@@ -3933,7 +3933,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I didn&apos;t find any corrupt script archives in your Mods folder. That&apos;s good because if I did, the game would crash if it found them..
+        ///   Looks up a localized string similar to I didn&apos;t find any corrupt .ts4script files in your Mods folder. That&apos;s good because if I did, the game would crash if it found them..
         /// </summary>
         internal static string Scan_Corrupt_Ts4Script_NoneFound_Description {
             get {
@@ -4185,7 +4185,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ((1}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨.
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({1}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨.
         /// </summary>
         internal static string Scan_Dependency_ReinstallFile_Description {
             get {
@@ -4440,7 +4440,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Script Archives are Too Deep.
+        ///   Looks up a localized string similar to No Script Mod Files are Too Deep.
         /// </summary>
         internal static string Scan_Depth_Ts4Script_NoneFound_Caption {
             get {
@@ -4449,7 +4449,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I didn&apos;t find any script archives more than one folder deep in your Mods folder. That&apos;s good because if I did, I can assure you the game would not have..
+        ///   Looks up a localized string similar to I didn&apos;t find any script mod files more than one folder deep in your Mods folder. That&apos;s good because if I did, I can assure you the game would not have..
         /// </summary>
         internal static string Scan_Depth_Ts4Script_NoneFound_Description {
             get {
@@ -4458,7 +4458,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I found this script archive too deep in your Mods folder, specifically at this path:
+        ///   Looks up a localized string similar to I found this script mod file too deep in your Mods folder, specifically at this path:
         ///`{0}`&lt;br /&gt;
         ///We need to move it closer to the root of your Mods folder so the game can find it..
         /// </summary>
@@ -4469,7 +4469,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show me this script archive.
+        ///   Looks up a localized string similar to Show me this script mod file.
         /// </summary>
         internal static string Scan_Depth_Ts4Script_TooDeep_ShowMe_Label {
             get {
@@ -5155,7 +5155,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you&apos;ve installed the same thing and twice *and will have problems as a result*... and you can&apos;t be bothered?.
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can do all this complex hash set calculation to know when you&apos;ve installed the same thing twice *and will have problems as a result*... and you can&apos;t be bothered?.
         /// </summary>
         internal static string Scan_MultipleModVersions_StopTellingMe_CautionText {
             get {
@@ -5263,7 +5263,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have script archives installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**..
+        ///   Looks up a localized string similar to You have script mod files installed, but either the **Enable Custom Content and Mods** box or the **Script Mods Allowed** box (or both) is unchecked in **Game Options**..
         /// </summary>
         internal static string Scan_Setting_ScriptModsGameOption_Incorrect_Description {
             get {
@@ -5686,7 +5686,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If you&apos;re having any trouble picking from this list, you may want to visit [the download page for (0)]({1}), which may have more information or links to it..
+        ///   Looks up a localized string similar to If you&apos;re having any trouble picking from this list, you may want to visit [the download page for {0}]({1}), which may have more information or links to it..
         /// </summary>
         internal static string SelectFeaturesDialog_Guidance {
             get {
@@ -6118,7 +6118,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use this switch to temporarily disable generation of the global manifest package. Don&apos;t worry if you forget to turn this back on if you had it on. I&apos;ll do that for you. 💖.
+        ///   Looks up a localized string similar to Use this switch to temporarily disable generation of the global manifest package. Don&apos;t worry if you forget to turn this back on if you had it enabled. I&apos;ll do that for you. 💖.
         /// </summary>
         internal static string SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip {
             get {
@@ -6408,7 +6408,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don&apos;t actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my packages..
+        ///   Looks up a localized string similar to Hey, PlumbBuddy! You should probably just default all your health scans off for me unless I turn them on for myself. You and I both know I don&apos;t actually have time to play the game. 😂 Oh, and could you unlock your Creator Tools for me? I may need to update manifests in my mods..
         /// </summary>
         internal static string UserTypeSelector_ModCreator_Description {
             get {

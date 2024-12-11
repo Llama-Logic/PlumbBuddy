@@ -1329,7 +1329,7 @@ Move available features on the left over to the required list on the right. What
     <value>Features My Mod Needs</value>
   </data>
   <data name="SelectFeaturesDialog_Guidance" xml:space="preserve">
-    <value>If you're having any trouble picking from this list, you may want to visit [the download page for (0)]({1}), which may have more information or links to it.</value>
+    <value>If you're having any trouble picking from this list, you may want to visit [the download page for {0}]({1}), which may have more information or links to it.</value>
     <comment>This text is in Markdown. {0} = Name of Required Mod; {1} = Download Page URL of Required Mod</comment>
   </data>
   <data name="SelectFeaturesDialog_Guidance_FallbackModName" xml:space="preserve">
@@ -1702,7 +1702,7 @@ Move available features on the left over to the required list on the right. What
     <value>A Mod Needs Another Mod Installed</value>
   </data>
   <data name="Scan_Dependency_ReinstallFile_Description" xml:space="preserve">
-    <value>I've found {0} in your Mods folder ((1}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨</value>
+    <value>I've found {0} in your Mods folder ({1}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name, but I *do know* you need to re-download the original mod before this gets bad. 😨</value>
     <comment>This text is in Markdown. {0} = The Number of Files; {1} = Enumeration of Mod Files</comment>
   </data>
   <data name="Scan_Dependency_ReinstallFile_Download_Label" xml:space="preserve">
