@@ -2523,4 +2523,10 @@ More detailed technical information is available in my log.</value>
     <value> by {0}</value>
     <comment>{0} = List of Creator Names</comment>
   </data>
+  <data name="Common_SelectModFileFromCatalog" xml:space="preserve">
+    <value>Select a Mod File from the Catalog</value>
+  </data>
+  <data name="Common_AcceptADraggedAndDroppedModFile" xml:space="preserve">
+    <value>Accept a Dragged and Dropped Mod File</value>
+  </data>
 </root>

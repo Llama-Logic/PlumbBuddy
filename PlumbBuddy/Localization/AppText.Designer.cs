@@ -214,6 +214,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accept a Dragged and Dropped Mod File.
+        /// </summary>
+        internal static string Common_AcceptADraggedAndDroppedModFile {
+            get {
+                return ResourceManager.GetString("Common_AcceptADraggedAndDroppedModFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse....
         /// </summary>
         internal static string Common_Browse_Ellipsis {
@@ -372,6 +381,15 @@ namespace PlumbBuddy.Localization {
         internal static string Common_Selected {
             get {
                 return ResourceManager.GetString("Common_Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a Mod File from the Catalog.
+        /// </summary>
+        internal static string Common_SelectModFileFromCatalog {
+            get {
+                return ResourceManager.GetString("Common_SelectModFileFromCatalog", resourceCulture);
             }
         }
         

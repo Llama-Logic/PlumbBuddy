@@ -51,10 +51,14 @@
                         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
                             @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                         </MudButton>
-                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync" />
+                        <MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
+                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync" />
+                        </MudTooltip>
                         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                         {
-                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                            <MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+                            </MudTooltip>
                         }
                     </MudStack>
                 </AdornmentEnd>
@@ -70,10 +74,14 @@
                         <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
                             @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                         </MudButton>
-                        <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync" />
+                        <MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
+                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync" />
+                        </MudTooltip>
                         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                         {
-                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                            <MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+                            </MudTooltip>
                         }
                     </MudStack>
                 </AdornmentEnd>
@@ -108,7 +116,9 @@
             </MudButton>
             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
             {
-                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Warning" OnClick="HandleDropAnForAddSubsumedHashOnClickAsync" />
+                <MudTooltip Arrow Color="Color.Warning" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Warning" OnClick="HandleDropAnForAddSubsumedHashOnClickAsync" />
+                </MudTooltip>
             }
         </MudStack>
     </MudItem>

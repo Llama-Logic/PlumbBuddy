@@ -155,7 +155,9 @@
                                         <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
                                         @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                                         {
-                                            <MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
+                                            <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                                                <MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
+                                            </MudTooltip>
                                         }
                                         <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
                                     </MudStack>
@@ -202,10 +204,14 @@
                                     <MudItem>
                                         <MudStack Row>
                                             <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
-                                            <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
+                                            <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_SelectModFileFromCatalog)">
+                                                <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
+                                            </MudTooltip>
                                             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                                             {
-                                                <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
+                                                <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                                                    <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
+                                                </MudTooltip>
                                             }
                                         </MudStack>
                                     </MudItem>

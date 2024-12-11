@@ -10,10 +10,14 @@
     <AdornmentEnd>
         <MudStack Row>
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseOnClickAsync" Disabled="Disabled">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
-            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedModClickAsync" Disabled="Disabled" />
+            <MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
+                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedModClickAsync" Disabled="Disabled" />
+            </MudTooltip>
             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
             {
-                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDragAndDropOnClickAsync" Disabled="Disabled" />
+                <MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDragAndDropOnClickAsync" Disabled="Disabled" />
+                </MudTooltip>
             }
         </MudStack>
     </AdornmentEnd>
