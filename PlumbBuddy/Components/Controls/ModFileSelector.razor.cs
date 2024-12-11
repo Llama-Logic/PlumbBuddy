@@ -28,7 +28,7 @@ partial class ModFileSelector
     }
 
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
-    static async Task<ModFileManifestModel?> GetSelectedModFileManifestAsync(PbDbContext pbDbContext, IDialogService dialogService, FileInfo modFile)
+    public static async Task<ModFileManifestModel?> GetSelectedModFileManifestAsync(PbDbContext pbDbContext, IDialogService dialogService, FileInfo modFile)
     {
         IReadOnlyDictionary<ResourceKey, ModFileManifestModel>? manifests = null;
         ImmutableArray<byte> hash;
@@ -235,6 +235,12 @@ partial class ModFileSelector
         var paths = await UserInterfaceMessaging.GetFilesFromDragAndDropAsync();
         if (paths.Any())
             FilePath = paths[0];
+    }
+
+    async Task HandleSelectCatalogedModClickAsync()
+    {
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath)
+            FilePath = Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath);
     }
 
     string? ValidateModFilePath(string? path)

@@ -210,6 +210,58 @@ partial class ModRequirementEditor
             modRequirement.Name = newValue;
     }
 
+    async Task HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest
+            && manifest.Hash is { IsDefaultOrEmpty: false } hash)
+            HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest
+            && manifest.Hash is { IsDefaultOrEmpty: false } hash)
+            HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleSelectCatalogedModFileForAddedHashOnClickAsync()
+    {
+        await DialogService.ShowInfoDialogAsync(AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption, AppText.ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text);
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest
+            && !manifest.Hash.IsDefaultOrEmpty)
+            HandleHashesChanged
+            (
+                Hashes
+                    .Except(manifest.SubsumedHashes.Select(sh => sh.ToHexString()), StringComparer.OrdinalIgnoreCase)
+                    .Concat([manifest.Hash.ToHexString()])
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+                    .AsReadOnly()
+            );
+    }
+
+    async Task HandleSelectCatalogedModFileForManifestFeatureSelectionOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is not { } modFilePath
+            || await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is not { } manifest)
+            return;
+        if (manifest.Features.Count is 0)
+        {
+            await DialogService.ShowErrorDialogAsync(AppText.ModRequirementEditor_Error_NoManifestedFeatures_Caption, AppText.ModRequirementEditor_Error_NoManifestedFeatures_Text);
+            return;
+        }
+        if (await DialogService.ShowSelectFeaturesDialogAsync(manifest!) is not { } selectedFeatures)
+            return;
+        HandleRequiredFeaturesChanged(selectedFeatures);
+    }
+
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))

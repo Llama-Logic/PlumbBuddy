@@ -598,6 +598,14 @@ partial class ManifestEditor
         UserInterfaceMessaging.IsModScaffoldedInquired -= HandleUserInterfaceMessagingIsModScaffoldedInquired;
     }
 
+    async Task HandleAddCatalogedRequiredModOnClickedAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest)
+            await AddRequiredManifestAsync(manifest);
+    }
+
     async Task HandleAddFilesClickedAsync()
     {
         var modFiles = await ModFileSelector.SelectModFilesAsync();

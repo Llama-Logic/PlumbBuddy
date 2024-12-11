@@ -1,0 +1,40 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
+@inject IPlatformFunctions PlatformFunctions
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<MudDialog Class="tertiary-dialog">
+    <DialogContent>
+        <MudTable @ref="table" @bind-SelectedItem="@selectedModFileForDisplay" Breakpoint="Breakpoint.Sm" Dense Filter="new Func<ModFileForDisplay?, bool>(FilterFunc)" FixedHeader GroupBy="@groupDefinition" GroupHeaderStyle="background-color:var(--mud-palette-background-gray)" Height="500px" Items="@modFilesForDisplay" Outlined RowClass="cursor-pointer" RowClassFunc="SelectedRowClassFunc">
+            <GroupHeaderTemplate>
+                <MudTh Class="mud-table-cell-custom-group">@context.Key</MudTh>
+            </GroupHeaderTemplate>
+            <HeaderContent>
+                <MudTh>Path</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Path">
+                    <MudBreadcrumbs Items="@(CreateBreadcrumbs(context))" Class="pa-0" />
+                </MudTd>
+            </RowTemplate>
+            <ToolBarContent>
+                <MudStack Row Style="width: 80%;">
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.BookSearch" Color="Color.Tertiary" />
+                    <MudTextM3 Typo="TypoM3.Title" Color="Color.Tertiary">
+                        @MarkupLocalizer[nameof(AppText.SelectCatalogedModFileDialog_Caption)]
+                    </MudTextM3>
+                </MudStack>
+                <MudSpacer />
+                <MudTextField @bind-Value="@searchText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate OnDebounceIntervalElapsed="HandleDebounceIntervalEllapsed" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Class="mt-0" />
+            </ToolBarContent>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Cancel)]
+        </MudButton>
+        <MudButton Color="Color.Tertiary" OnClick="OkOnClickHandler" Disabled="@(selectedModFileForDisplay is null)">
+            @MarkupLocalizer[nameof(AppText.Common_Ok)]
+        </MudButton>
+    </DialogActions>
+</MudDialog>

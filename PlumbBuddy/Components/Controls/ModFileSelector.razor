@@ -1,4 +1,6 @@
+@inject IDialogService DialogService
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject ISettings Settings
 @inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <MudTextFieldExtended T="string" Label="@Label" Variant="Variant.Filled" @bind-Text="FilePath" Immediate Required Validation="@(new Func<string, string?>(ValidateModFilePath))" Disabled="Disabled" ReadOnly>
@@ -8,6 +10,7 @@
     <AdornmentEnd>
         <MudStack Row>
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseOnClickAsync" Disabled="Disabled">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
+            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedModClickAsync" Disabled="Disabled" />
             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
             {
                 <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDragAndDropOnClickAsync" Disabled="Disabled" />

@@ -137,6 +137,23 @@ static class DialogExtensions
             return null;
         });
 
+    public static Task<string?> ShowSelectCatalogedModFileDialogAsync(this IDialogService dialogService) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<SelectCatalogedModFileDialog>(null, new DialogParameters<SelectCatalogedModFileDialog>()
+            {
+            }, new DialogOptions
+            {
+                FullWidth = true,
+                MaxWidth = MaxWidth.Medium
+            });
+            if (await dialog.Result is { } dialogResult
+                && !dialogResult.Canceled
+                && dialogResult.Data is string modFilePath)
+                return modFilePath;
+            return null;
+        });
+
     public static Task<IReadOnlyList<string>?> ShowSelectFeaturesDialogAsync(this IDialogService dialogService, ModFileManifestModel manifest) =>
         StaticDispatcher.DispatchAsync(async () =>
         {

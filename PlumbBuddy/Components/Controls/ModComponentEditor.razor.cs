@@ -189,6 +189,24 @@ partial class ModComponentEditor
             modComponent.Name = newValue;
     }
 
+    async Task HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest
+            && manifest.Hash is { IsDefaultOrEmpty: false } hash)
+            HandleIgnoreIfHashAvailableChanged(hash.ToHexString());
+    }
+
+    async Task HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync()
+    {
+        using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        if (await DialogService.ShowSelectCatalogedModFileDialogAsync() is { } modFilePath
+            && await ModFileSelector.GetSelectedModFileManifestAsync(pbDbContext, DialogService, new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", modFilePath))) is { } manifest
+            && manifest.Hash is { IsDefaultOrEmpty: false } hash)
+            HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
+    }
+
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.UsePublicPackCatalog))

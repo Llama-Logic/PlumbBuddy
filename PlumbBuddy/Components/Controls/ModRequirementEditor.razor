@@ -24,6 +24,7 @@
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForAddModFileOnClickAsync">
                 @MarkupLocalizer[nameof(AppText.ModRequirementEditor_AddModFile_Label)]
             </MudButton>
+            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" Color="Color.Tertiary" OnClick="HandleSelectCatalogedModFileForAddedHashOnClickAsync" />
             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
             {
                 <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" Color="Color.Tertiary" OnClick="HandleDropAModFileForAddedHashOnClickAsync" />
@@ -39,6 +40,7 @@
             <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Color="Color.Tertiary" OnClick="HandleBrowseForModFileForManifestFeatureSelectionOnClickAsync">
                 @MarkupLocalizer[nameof(AppText.ModRequirementEditor_SelectFeaturesBasedOnModFileManifest_Label)]
             </MudButton>
+            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" Color="Color.Tertiary" OnClick="HandleSelectCatalogedModFileForManifestFeatureSelectionOnClickAsync" />
             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
             {
                 <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" Color="Color.Tertiary" OnClick="HandleDropAModFileForManifestFeatureSelectionOnClickAsync" />
@@ -69,7 +71,7 @@
             <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder)]" />
         }
     </MudItem>
-    <MudItem xs="12" lg="6">
+    <MudItem xs="12" xl="6">
         <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder)]">
             <AdornmentStart>
                 <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
@@ -79,6 +81,7 @@
                     <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
                         @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                     </MudButton>
+                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync" />
                     @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                     {
                         <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
@@ -87,7 +90,7 @@
             </AdornmentEnd>
         </MudTextFieldExtended>
     </MudItem>
-    <MudItem xs="12" lg="6">
+    <MudItem xs="12" xl="6">
         <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder)]">
             <AdornmentStart>
                 <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
@@ -97,6 +100,7 @@
                     <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
                         @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
                     </MudButton>
+                    <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync" />
                     @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                     {
                         <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />

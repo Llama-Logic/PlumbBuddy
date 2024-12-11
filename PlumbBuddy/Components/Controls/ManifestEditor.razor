@@ -202,6 +202,7 @@
                                     <MudItem>
                                         <MudStack Row>
                                             <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
+                                            <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
                                             @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
                                             {
                                                 <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />

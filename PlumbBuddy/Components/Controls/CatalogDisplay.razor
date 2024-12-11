@@ -99,7 +99,7 @@
                             <ToolBarContent>
                                 <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files)]</MudTextM3>
                                 <MudSpacer />
-                                <MudTextField @bind-Value="@filesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+                                <MudTextField @bind-Value="@filesSearchText" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
                             </ToolBarContent>
                             <HeaderContent>
                                 <MudTh>@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]</MudTh>
@@ -126,7 +126,7 @@
                                 <ToolBarContent>
                                     <MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer[nameof(AppText.CatalogDisplay_Dependencies)]</MudTextM3>
                                     <MudSpacer />
-                                    <MudTextField @bind-Value="@dependenciesSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
+                                    <MudTextField @bind-Value="@dependenciesSearchText" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
                                 </ToolBarContent>
                                 <HeaderContent>
                                     <MudTh>@StringLocalizer[nameof(AppText.Common_Name)]</MudTh>

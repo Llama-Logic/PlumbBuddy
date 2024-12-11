@@ -349,6 +349,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        internal static string Common_Search {
+            get {
+                return ResourceManager.GetString("Common_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select.
         /// </summary>
         internal static string Common_Select {
@@ -5592,6 +5601,42 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_SelectedNotFoundScans_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_SelectedNotFoundScans_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Cataloged Mod File.
+        /// </summary>
+        internal static string SelectCatalogedModFileDialog_Caption {
+            get {
+                return ResourceManager.GetString("SelectCatalogedModFileDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}{1}{2}.
+        /// </summary>
+        internal static string SelectCatalogedModFileDialog_ModDescription {
+            get {
+                return ResourceManager.GetString("SelectCatalogedModFileDialog_ModDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  by {0}.
+        /// </summary>
+        internal static string SelectCatalogedModFileDialog_ModDescription_ByLine {
+            get {
+                return ResourceManager.GetString("SelectCatalogedModFileDialog_ModDescription_ByLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  {0}.
+        /// </summary>
+        internal static string SelectCatalogedModFileDialog_ModDescription_ModVersion {
+            get {
+                return ResourceManager.GetString("SelectCatalogedModFileDialog_ModDescription_ModVersion", resourceCulture);
             }
         }
         
