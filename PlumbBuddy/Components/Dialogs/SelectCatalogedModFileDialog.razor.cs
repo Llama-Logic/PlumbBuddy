@@ -4,7 +4,7 @@ partial class SelectCatalogedModFileDialog
 {
     static string lastSearchText = string.Empty;
 
-    public record ModFileForDisplay(string ModDescription, string Path);
+    record ModFileForDisplay(string ModDescription, string Path);
 
     readonly TableGroupDefinition<ModFileForDisplay?> groupDefinition = new()
     {
