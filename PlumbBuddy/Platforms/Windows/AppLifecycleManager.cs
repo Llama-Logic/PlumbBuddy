@@ -26,7 +26,6 @@ class AppLifecycleManager :
         Dispose(false);
 
     AppWindow? appWindow;
-    bool isVisible;
     bool isWindowActive;
     bool preventCasualClosing = true;
     readonly AsyncManualResetEvent? startupTaskTrap;
@@ -34,16 +33,9 @@ class AppLifecycleManager :
 
     public bool HideMainWindowAtLaunch { get; }
 
-    public bool IsVisible
-    {
-        get => isVisible;
-        set
-        {
-            if (isVisible == value)
-                return;
-            isVisible = value;
-        }
-    }
+    public bool IsVisible =>
+        appWindow is { } nonNullAppWindow
+        && nonNullAppWindow.IsVisible;
 
     public bool PreventCasualClosing
     {
@@ -84,12 +76,6 @@ class AppLifecycleManager :
         && T.TryParse(valueStr?.ToString(), provider, out var value)
         ? value
         : defaultValue;
-
-    void HandleAppWindowChanged(AppWindow sender, AppWindowChangedEventArgs e) =>
-        IsVisible =
-            sender.IsVisible
-            && xamlWindow is not null
-            && !PInvoke.IsIconic(new HWND(WindowNative.GetWindowHandle(xamlWindow)));
 
     void HandleAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs e)
     {
@@ -163,9 +149,7 @@ class AppLifecycleManager :
             if (startupTaskTrap is not null)
                 this.xamlWindow.Activate();
             appWindow = xamlWindow.AppWindow;
-            appWindow.Changed += HandleAppWindowChanged;
             appWindow.Closing += HandleAppWindowClosing;
-            IsVisible = appWindow.IsVisible;
             if (GetLocalSetting("WindowPlacementSaved", 0) is not 0)
             {
                 var windowPlacement = new WINDOWPLACEMENT
