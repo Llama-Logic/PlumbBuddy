@@ -14,8 +14,6 @@ public class AppLifecycleManager :
     public Task UiReleaseSignal =>
         Task.CompletedTask;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
     public void HideWindow()
     {
     }

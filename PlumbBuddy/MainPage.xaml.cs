@@ -192,16 +192,18 @@ public partial class MainPage :
 
     async void HandleDrop(object sender, DropEventArgs e)
     {
+#if WINDOWS
         if (e.PlatformArgs is { } args)
         {
-#if WINDOWS
             var dataView = args.DragEventArgs.DataView;
             if (dataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
                 userInterfaceMessaging.DropFiles((await dataView.GetStorageItemsAsync())
                     .OfType<Windows.Storage.IStorageItem>()
                     .Select(file => file.Path)
                     .ToImmutableArray());
-#endif
         }
+#else
+        await Task.CompletedTask;
+#endif
     }
 }
