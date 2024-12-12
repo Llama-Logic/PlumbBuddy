@@ -1,3 +1,7 @@
+#if WINDOWS
+using H.NotifyIcon.Core;
+#endif
+
 namespace PlumbBuddy;
 
 [SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
@@ -24,14 +28,18 @@ public partial class MainPage :
         this.userInterfaceMessaging = userInterfaceMessaging;
         InitializeComponent();
         BindingContext = this;
+#if WINDOWS
         UpdateTrayIconVisibility();
+#endif
         ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
     readonly ISettings settings;
     bool showFileDropInterface;
+#if WINDOWS
     TaskbarIcon? trayIcon;
+#endif
     readonly IUserInterfaceMessaging userInterfaceMessaging;
     bool webViewShownBefore;
 
@@ -57,16 +65,12 @@ public partial class MainPage :
     void HandleCancelFileDropClicked(object sender, EventArgs e) =>
         userInterfaceMessaging.IsFileDroppingEnabled = false;
 
-    Task HandleFileDropZoneDragAndDrop(IReadOnlyList<string> paths)
-    {
-        userInterfaceMessaging.DropFiles(paths);
-        return Task.CompletedTask;
-    }
-
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+#if WIDNOWSX
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
+#endif
     }
 
     void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -85,6 +89,14 @@ public partial class MainPage :
     {
         settings.PropertyChanged -= HandleSettingsPropertyChanged;
         userInterfaceMessaging.PropertyChanged -= HandleUserInterfaceMessagingPropertyChanged;
+#if WINDOWS
+        if (trayIcon is not null)
+        {
+            pageContainer.Remove(trayIcon);
+            trayIcon.Dispose();
+            trayIcon = null;
+        }
+#endif
     }
 
     protected override void OnHandlerChanged()
@@ -130,6 +142,7 @@ public partial class MainPage :
         }
     }
 
+#if WINDOWS
     void UpdateTrayIconVisibility()
     {
         if (settings.ShowSystemTrayIcon && trayIcon is null)
@@ -163,6 +176,7 @@ public partial class MainPage :
             trayIcon = null;
         }
     }
+#endif
 
     void HandleDragOver(object sender, DragEventArgs e)
     {

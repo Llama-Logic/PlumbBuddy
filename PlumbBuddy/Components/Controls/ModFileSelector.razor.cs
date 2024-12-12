@@ -30,6 +30,9 @@ partial class ModFileSelector
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public static async Task<ModFileManifestModel?> GetSelectedModFileManifestAsync(PbDbContext pbDbContext, IDialogService dialogService, FileInfo modFile)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(dialogService);
+        ArgumentNullException.ThrowIfNull(modFile);
         IReadOnlyDictionary<ResourceKey, ModFileManifestModel>? manifests = null;
         ImmutableArray<byte> hash;
         try
