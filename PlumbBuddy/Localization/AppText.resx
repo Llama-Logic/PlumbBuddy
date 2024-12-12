@@ -1695,7 +1695,7 @@ Move available features on the left over to the required list on the right. What
     <value>file</value>
   </data>
   <data name="Scan_Dependency_BrokenFile_Description" xml:space="preserve">
-    <value>I've found {0} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath =&gt; $"`{filePath}`").Humanize()}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱</value>
+    <value>I've found {0} in your Mods folder ({1}) needing another mod installed... and I can't find it. Unfortunately, I don't even know its name and have no idea where to even send you to download a fresh copy of either. 😱</value>
     <comment>This text is in Markdown. {0} = The Number of Files; {1} = Enumeration of Mod Files</comment>
   </data>
   <data name="Scan_Dependency_ReinstallFile_Caption" xml:space="preserve">
@@ -2120,7 +2120,7 @@ You may believe that it's not *technically* causing a problem, but it has been r
   </data>
   <data name="Scan_LooseArchive_7Zip_Found_Description" xml:space="preserve">
     <value>I found this 7-Zip file in your Mods folder, specifically at this path:
-`{fileOfInterest.Path}`&lt;br /&gt;
+`{0}`&lt;br /&gt;
 While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.</value>
     <comment>This text is in Markdown. {0} = The Path of the File</comment>
   </data>

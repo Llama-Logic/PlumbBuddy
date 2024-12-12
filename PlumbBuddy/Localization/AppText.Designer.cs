@@ -3969,7 +3969,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({modWithMissingDependencyMod.FilePaths.Select(filePath =&gt; $&quot;`{filePath}`&quot;).Humanize()}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name and have no idea where to even send you to download a fresh copy of either. 😱.
+        ///   Looks up a localized string similar to I&apos;ve found {0} in your Mods folder ({1}) needing another mod installed... and I can&apos;t find it. Unfortunately, I don&apos;t even know its name and have no idea where to even send you to download a fresh copy of either. 😱.
         /// </summary>
         internal static string Scan_Dependency_BrokenFile_Description {
             get {
@@ -4672,7 +4672,7 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this 7-Zip file in your Mods folder, specifically at this path:
-        ///`{fileOfInterest.Path}`&lt;br /&gt;
+        ///`{0}`&lt;br /&gt;
         ///While it&apos;s not *technically* causing a problem, it makes me uncomfortable since it can&apos;t be used by the game in there and it could trick you into thinking you&apos;ve installed a mod when you really haven&apos;t..
         /// </summary>
         internal static string Scan_LooseArchive_7Zip_Found_Description {

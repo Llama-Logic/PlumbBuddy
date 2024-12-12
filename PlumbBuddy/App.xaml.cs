@@ -96,6 +96,31 @@ public partial class App :
         //        pbDbContext.PackCodes.Add(new PackCode { Code = $"SP{sp:00}" });
         //    pbDbContext.SaveChanges();
         //}
+#if DEBUG
+        var naughtyStrings = new List<string>();
+        var numbers = Enumerable.Range(0, 20).Select(i => (object?)i).ToArray();
+        foreach (var property in typeof(AppText)
+            .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            .Where(property => property.PropertyType == typeof(string)))
+        {
+            try
+            {
+#pragma warning disable CA1806 // Do not ignore method results
+                string.Format((string)property.GetValue(null)!, numbers);
+#pragma warning restore CA1806 // Do not ignore method results
+            }
+            catch
+            {
+                naughtyStrings.Add(property.Name);
+            }
+        }
+        if (naughtyStrings.Count is > 0)
+        {
+            logger.LogError($"the following localization resources have invalid formats: {naughtyStrings.Humanize()}");
+            if (Debugger.IsAttached)
+                Debugger.Break();
+        }
+#endif
         // I didn't inject you directly so that I could make sure I migrated before I woke you up
         // but guess what, it's time for school
         lifetimeScope.Resolve<ISmartSimObserver>();
