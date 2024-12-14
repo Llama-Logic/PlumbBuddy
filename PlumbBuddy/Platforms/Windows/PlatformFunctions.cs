@@ -39,16 +39,19 @@ partial class PlatformFunctions :
     static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
     static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
 
-    public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger)
+    public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger, IAppLifecycleManager appLifecycleManager)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         this.lifetimeScope = lifetimeScope;
         this.logger = logger;
+        this.appLifecycleManager = appLifecycleManager;
         badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
         toastNotifier = ToastNotificationManager.CreateToastNotifier();
     }
 
+    readonly IAppLifecycleManager appLifecycleManager;
     readonly BadgeUpdater badgeUpdater;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<PlatformFunctions> logger;
@@ -94,7 +97,8 @@ partial class PlatformFunctions :
             ProgressValue = Math.Min(progressValue, inDomainValue);
             progressMaximum = inDomainValue;
             OnPropertyChanged(progressMaximumChangedEventArgs);
-            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+            if (appLifecycleManager.IsVisible)
+                TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
         }
     }
 
@@ -112,7 +116,8 @@ partial class PlatformFunctions :
             }
             progressState = value;
             OnPropertyChanged(progressStateChangedEventArgs);
-            TaskbarManager.Instance.SetProgressState((TaskbarProgressBarState)progressState);
+            if (appLifecycleManager.IsVisible)
+                TaskbarManager.Instance.SetProgressState((TaskbarProgressBarState)progressState);
         }
     }
 
@@ -127,7 +132,8 @@ partial class PlatformFunctions :
             ProgressMaximum = Math.Max(progressMaximum, inDomainValue);
             progressValue = inDomainValue;
             OnPropertyChanged(progressValueChangedEventArgs);
-            TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
+            if (appLifecycleManager.IsVisible)
+                TaskbarManager.Instance.SetProgressValue(progressValue, progressMaximum);
         }
     }
 

@@ -445,148 +445,158 @@ public class ModsDirectoryCataloger :
                     continue;
                 }
             }
-            State = ModsDirectoryCatalogerState.Cataloging;
-            platformFunctions.ProgressState = AppProgressState.Indeterminate;
-            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            while (nomNom.TryDequeue(out var path))
+            try
             {
-                var filesOfInterestPath = Path.Combine("Mods", path);
-                var modsDirectoryPath = Path.Combine(settings.UserDataFolderPath, "Mods");
-                var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
-                var fullPath = Path.Combine(modsDirectoryPath, path);
-                if (File.Exists(fullPath))
-                    await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
-                else if (Directory.Exists(fullPath))
+                State = ModsDirectoryCatalogerState.Cataloging;
+                platformFunctions.ProgressState = AppProgressState.Indeterminate;
+                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                while (nomNom.TryDequeue(out var path))
                 {
-                    var modsDirectoryFiles = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories).ToImmutableArray();
-                    var filesCataloged = 0;
-                    var filesToCatalog = modsDirectoryFiles.Length;
-                    ProgressValue = 0;
-                    ProgressMax = filesToCatalog;
-                    platformFunctions.ProgressState = AppProgressState.Normal;
-                    platformFunctions.ProgressMaximum = progressMax!.Value;
-                    var preservedModFilePaths = new ConcurrentBag<string>();
-                    var preservedFileOfInterestPaths = new ConcurrentBag<string>();
-                    using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
+                    var filesOfInterestPath = Path.Combine("Mods", path);
+                    var modsDirectoryPath = Path.Combine(settings.UserDataFolderPath, "Mods");
+                    var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
+                    var fullPath = Path.Combine(modsDirectoryPath, path);
+                    if (File.Exists(fullPath))
+                        await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
+                    else if (Directory.Exists(fullPath))
                     {
-                        var timeAtCataloged = new ConcurrentDictionary<int, DateTimeOffset>();
-                        await Task.WhenAll(modsDirectoryFiles.Select(async fileInfo =>
+                        var modsDirectoryFiles = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories).ToImmutableArray();
+                        var filesCataloged = 0;
+                        var filesToCatalog = modsDirectoryFiles.Length;
+                        ProgressValue = 0;
+                        ProgressMax = filesToCatalog;
+                        platformFunctions.ProgressState = AppProgressState.Normal;
+                        platformFunctions.ProgressMaximum = progressMax!.Value;
+                        var preservedModFilePaths = new ConcurrentBag<string>();
+                        var preservedFileOfInterestPaths = new ConcurrentBag<string>();
+                        using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
                         {
-                            await semaphore.WaitAsync().ConfigureAwait(false);
-                            try
+                            var timeAtCataloged = new ConcurrentDictionary<int, DateTimeOffset>();
+                            await Task.WhenAll(modsDirectoryFiles.Select(async fileInfo =>
                             {
-                                await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
-                                var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
-                                ProgressValue = newFilesCataloged;
-                                platformFunctions.ProgressValue = progressValue;
-                                if (newFilesCataloged % estimateBackwardSample is 0)
+                                await semaphore.WaitAsync().ConfigureAwait(false);
+                                try
                                 {
-                                    timeAtCataloged.TryAdd(newFilesCataloged, DateTimeOffset.Now);
-                                    if (timeAtCataloged.TryGetValue(newFilesCataloged - estimateBackwardSample, out var timeSomeFilesAgo))
-                                        EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - timeSomeFilesAgo).Ticks / estimateBackwardSample * (filesToCatalog - newFilesCataloged) / 10000000 * 10000000 + 10000000);
+                                    await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
+                                    var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
+                                    ProgressValue = newFilesCataloged;
+                                    platformFunctions.ProgressValue = progressValue;
+                                    if (newFilesCataloged % estimateBackwardSample is 0)
+                                    {
+                                        timeAtCataloged.TryAdd(newFilesCataloged, DateTimeOffset.Now);
+                                        if (timeAtCataloged.TryGetValue(newFilesCataloged - estimateBackwardSample, out var timeSomeFilesAgo))
+                                            EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - timeSomeFilesAgo).Ticks / estimateBackwardSample * (filesToCatalog - newFilesCataloged) / 10000000 * 10000000 + 10000000);
+                                    }
+                                    var fileType = GetFileType(fileInfo);
+                                    if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
+                                        preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                                    else if (fileType is not ModsDirectoryFileType.Ignored)
+                                        preservedFileOfInterestPaths.Add(Path.Combine("Mods", fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
                                 }
-                                var fileType = GetFileType(fileInfo);
-                                if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
-                                    preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
-                                else if (fileType is not ModsDirectoryFileType.Ignored)
-                                    preservedFileOfInterestPaths.Add(Path.Combine("Mods", fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
-                            }
-                            finally
-                            {
-                                semaphore.Release();
-                            }
-                        })).ConfigureAwait(false);
+                                finally
+                                {
+                                    semaphore.Release();
+                                }
+                            })).ConfigureAwait(false);
+                        }
+                        var now = DateTimeOffset.Now;
+                        await pbDbContext.ModFiles
+                            .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
+                            .ExecuteDeleteAsync()
+                            .ConfigureAwait(false);
+                        await pbDbContext.FilesOfInterest
+                            .Where(foi => foi.Path.StartsWith(filesOfInterestPath) && !preservedFileOfInterestPaths.Contains(foi.Path))
+                            .ExecuteDeleteAsync()
+                            .ConfigureAwait(false);
                     }
-                    var now = DateTimeOffset.Now;
-                    await pbDbContext.ModFiles
-                        .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
-                        .ExecuteDeleteAsync()
-                        .ConfigureAwait(false);
-                    await pbDbContext.FilesOfInterest
-                        .Where(foi => foi.Path.StartsWith(filesOfInterestPath) && !preservedFileOfInterestPaths.Contains(foi.Path))
-                        .ExecuteDeleteAsync()
-                        .ConfigureAwait(false);
+                    else
+                    {
+                        var now = DateTimeOffset.Now;
+                        var modFilesRemoved = await pbDbContext.ModFiles
+                            .Where(md => md.Path != null && md.Path.StartsWith(path))
+                            .ExecuteDeleteAsync()
+                            .ConfigureAwait(false);
+                        modFilesRemoved.ToString();
+                        await pbDbContext.FilesOfInterest
+                            .Where(foi => foi.Path.StartsWith(filesOfInterestPath))
+                            .ExecuteDeleteAsync()
+                            .ConfigureAwait(false);
+                    }
                 }
-                else
+                EstimatedStateTimeRemaining = null;
+                await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
+                State = ModsDirectoryCatalogerState.AnalyzingTopology;
+                ProgressMax = null;
+                platformFunctions.ProgressState = AppProgressState.Indeterminate;
+                var resourceWasRemovedOrReplaced = false;
+                var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
+                var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
+                await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+                var pathCollation = platformFunctions.FileSystemStringComparison switch
                 {
-                    var now = DateTimeOffset.Now;
-                    var modFilesRemoved = await pbDbContext.ModFiles
-                        .Where(md => md.Path != null && md.Path.StartsWith(path))
-                        .ExecuteDeleteAsync()
-                        .ConfigureAwait(false);
-                    modFilesRemoved.ToString();
-                    await pbDbContext.FilesOfInterest
-                        .Where(foi => foi.Path.StartsWith(filesOfInterestPath))
-                        .ExecuteDeleteAsync()
-                        .ConfigureAwait(false);
-                }
-            }
-            EstimatedStateTimeRemaining = null;
-            await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
-            State = ModsDirectoryCatalogerState.AnalyzingTopology;
-            ProgressMax = null;
-            platformFunctions.ProgressState = AppProgressState.Indeterminate;
-            var resourceWasRemovedOrReplaced = false;
-            var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
-            var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
-            await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
-            await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-            var pathCollation = platformFunctions.FileSystemStringComparison switch
-            {
-                StringComparison.Ordinal => "BINARY",
-                StringComparison.OrdinalIgnoreCase => "NOCASE",
-                _ => throw new NotSupportedException($"Cannot translate {platformFunctions.FileSystemStringComparison} to SQLite collation")
-            };
+                    StringComparison.Ordinal => "BINARY",
+                    StringComparison.OrdinalIgnoreCase => "NOCASE",
+                    _ => throw new NotSupportedException($"Cannot translate {platformFunctions.FileSystemStringComparison} to SQLite collation")
+                };
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection
-            await pbDbContext.Database.ExecuteSqlRawAsync
-            (
-                $"""
-                INSERT INTO
-                    ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
-                SELECT DISTINCT
-                    {currentTopologySnapshot.Id},
-                    sq.Id
-                FROM 
-                    (
-                    	SELECT DISTINCT
-                    		mfr.KeyType,
-                    		mfr.KeyGroup,
-                    		mfr.KeyFullInstance,
-                    		FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
-                    	FROM
-                    		ModFileResources mfr
-                            JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
-                    		JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
-                    	WHERE
-                    		mf.Path IS NOT NULL
-                    		AND mf.FileType = 1
-                    ) sq
-                """
-            ).ConfigureAwait(false);
-            if (latestTopologySnapshot is not null)
-            {
-                resourceWasRemovedOrReplaced =
-                    (await pbDbContext.Database.SqlQueryRaw<int>
-                    (
-                        $"""
-                        SELECT COUNT(*)
-                        FROM (
-                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
-                            EXCEPT
-                            SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
-                        )
-                        """
-                    ).ToListAsync().ConfigureAwait(false))[0] > 0;
-                await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
-            }
+                await pbDbContext.Database.ExecuteSqlRawAsync
+                (
+                    $"""
+                    INSERT INTO
+                        ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
+                    SELECT DISTINCT
+                        {currentTopologySnapshot.Id},
+                        sq.Id
+                    FROM 
+                        (
+                    	    SELECT DISTINCT
+                    		    mfr.KeyType,
+                    		    mfr.KeyGroup,
+                    		    mfr.KeyFullInstance,
+                    		    FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
+                    	    FROM
+                    		    ModFileResources mfr
+                                JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
+                    		    JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                    	    WHERE
+                    		    mf.Path IS NOT NULL
+                    		    AND mf.FileType = 1
+                        ) sq
+                    """
+                ).ConfigureAwait(false);
+                if (latestTopologySnapshot is not null)
+                {
+                    resourceWasRemovedOrReplaced =
+                        (await pbDbContext.Database.SqlQueryRaw<int>
+                        (
+                            $"""
+                            SELECT COUNT(*)
+                            FROM (
+                                SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
+                                EXCEPT
+                                SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
+                            )
+                            """
+                        ).ToListAsync().ConfigureAwait(false))[0] > 0;
+                    await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
+                }
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection
-            if (resourceWasRemovedOrReplaced && settings.CacheStatus is SmartSimCacheStatus.Normal)
-                settings.CacheStatus = SmartSimCacheStatus.Stale;
-            State = ModsDirectoryCatalogerState.Idle;
-            platformFunctions.ProgressState = AppProgressState.None;
-            platformFunctions.ProgressMaximum = 0;
-            busyManualResetEvent.Reset();
-            idleManualResetEvent.Set();
+                if (resourceWasRemovedOrReplaced && settings.CacheStatus is SmartSimCacheStatus.Normal)
+                    settings.CacheStatus = SmartSimCacheStatus.Stale;
+                platformFunctions.ProgressState = AppProgressState.None;
+                platformFunctions.ProgressMaximum = 0;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "encountered unhandled exception while processing the paths queue");
+            }
+            finally
+            {
+                State = ModsDirectoryCatalogerState.Idle;
+                busyManualResetEvent.Reset();
+                idleManualResetEvent.Set();
+            }
         }
     }
 
