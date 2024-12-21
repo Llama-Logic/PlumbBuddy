@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,79 +26,79 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -119,5 +119,165 @@
   </resheader>
   <data name="UserDataFolderName" xml:space="preserve">
     <value>模擬市民4</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_TagLine" xml:space="preserve">
+    <value>《模拟人生4》MOD的贴心助手</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_OpenModsFolder_Label" xml:space="preserve">
+    <value>打开Mods文件夹</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_ClearCache_Label" xml:space="preserve">
+    <value>检查软件更新</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_AskForHelp_Label" xml:space="preserve">
+    <value>联网提问</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_Settings_Label" xml:space="preserve">
+    <value>软件设置</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_CloseWindow_Label" xml:space="preserve">
+    <value>隐藏窗口</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_Shutdown_Label" xml:space="preserve">
+    <value>退出软件</value>
+    <comment></comment>
+  </data>
+  <data name="MainMenu_Version" xml:space="preserve">
+    <value>(版本号：{0})</value>
+    <comment>{0} = 版本号</comment>
+  </data>
+  <data name="Home_ModHealth_Label" xml:space="preserve">
+    <value>MOD状态</value>
+    <comment></comment>
+  </data>
+  <data name="Home_Catalog_Label" xml:space="preserve">
+    <value>目录</value>
+    <comment></comment>
+  </data>
+  <data name="CatalogDisplay_UserAssistanceNote" xml:space="preserve">
+    <value>当作者在MOD中包含了清单文件时，这些MOD才会出现在你的目录中。</value>
+    <comment></comment>
+  </data>
+  <data name="CatalogDisplay_SearchCatalog" xml:space="preserve">
+    <value>搜索目录</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_Dependency_RequiredPack_Caption" xml:space="preserve">
+    <value>{0} 未找到 {1}</value>
+    <comment>拼接。 {0} = The Name of the Mod; {1} = The Quantized Packs</comment>
+  </data>
+  <data name="Scan_Missing_Missing_Description" xml:space="preserve">
+    <value>不过你应该去下载它，因为它能大大改善 {0}。</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_Missing_Utility_BetterExceptions" xml:space="preserve">
+    <value>详细的异常报告、MOD冲突和补丁更新分析</value>
+    <comment>md拼接</comment>
+  </data>
+  <data name="Scan_Missing_Missing_GoGet_Label" xml:space="preserve">
+    <value>获取 {0}</value>
+    <comment>{0} = The Name of the Mod</comment>
+  </data>
+  <data name="Scan_Common_StopTellingMe_Label" xml:space="preserve">
+    <value>不再提醒</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_Found_Caption" xml:space="preserve">
+    <value>发现了一个 RAR 文件： {0}</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_Found_Caption" xml:space="preserve">
+    <value>我发现了一个 ZIP 文件： {0}</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_Found_Caption" xml:space="preserve">
+    <value>我发现了一个 7-Zip 文件：{0}</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_LooseArchive_Rar_Found_Description" xml:space="preserve">
+    <value>我在你的Mods文件夹中发现了这个RAR文件，路径是：
+`{0}`&lt;br /&gt;
+虽然它*技术上*不会造成问题，但它让我感到不安，因为游戏无法在这个位置使用它，而且它可能会误导你，让你以为已经安装了MOD，实际上并没有。</value>
+    <comment>md拼接</comment>
+  </data>
+  <data name="Scan_LooseArchive_7Zip_Found_Description" xml:space="preserve">
+    <value>我在你的Mods文件夹中发现了这个7z文件，路径是：
+`{0}`&lt;br /&gt;
+虽然它*技术上*不会造成问题，但它让我感到不安，因为游戏无法在这个位置使用它，而且它可能会误导你，让你以为已经安装了MOD，实际上并没有。</value>
+    <comment>md拼接</comment>
+  </data>
+  <data name="Scan_LooseArchive_Zip_Found_Description" xml:space="preserve">
+    <value>我在你的Mods文件夹中发现了这个zip文件，路径是：
+`{0}`&lt;br /&gt;
+你可能认为它*技术上*不会造成问题，但有报告称，游戏中的某些过时代码路径可能会尝试打开这个文件，这将是&lt;strong&gt;非常糟糕&lt;/strong&gt;的。我们立即将它移动到你的下载文件夹吧。</value>
+    <comment>md拼接</comment>
+  </data>
+  <data name="Scan_ErrorLog_FileFound_Caption_Casual" xml:space="preserve">
+    <value>游戏或MOD之一正在请求帮助！</value>
+    <comment></comment>
+  </data>
+  <data name="Scan_ErrorLog_FileFound_Text_Casual" xml:space="preserve">
+    <value>我在你的用户数据文件夹中发现了这个文件，它的存在意味着某些事情出错了。&lt;br /&gt;
+`{0}`&lt;br /&gt;
+我们可以将这个文件带到Discord中的相关人员那里，他们可以帮我们弄清楚它的含义，并告诉我们是否需要做些什么。</value>
+    <comment>md拼接</comment>
+  </data>
+  <data name="Scan_ErrorLog_FileFound_SelectSupportDiscord_Label" xml:space="preserve">
+    <value>选择一个《模拟人生4》帮助渠道</value>
+  </data>
+  <data name="Scan_ErrorLog_FileFound_ShowFile_Label" xml:space="preserve">
+    <value>打开所在文件夹</value>
+  </data>
+  <data name="Scan_ErrorLog_FileFound_Delete_Label" xml:space="preserve">
+    <value>删掉这个错误文件</value>
+  </data>
+  <data name="DeleteErrorLogsDialog_Caption" xml:space="preserve">
+    <value>删除错误日志</value>
+  </data>
+  <data name="DeleteErrorLogsDialog_Text" xml:space="preserve">
+    <value>实际上你有多个待处理的错误日志。你想删除多个吗？</value>
+  </data>
+  <data name="DeleteErrorLogsDialog_ErrorLogsToDelete_Label" xml:space="preserve">
+    <value>要删除的错误日志文件，点击Select All全选</value>
+  </data>
+  <data name="Common_Ok" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Dialogs_Error_GetSupportDiscordsFailed_Caption" xml:space="preserve">
+    <value>出错了</value>
+  </data>
+  <data name="Dialogs_Error_GetSupportDiscordsFailed_Text" xml:space="preserve">
+    <value>当我尝试从我的网站获取支持的 Discord 服务器列表时，它... 没有成功。嗯...我们能稍后再试吗？</value>
+  </data>
+  <data name="Scan_Missing_Installed_Caption" xml:space="preserve">
+    <value>已安装</value>
+  </data>
+  <data name="Scan_Missing_MayNotLoad_Caption" xml:space="preserve">
+    <value>可能无法加载</value>
+  </data>
+  <data name="Scan_Missing_Installed_Description" xml:space="preserve">
+    <value>享受这个精彩的MOD吧，{0}。 😁</value>
+  </data>
+  <data name="Scan_Missing_Utility_ModGuard" xml:space="preserve">
+    <value>防止黑客攻击、钓鱼以及其他恶意软件攻击，这些攻击在MOD作者被盗号的情况下可能会发生。</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Okay_Caption" xml:space="preserve">
+    <value>Mods支持正常启用</value>
+  </data>
+  <data name="Scan_Setting_ModsGameOption_Okay_Description" xml:space="preserve">
+    <value>**游戏选项**中的**启用自定义内容和模组**选项框目前没有问题。</value>
+  </data>
+  <data name="Scan_Setting_ScriptModsGameOption_Okay_Description" xml:space="preserve">
+    <value>**游戏选项**中的**已允许脚本模组**选项框目前没有问题。</value>
   </data>
 </root>
