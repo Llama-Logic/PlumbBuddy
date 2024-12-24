@@ -34,9 +34,9 @@ amethyst-lilac:
       light: manifest-editor-light.png
       repeat: no-repeat
       size: contain
-    simvault:
-      dark: simvault-dark.png
-      light: simvault-light.png
+    archivist:
+      dark: archivist-dark.png
+      light: archivist-light.png
       size: contain
 
 littlbowbub:
@@ -66,9 +66,9 @@ littlbowbub:
     manifest-editor:
       dark: manifest-editor.png
       light: manifest-editor.png
-    simvault:
-      dark: simvault.png
-      light: simvault.png
+    archivist:
+      dark: archivist.png
+      light: archivist.png
 
 little-ms-sam:
   display_name: LittleMsSam
@@ -122,7 +122,7 @@ little-ms-sam:
     manifest-editor:
       dark: none.png
       light: none.png
-    simvault:
+    archivist:
       dark: none.png
       light: none.png
 

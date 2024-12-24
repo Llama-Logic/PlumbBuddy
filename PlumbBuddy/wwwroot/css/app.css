@@ -2,18 +2,22 @@
     overflow-x: hidden;
     --plumbbuddy-tab-background-mod-health-dark: url('/img/ModHealthBackgroundDark.png');
     --plumbbuddy-tab-background-mod-health-light: url('/img/ModHealthBackgroundLight.png');
+    --plumbbuddy-tab-background-mod-health-position: center;
     --plumbbuddy-tab-background-mod-health-repeat: unset;
     --plumbbuddy-tab-background-mod-health-size: cover;
     --plumbbuddy-tab-background-catalog-dark: url('/img/CatalogBackgroundDark.png');
     --plumbbuddy-tab-background-catalog-light: url('/img/CatalogBackgroundLight.png');
+    --plumbbuddy-tab-background-catalog-position: center;
     --plumbbuddy-tab-background-catalog-repeat: unset;
     --plumbbuddy-tab-background-catalog-size: cover;
-    --plumbbuddy-tab-background-simvault-dark: url('/img/SimVaultBackground.png');
-    --plumbbuddy-tab-background-simvault-light: url('/img/SimVaultBackground.png');
-    --plumbbuddy-tab-background-simvault-repeat: unset;
-    --plumbbuddy-tab-background-simvault-size: cover;
+    --plumbbuddy-tab-background-archivist-dark: url('/img/ArchivistBackgroundDark.png');
+    --plumbbuddy-tab-background-archivist-light: url('/img/ArchivistBackgroundLight.png');
+    --plumbbuddy-tab-background-archivist-position: bottom;
+    --plumbbuddy-tab-background-archivist-repeat: unset;
+    --plumbbuddy-tab-background-archivist-size: cover;
     --plumbbuddy-tab-background-manifest-editor-dark: url('/img/ManifestEditorBackgroundDark.png');
     --plumbbuddy-tab-background-manifest-editor-light: url('/img/ManifestEditorBackgroundLight.png');
+    --plumbbuddy-tab-background-manifest-position: center;
     --plumbbuddy-tab-background-manifest-editor-repeat: unset;
     --plumbbuddy-tab-background-manifest-editor-size: cover;
 }

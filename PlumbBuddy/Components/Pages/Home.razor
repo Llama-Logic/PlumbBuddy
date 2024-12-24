@@ -24,18 +24,18 @@
             <CatalogDisplay />
         </div>
     </MudTabPanel>
-    @if (Settings.Type is UserType.Creator)
+	<MudTabPanel Text="Archivist" Icon="@MaterialDesignIcons.Normal.ArchiveClock" BadgeColor="Color.Warning" BadgeDot>
+		<div class="archivist-tab-container">
+			<div class="background"></div>
+			<Archivist />
+		</div>
+	</MudTabPanel>
+	@if (Settings.Type is UserType.Creator)
     {
         <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ManifestEditor_Label)]" Icon="@MaterialDesignIcons.Normal.TagEdit">
             <div class="manifest-editor-tab-container">
                 <div class="background"></div>
                 <ManifestEditor />
-            </div>
-        </MudTabPanel>
-        <MudTabPanel Text="SimVault" Icon="@MaterialDesignIcons.Normal.ArchiveSync">
-            <div class="simvault-tab-container">
-                <div class="background"></div>
-                <SimVault />
             </div>
         </MudTabPanel>
     }

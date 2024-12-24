@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlumbBuddy.Data", "PlumbBud
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlumbBuddy", "PlumbBuddy\PlumbBuddy.csproj", "{ABFC0C08-6DF0-45FE-8542-4C6716E7C0D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlumbBuddy.Archivist.Data", "PlumbBuddy.Archivist.Data\PlumbBuddy.Archivist.Data.csproj", "{9E3EE702-9108-48E5-BCF2-D5B7B25FB690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{ABFC0C08-6DF0-45FE-8542-4C6716E7C0D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABFC0C08-6DF0-45FE-8542-4C6716E7C0D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ABFC0C08-6DF0-45FE-8542-4C6716E7C0D6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9E3EE702-9108-48E5-BCF2-D5B7B25FB690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E3EE702-9108-48E5-BCF2-D5B7B25FB690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E3EE702-9108-48E5-BCF2-D5B7B25FB690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E3EE702-9108-48E5-BCF2-D5B7B25FB690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

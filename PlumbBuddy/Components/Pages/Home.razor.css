@@ -16,7 +16,7 @@
 
     .mod-health-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-mod-health-light);
-        background-position: center;
+        background-position: var(--plumbbuddy-tab-background-mod-health-position);
         background-repeat: var(--plumbbuddy-tab-background-mod-health-repeat);
         background-size: var(--plumbbuddy-tab-background-mod-health-size);
         height: 100vh;
@@ -36,7 +36,7 @@
 
     .catalog-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-catalog-light);
-        background-position: center;
+        background-position: var(--plumbbuddy-tab-background-catalog-position);
         background-repeat: var(--plumbbuddy-tab-background-catalog-repeat);
         background-size: var(--plumbbuddy-tab-background-catalog-size);
         height: 100vh;
@@ -48,17 +48,17 @@
         z-index: -10;
     }
 
-.simvault-tab-container {
+.archivist-tab-container {
     height: calc(100vh - 112px);
     overflow-y: auto;
     padding: 24px;
 }
 
-    .simvault-tab-container .background {
-        background-image: var(--plumbbuddy-tab-background-simvault-light);
-        background-position: center;
-        background-repeat: var(--plumbbuddy-tab-background-simvault-repeat);
-        background-size: var(--plumbbuddy-tab-background-simvault-size);
+    .archivist-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-archivist-light);
+        background-position: var(--plumbbuddy-tab-background-archivist-position);
+        background-repeat: var(--plumbbuddy-tab-background-archivist-repeat);
+        background-size: var(--plumbbuddy-tab-background-archivist-size);
         height: 100vh;
         left: 0;
         overflow: hidden;
@@ -75,7 +75,7 @@
 
     .manifest-editor-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-manifest-editor-light);
-        background-position: center;
+        background-position: var(--plumbbuddy-tab-background-manifest-editor-position);
         background-repeat: var(--plumbbuddy-tab-background-manifest-editor-repeat);
         background-size: var(--plumbbuddy-tab-background-manifest-editor-size);
         height: 100vh;
@@ -96,8 +96,8 @@
         background-image: var(--plumbbuddy-tab-background-catalog-dark);
     }
 
-    .simvault-tab-container .background {
-        background-image: var(--plumbbuddy-tab-background-simvault-dark);
+    .archivist-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-archivist-dark);
     }
 
     .manifest-editor-tab-container .background {

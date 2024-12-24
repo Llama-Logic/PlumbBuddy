@@ -8,6 +8,30 @@ class Settings :
 
     readonly IPreferences preferences;
 
+    public string ArchiveFolderPath
+    {
+        get => preferences.Get(nameof(ArchiveFolderPath), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PlumbBuddy", "Archive"));
+        set
+        {
+            if (ArchiveFolderPath == value)
+                return;
+            preferences.Set(nameof(ArchiveFolderPath), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ArchivingEnabled
+    {
+        get => preferences.Get(nameof(ArchivingEnabled), false);
+        set
+        {
+            if (ArchivingEnabled == value)
+                return;
+            preferences.Set(nameof(ArchivingEnabled), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool AutomaticallyCheckForUpdates
     {
         get => preferences.Get(nameof(AutomaticallyCheckForUpdates), false);

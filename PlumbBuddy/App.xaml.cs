@@ -25,7 +25,7 @@ public partial class App :
         }
         catch (SqliteException)
         {
-            logger.LogInformation("The preceding error occurred because the migration succession has been broken by terrible, lazy developers. I will recover now by rebuilding your database. I'm sorry that I'll have to scan all your mods again.");
+            logger.LogInformation("The preceding error occurred because the migration succession has been broken by my developers. I will recover now by rebuilding your database. I'm sorry that I'll have to scan all your mods again.");
             var objects = new List<(string? name, string? type)>();
             var sqliteConnection = pbDbContext.Database.GetDbConnection();
             var wasClosed = sqliteConnection.State is ConnectionState.Closed;
