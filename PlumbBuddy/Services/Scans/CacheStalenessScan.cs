@@ -45,10 +45,7 @@ public sealed class CacheStalenessScan :
             {
                 Icon = MaterialDesignIcons.Normal.SelectCompare,
                 Caption = AppText.Scan_CacheStaleness_AwaitingAnalysis_Caption,
-                Description =
-                    """
-                    <iframe src="https://giphy.com/embed/dyjmESp3MmPZyfw94t" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/originals-hold-on-up-dawnie-jefferson-dyjmESp3MmPZyfw94t">via GIPHY</a></p>
-                    """,
+                Description = AppText.Scan_CacheStaleness_AwaitingAnalysis_Description,
                 Origin = this
             }
             :

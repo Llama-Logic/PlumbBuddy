@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -639,8 +639,7 @@ If only *parts* of your mod need to be present or not based on whether packs or 
   </data>
   <data name="ManifestEditor_Error_InaccessiblePackage_Text" xml:space="preserve">
     <value>I was unable to read this file as a valid Maxis DataBase Packed File with exclusive access:
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/1g2JyW7p6mtZc6bOEY" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/guavajuice-guava-juice-roi-1g2JyW7p6mtZc6bOEY"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File</comment>
   </data>
   <data name="ManifestEditor_Info_SelectedMergedPackage_Caption" xml:space="preserve">
@@ -649,8 +648,7 @@ If only *parts* of your mod need to be present or not based on whether packs or 
   <data name="ManifestEditor_Info_SelectedMergedPackage_Text" xml:space="preserve">
     <value>Just so you're aware... this file has multiple manifests. Frankly, not the best. Don't worry, I'll tidy things up and leave it with just one when we finish here.
 `{0}`&lt;br /&gt;&lt;br /&gt;
-From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`. You can change that if you want by selecting this file on the **Components** step.&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`. You can change that if you want by selecting this file on the **Components** step.</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File; {1} = Selected manifest resource name</comment>
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Caption" xml:space="preserve">
@@ -658,8 +656,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
   </data>
   <data name="ManifestEditor_Error_InaccessibleScriptArchive_Text" xml:space="preserve">
     <value>I was unable to read this file as a valid ZIP archive with exclusive access:
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/3o72EYhVhAYFJ4rv68" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/ghostbustersmovies-ghostbusters-original-3o72EYhVhAYFJ4rv68"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File</comment>
   </data>
   <data name="ManifestEditor_Error_UnrecognizedFileType_Caption" xml:space="preserve">
@@ -667,8 +664,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
   </data>
   <data name="ManifestEditor_Error_UnrecognizedFileType_Text" xml:space="preserve">
     <value>What even is this?
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/WRQBXSCnEFJIuxktnw" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/math-lady-meme-WRQBXSCnEFJIuxktnw"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File</comment>
   </data>
   <data name="ManifestEditor_Composing_Status_RemovingManifests" xml:space="preserve">
@@ -732,8 +728,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
   </data>
   <data name="ManifestEditor_Error_ScaffoldingReferenceBroken_Text" xml:space="preserve">
     <value>When you last updated the manifest in this mod, it had a file at this location which I failed to find. If you weren't expecting to see this message, you should probably investigate.
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/6uGhT1O4sxpi8" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/awkward-pulp-fiction-john-travolta-6uGhT1O4sxpi8"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Absolute path to Mod File</comment>
   </data>
   <data name="ManifestEditor_Info_MissingScaffolding_Caption" xml:space="preserve">
@@ -743,8 +738,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <value>There are only a few reasons this might happen. In any case, you are seen.
 1. *You are* the original creator of this mod and you don't back up your files (in which case, for shame). You're going to have to re-add all of your mod's components without the scaffolding, but I will clean-up intramod requirements for you automatically as you go.
 2. You're a kind soul adopting an orphaned mod and the marmot smiles down upon you. If so, we do have [some potentially useful advice for you](https://plumbbuddy.app/community-services/adoption-guidance).
-3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/xTkcEHkC6P3I5VCDpm" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/converse-xTkcEHkC6P3I5VCDpm"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+3. You're *one of those* players who knows just enough to be dangerous, you lied to me during Onboarding, and now you're about to *do something **really stupid***. [Enjoy breaking things](https://youtu.be/m_F8wSZT3QY), I guess. 🤷</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Caution_ConfirmWithWarnings_Caption" xml:space="preserve">
@@ -765,8 +759,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <value>Are you sure?</value>
   </data>
   <data name="ManifestEditor_Caution_RemoveRequiredMod_Text" xml:space="preserve">
-    <value>You're about to remove your mod's requirement of {0}. If you change your mind you'll have to **Cancel** and start from scratch or add it back.&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/qxCYGGPbQp3yj5aSsL" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/thelonelyisland-season-3-i-think-you-should-leave-itysl-qxCYGGPbQp3yj5aSsL"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <value>You're about to remove your mod's requirement of {0}. If you change your mind you'll have to **Cancel** and start from scratch or add it back.</value>
     <comment>This text is in Markdown. {0} = Required Mod Name</comment>
   </data>
   <data name="ManifestEditor_Caution_RemoveRequiredMod_Text_ModNameFallback" xml:space="preserve">
@@ -953,8 +946,7 @@ If you don't have one, but you're interested in getting a commission for all the
   </data>
   <data name="ModFileSelector_SelectAModFileManifest_Error_NoManifests_Text" xml:space="preserve">
     <value>I'm sorry, but the mod file you selected doesn't contain any manifests. For technical reasons, it simply isn't safe to try to reference it in this manner. All you can do for now is *politely* ask the original creator to publish it with a manifest in their next release... and then wait **patiently**.
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/3oEjI8D0T5KXgPZrTW" width="480" height="269" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/summerbreak-summer-break-sb3-3oEjI8D0T5KXgPZrTW"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Full path to the Mod File</comment>
   </data>
   <data name="ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Caption" xml:space="preserve">
@@ -962,8 +954,7 @@ If you don't have one, but you're interested in getting a commission for all the
   </data>
   <data name="ModFileSelector_SelectAModFileManifest_Info_MultipleManifests_Text" xml:space="preserve">
     <value>This is embarassing, but because some bozo merged their files and didn't update the manifests 🤦, I'm going to have to ask you to select precisely which of the multiple manifests in this mod file you want to use.
-`{0}`&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/8Fla28qk2RGlYa2nXr" width="480" height="259" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/8Fla28qk2RGlYa2nXr"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+`{0}`</value>
     <comment>This text is in Markdown. {0} = Full path to the Mod File</comment>
   </data>
   <data name="ModFileSelector_Validate_FileNotFound" xml:space="preserve">
@@ -1311,8 +1302,7 @@ I'm going to poke in there now. If macOS pauses me to ask you if it's cool, plea
   </data>
   <data name="SelectFeaturesDialog_Text" xml:space="preserve">
     <value>**Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it's giving me more details about what issues could arise if things change later on.&lt;br /&gt;
-Move available features on the left over to the required list on the right. What will you have? 😏&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/x49H7NdakLhNgLoy7v" width="480" height="307" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/archerfx-x49H7NdakLhNgLoy7v"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+Move available features on the left over to the required list on the right. What will you have? 😏</value>
     <comment>This text is in Markdown. {0} = Mod Creator's Name</comment>
   </data>
   <data name="SelectFeaturesDialog_Text_ModCreatorNameFallback" xml:space="preserve">
@@ -1586,9 +1576,7 @@ Move available features on the left over to the required list on the right. What
 * help players with installation problems involving it.
 
 ##### Manifest Hashes Need to be Maintained
-*Please remember to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.
-
-&lt;iframe src="https://giphy.com/embed/QC26L3oE3DEULQri7D" width="480" height="374" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/farmersinsurance-jk-simmons-farmers-insurance-professor-burke-QC26L3oE3DEULQri7D"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+*Please remember to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Composing_Success_Caption" xml:space="preserve">
@@ -2376,8 +2364,7 @@ Doing so **will not cost you any more**, but it will cause {0} to earn a commiss
   <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Text" xml:space="preserve">
     <value>I've just copied this Promo Code to your computer's clipboard:
 `{0}`&lt;br /&gt;                    
-You can now just paste it right in to the Promo Code field during check-out and help support {1}!&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/rlQgaKAzFj21hivpE8" width="480" height="360" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/blkbok-rlQgaKAzFj21hivpE8"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+You can now just paste it right in to the Promo Code field during check-out and help support {1}!</value>
     <comment>This text is in Markdown. {0} = EA Promo Code; {1} = List of Creators</comment>
   </data>
   <data name="SmartSimObserver_OpenDownloadsFolder_Error_Text" xml:space="preserve">
@@ -2476,24 +2463,21 @@ More detailed technical information is available in my log.</value>
     <value>Tread lightly here 🤚</value>
   </data>
   <data name="ManifestComponentEditor_Caution_AddSubsumedHash_Text" xml:space="preserve">
-    <value>What you're *about to do* is tell me that this mod file counts for the one you're about to select in the file picker. Be **sure** you understand the ramifications of that before you do it.
-&lt;iframe src="https://giphy.com/embed/4DvP1HK8UviaOuRcCY" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/SPTV-be-careful-cordell-walker-texas-ranger-4DvP1HK8UviaOuRcCY"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <value>What you're *about to do* is tell me that this mod file counts for the one you're about to select in the file picker. Be **sure** you understand the ramifications of that before you do it.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ModRequirementEditor_Error_NoManifestedFeatures_Caption" xml:space="preserve">
     <value>Whoops, this mod file has no offered features</value>
   </data>
   <data name="ModRequirementEditor_Error_NoManifestedFeatures_Text" xml:space="preserve">
-    <value>There are apparently no features on offer. If you didn't make a mistake picking the mod file just now, definitely clear out the required features!&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/l2JehQ2GitHGdVG9y" width="480" height="362" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/season-16-the-simpsons-16x9-l2JehQ2GitHGdVG9y"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <value>There are apparently no features on offer. If you didn't make a mistake picking the mod file just now, definitely clear out the required features!</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Caption" xml:space="preserve">
     <value>Please keep in mind ☝️</value>
   </data>
   <data name="ModRequirementEditor_Info_AddHashesRequirementDomainReminder_Text" xml:space="preserve">
-    <value>Only pick another mod file in this mod if you're certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod's requirements.&lt;br /&gt;&lt;br /&gt;
-&lt;iframe src="https://giphy.com/embed/QqmtxPQ9n6wXoPDkoc" width="270" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/joycelayman-marketing-coach-business-strategist-your-reminder-QqmtxPQ9n6wXoPDkoc"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;</value>
+    <value>Only pick another mod file in this mod if you're certain *your mod* requires it. You do not (and should not) try to make sure the player is also meeting the other mod's requirements.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="DesktopInterface_DragAndDrop_Label" xml:space="preserve">
@@ -2528,5 +2512,8 @@ More detailed technical information is available in my log.</value>
   </data>
   <data name="Common_AcceptADraggedAndDroppedModFile" xml:space="preserve">
     <value>Drag and Drop Mod Files</value>
+  </data>
+  <data name="Scan_CacheStaleness_AwaitingAnalysis_Description" xml:space="preserve">
+    <value>☝️ When the topology analysis I'm waiting for is complete, I'll let you know what the status of your cache is.</value>
   </data>
 </root>
