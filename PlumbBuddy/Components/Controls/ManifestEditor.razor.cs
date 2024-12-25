@@ -372,11 +372,9 @@ partial class ManifestEditor
             {
                 await updateStatusAsync(0, StringLocalizer["ManifestEditor_Composing_Status_RemovingManifests", getComponentRelativePath(component)]).ConfigureAwait(false);
                 if (component.FileObjectModel is DataBasePackedFile dbpf)
-                    foreach (var manifestResourceKey in (await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false)).Keys)
-                        dbpf.Delete(manifestResourceKey); // 😱
+                    await ModFileManifestModel.DeleteModFileManifestsAsync(dbpf).ConfigureAwait(false);
                 else if (component.FileObjectModel is ZipArchive zipArchive)
-                    while (zipArchive.Entries.FirstOrDefault(entry => entry.FullName.Equals("llamalogic.modfilemanifest.yml", StringComparison.OrdinalIgnoreCase)) is { } entry)
-                        entry.Delete(); // 😱
+                    ModFileManifestModel.DeleteModFileManifest(zipArchive);
                 else
                     throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
             }
@@ -525,17 +523,11 @@ partial class ManifestEditor
                     await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", componentRelativePath]).ConfigureAwait(false);
                     if (component.FileObjectModel is DataBasePackedFile dbpf)
                     {
-                        await dbpf.SetAsync(new ResourceKey(ResourceType.SnippetTuning, 0x80000000, manifest.TuningFullInstance), manifest).ConfigureAwait(false);
+                        await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
                         await dbpf.SaveAsync().ConfigureAwait(false);
                     }
                     else if (component.FileObjectModel is ZipArchive zipArchive)
-                    {
-                        var manifestEntry = zipArchive.CreateEntry("llamalogic.modfilemanifest.yml");
-                        using var manifestEntryStream = manifestEntry.Open();
-                        using var manifestEntryStreamWriter = new StreamWriter(manifestEntryStream);
-                        await manifestEntryStreamWriter.WriteLineAsync(manifest.ToString()).ConfigureAwait(false);
-                        await manifestEntryStreamWriter.FlushAsync().ConfigureAwait(false);
-                    }
+                        await ModFileManifestModel.SetModFileManifestAsync(zipArchive, manifest).ConfigureAwait(false);
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                     component.FileObjectModel.Dispose();
