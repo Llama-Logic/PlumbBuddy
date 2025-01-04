@@ -355,7 +355,7 @@ partial class ManifestEditor
             .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceToolingMetadataAttribute>() is not null)
             .ToImmutableHashSet();
         var imageAndStringTableTypes = Enum.GetValues<ResourceType>()
-            .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.DirectDrawSurface or ResourceFileType.PortableNetworkGraphic)
+            .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.DirectDrawSurface or ResourceFileType.PortableNetworkGraphic or ResourceFileType.Ts4TranslucentJointPhotographicExpertsGroupImage)
             .Concat([ResourceType.StringTable])
             .ToImmutableHashSet();
         var tuningAndSimDataTypes = Enum.GetValues<ResourceType>()
@@ -374,7 +374,7 @@ partial class ManifestEditor
                 if (component.FileObjectModel is DataBasePackedFile dbpf)
                     await ModFileManifestModel.DeleteModFileManifestsAsync(dbpf).ConfigureAwait(false);
                 else if (component.FileObjectModel is ZipArchive zipArchive)
-                    ModFileManifestModel.DeleteModFileManifest(zipArchive);
+                    ModFileManifestModel.DeleteModFileManifests(zipArchive);
                 else
                     throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
             }

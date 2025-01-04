@@ -12,9 +12,9 @@
 
 <MudGrid Justify="Justify.Center" Class="align-center">
     <MudItem Class="flex-grow-1">
-        <div class="catalog-note rounded">
-            <MudAlert Severity="Severity.Info">@MarkupLocalizer[nameof(AppText.CatalogDisplay_UserAssistanceNote)]</MudAlert>
-        </div>
+        <MudPaper Outlined>
+			<MudAlert Severity="Severity.Info">@MarkupLocalizer[nameof(AppText.CatalogDisplay_UserAssistanceNote)]</MudAlert>
+		</MudPaper>
     </MudItem>
     <MudItem>
         <MudTextField T="string" @bind-Value="@ModsSearchText" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.CatalogDisplay_SearchCatalog)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" />

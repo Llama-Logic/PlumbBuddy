@@ -48,6 +48,7 @@ partial class PlatformFunctions :
     }
 
     DateTimeOffset? lastGameProcessScan;
+    Process? lastGameProcess;
     int progressMaximum;
     AppProgressState progressState;
     int progressValue;
@@ -132,8 +133,9 @@ partial class PlatformFunctions :
         ArgumentNullException.ThrowIfNull(installationDirectory);
         if (lastGameProcessScan is { } last
             && last + gameProcessScanGracePeriod > DateTimeOffset.UtcNow)
-            return null;
+            return lastGameProcess;
         lastGameProcessScan = DateTimeOffset.UtcNow;
+        lastGameProcess = null;
         using var zshProcess = Process.Start(new ProcessStartInfo("/bin/zsh", $"-c \"pgrep -f 'The Sims 4'\"")
         {
             RedirectStandardOutput = true,
@@ -150,7 +152,10 @@ partial class PlatformFunctions :
                 .Where(maybeNullProcessId => maybeNullProcessId is not null)
                 .FirstOrDefault();
             if (maybeNullProcessId is { } processId)
-                return Process.GetProcessById(processId);
+            {
+                lastGameProcess = Process.GetProcessById(processId);
+                return lastGameProcess;
+            }
         }
         return null;
     }

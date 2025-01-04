@@ -20,6 +20,15 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
     });
 };
 
+window.loadLottie = (animationPath, animationClassName) =>
+    lottie.loadAnimation({
+        container: document.querySelector(`.${animationClassName}`),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: animationPath
+    });
+
 window.registerExternalLinkHandler = handlerInstance =>
     document.body.addEventListener('click', e => {
         if (e.target.tagName === 'A' && e.target.href && !e.target.href.startsWith(window.location.origin)) {

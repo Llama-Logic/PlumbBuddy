@@ -26,8 +26,12 @@ html {
     overflow-y: hidden;
 }
 
-article:last-child > * {
+article.mud-markdown-body > *:last-child {
     margin-bottom: 0 !important;
+}
+
+.fade-container {
+    transition: opacity 0.5s ease-in-out;
 }
 
 .mud-popover.mud-tooltip {
@@ -69,8 +73,18 @@ div.mud-input-control.no-material-variant .mud-input > * {
     height: 100%;
 }
 
+.manual-markdown p:not(:first-child) {
+    margin-top: .5em;
+}
+
 .mud-dialog {
     border: 1px solid var(--mud-palette-lines-default);
+}
+
+.animation-dialog .mud-dialog-content {
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
 }
 
 .primary-dialog {
@@ -259,12 +273,6 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
     background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-error) 35%) 85%);
 }
 
-.catalog-note {
-    backdrop-filter: blur(10px);
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 80%);
-    -webkit-backdrop-filter: blur(10px);
-}
-
 .catalog-list {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
@@ -276,5 +284,19 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
     height: calc(100vh - 240px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.chronicle-list {
+    backdrop-filter: blur(10px);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-background) 90%);
+    height: calc(100vh - 242px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.chronicle-details {
+    backdrop-filter: blur(10px);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-background) 80%);
+    height: calc(100vh - 242px);
     -webkit-backdrop-filter: blur(10px);
 }

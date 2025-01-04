@@ -10,6 +10,12 @@ partial class FoldersSelector
     bool isTS4AvailableFromValve;
 
     [Parameter]
+    public string ArchiveFolderPath { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ArchiveFolderPathChanged { get; set; }
+
+    [Parameter]
     public string DownloadsFolderPath { get; set; } = string.Empty;
 
     [Parameter]
@@ -31,6 +37,17 @@ partial class FoldersSelector
 
     [Parameter]
     public EventCallback<string> UserDataFolderPathChanged { get; set; }
+
+    async Task BrowseForArchiveFolderOnClickAsync()
+    {
+        var result = await FolderPicker.PickAsync(ArchiveFolderPath);
+        if (result.Exception is not null)
+            return;
+        if (!result.IsSuccessful)
+            return;
+        ArchiveFolderPath = result.Folder.Path;
+        await ArchiveFolderPathChanged.InvokeAsync(ArchiveFolderPath);
+    }
 
     async Task BrowseForDownloadsFolderOnClickAsync()
     {
@@ -91,14 +108,18 @@ partial class FoldersSelector
         }
         DownloadsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
         await DownloadsFolderPathChanged.InvokeAsync(DownloadsFolderPath);
+        ArchiveFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PlumbBuddy", "Archive");
+        await ArchiveFolderPathChanged.InvokeAsync(ArchiveFolderPath);
     }
 
-    async Task UseDefaultUserDataAndDownloadsFoldersOnClickAsync()
+    async Task UseDefaultUserFoldersOnClickAsync()
     {
         UserDataFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Electronic Arts", AppText.UserDataFolderName);
         await UserDataFolderPathChanged.InvokeAsync(UserDataFolderPath);
         DownloadsFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
         await DownloadsFolderPathChanged.InvokeAsync(DownloadsFolderPath);
+        ArchiveFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PlumbBuddy", "Archive");
+        await ArchiveFolderPathChanged.InvokeAsync(ArchiveFolderPath);
         StateHasChanged();
     }
 

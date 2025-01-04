@@ -8,6 +8,8 @@ partial class SettingsDialog
     MudTabs? tabs;
     ThemeSelector? themeSelector;
 
+    string ArchiveFolderPath { get; set; } = string.Empty;
+
     bool AutomaticallyCheckForUpdates { get; set; }
 
     string DownloadsFolderPath { get; set; } = string.Empty;
@@ -74,6 +76,7 @@ partial class SettingsDialog
             if (foldersSelector is not null)
             {
                 await foldersSelector.ScanForFoldersAsync();
+                ArchiveFolderPath = Settings.ArchiveFolderPath;
                 DownloadsFolderPath = Settings.DownloadsFolderPath;
                 InstallationFolderPath = Settings.InstallationFolderPath;
                 UserDataFolderPath = Settings.UserDataFolderPath;
@@ -130,6 +133,7 @@ partial class SettingsDialog
         }
         if (defaultCreatorsChipSetField is not null)
             await defaultCreatorsChipSetField.CommitPendingEntryIfEmptyAsync();
+        Settings.ArchiveFolderPath = ArchiveFolderPath;
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;

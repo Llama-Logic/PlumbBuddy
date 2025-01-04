@@ -1,6 +1,7 @@
 @inject IElectronicArtsApp ElectronicArtsApp
 @inject IFolderPicker FolderPicker
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject ISettings Settings
 @inject ISteam Steam
 @inject IStringLocalizer<AppText> StringLocalizer
 
@@ -29,7 +30,7 @@
                 <MudTextM3 Typo="TypoM3.Body" Size="Size.Small">
                     @CultureInfo.CurrentCulture.NativeName
                 </MudTextM3>
-                <MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserDataAndDownloadsFoldersOnClickAsync">@MarkupLocalizer[nameof(AppText.FoldersSelector_ResetPaths)]</MudButton>
+				<MudButton StartIcon="@MaterialDesignIcons.Normal.FolderAccount" Variant="Variant.Filled" Class="mt-4" OnClick="UseDefaultUserFoldersOnClickAsync">@MarkupLocalizer[nameof(AppText.FoldersSelector_ResetPaths)]</MudButton>
             </MudStack>
         </MudStack>
     </MudItem>
@@ -101,36 +102,43 @@
         @MarkupLocalizer[nameof(AppText.FoldersSelector_ManualSelection_OnboardingHeading_2)]
     </MudTextM3>
 }
-<MudGrid Justify="Justify.Center" Class="mt-8 mb-4">
+<MudGrid Justify="Justify.Center" Class="my-8">
     <MudItem xs="10">
         <MudForm @ref="@foldersForm">
-            <MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_UserDataFolder)]" Variant="Variant.Filled" @bind-Text="@UserDataFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
-            <br />
-            <MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_InstallationFolder)]" Variant="Variant.Filled" @bind-Text="@InstallationFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
-            <br />
-            <MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_DownloadsFolder)]" Variant="Variant.Filled" @bind-Text="@DownloadsFolderPath" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForDownloadsFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
+			<MudStack>
+				<MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_UserDataFolder)]" Variant="Variant.Filled" Text="@UserDataFolderPath" TextChanged="@UserDataFolderPathChanged" Immediate Required Validation="@(new Func<string, string?>(ValidateUserDataFolderPath))">
+					<AdornmentStart>
+						<MudIcon Icon="@MaterialDesignIcons.Normal.FolderAccount" />
+					</AdornmentStart>
+					<AdornmentEnd>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForUserDataFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
+					</AdornmentEnd>
+				</MudTextFieldExtended>
+				<MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_InstallationFolder)]" Variant="Variant.Filled" Text="@InstallationFolderPath" TextChanged="@InstallationFolderPathChanged" Immediate Required Validation="@(new Func<string, string?>(ValidateInstallationFolderPath))">
+					<AdornmentStart>
+						<MudIcon Icon="@MaterialDesignIcons.Normal.FolderTable" />
+					</AdornmentStart>
+					<AdornmentEnd>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForInstallationFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
+					</AdornmentEnd>
+				</MudTextFieldExtended>
+				<MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_DownloadsFolder)]" Variant="Variant.Filled" Text="@DownloadsFolderPath" TextChanged="@DownloadsFolderPathChanged" Immediate Required Validation="@(new Func<string, string?>(ValidateDownloadsFolderPath))">
+					<AdornmentStart>
+						<MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
+					</AdornmentStart>
+					<AdornmentEnd>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForDownloadsFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
+					</AdornmentEnd>
+				</MudTextFieldExtended>
+				<MudTextFieldExtended T="string" Label="@StringLocalizer[nameof(AppText.FoldersSelector_ArchiveFolder)]" Variant="Variant.Filled" Text="@ArchiveFolderPath" TextChanged="@ArchiveFolderPathChanged" Immediate Required Disabled="@(Settings.ArchivistEnabled)">
+					<AdornmentStart>
+						<MudIcon Icon="@MaterialDesignIcons.Normal.FolderStar" />
+					</AdornmentStart>
+					<AdornmentEnd>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="BrowseForArchiveFolderOnClickAsync">@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]</MudButton>
+					</AdornmentEnd>
+				</MudTextFieldExtended>
+			</MudStack>
         </MudForm>
     </MudItem>
 </MudGrid>
-<br />

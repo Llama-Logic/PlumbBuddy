@@ -77,7 +77,7 @@
         </MudTabPanel>
         <MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Label)]" Icon="@MaterialDesignIcons.Normal.Folder">
             <div class="mt-8">
-                <FoldersSelector @ref="@foldersSelector" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
+				<FoldersSelector @ref="@foldersSelector" @bind-ArchiveFolderPath="@ArchiveFolderPath" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
             </div>
         </MudTabPanel>
         <MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus">

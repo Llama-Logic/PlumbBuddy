@@ -574,6 +574,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive Folder.
+        /// </summary>
+        internal static string FoldersSelector_ArchiveFolder {
+            get {
+                return ResourceManager.GetString("FoldersSelector_ArchiveFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Distribution Platform.
         /// </summary>
         internal static string FoldersSelector_DistributionPlatform {
@@ -2043,8 +2052,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;
-        ///If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me t [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.
+        ///
+        ///If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [d [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_Confirm_Note_BlankPromoCode {
             get {
@@ -2666,7 +2676,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to Just so you&apos;re aware... this file has multiple manifests. Frankly, not the best. Don&apos;t worry, I&apos;ll tidy things up and leave it with just one when we finish here.
-        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///`{0}`
+        ///
         ///From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`. You can change that if you want by selecting this file on the **Components** step..
         /// </summary>
         internal static string ManifestEditor_Info_SelectedMergedPackage_Text {
@@ -3191,9 +3202,11 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to It&apos;s awesome that you&apos;re using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that&apos;s where your mods are (or will be), so I pretty much need to do that.&lt;br /&gt;
-        ///I&apos;m going to poke in there now. If macOS pauses me to ask you if it&apos;s cool, please tell it that it&apos;s okay for me to be in there.&lt;br /&gt;
-        ///*Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I w [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to It&apos;s awesome that you&apos;re using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that&apos;s where your mods are (or will be), so I pretty much need to do that.
+        ///
+        ///I&apos;m going to poke in there now. If macOS pauses me to ask you if it&apos;s cool, please tell it that it&apos;s okay for me to be in there.
+        ///
+        ///*Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won&apos;t be  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OnboardingDialog_Caution_SpookingMacs_Text {
             get {
@@ -3870,7 +3883,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this corrupt package file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///Your game is not going to be able to start with this file here. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
         internal static string Scan_Corrupt_Package_Found_Description {
@@ -3881,7 +3895,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this corrupt package file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///Thankfully, its also at an invalid depth for the game to find it. Still though, it&apos;s a time bomb waiting to go off. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
         internal static string Scan_Corrupt_Package_FoundOutOfRange_Description {
@@ -3919,7 +3934,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this corrupt .ts4script file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///Your game is not going to be able to start with this file here. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
         internal static string Scan_Corrupt_Ts4Script_Found_Description {
@@ -3930,7 +3946,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this corrupt .ts4script file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///Thankfully, its also at an invalid depth for the game to find it. Still though, it&apos;s a time bomb waiting to go off. Let&apos;s move it to your Downloads folder, safely out of the game&apos;s reach..
         /// </summary>
         internal static string Scan_Corrupt_Ts4Script_FoundOutOfRange_Description {
@@ -4255,7 +4272,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to **{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+        ///   Looks up a localized string similar to **{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.
+        ///
         ///*If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*..
         /// </summary>
         internal static string Scan_Dependency_RequiredPack_Description {
@@ -4410,7 +4428,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this package file too deep in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///We need to move it closer to the root of your Mods folder so the game can find it..
         /// </summary>
         internal static string Scan_Depth_Package_TooDeep_Description {
@@ -4475,7 +4494,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this script mod file too deep in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///We need to move it closer to the root of your Mods folder so the game can find it..
         /// </summary>
         internal static string Scan_Depth_Ts4Script_TooDeep_Description {
@@ -4584,8 +4604,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I found this file in your User Data folder and its presence is a signal that something went wrong.&lt;br /&gt;
-        ///`{0}`&lt;br /&gt;
+        ///   Looks up a localized string similar to I found this file in your User Data folder and its presence is a signal that something went wrong.
+        ///`{0}`
+        ///
         ///We could take the file to informed people in Discord who can help us figure out what it means and if there&apos;s anything we should do about it..
         /// </summary>
         internal static string Scan_ErrorLog_FileFound_Text_Casual {
@@ -4595,7 +4616,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:&lt;br /&gt;
+        ///   Looks up a localized string similar to A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:
         ///`{0}`.
         /// </summary>
         internal static string Scan_ErrorLog_FileFound_Text_NonCasual {
@@ -4614,8 +4635,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you&apos;ve installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.&lt;br /&gt;
-        ///*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &quot;{0}&quot; is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you&apos;ve installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.
+        ///
+        ///*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This **u [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Scan_Exclusivity_ConflicingClaim_Description {
             get {
@@ -4670,7 +4692,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this 7-Zip file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///While it&apos;s not *technically* causing a problem, it makes me uncomfortable since it can&apos;t be used by the game in there and it could trick you into thinking you&apos;ve installed a mod when you really haven&apos;t..
         /// </summary>
         internal static string Scan_LooseArchive_7Zip_Found_Description {
@@ -4744,7 +4767,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this RAR file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///While it&apos;s not *technically* causing a problem, it makes me uncomfortable since it can&apos;t be used by the game in there and it could trick you into thinking you&apos;ve installed a mod when you really haven&apos;t..
         /// </summary>
         internal static string Scan_LooseArchive_Rar_Found_Description {
@@ -4791,7 +4815,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I found this ZIP file in your Mods folder, specifically at this path:
-        ///`{0}`&lt;br /&gt;
+        ///`{0}`
+        ///
         ///You may believe that it&apos;s not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be &lt;strong&gt;very bad&lt;/strong&gt;. Let&apos;s move it to your Downloads folder right away..
         /// </summary>
         internal static string Scan_LooseArchive_Zip_Found_Description {
@@ -5089,7 +5114,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I don&apos;t mean to be pushy, but you need to remove all but one of these.&lt;br /&gt;&lt;br /&gt;
+        ///   Looks up a localized string similar to I don&apos;t mean to be pushy, but you need to remove all but one of these.
+        ///
         ///{0}.
         /// </summary>
         internal static string Scan_MultipleModVersions_Description {
@@ -5738,7 +5764,8 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to **Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it&apos;s giving me more details about what issues could arise if things change later on.&lt;br /&gt;
+        ///   Looks up a localized string similar to **Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it&apos;s giving me more details about what issues could arise if things change later on.
+        ///
         ///Move available features on the left over to the required list on the right. What will you have? 😏.
         /// </summary>
         internal static string SelectFeaturesDialog_Text {
@@ -5973,8 +6000,10 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
-        ///`{1}`&lt;br /&gt;
-        ///Since you&apos;re interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?&lt;br /&gt;
+        ///`{1}`
+        ///
+        ///Since you&apos;re interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?
+        ///
         ///Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!.
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text {
@@ -5994,7 +6023,8 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to I&apos;ve just copied this Promo Code to your computer&apos;s clipboard:
-        ///`{0}`&lt;br /&gt;                    
+        ///`{0}`
+        ///
         ///You can now just paste it right in to the Promo Code field during check-out and help support {1}!.
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Text {
@@ -6058,8 +6088,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Downloads folder I have on file for you does not exist:&lt;br /&gt;
-        ///`{0}`&lt;br /&gt;&lt;br /&gt;
+        ///   Looks up a localized string similar to The Downloads folder I have on file for you does not exist:
+        ///`{0}`
+        ///
         ///You may want to go into Settings and change that..
         /// </summary>
         internal static string SmartSimObserver_OpenDownloadsFolder_Error_Text {

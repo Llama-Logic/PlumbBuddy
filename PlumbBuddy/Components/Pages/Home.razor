@@ -12,27 +12,27 @@
 
 <div class="main-tabs-backdrop"></div>
 <MudTabs @bind-ActivePanelIndex="@activePanelIndex" Centered KeepPanelsAlive MinimumTabWidth="200px" Class="main-tabs">
-    <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.AnalyzingTopology && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
+	<MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" IconColor="Color.Primary" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.AnalyzingTopology && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
         <div class="mod-health-tab-container">
             <div class="background"></div>
             <ScanIssuesDisplay />
         </div>
     </MudTabPanel>
-    <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_Catalog_Label)]" Icon="@MaterialDesignIcons.Normal.Book">
+	<MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_Catalog_Label)]" Icon="@MaterialDesignIcons.Normal.Book" IconColor="Color.Primary">
         <div class="catalog-tab-container">
             <div class="background"></div>
             <CatalogDisplay />
         </div>
     </MudTabPanel>
-	<MudTabPanel Text="Archivist" Icon="@MaterialDesignIcons.Normal.ArchiveClock" BadgeColor="Color.Warning" BadgeDot>
+	<MudTabPanel Text="Archivist" Icon="@MaterialDesignIcons.Normal.ArchiveClock" IconColor="Color.Secondary">
 		<div class="archivist-tab-container">
 			<div class="background"></div>
-			<Archivist />
+			<ArchivistDisplay />
 		</div>
 	</MudTabPanel>
 	@if (Settings.Type is UserType.Creator)
     {
-        <MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ManifestEditor_Label)]" Icon="@MaterialDesignIcons.Normal.TagEdit">
+		<MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ManifestEditor_Label)]" Icon="@MaterialDesignIcons.Normal.TagEdit" IconColor="Color.Tertiary">
             <div class="manifest-editor-tab-container">
                 <div class="background"></div>
                 <ManifestEditor />

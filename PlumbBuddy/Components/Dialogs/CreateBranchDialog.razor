@@ -1,0 +1,34 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
+<MudDialog Class="secondary-dialog">
+	<TitleContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" />
+			<MudTextM3 Typo="TypoM3.Title" Color="Color.Secondary">
+				Create Branch
+			</MudTextM3>
+		</MudStack>
+	</TitleContent>
+	<DialogContent>
+		<MudStack>
+			<MudTextField @bind-Value="@ChronicleName" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Label" AdornmentColor="Color.Secondary" HelperText="This is the name your new chronicle will have." Label="Name" Variant="Variant.Filled" />
+			<MudTextField @bind-Value="@PreviousSaveGameInstance" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.FormatListGroup" AdornmentColor="Color.Secondary" HelperText="Instances are numbers that uniquely identify new games you make in The Sims 4. This number being the same in different save files is how I know to group them as snapshots together in the same chronicle. The instance number displayed in the read-only field above is the one used by the chronicle from which you are currently creating a branch." Label="Existing Instance" ReadOnly Variant="Variant.Filled" />
+			<MudTextFieldExtended @bind-Value="@newSaveGameInstance" HelperText="In order for your branch to become a new chronicle, we need to specify an instance different from the pre-existing one above. I've generated a new one for you, but you can click the dice button on the right to make me do that as many times as you like." Label="New Instance" ReadOnly Variant="Variant.Filled">
+				<AdornmentStart>
+					<MudIcon Icon="@MaterialDesignIcons.Normal.FormatListGroupPlus" Color="Color.Secondary" />
+				</AdornmentStart>
+				<AdornmentEnd>
+					<MudIconButton Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.DiceMultiple" OnClick="RandomizeNewSaveGameInstanceOnClickHandler" />
+				</AdornmentEnd>
+			</MudTextFieldExtended>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="CancelOnClickHandler">
+			@MarkupLocalizer[nameof(AppText.Common_Cancel)]
+		</MudButton>
+		<MudButton Color="Color.Secondary" OnClick="OkOnClickHandler">
+			@MarkupLocalizer[nameof(AppText.Common_Ok)]
+		</MudButton>
+	</DialogActions>
+</MudDialog>

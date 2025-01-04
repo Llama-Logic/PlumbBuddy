@@ -1,0 +1,16 @@
+@inject IJSRuntime JSRuntime
+
+<MudDialog Class="@($"animation-dialog {Class}")">
+	<TitleContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@IconSvg" Color="@Color" />
+			<MudTextM3 Typo="TypoM3.Title" Color="@Color">@Caption</MudTextM3>
+		</MudStack>
+	</TitleContent>
+	<DialogContent>
+		@if (ProcessComplete is not null)
+		{
+			<div class="@animationClassName" style="width: @(AnimationWidth); height: @(AnimationHeight);"></div>
+		}
+	</DialogContent>
+</MudDialog>

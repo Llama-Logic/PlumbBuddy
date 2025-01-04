@@ -8,6 +8,12 @@ partial class OnboardingDialog
     bool isLoading;
     string? loadingText;
 
+    string ArchiveFolderPath
+    {
+        get => Settings.ArchiveFolderPath;
+        set => Settings.ArchiveFolderPath = value;
+    }
+
     bool AutomaticallyCheckForUpdates
     {
         get => Settings.AutomaticallyCheckForUpdates;

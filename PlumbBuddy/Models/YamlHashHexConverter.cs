@@ -9,7 +9,7 @@ sealed class YamlHashHexConverter :
     public bool Accepts(Type type) =>
         type == typeof(ImmutableArray<byte>);
 
-    public object? ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
+    public object? ReadYaml(YamlDotNet.Core.IParser parser, Type type, ObjectDeserializer rootDeserializer)
     {
         try
         {

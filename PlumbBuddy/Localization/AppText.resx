@@ -647,7 +647,8 @@ If only *parts* of your mod need to be present or not based on whether packs or 
   </data>
   <data name="ManifestEditor_Info_SelectedMergedPackage_Text" xml:space="preserve">
     <value>Just so you're aware... this file has multiple manifests. Frankly, not the best. Don't worry, I'll tidy things up and leave it with just one when we finish here.
-`{0}`&lt;br /&gt;&lt;br /&gt;
+`{0}`
+
 From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`. You can change that if you want by selecting this file on the **Components** step.</value>
     <comment>This text is in Markdown. {0} = Full path to Mod File; {1} = Selected manifest resource name</comment>
   </data>
@@ -839,7 +840,8 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <comment>This text is in Markdown. {0} = Required Mod Name</comment>
   </data>
   <data name="ManifestEditor_Confirm_Note_BlankPromoCode" xml:space="preserve">
-    <value>Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.&lt;br /&gt;
+    <value>Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.
+
 If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
     <comment>This text is in Markdown.</comment>
   </data>
@@ -1286,8 +1288,10 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>I may be about to spook your Mac</value>
   </data>
   <data name="OnboardingDialog_Caution_SpookingMacs_Text" xml:space="preserve">
-    <value>It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.&lt;br /&gt;
-I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.&lt;br /&gt;
+    <value>It's awesome that you're using me on your Mac! It does *a lot* to keep you safe and one of those things is to stop programs from randomly going into your Documents folder. Trouble is, that's where your mods are (or will be), so I pretty much need to do that.
+
+I'm going to poke in there now. If macOS pauses me to ask you if it's cool, please tell it that it's okay for me to be in there.
+
 *Note: You can cancel this, but reading from this area on your computer is basically the reason I exist so I won't be able to continue without doing it.*</value>
     <comment>This text is in Markdown.</comment>
   </data>
@@ -1301,7 +1305,8 @@ I'm going to poke in there now. If macOS pauses me to ask you if it's cool, plea
     <value>No</value>
   </data>
   <data name="SelectFeaturesDialog_Text" xml:space="preserve">
-    <value>**Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it's giving me more details about what issues could arise if things change later on.&lt;br /&gt;
+    <value>**Amazing news!** {0} included a list of features that the mod offers, which means *you get to specify which ones you need!* This is great because it's giving me more details about what issues could arise if things change later on.
+
 Move available features on the left over to the required list on the right. What will you have? 😏</value>
     <comment>This text is in Markdown. {0} = Mod Creator's Name</comment>
   </data>
@@ -1633,7 +1638,8 @@ Move available features on the left over to the required list on the right. What
     <value>Pack</value>
   </data>
   <data name="Scan_Dependency_RequiredPack_Description" xml:space="preserve">
-    <value>**{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.&lt;br /&gt;
+    <value>**{0}** requires **{1}**. When a mod requires a pack, you need to either remove the mod or install the missing pack. Packs are purchasable downloadable content for The Sims 4 from Electronic Arts.
+
 *If you believe you purchased this content already, you may want to check for any The Sims 4 DLC you may have available for download in {2}*.</value>
     <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Missing Packs; {2} = Player's Distribution Platform</comment>
   </data>
@@ -1819,13 +1825,14 @@ Move available features on the left over to the required list on the right. What
     <value>A File Likely Containing an Error Has Been Found</value>
   </data>
   <data name="Scan_ErrorLog_FileFound_Text_Casual" xml:space="preserve">
-    <value>I found this file in your User Data folder and its presence is a signal that something went wrong.&lt;br /&gt;
-`{0}`&lt;br /&gt;
+    <value>I found this file in your User Data folder and its presence is a signal that something went wrong.
+`{0}`
+
 We could take the file to informed people in Discord who can help us figure out what it means and if there's anything we should do about it.</value>
     <comment>This text is in Markdown. {0} = The Path to the Error Log</comment>
   </data>
   <data name="Scan_ErrorLog_FileFound_Text_NonCasual" xml:space="preserve">
-    <value>A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:&lt;br /&gt;
+    <value>A file which is likely an exception log or technical report triggered by an error was found at the following path in your User Data folder:
 `{0}`</value>
     <comment>This text is in Markdown. {0} = The Path to the Error Log</comment>
   </data>
@@ -1846,8 +1853,10 @@ We could take the file to informed people in Discord who can help us figure out 
     <comment>{0} = The Name of the Exclusivity</comment>
   </data>
   <data name="Scan_Exclusivity_ConflicingClaim_Description" xml:space="preserve">
-    <value>"{0}" is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you've installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.&lt;br /&gt;
-*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This **usually** means that they will be okay with just one of them, so you don't have to worry about an impossible choice in their case.*&lt;br /&gt;
+    <value>"{0}" is a special thing that only one mod file in your Mods folder can do or have *for things to work correctly*, and unfortunately, you've installed multiple mods trying to claim it. It would be best to remove all but one of the whole mods these mod files are a part of, although you may want to review the **Catalog** to see what other mods are dependents of them to make an informed decision.
+
+*Note: Some mods may be listed as dependents of two or more of these mods in this exclusivity conflict. This **usually** means that they will be okay with just one of them, so you don't have to worry about an impossible choice in their case.*
+
 Here are the mod files each claiming "{0}":
 {1}</value>
     <comment>{0} = The Name of the Exclusivity; {1} = The List of Mods Claiming the Exclusivity</comment>
@@ -1875,7 +1884,8 @@ Here are the mod files each claiming "{0}":
     <value>the Same Mod</value>
   </data>
   <data name="Scan_MultipleModVersions_Description" xml:space="preserve">
-    <value>I don't mean to be pushy, but you need to remove all but one of these.&lt;br /&gt;&lt;br /&gt;
+    <value>I don't mean to be pushy, but you need to remove all but one of these.
+
 {0}</value>
     <comment>This text is in Markdown. {0} = List of Multiple Mod Versions</comment>
   </data>
@@ -1932,7 +1942,8 @@ Here are the mod files each claiming "{0}":
   </data>
   <data name="Scan_Corrupt_Package_Found_Description" xml:space="preserve">
     <value>I found this corrupt package file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
@@ -1950,19 +1961,22 @@ Your game is not going to be able to start with this file here. Let's move it to
   </data>
   <data name="Scan_Corrupt_Package_FoundOutOfRange_Description" xml:space="preserve">
     <value>I found this corrupt package file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_Found_Description" xml:space="preserve">
     <value>I found this corrupt .ts4script file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 Your game is not going to be able to start with this file here. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
   <data name="Scan_Corrupt_Ts4Script_FoundOutOfRange_Description" xml:space="preserve">
     <value>I found this corrupt .ts4script file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 Thankfully, its also at an invalid depth for the game to find it. Still though, it's a time bomb waiting to go off. Let's move it to your Downloads folder, safely out of the game's reach.</value>
     <comment>This text is in Markdown. {0} = The Path to the Mod File</comment>
   </data>
@@ -2028,13 +2042,15 @@ I don't want to accidentally cause you to lose important files! You may need to 
   </data>
   <data name="Scan_Depth_Package_TooDeep_Description" xml:space="preserve">
     <value>I found this package file too deep in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 We need to move it closer to the root of your Mods folder so the game can find it.</value>
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
   </data>
   <data name="Scan_Depth_Ts4Script_TooDeep_Description" xml:space="preserve">
     <value>I found this script mod file too deep in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 We need to move it closer to the root of your Mods folder so the game can find it.</value>
     <comment>This text is in Markdown. {0} = The Path of the Mod File</comment>
   </data>
@@ -2096,19 +2112,22 @@ We need to move it closer to the root of your Mods folder so the game can find i
   </data>
   <data name="Scan_LooseArchive_Rar_Found_Description" xml:space="preserve">
     <value>I found this RAR file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.</value>
     <comment>This text is in Markdown. {0} = The Path of the File</comment>
   </data>
   <data name="Scan_LooseArchive_Zip_Found_Description" xml:space="preserve">
     <value>I found this ZIP file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 You may believe that it's not *technically* causing a problem, but it has been reported that deprecated code paths in the game may attempt to open this file, which would be &lt;strong&gt;very bad&lt;/strong&gt;. Let's move it to your Downloads folder right away.</value>
     <comment>This text is in Markdown. {0} = The Path of the File</comment>
   </data>
   <data name="Scan_LooseArchive_7Zip_Found_Description" xml:space="preserve">
     <value>I found this 7-Zip file in your Mods folder, specifically at this path:
-`{0}`&lt;br /&gt;
+`{0}`
+
 While it's not *technically* causing a problem, it makes me uncomfortable since it can't be used by the game in there and it could trick you into thinking you've installed a mod when you really haven't.</value>
     <comment>This text is in Markdown. {0} = The Path of the File</comment>
   </data>
@@ -2325,7 +2344,7 @@ Brief technical details:&lt;br /&gt;
 &lt;span style="font-family: monospace;"&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
 &lt;br /&gt;
 More detailed technical information is available in my log.</value>
-    <comment>This text is in Markdown. {0} = Relative Path to the Mod File; {1} = Error Type; {2} = Error Message</comment>
+    <comment>{0} = Relative Path to the Mod File; {1} = Error Type; {2} = Error Message</comment>
   </data>
   <data name="SmartSimObserver_Success_OfferPatchDayModUpdatesHelp" xml:space="preserve">
     <value>You just successfully upgraded The Sims 4 from {0} to {1}! Well done! Would you like help joining a Discord server which announces updates for mods? There are probably at least a few important updates headed your way from creators.</value>
@@ -2350,8 +2369,10 @@ Click me to start Guided Support for the PlumbBuddy Discord and we can get that 
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text" xml:space="preserve">
     <value>Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
-`{1}`&lt;br /&gt;
-Since you're interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?&lt;br /&gt;
+`{1}`
+
+Since you're interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?
+
 Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!</value>
     <comment>This text is in Markdown. {0} = List of Creators; {1} = EA Promo Code; {2} = Pack Code</comment>
   </data>
@@ -2363,13 +2384,15 @@ Doing so **will not cost you any more**, but it will cause {0} to earn a commiss
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Text" xml:space="preserve">
     <value>I've just copied this Promo Code to your computer's clipboard:
-`{0}`&lt;br /&gt;                    
+`{0}`
+
 You can now just paste it right in to the Promo Code field during check-out and help support {1}!</value>
     <comment>This text is in Markdown. {0} = EA Promo Code; {1} = List of Creators</comment>
   </data>
   <data name="SmartSimObserver_OpenDownloadsFolder_Error_Text" xml:space="preserve">
-    <value>The Downloads folder I have on file for you does not exist:&lt;br /&gt;
-`{0}`&lt;br /&gt;&lt;br /&gt;
+    <value>The Downloads folder I have on file for you does not exist:
+`{0}`
+
 You may want to go into Settings and change that.</value>
     <comment>This text is in Markdown. {0} = Downloads Folder Path</comment>
   </data>
@@ -2515,5 +2538,8 @@ More detailed technical information is available in my log.</value>
   </data>
   <data name="Scan_CacheStaleness_AwaitingAnalysis_Description" xml:space="preserve">
     <value>☝️ When the topology analysis I'm waiting for is complete, I'll let you know what the status of your cache is.</value>
+  </data>
+  <data name="FoldersSelector_ArchiveFolder" xml:space="preserve">
+    <value>Archive Folder</value>
   </data>
 </root>

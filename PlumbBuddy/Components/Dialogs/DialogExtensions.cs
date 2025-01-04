@@ -43,6 +43,28 @@ static class DialogExtensions
             }
         });
 
+    public static void ShowBusyAnimationDialog(this IDialogService dialogService, string @class, MudBlazor.Color color, string iconSvg, string caption, string animationPath, string animationWidth, string animationHeight, Task processComplete) =>
+        StaticDispatcher.Dispatch(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<BusyAnimationDialog>(caption, new DialogParameters<BusyAnimationDialog>()
+            {
+                { x => x.Class, @class },
+                { x => x.Color, color },
+                { x => x.IconSvg, iconSvg },
+                { x => x.Caption, caption },
+                { x => x.AnimationPath, animationPath },
+                { x => x.AnimationWidth, animationWidth },
+                { x => x.AnimationHeight, animationHeight },
+                { x => x.ProcessComplete, processComplete }
+            }, new DialogOptions
+            {
+                BackdropClick = false,
+                CloseOnEscapeKey = false,
+                MaxWidth = MaxWidth.Small
+            });
+            await dialog.Result;
+        });
+
     public static Task<bool> ShowCautionDialogAsync(this IDialogService dialogService, string caption, string text) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
@@ -59,6 +81,24 @@ static class DialogExtensions
                 && dialogResult.Data is bool bData)
                 return bData;
             return false;
+        });
+
+    public static Task<CreateBranchDialogResult?> ShowCreateBranchDialogAsync(this IDialogService dialogService, string chronicleName, uint previousSaveGameInstance) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<CreateBranchDialog>("Create Branch", new DialogParameters<CreateBranchDialog>()
+            {
+                { x => x.ChronicleName, chronicleName },
+                { x => x.PreviousSaveGameInstance, previousSaveGameInstance }
+            }, new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small
+            });
+            if (await dialog.Result is { } dialogResult
+                && !dialogResult.Canceled
+                && dialogResult.Data is CreateBranchDialogResult createBranchDialogResult)
+                return createBranchDialogResult;
+            return null;
         });
 
     public static Task<IReadOnlyList<string>> ShowDeleteErrorLogsDialogAsync(this IDialogService dialogService, IReadOnlyList<string> filePaths, IEnumerable<string> preselectedFilePaths) =>

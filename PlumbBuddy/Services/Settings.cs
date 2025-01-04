@@ -20,14 +20,26 @@ class Settings :
         }
     }
 
-    public bool ArchivingEnabled
+    public bool ArchivistEnabled
     {
-        get => preferences.Get(nameof(ArchivingEnabled), false);
+        get => preferences.Get(nameof(ArchivistEnabled), true);
         set
         {
-            if (ArchivingEnabled == value)
+            if (ArchivistEnabled == value)
                 return;
-            preferences.Set(nameof(ArchivingEnabled), value);
+            preferences.Set(nameof(ArchivistEnabled), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ArchivistAutoIngestSaves
+    {
+        get => preferences.Get(nameof(ArchivistAutoIngestSaves), false);
+        set
+        {
+            if (ArchivistAutoIngestSaves == value)
+                return;
+            preferences.Set(nameof(ArchivistAutoIngestSaves), value);
             OnPropertyChanged();
         }
     }

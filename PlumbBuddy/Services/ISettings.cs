@@ -4,7 +4,8 @@ public interface ISettings :
     INotifyPropertyChanged
 {
     string ArchiveFolderPath { get; set; }
-    bool ArchivingEnabled { get; set; }
+    bool ArchivistEnabled { get; set; }
+    bool ArchivistAutoIngestSaves { get; set; }
     bool AutomaticallyCheckForUpdates { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
     string DefaultCreatorsList { get; set; }
