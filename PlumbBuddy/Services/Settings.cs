@@ -22,7 +22,7 @@ class Settings :
 
     public bool ArchivistEnabled
     {
-        get => preferences.Get(nameof(ArchivistEnabled), true);
+        get => preferences.Get(nameof(ArchivistEnabled), false);
         set
         {
             if (ArchivistEnabled == value)

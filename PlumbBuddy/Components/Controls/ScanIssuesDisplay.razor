@@ -77,21 +77,6 @@
     }
     else
     {
-		<MudItem>
-			<MudPaper Outlined Class="rounded pa-8">
-				<div id="mdc-refresh-animation" style="width: 300px; height: 300px;"></div>
-			</MudPaper>
-			<script type="module">
-				lottie.loadAnimation({
-					container: document.getElementById('mdc-refresh-animation'),
-					renderer: 'svg',
-					loop: true,
-					autoplay: true,
-					path: 'json/scan.json'
-				});
-			</script>
-		</MudItem>
-		<MudFlexBreak />
         <MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
             <MudCard Outlined="true" Class="scan-issue scan-issue-refreshing">
                 <MudCardHeader>

@@ -125,6 +125,7 @@ public class Snapshot :
 
     readonly Chronicle chronicle;
     readonly IDbContextFactory<ChronicleDbContext> dbContextFactory;
+    ImmutableArray<byte> enhancedPackageSha256 = [];
     readonly TaskCompletionSource firstLoadComplete;
     bool isEditing;
     string label = string.Empty;
@@ -138,6 +139,9 @@ public class Snapshot :
 
     public Chronicle Chronicle =>
         chronicle;
+
+    public ImmutableArray<byte> EnhancedPackageSha256 =>
+        enhancedPackageSha256;
 
     public Task FirstLoadComplete =>
         firstLoadComplete.Task;
@@ -368,6 +372,7 @@ public class Snapshot :
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             savePackageSnapshot = await dbContext.SavePackageSnapshots
+                .Include(sps => sps.EnhancedSavePackageHash)
                 .Include(sps => sps.OriginalSavePackageHash)
                 .FirstOrDefaultAsync(sps => sps.Id == savePackageSnapshotId)
                 .ConfigureAwait(false);
@@ -378,6 +383,12 @@ public class Snapshot :
         {
             ActiveHouseholdName = savePackageSnapshot.ActiveHouseholdName;
             OnPropertyChanged(nameof(ActiveHouseholdName));
+        }
+        var spsEnhancedSavePackageHash = (savePackageSnapshot.EnhancedSavePackageHash?.Sha256 ?? []).ToImmutableArray();
+        if (!enhancedPackageSha256.SequenceEqual(spsEnhancedSavePackageHash))
+        {
+            enhancedPackageSha256 = spsEnhancedSavePackageHash;
+            OnPropertyChanged(nameof(EnhancedPackageSha256));
         }
         if (label != savePackageSnapshot.Label)
         {

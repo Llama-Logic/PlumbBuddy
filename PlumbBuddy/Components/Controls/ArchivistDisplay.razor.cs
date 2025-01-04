@@ -42,17 +42,6 @@ partial class ArchivistDisplay
             PlatformFunctions.ViewFile(exportedFile);
     }
 
-    async Task RestoreSavePackageAsync(Snapshot snapshot)
-    {
-        if (Archivist.SelectedChronicle is { } chronicle)
-        {
-            var taskCompletionSource = new TaskCompletionSource();
-            DialogService.ShowBusyAnimationDialog("secondary-dialog", MudBlazor.Color.Secondary, MaterialDesignIcons.Normal.FileRestore, "Reconstructing and Slotting Save Package", "json/archivist-constructing.json", "550px", "550px", taskCompletionSource.Task);
-            if (await snapshot.RestoreSavePackageAsync(Settings, chronicle, taskCompletionSource.SetResult) is { } restoredFile)
-                PlatformFunctions.ViewFile(restoredFile);
-        }
-    }
-
     bool IncludeChronicle(Chronicle chronicle)
     {
         if (string.IsNullOrWhiteSpace(chroniclesSearchText))
@@ -101,4 +90,62 @@ partial class ArchivistDisplay
             return true;
         return false;
     }
+
+    async Task RestoreSavePackageAsync(Snapshot snapshot)
+    {
+        if (Archivist.SelectedChronicle is { } chronicle)
+        {
+            var taskCompletionSource = new TaskCompletionSource();
+            DialogService.ShowBusyAnimationDialog("secondary-dialog", MudBlazor.Color.Secondary, MaterialDesignIcons.Normal.FileRestore, "Reconstructing and Slotting Save Package", "json/archivist-constructing.json", "550px", "550px", taskCompletionSource.Task);
+            if (await snapshot.RestoreSavePackageAsync(Settings, chronicle, taskCompletionSource.SetResult) is { } restoredFile)
+                PlatformFunctions.ViewFile(restoredFile);
+        }
+    }
+
+    async Task ShowChronicleDatabaseAsync(Chronicle chronicle)
+    {
+        if (!await DialogService.ShowCautionDialogAsync("Please Be Cautious ✋",
+            """
+            Chronicle databases contain everything that is needed to bring your saves, no matter how long they've been gone from your game, back from the Netherworld 🪦. They are *memory*, 🐶 precious and 🌻 pure. I'll show you the one for this chronicle, but only if you *promise* me you'll treat it nicely.
+
+            (Basically don't move it, delete it, open it... you know... give it odd looks. Be polite and keep your hands to yourself!)
+            """))
+            return;
+        PlatformFunctions.ViewFile(new FileInfo(Path.Combine(Settings.ArchiveFolderPath, $"{MemoryMarshal.Read<ulong>(chronicle.FullInstance.AsSpan()):x16}.chronicle.sqlite")));
+    }
+
+    Task ShowSavePackageInSavesDirectoryAsync(Snapshot snapshot) => Task.Run(async () =>
+    {
+        var savesFolder = new DirectoryInfo(Path.Combine(Settings.UserDataFolderPath, "saves"));
+        if (savesFolder.Exists)
+        {
+            if (!(await DialogService.ShowQuestionDialogAsync("This Might Take Some Time...",
+                """
+                I need to carefully examine the saves you currently have to see if I can find a match. I'll pop open your saves folder with it selected if I find it, or tell if you I couldn't find it.
+
+                You sure you want me to go looking for it?
+                """) ?? false))
+                return;
+            foreach (var file in savesFolder.GetFiles("*.*", SearchOption.TopDirectoryOnly))
+            {
+                try
+                {
+                    var sha256 = await ModFileManifestModel.GetFileSha256HashAsync(file.FullName).ConfigureAwait(false);
+                    if (sha256.SequenceEqual(snapshot.OriginalPackageSha256)
+                        || sha256.SequenceEqual(snapshot.EnhancedPackageSha256))
+                    {
+                        PlatformFunctions.ViewFile(file);
+                        return;
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+        await DialogService.ShowInfoDialogAsync("This Save Exists Now Only in My Memory",
+            """
+            It seems the game decided to finally let this one pass on 🪽 to conserve your storage space. But, I can bring it back if you want 🫴, just restore or branch from this snapshot.
+            """);
+    });
 }

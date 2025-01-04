@@ -6,7 +6,7 @@
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
 
-<div id="archivist-ingesting-animation" class="absolute fade-container" style="z-index: -10; top: 0; left: 0; width: 100vw; height: 100vw; @(Observed(() => Archivist.State) is ArchivistState.Ingesting ? "opacity: 1;" : "opacity: 0;")"></div>
+<div id="archivist-ingesting-animation" class="absolute fade-container" style="z-index: -10; top: 0; left: 0; width: 100vw; height: 100vw; @(Observed(() => Archivist.State) is ArchivistState.Ingesting ? "opacity: 0.35;" : "opacity: 0;")"></div>
 <script type="module">
 	lottie.loadAnimation({
 	container: document.getElementById('archivist-ingesting-animation'),
@@ -94,13 +94,14 @@
 		<div class="chronicle-details overflow-y-auto rounded mud-paper-outlined pa-4">
 			@if (Archivist.SelectedChronicle is { } selectedChronicle)
 			{
+				if (Observed(() => Archivist.State) is ArchivistState.Ingesting && isEditingChronicle)
+				{
+					isEditingChronicle = false;
+				}
 				<div class="d-flex gap-4 align-start">
-					@if (!isEditingChronicle)
+					@if (!isEditingChronicle && Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
 					{
-						@if (Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
-						{
-							<MudImage Src="@thumbnailUri" Class="flex-shrink-1" Style="max-width: 180px; max-height: 120px;" />
-						}
+						<MudImage Src="@thumbnailUri" Class="flex-shrink-1" Style="max-width: 180px; max-height: 120px;" />
 					}
 					<MudStack Spacing="1" Class="flex-grow-1">
 						@if (isEditingChronicle)
@@ -139,7 +140,14 @@
 							</MudField>
 						}
 					</MudStack>
-					<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+					<MudStack Spacing="0">
+						<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Chronicle's Details" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)">
+							<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+						</MudTooltip>
+						<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="Show this Chronicle's Database">
+							<MudIconButton Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.DatabaseSearch" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowChronicleDatabaseAsync(selectedChronicle)))" />
+						</MudTooltip>
+					</MudStack>
 				</div>
 				<MudGrid Justify="Justify.Center" Spacing="1">
 					<MudItem xs="12">
@@ -215,10 +223,10 @@
 								{
 									<MudTr>
 										<td colspan="3" class="relative py-4">
-											<div class="d-flex gap-4 align-start">
+											<div class="d-flex gap-4 align-start px-4">
 												@if (Observed(() => context.ThumbnailUri) is { Length: > 0 } thumbnailUri)
 												{
-													<MudImage Src="@thumbnailUri" />
+													<MudImage Src="@thumbnailUri" Style="max-width: 180px; max-height: 120px;" />
 												}
 												<MudStack Spacing="1" Class="flex-grow-1">
 													@if (context.IsEditing)
@@ -247,7 +255,14 @@
 														}
 													</MudStack>
 												</MudStack>
-												<MudToggleIconButton @bind-Toggled="@context.IsEditing" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+												<MudStack Spacing="0">
+													<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Snapshot's Details">
+														<MudToggleIconButton @bind-Toggled="@context.IsEditing" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+													</MudTooltip>
+													<MudTooltip Arrow Placement="Placement.Left" Text="Try to Find this Save in the Saves Folder">
+														<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowSavePackageInSavesDirectoryAsync(context)))" />
+													</MudTooltip>
+												</MudStack>
 											</div>
 										</td>
 									</MudTr>

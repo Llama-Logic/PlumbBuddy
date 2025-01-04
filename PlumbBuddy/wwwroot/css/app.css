@@ -289,14 +289,14 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
 
 .chronicle-list {
     backdrop-filter: blur(10px);
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-background) 90%);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
     height: calc(100vh - 242px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .chronicle-details {
     backdrop-filter: blur(10px);
-    background-color: color-mix(in srgb, transparent, var(--mud-palette-background) 80%);
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
     height: calc(100vh - 242px);
     -webkit-backdrop-filter: blur(10px);
 }
