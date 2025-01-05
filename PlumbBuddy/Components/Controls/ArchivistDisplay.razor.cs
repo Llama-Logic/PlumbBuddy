@@ -16,6 +16,22 @@ partial class ArchivistDisplay
         }
     }
 
+    async Task BrowseForFolderToScanAsync()
+    {
+        if (await FolderPicker.Default.PickAsync().ConfigureAwait(false) is not { } folderPickerResult
+            || !folderPickerResult.IsSuccessful)
+            return;
+        var (folder, pickerEx) = folderPickerResult;
+        if (pickerEx is not null)
+        {
+            await DialogService.ShowErrorDialogAsync("Something Went Wrong", $"{pickerEx.GetType().Name}: {pickerEx.Message}").ConfigureAwait(false);
+            return;
+        }
+        if (folder is null)
+            return;
+        await Archivist.AddPathToProcessAsync(new DirectoryInfo(folder.Path));
+    }
+
     async Task CreateBranchAsync(Snapshot snapshot)
     {
         if (Archivist.SelectedChronicle is { } chronicle

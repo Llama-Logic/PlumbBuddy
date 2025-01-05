@@ -29,6 +29,7 @@ public class Chronicle :
     readonly IDbContextFactory<ChronicleDbContext> dbContextFactory;
     readonly TaskCompletionSource firstLoadComplete;
     ImmutableArray<byte> fullInstance = [];
+    string? gameNameOverride;
     DateTimeOffset? lastUpdated;
     string name = string.Empty;
     string? notes;
@@ -50,6 +51,19 @@ public class Chronicle :
 
     public ImmutableArray<byte> FullInstance =>
         fullInstance;
+
+    public string? GameNameOverride
+    {
+        get => gameNameOverride;
+        set
+        {
+            if (gameNameOverride == value)
+                return;
+            gameNameOverride = value;
+            OnPropertyChanged();
+            CommitUserUpdate(e => e.GameNameOverride, value);
+        }
+    }
 
     public DateTimeOffset? LastUpdated =>
         lastUpdated;
@@ -111,23 +125,7 @@ public class Chronicle :
             try
             {
                 using var fileStream = await fileResult.OpenReadAsync().ConfigureAwait(false);
-                var thumbnail = await Image.LoadAsync<Rgba32>(fileStream).ConfigureAwait(false);
-                if (thumbnail.Width > 2048 || thumbnail.Height > 2048)
-                    thumbnail.Mutate(x => x.Resize(new ResizeOptions
-                    {
-                        Size = new(2048, 2048),
-                        Mode = ResizeMode.Max,
-                        Sampler = KnownResamplers.Lanczos3
-                    }));
-                using var thumbnailMemoryStream = new MemoryStream();
-                await thumbnail.SaveAsPngAsync(thumbnailMemoryStream).ConfigureAwait(false);
-                using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is { } propertySet)
-                {
-                    propertySet.Thumbnail = thumbnailMemoryStream.ToArray();
-                    await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                    ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(propertySet.Thumbnail)}";
-                }
+                await SetThumbnailAsync(dialogService, await Image.LoadAsync<Rgba32>(fileStream).ConfigureAwait(false)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -200,6 +198,11 @@ public class Chronicle :
                 this.fullInstance = fullInstance;
                 OnPropertyChanged(nameof(FullInstance));
             }
+            if (gameNameOverride != propertySet.GameNameOverride)
+            {
+                gameNameOverride = propertySet.GameNameOverride;
+                OnPropertyChanged(nameof(GameNameOverride));
+            }
             if (name != propertySet.Name)
             {
                 name = propertySet.Name;
@@ -229,6 +232,35 @@ public class Chronicle :
         {
             snapshotCount = currentSnapshotCount;
             OnPropertyChanged(nameof(SnapshotCount));
+        }
+    }
+
+    public async Task SetThumbnailAsync(IDialogService dialogService, Image<Rgba32> thumbnail)
+    {
+        ArgumentNullException.ThrowIfNull(dialogService);
+        ArgumentNullException.ThrowIfNull(thumbnail);
+        try
+        {
+            if (thumbnail.Width > 2048 || thumbnail.Height > 2048)
+                thumbnail.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new(2048, 2048),
+                    Mode = ResizeMode.Max,
+                    Sampler = KnownResamplers.Lanczos3
+                }));
+            using var thumbnailMemoryStream = new MemoryStream();
+            await thumbnail.SaveAsPngAsync(thumbnailMemoryStream).ConfigureAwait(false);
+            using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is { } propertySet)
+            {
+                propertySet.Thumbnail = thumbnailMemoryStream.ToArray();
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(propertySet.Thumbnail)}";
+            }
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
         }
     }
 }

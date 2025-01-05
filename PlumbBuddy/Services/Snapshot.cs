@@ -1,5 +1,7 @@
 using EA.Sims4.Persistence;
 using Google.Protobuf;
+using SixLabors.ImageSharp.PixelFormats;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace PlumbBuddy.Services;
 
@@ -470,5 +472,24 @@ public class Snapshot :
             onSerializationCompleted();
             return new FileInfo(filePath);
         });
+    }
+
+    public async Task UseThumbnailForChronicleAsync(IDialogService dialogService)
+    {
+        ArgumentNullException.ThrowIfNull(dialogService);
+        try
+        {
+            using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(savePackageSnapshotId).ConfigureAwait(false);
+            if (savePackageSnapshot?.Thumbnail is { Length: > 0 } thumbnail)
+            {
+                using var memoryStream = new MemoryStream(thumbnail, false);
+                await chronicle.SetThumbnailAsync(dialogService, await Image.LoadAsync<Rgba32>(memoryStream).ConfigureAwait(false)).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
+        }
     }
 }

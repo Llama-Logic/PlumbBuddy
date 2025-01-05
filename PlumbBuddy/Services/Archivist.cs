@@ -112,6 +112,14 @@ public partial class Archivist :
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public Task AddPathToProcessAsync(FileSystemInfo fileSystemInfo)
+    {
+        ArgumentNullException.ThrowIfNull(fileSystemInfo);
+        return pathsProcessingQueue is null
+            ? Task.CompletedTask
+            : pathsProcessingQueue.EnqueueAsync(fileSystemInfo.FullName);
+    }
+
     void ConnectToFolders() =>
         Task.Run(ConnectToFoldersAsync);
 
@@ -481,17 +489,25 @@ public partial class Archivist :
                 }
                 MemoryStream? enhancedPackageMemoryStream = null;
                 ReadOnlyMemory<byte> customThumbnail = chroniclePropertySet.Thumbnail;
-                if (!customThumbnail.IsEmpty)
+                if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
+                    || !customThumbnail.IsEmpty)
                 {
-                    foreach (var saveThumbnail4Key in packageKeys
-                        .Where(key => key.Type is ResourceType.SaveThumbnail4))
-                        await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, chroniclePropertySet.Thumbnail).ConfigureAwait(false);
+                    if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
+                        && saveGameData.SaveSlot is { } saveSlot)
+                    {
+                        saveSlot.SlotName = chroniclePropertySet.GameNameOverride.Trim();
+                        await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray()).ConfigureAwait(false);
+                    }
+                    if (!customThumbnail.IsEmpty)
+                        foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                            await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, chroniclePropertySet.Thumbnail).ConfigureAwait(false);
                     enhancedPackageMemoryStream = new MemoryStream();
                     await package.CopyToAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
                     enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
                     using var sha256 = SHA256.Create();
                     fileHashArray = await sha256.ComputeHashAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
-                    newSnapshot.EnhancedSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray };
+                    newSnapshot.EnhancedSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false)
+                        ?? new() { Sha256 = fileHashArray };
                     enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
                 }
                 await package.DisposeAsync().ConfigureAwait(false);

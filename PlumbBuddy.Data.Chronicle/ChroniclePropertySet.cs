@@ -18,6 +18,8 @@ public class ChroniclePropertySet
     [SuppressMessage("Performance", "CA1819: Properties should not return arrays")]
     public byte[]? BasisOriginalPackageSha256 { get; set; }
 
+    public string? GameNameOverride { get; set; }
+
     [Required]
     public string Name { get; set; } = string.Empty;
 

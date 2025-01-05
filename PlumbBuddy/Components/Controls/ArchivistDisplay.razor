@@ -6,80 +6,72 @@
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
 
-<div id="archivist-ingesting-animation" class="absolute fade-container" style="z-index: -10; top: 0; left: 0; width: 100vw; height: 100vw; @(Observed(() => Archivist.State) is ArchivistState.Ingesting ? "opacity: 0.35;" : "opacity: 0;")"></div>
-<script type="module">
-	lottie.loadAnimation({
-	container: document.getElementById('archivist-ingesting-animation'),
-	renderer: 'svg',
-	loop: true,
-	autoplay: true,
-	path: 'json/archivist-ingesting.json'
-	});
-</script>
 <MudGrid Class="align-center">
-	<MudItem xs="2">
-		<MudPaper Outlined Class="px-4 py-2">
-			<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
-				<MudTooltip Color="Color.Secondary" Text="If this switch is flipped, I will connect to the Archive folder you have configured in Settings.">
-					<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistEnabled).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Archive" ThumbOffIcon="@MaterialDesignIcons.Normal.ArchiveOff" Disabled="@(!Observed(() => Archivist.CanIngest))" />
-				</MudTooltip>
-				<MudTooltip Color="Color.Secondary" Text="@(Observed(() => Archivist.CanIngest) ? "If I'm enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them." : "For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.")">
-					<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistAutoIngestSaves).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Autorenew" ThumbOffIcon="@MaterialDesignIcons.Normal.AutorenewOff" Disabled="@(!Observed(() => Archivist.CanIngest) || !Observed(() => Settings.ArchivistEnabled))" />
-				</MudTooltip>
-			</MudStack>
-		</MudPaper>
-	</MudItem>
-	<MudItem xs="8">
-		<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
-			@if (Observed(() => Archivist.State) is ArchivistState.AwaitingModCataloging)
-			{
-				<MudTooltip Color="Color.Secondary" Text="Since I want to correctly capture your mod list in snapshots, I'm waiting for mod cataloging to finish.">
-					<MudBadge Overlap Icon="@MaterialDesignIcons.Normal.PackageVariant" Origin="Origin.TopRight" Color="Color.Primary">
-						<MudIcon Icon="@MaterialDesignIcons.Normal.PauseOctagon" Color="Color.Secondary" Style="font-size: 40px;" />
-					</MudBadge>
-				</MudTooltip>
-			}
-			else if (Observed(() => Archivist.State) is ArchivistState.Ingesting)
-			{
-				<MudProgressLinear Color="Color.Secondary" Indeterminate Rounded Size="Size.Large" />
-			}
-			else if (Observed(() => Settings.ArchivistEnabled))
-			{
-				if (Observed(() => Settings.ArchivistAutoIngestSaves))
+	<MudItem xs="12">
+		<MudStack Row AlignItems="AlignItems.Center" Spacing="6">
+			<MudPaper Outlined Class="px-4 py-2">
+				<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
+					<MudTooltip Color="Color.Secondary" Text="If this switch is flipped, I will connect to the Archive folder you have configured in Settings.">
+						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistEnabled).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Archive" ThumbOffIcon="@MaterialDesignIcons.Normal.ArchiveOff" Disabled="@(!Observed(() => Archivist.CanIngest))" />
+					</MudTooltip>
+					<MudTooltip Color="Color.Secondary" Text="@(Observed(() => Archivist.CanIngest) ? "If I'm enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them." : "For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.")">
+						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistAutoIngestSaves).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Autorenew" ThumbOffIcon="@MaterialDesignIcons.Normal.AutorenewOff" Disabled="@(!Observed(() => Archivist.CanIngest) || !Observed(() => Settings.ArchivistEnabled))" />
+					</MudTooltip>
+					<MudTooltip Arrow Color="Color.Secondary" Text="Scan a Folder for Saves">
+						<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.FolderSearch" Disabled="@(!Observed(() => Archivist.CanIngest) || !Observed(() => Settings.ArchivistEnabled))" OnClick="BrowseForFolderToScanAsync" />
+					</MudTooltip>
+				</MudStack>
+			</MudPaper>
+			<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Class="flex-grow-1">
+				@if (Observed(() => Archivist.State) is ArchivistState.AwaitingModCataloging)
 				{
-					if (Observed(() => Archivist.CanIngest))
+					<MudTooltip Color="Color.Secondary" Text="Since I want to correctly capture your mod list in snapshots, I'm waiting for mod cataloging to finish.">
+						<MudBadge Overlap Icon="@MaterialDesignIcons.Normal.PackageVariant" Origin="Origin.TopRight" Color="Color.Primary">
+							<MudIcon Icon="@MaterialDesignIcons.Normal.PauseOctagon" Color="Color.Secondary" Style="font-size: 40px;" />
+						</MudBadge>
+					</MudTooltip>
+				}
+				else if (Observed(() => Archivist.State) is ArchivistState.Ingesting)
+				{
+					<MudProgressLinear Color="Color.Secondary" Indeterminate Rounded Size="Size.Large" />
+				}
+				else if (Observed(() => Settings.ArchivistEnabled))
+				{
+					if (Observed(() => Settings.ArchivistAutoIngestSaves))
 					{
-						<MudTooltip Color="Color.Secondary" Text="I'm done archiving your save files.">
-							<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveCheck" Color="Color.Secondary" Style="font-size: 40px; margin-top: 6px;" />
-						</MudTooltip>
+						if (Observed(() => Archivist.CanIngest))
+						{
+							<MudTooltip Color="Color.Secondary" Text="I'm done archiving your save files.">
+								<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveCheck" Color="Color.Secondary" Style="font-size: 40px;" />
+							</MudTooltip>
+						}
+						else
+						{
+							<MudTooltip Color="Color.Secondary" Text="For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.">
+								<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveAlert" Color="Color.Secondary" Class="mt-1" Style="font-size: 40px;" />
+							</MudTooltip>
+							<MudTooltip Arrow Color="Color.Secondary" Text="Check for Update">
+								<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.Update" />
+							</MudTooltip>
+						}
 					}
 					else
 					{
-						<MudTooltip Color="Color.Secondary" Text="For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.">
-							<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveAlert" Color="Color.Secondary" Class="mt-1" Style="font-size: 40px;" />
-						</MudTooltip>
-						<MudTooltip Arrow Color="Color.Secondary" Text="Check for Update">
-							<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.Update" />
+						<MudTooltip Color="Color.Secondary" Text="I am connected to your archive.">
+							<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSave" Color="Color.Secondary" Style="font-size: 40px;" />
 						</MudTooltip>
 					}
 				}
 				else
 				{
-					<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSave" Color="Color.Secondary" Style="font-size: 40px;" />
+					<MudTooltip Color="Color.Secondary" Text="I'm disconnected from your archive.">
+						<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveOff" Style="font-size: 40px; opacity: .35;" />
+					</MudTooltip>
 				}
-			}
-			else
-			{
-				<MudTooltip Color="Color.Secondary" Text="I'm idle at the moment since you have me switched off.">
-					<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveOff" Style="font-size: 40px; margin-top: 6px; opacity: .35;" />
-				</MudTooltip>
-			}
+			</MudStack>
+			<MudTextField @bind-Value="@ChroniclesSearchText" Variant="Variant.Filled" Label="Search Chronicles" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" Class="flex-grow-0" Style="background-color: var(--mud-palette-surface);" />
 		</MudStack>
 	</MudItem>
-	<MudItem xs="2">
-		<MudTextField @bind-Value="@ChroniclesSearchText" Variant="Variant.Filled" Label="Search Chronicles" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" Style="background-color: var(--mud-palette-surface);" />
-	</MudItem>
-	<MudFlexBreak />
 	<MudItem xs="4">
 		<div class="chronicle-list overflow-y-auto rounded mud-paper-outlined">
 			<MudList T="Chronicle" @bind-SelectedValue="@(Binding(() => Archivist.SelectedChronicle).Value)" Color="Color.Secondary">
@@ -91,7 +83,7 @@
 		</div>
 	</MudItem>
 	<MudItem xs="8">
-		<div class="chronicle-details overflow-y-auto rounded mud-paper-outlined pa-4">
+		<div class="chronicle-details overflow-auto rounded mud-paper-outlined pa-4">
 			@if (Archivist.SelectedChronicle is { } selectedChronicle)
 			{
 				if (Observed(() => Archivist.State) is ArchivistState.Ingesting && isEditingChronicle)
@@ -101,18 +93,19 @@
 				<div class="d-flex gap-4 align-start">
 					@if (!isEditingChronicle && Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
 					{
-						<MudImage Src="@thumbnailUri" Class="flex-shrink-1" Style="max-width: 180px; max-height: 120px;" />
+						<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
 					}
 					<MudStack Spacing="1" Class="flex-grow-1">
 						@if (isEditingChronicle)
 						{
 							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Name).Value" Variant="Variant.Filled" Label="Name" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" />
 							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Notes).Value" Variant="Variant.Filled" Label="Notes" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable />
+							<MudTextField @bind-Value="@Binding(() => selectedChronicle.GameNameOverride).Value" Variant="Variant.Filled" Label="Game Name Override" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" Adornment="Adornment.Start" Clearable HelperText="I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4." />
 							<MudField Label="Custom Thumbnail" Variant="Variant.Filled">
 								<MudStack Spacing="1">
 									@if (Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
 									{
-										<MudImage Src="@thumbnailUri" Style="max-width: 180px; max-height: 120px;" />
+										<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
 									}
 									<MudStack Row>
 										<MudButton OnClick="@(new Func<Task>(() => selectedChronicle.BrowseForCustomThumbnailAsync(DialogService)))" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
@@ -151,7 +144,7 @@
 				</div>
 				<MudGrid Justify="Justify.Center" Spacing="1">
 					<MudItem xs="12">
-						<MudTable T="Snapshot" Items="@(ObservedCollection(() => selectedChronicle.Snapshots).OrderByDescending(s => s.LastWriteTime))" Breakpoint="Breakpoint.Md" Dense Filter="IncludeSnapshot" Class="mt-2">
+						<MudTable T="Snapshot" Items="@(ObservedCollection(() => selectedChronicle.Snapshots).OrderByDescending(s => s.LastWriteTime))" Breakpoint="Breakpoint.Sm" Dense Filter="IncludeSnapshot" Class="mt-2">
 							<ToolBarContent>
 								<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">Snapshots</MudTextM3>
 								<MudSpacer />
@@ -226,7 +219,7 @@
 											<div class="d-flex gap-4 align-start px-4">
 												@if (Observed(() => context.ThumbnailUri) is { Length: > 0 } thumbnailUri)
 												{
-													<MudImage Src="@thumbnailUri" Style="max-width: 180px; max-height: 120px;" />
+													<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
 												}
 												<MudStack Spacing="1" Class="flex-grow-1">
 													@if (context.IsEditing)
@@ -247,6 +240,12 @@
 														}
 													}
 													<MudStack Row>
+														@if (Observed(() => context.ThumbnailUri) is { Length: > 0 })
+														{
+															<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.ImageCheck" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" OnClick="@(new Func<MouseEventArgs, Task>(e => context.UseThumbnailForChronicleAsync(DialogService)))">
+																Use Thumbnail for Chronicle
+															</MudButton>
+														}
 														@if (context.WasLive)
 														{
 															<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.InvoiceExport" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportModListAsync(context)))">
