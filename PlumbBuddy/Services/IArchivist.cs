@@ -13,4 +13,6 @@ public interface IArchivist :
     ReadOnlyObservableCollection<Chronicle> Chronicles { get; }
 
     Task AddPathToProcessAsync(FileSystemInfo fileSystemInfo);
+
+    Task ReapplyEnhancementsAsync(Chronicle chronicle);
 }

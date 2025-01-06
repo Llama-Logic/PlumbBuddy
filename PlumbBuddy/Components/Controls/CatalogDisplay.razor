@@ -26,7 +26,7 @@
                 @if (mods is not null)
                     foreach (var (modKey, modValue) in mods.Where(kv => IncludeMod(kv)).OrderBy(kv => kv.Key.Name).ThenBy(kv => kv.Key.Creators ?? kv.Key.Url?.ToString()))
                     {
-                        <MudListItem T="ModKey" Value="@modKey" Text="@modKey.Name" SecondaryText="@(modKey.Creators ?? modKey.Url?.ToString())" Icon="@MaterialDesignIcons.Normal.Puzzle" />
+						<MudListItem T="ModKey" Value="@modKey" Text="@modKey.Name" SecondaryText="@(modKey.Creators ?? modKey.Url?.ToString())" Icon="@MaterialDesignIcons.Normal.Certificate" IconColor="Color.Primary" />
                     }
             </MudList>
         </div>
@@ -107,7 +107,16 @@
                             </HeaderContent>
                             <RowTemplate>
                                 <MudTd DataLabel="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]">
-                                    <MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0" />
+                                    <MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0">
+										<ItemTemplate Context="item">
+											<MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+												<MudIcon Icon="@item.Icon" />
+												<MudTextM3>
+													<MudHighlighter Text="@item.Text" HighlightedText="@filesSearchText" />
+												</MudTextM3>
+											</MudStack>
+										</ItemTemplate>
+									</MudBreadcrumbs>
                                 </MudTd>
                                 <MudTd>
                                     <MudStack Row Justify="Justify.FlexEnd">
@@ -136,14 +145,22 @@
                                 </HeaderContent>
                                 <RowTemplate>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Name)]">
-                                        <MudTextM3 Color="@(mods.ContainsKey(context) ? Color.Default : Color.Error)">@context.Name</MudTextM3>
-                                    </MudTd>
+										<MudTextM3 Color="@(mods.ContainsKey(context) ? Color.Default : Color.Error)">
+											<MudHighlighter Text="@context.Name" HighlightedText="@dependenciesSearchText" />
+										</MudTextM3>
+									</MudTd>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Creators)]">
-                                        <MudTextM3>@context.Creators</MudTextM3>
-                                    </MudTd>
+										<MudTextM3>
+											<MudHighlighter Text="@context.Creators" HighlightedText="@dependenciesSearchText" />
+										</MudTextM3>
+									</MudTd>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Url)]">
-                                        <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
-                                    </MudTd>
+                                        <MudLink Href="@context.Url?.ToString()">
+											<MudTextM3>
+												<MudHighlighter Text="@context.Url?.ToString()" HighlightedText="@dependenciesSearchText" />
+											</MudTextM3>
+										</MudLink>
+									</MudTd>
                                     <MudTd>
                                         <MudStack Row Justify="Justify.FlexEnd">
                                             @if (mods.ContainsKey(context))
@@ -181,13 +198,19 @@
                                 </HeaderContent>
                                 <RowTemplate>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Name)]">
-                                        <MudTextM3>@context.Name</MudTextM3>
+                                        <MudTextM3>
+											<MudHighlighter Text="@context.Name" HighlightedText="@dependentsSearchText" />
+										</MudTextM3>
                                     </MudTd>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Creators)]">
-                                        <MudTextM3>@context.Creators</MudTextM3>
+                                        <MudTextM3>
+											<MudHighlighter Text="@context.Creators" HighlightedText="@dependentsSearchText" />
+										</MudTextM3>
                                     </MudTd>
                                     <MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Url)]">
-                                        <MudLink Href="@context.Url?.ToString()">@context.Url</MudLink>
+                                        <MudLink Href="@context.Url?.ToString()">
+											<MudHighlighter Text="@context.Url?.ToString()" HighlightedText="@dependentsSearchText" />
+										</MudLink>
                                     </MudTd>
                                     <MudTd>
                                         <MudStack Row Justify="Justify.FlexEnd">

@@ -119,7 +119,7 @@ public class Snapshot :
         ArgumentNullException.ThrowIfNull(savePackageSnapshot);
         ArgumentNullException.ThrowIfNull(chronicle);
         this.dbContextFactory = dbContextFactory;
-        savePackageSnapshotId = savePackageSnapshot.Id;
+        SavePackageSnapshotId = savePackageSnapshot.Id;
         this.chronicle = chronicle;
         firstLoadComplete = new();
         _ = Task.Run(() => LoadAllAsync(savePackageSnapshot));
@@ -133,7 +133,6 @@ public class Snapshot :
     string label = string.Empty;
     string? notes;
     ImmutableArray<byte> originalPackageSha256 = [];
-    readonly long savePackageSnapshotId;
     bool showDetails;
     string? thumbnailUri;
 
@@ -195,6 +194,8 @@ public class Snapshot :
     public ImmutableArray<byte> OriginalPackageSha256 =>
         originalPackageSha256;
 
+    public long SavePackageSnapshotId { get; }
+
     public bool ShowDetails
     {
         get => showDetails;
@@ -208,7 +209,7 @@ public class Snapshot :
                 _ = Task.Run(async () =>
                 {
                     using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                    var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(savePackageSnapshotId).ConfigureAwait(false);
+                    var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(SavePackageSnapshotId).ConfigureAwait(false);
                     if (savePackageSnapshot?.Thumbnail is { Length: > 0 } thumbnail)
                         ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(thumbnail)}";
                     else
@@ -240,7 +241,7 @@ public class Snapshot :
         _ = Task.Run(async () =>
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            var savePackageSnapshot = new SavePackageSnapshot { Id = savePackageSnapshotId };
+            var savePackageSnapshot = new SavePackageSnapshot { Id = SavePackageSnapshotId };
             dbContext.Attach(savePackageSnapshot);
             dbContext.Entry(savePackageSnapshot).Property(expression).CurrentValue = value;
             dbContext.Entry(savePackageSnapshot).Property(expression).IsModified = true;
@@ -258,7 +259,7 @@ public class Snapshot :
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
                 return null;
-            using var package = await RegeneratePackageAsync(dbContext, savePackageSnapshotId).ConfigureAwait(false);
+            using var package = await RegeneratePackageAsync(dbContext, SavePackageSnapshotId).ConfigureAwait(false);
             var keys = await package.GetKeysAsync().ConfigureAwait(false);
             var slotId = GetOpenSlot(settings);
             foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
@@ -283,6 +284,7 @@ public class Snapshot :
                 BasisFullInstance = propertySet.FullInstance,
                 BasisOriginalPackageSha256 = [.. originalPackageSha256],
                 FullInstance = newSaveGameInstanceBytes,
+                GameNameOverride = propertySet.GameNameOverride,
                 Name = newChronicleName,
                 Thumbnail = propertySet.Thumbnail
             }).ConfigureAwait(false);
@@ -310,7 +312,7 @@ public class Snapshot :
         using var csvStreamWriter = new StreamWriter(csvStream);
         using var csvWriter = new CsvWriter(csvStreamWriter, new CsvConfiguration(CultureInfo.InvariantCulture));
         await csvWriter.WriteRecordsAsync((await dbContext.SavePackageSnapshots
-            .Where(sps => sps.Id == savePackageSnapshotId)
+            .Where(sps => sps.Id == SavePackageSnapshotId)
             .SelectMany(sps => sps.ModFiles!)
             .OrderBy(mf => mf.Path)
             .ToListAsync())
@@ -341,7 +343,7 @@ public class Snapshot :
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
                 return null;
-            using var package = await RegeneratePackageAsync(dbContext, savePackageSnapshotId).ConfigureAwait(false);
+            using var package = await RegeneratePackageAsync(dbContext, SavePackageSnapshotId).ConfigureAwait(false);
             using var packageStream = await ConvertPackageToExcludedStreamAsync(dbContext, package).ConfigureAwait(false);
             onSerializationCompleted();
             var result = await FileSaver.Default.SaveAsync(string.Concat($"{propertySet.Name} - {Label}.save".Split(Path.GetInvalidFileNameChars())), packageStream);
@@ -376,7 +378,7 @@ public class Snapshot :
             savePackageSnapshot = await dbContext.SavePackageSnapshots
                 .Include(sps => sps.EnhancedSavePackageHash)
                 .Include(sps => sps.OriginalSavePackageHash)
-                .FirstOrDefaultAsync(sps => sps.Id == savePackageSnapshotId)
+                .FirstOrDefaultAsync(sps => sps.Id == SavePackageSnapshotId)
                 .ConfigureAwait(false);
         }
         if (savePackageSnapshot is null)
@@ -440,12 +442,14 @@ public class Snapshot :
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
                 return null;
-            using var package = await RegeneratePackageAsync(dbContext, savePackageSnapshotId).ConfigureAwait(false);
+            using var package = await RegeneratePackageAsync(dbContext, SavePackageSnapshotId).ConfigureAwait(false);
             var keys = await package.GetKeysAsync().ConfigureAwait(false);
             foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
             {
                 var saveGameData = SaveGameData.Parser.ParseFrom((await package.GetAsync(key).ConfigureAwait(false)).Span);
-                saveGameData.SaveSlot.SlotName = $"{chronicle.Name}: {Label}";
+                saveGameData.SaveSlot.SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
+                    ? $"{chronicle.Name}: {Label}"
+                    : chronicle.GameNameOverride.Trim();
                 await package.SetAsync(key, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(key)).ConfigureAwait(false);
             }
             ReadOnlyMemory<byte> thumbnail = propertySet.Thumbnail;
@@ -480,7 +484,7 @@ public class Snapshot :
         try
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(savePackageSnapshotId).ConfigureAwait(false);
+            var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(SavePackageSnapshotId).ConfigureAwait(false);
             if (savePackageSnapshot?.Thumbnail is { Length: > 0 } thumbnail)
             {
                 using var memoryStream = new MemoryStream(thumbnail, false);

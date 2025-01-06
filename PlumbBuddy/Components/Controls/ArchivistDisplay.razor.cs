@@ -107,6 +107,32 @@ partial class ArchivistDisplay
         return false;
     }
 
+    void NavigateToBasis(string? emphasis)
+    {
+        if (Archivist.SelectedChronicle is { } selectedChronicle
+            && selectedChronicle.BasedOnSnapshot is { } basedOnSnapshot)
+        {
+            Archivist.SelectedChronicle = basedOnSnapshot.Chronicle;
+            if (emphasis == "snapshot")
+            {
+                snapshotsTextSearch = basedOnSnapshot.LastWriteTime.ToString("g");
+                basedOnSnapshot.ShowDetails = true;
+            }
+            else
+                snapshotsTextSearch = string.Empty;
+        }
+    }
+
+    async Task ReapplyEnhancementsAsync(Chronicle chronicle)
+    {
+        if (!await DialogService.ShowCautionDialogAsync("This Might Take a While ⏱️",
+            """
+            I will need to go through each of your save files for this chronicle to alter them with your current customizations (and restore the original thumbnail if you're removed a custom one). Depending on how many saves you still have in The Sims 4 for this chronicle, you may want to grab a magazine or pull up YouTube while I'm doing this.
+            """).ConfigureAwait(false))
+            return;
+        DialogService.ShowBusyAnimationDialog("secondary-dialog", MudBlazor.Color.Secondary, MaterialDesignIcons.Normal.FileRefresh, "Reapplying Customizations to Existing Saves", "json/archivist-constructing.json", "550px", "550px", Task.Run(async () => await Archivist.ReapplyEnhancementsAsync(chronicle).ConfigureAwait(false)));
+    }
+
     async Task RestoreSavePackageAsync(Snapshot snapshot)
     {
         if (Archivist.SelectedChronicle is { } chronicle)

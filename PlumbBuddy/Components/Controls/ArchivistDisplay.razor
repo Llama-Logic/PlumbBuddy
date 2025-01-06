@@ -129,13 +129,24 @@
 						@if (selectedChronicle.BasedOnSnapshot is { } basedOnSnapshot)
 						{
 							<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CallSplit" Label="Based on" Variant="Variant.Filled">
-								<MudBreadcrumbs Items="@(new List<BreadcrumbItem> { new BreadcrumbItem(Observed(() => basedOnSnapshot.Chronicle.Name), "javascript:void(0)", icon: MaterialDesignIcons.Normal.Altimeter), new BreadcrumbItem($"{Observed(() => basedOnSnapshot.Label)} ({Observed(() => basedOnSnapshot.LastWriteTime):g})", "javascript:void(0)", icon: MaterialDesignIcons.Normal.Timeline) })" Class="pa-0" />
+								<MudBreadcrumbs Items="@(new List<BreadcrumbItem> { new BreadcrumbItem(Observed(() => basedOnSnapshot.Chronicle.Name), "chronicle", icon: MaterialDesignIcons.Normal.Altimeter), new BreadcrumbItem($"{Observed(() => basedOnSnapshot.Label)} ({Observed(() => basedOnSnapshot.LastWriteTime):g})", "snapshot", icon: MaterialDesignIcons.Normal.Timeline) })" Class="pa-0">
+									<ItemTemplate>
+										<MudTooltip Arrow Text="@(context.Href == "snapshot" ? "Navigate to this Snapshot's Chronicle, Search for its Date, and Show its Details" : "Navigate to this Chronicle")">
+											<MudButton Variant="Variant.Text" StartIcon="@(context.Icon)" OnClick="@(() => NavigateToBasis(context.Href))">
+												@context.Text
+											</MudButton>
+										</MudTooltip>
+									</ItemTemplate>
+								</MudBreadcrumbs>
 							</MudField>
 						}
 					</MudStack>
 					<MudStack Spacing="0">
 						<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Chronicle's Details" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)">
 							<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+						</MudTooltip>
+						<MudTooltip Arrow Color="Color.Secondary" Placement="Placement.Left" Text="Reapply Customizations to Existing Saves" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)">
+							<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRefresh" Color="Color.Secondary" OnClick="@(() => ReapplyEnhancementsAsync(selectedChronicle))" />
 						</MudTooltip>
 						<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="Show this Chronicle's Database">
 							<MudIconButton Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.DatabaseSearch" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowChronicleDatabaseAsync(selectedChronicle)))" />
@@ -157,19 +168,21 @@
 											<MudToggleIconButton @bind-Toggled="context.ShowDetails" Icon="@MaterialDesignIcons.Normal.ChevronRight" ToggledIcon="@MaterialDesignIcons.Normal.ChevronDown" Size="Size.Small" />
 										</MudTooltip>
 										<MudIcon Icon="@MaterialDesignIcons.Normal.Timeline" Size="Size.Small" />
-										<span>
+										<MudTextM3>
 											<MudHighlighter Text="@(Observed(() => context.LastWriteTime).ToString("g"))" HighlightedText="@snapshotsTextSearch" />
-										</span>
+										</MudTextM3>
 									</MudStack>
 								</MudTd>
 								<MudTd DataLabel="Label">
-									<MudHighlighter Text="@(Observed(() => context.Label))" HighlightedText="@snapshotsTextSearch" />
+									<MudTextM3>
+										<MudHighlighter Text="@(Observed(() => context.Label))" HighlightedText="@snapshotsTextSearch" />
+									</MudTextM3>
 								</MudTd>
 								<MudTd>
 									<MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Spacing="1">
 										@if (context.WasLive)
 										{
-											<MudTooltip Arrow Text="The game had just written the save that is the basis of this snapshot. Click here to search for all Live snapshots.">
+											<MudTooltip Arrow Text="The game had just written the save from which this snapshot was taken. Click here to search for all Live snapshots.">
 												<MudChip T="object" Size="Size.Small" Icon="@MaterialDesignIcons.Normal.GamepadSquare" Class="ma-0" OnClick="@(new Action<MouseEventArgs>(e => snapshotsTextSearch = "Live"))">
 													<MudHighlighter Text="Live" HighlightedText="@snapshotsTextSearch" />
 												</MudChip>

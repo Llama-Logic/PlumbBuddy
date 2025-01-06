@@ -1,6 +1,7 @@
 using EA.Sims4.Persistence;
 using Google.Protobuf;
-using Microsoft.EntityFrameworkCore;
+using PlumbBuddy.Data.Chronicle;
+using System.IO;
 
 namespace PlumbBuddy.Services;
 
@@ -162,11 +163,7 @@ public partial class Archivist :
         fileSystemWatcher.Renamed += HandleFileSystemWatcherRenamed;
         fileSystemWatcher.EnableRaisingEvents = true;
         _ = Task.Run(ProcessPathsQueueAsync);
-        if (settings.ArchivistAutoIngestSaves)
-            await pathsProcessingQueue.EnqueueAsync(Path.Combine(settings.UserDataFolderPath, "saves")).ConfigureAwait(false);
-        else
-        {
-            using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
+        using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
             foreach (var fileInfoAndMatch in archiveFolder.GetFiles("*.*", SearchOption.TopDirectoryOnly)
                 .Select(fileInfo => new
                 {
@@ -175,12 +172,17 @@ public partial class Archivist :
                 })
                 .Where(fileInfoAndMatch => fileInfoAndMatch.Match.Success))
             {
-                var chronicle = new Chronicle(new ChronicleDbContextFactory(fileInfoAndMatch.FileInfo), this);
+                IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(fileInfoAndMatch.FileInfo);
+                using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
+                    await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
+                var chronicle = new Chronicle(chronicleDbContextFactory, this);
                 chronicleByFullInstanceHex.Add(fileInfoAndMatch.Match.Groups["fullInstanceHex"].Value, chronicle);
                 await chronicle.FirstLoadComplete.ConfigureAwait(false);
                 chronicles.Add(chronicle);
             }
-        }
+        if (settings.ArchivistAutoIngestSaves)
+            await pathsProcessingQueue.EnqueueAsync(Path.Combine(settings.UserDataFolderPath, "saves")).ConfigureAwait(false);
     }
 
     void DisconnectFromFolders() =>
@@ -294,7 +296,7 @@ public partial class Archivist :
 
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
-    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isSingleEnqueuedFile)
+    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, bool isSingleEnqueuedFile)
     {
         DataBasePackedFile? package = null;
         try
@@ -449,7 +451,8 @@ public partial class Archivist :
                             semaphore.Release();
                         }
                     })).ConfigureAwait(false);
-                if (isSingleEnqueuedFile
+                if (isInSavesDirectory
+                    && isSingleEnqueuedFile
                     && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null)
                 {
                     newSnapshot.WasLive = true;
@@ -489,8 +492,9 @@ public partial class Archivist :
                 }
                 MemoryStream? enhancedPackageMemoryStream = null;
                 ReadOnlyMemory<byte> customThumbnail = chroniclePropertySet.Thumbnail;
-                if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
-                    || !customThumbnail.IsEmpty)
+                if (isInSavesDirectory
+                    && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
+                    || !customThumbnail.IsEmpty))
                 {
                     if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                         && saveGameData.SaveSlot is { } saveSlot)
@@ -515,11 +519,16 @@ public partial class Archivist :
                 await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
                 if (enhancedPackageMemoryStream is not null)
                 {
+                    var creationTime = fileInfo.CreationTime;
+                    var lastWriteTime = fileInfo.LastWriteTime;
                     using var savePackageStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
                     await enhancedPackageMemoryStream.CopyToAsync(savePackageStream).ConfigureAwait(false);
                     await savePackageStream.FlushAsync().ConfigureAwait(false);
                     savePackageStream.Close();
                     await enhancedPackageMemoryStream.DisposeAsync().ConfigureAwait(false);
+                    fileInfo.Refresh();
+                    fileInfo.CreationTime = creationTime;
+                    fileInfo.LastWriteTime = lastWriteTime;
                 }
             }
             if (settings.ArchivistEnabled)
@@ -623,7 +632,18 @@ public partial class Archivist :
                         var savesDirectoryPath = Path.GetFullPath(Path.Combine(settings.UserDataFolderPath, "saves"));
                         while (settings.ArchivistEnabled && CanIngest && nomNom.TryDequeue(out var path))
                         {
-                            var isInSavesDirectory = Path.GetFullPath(path).StartsWith(savesDirectoryPath);
+                            FileSystemInfo? fileSystemInfo = File.Exists(path)
+                                ? new FileInfo(path)
+                                : Directory.Exists(path)
+                                ? new DirectoryInfo(path)
+                                : null;
+                            if (fileSystemInfo is null)
+                                continue;
+                            var isInSavesDirectory = savesDirectoryPath == Path.GetFullPath(fileSystemInfo is FileInfo fileInfo
+                                ? fileInfo.Directory!.FullName
+                                : fileSystemInfo is DirectoryInfo directoryInfo
+                                ? directoryInfo.Parent!.FullName
+                                : string.Empty);
                             if (isInSavesDirectory
                                 && !settings.ArchivistAutoIngestSaves)
                                 continue;
@@ -639,15 +659,15 @@ public partial class Archivist :
                             if (singleSaveFile.Exists
                                 && extensions.Contains(singleSaveFile.Extension)
                                 && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(singleSaveFile.Name)))
-                                await ProcessDequeuedFileAsync(new FileInfo(path), true).ConfigureAwait(false);
+                                await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, true).ConfigureAwait(false);
                             else if (Directory.Exists(path))
-                                foreach (var fileInfo in new DirectoryInfo(path)
+                                foreach (var directoryFileInfo in new DirectoryInfo(path)
                                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
                                     .Where(file => extensions.Contains(file.Extension) && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name)))
                                     .OrderBy(file => file.LastWriteTime)
                                     .ToImmutableArray())
                                 {
-                                    await ProcessDequeuedFileAsync(fileInfo, false).ConfigureAwait(false);
+                                    await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, false).ConfigureAwait(false);
                                     if (!settings.ArchivistEnabled
                                         || isInSavesDirectory
                                         && !settings.ArchivistAutoIngestSaves)
@@ -670,6 +690,82 @@ public partial class Archivist :
             {
             }
         }
+    }
+
+    public async Task ReapplyEnhancementsAsync(Chronicle chronicle)
+    {
+        ArgumentNullException.ThrowIfNull(chronicle);
+        var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
+        if (!savesDirectory.Exists)
+            return;
+        using var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4));
+        await Task.WhenAll(savesDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly)
+            .Where(file => GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name))
+            .OrderBy(file => file.LastWriteTime)
+            .ToImmutableArray()
+            .Select(async saveFile =>
+            {
+                await semaphore.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    var creationTime = saveFile.CreationTime;
+                    var lastWriteTime = saveFile.LastWriteTime;
+                    var saveFileHash = await ModFileManifestModel.GetFileSha256HashAsync(saveFile.FullName).ConfigureAwait(false);
+                    if (chronicle.Snapshots.FirstOrDefault(s => s.OriginalPackageSha256.SequenceEqual(saveFileHash)
+                        || s.EnhancedPackageSha256.SequenceEqual(saveFileHash)) is not { } snapshot)
+                        return;
+                    string tempFileName;
+                    using (var package = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false))
+                    {
+                        var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
+                        var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+                        if (saveGameDataKeys.Length is <= 0 or >= 2)
+                            return;
+                        var saveGameDataKey = saveGameDataKeys[0];
+                        IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"{saveGameDataKey.FullInstanceHex}.chronicle.sqlite")));
+                        using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                        if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
+                            await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
+                        if (await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
+                            return;
+                        if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
+                            return;
+                        if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
+                        {
+                            var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
+                            var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
+                            if (saveGameData.SaveSlot is { } saveSlot)
+                            {
+                                saveSlot.SlotName = chronicle.GameNameOverride;
+                                await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
+                            }
+                        }
+                        byte[]? thumbnailBytes = null;
+                        if (propertySet.Thumbnail is { Length: > 0 } customThumbnailBytes)
+                            thumbnailBytes = customThumbnailBytes;
+                        else if (savePackageSnapshot.Thumbnail is { Length: > 0 } originalThumbnailBytes)
+                            thumbnailBytes = originalThumbnailBytes;
+                        if (thumbnailBytes is { Length: > 0 })
+                            foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                                await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, thumbnailBytes).ConfigureAwait(false);
+                        tempFileName = $"{saveFile.FullName}.tmp";
+                        await package.SaveAsAsync(tempFileName).ConfigureAwait(false);
+                        var newEnhancedHashBytes = (await ModFileManifestModel.GetFileSha256HashAsync(tempFileName).ConfigureAwait(false)).ToArray();
+                        savePackageSnapshot.EnhancedSavePackageHash = (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(ksph => ksph.Sha256 == newEnhancedHashBytes).ConfigureAwait(false))
+                            ?? new KnownSavePackageHash { Sha256 = newEnhancedHashBytes };
+                        await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
+                        await snapshot.ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
+                    }
+                    File.Move(tempFileName, saveFile.FullName, overwrite: true);
+                    saveFile.Refresh();
+                    saveFile.CreationTime = creationTime;
+                    saveFile.LastAccessTime = lastWriteTime;
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            })).ConfigureAwait(false);
     }
 
     void ReconnectFolders() =>
