@@ -510,8 +510,12 @@ public partial class Archivist :
                     enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
                     using var sha256 = SHA256.Create();
                     fileHashArray = await sha256.ComputeHashAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
-                    newSnapshot.EnhancedSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false)
-                        ?? new() { Sha256 = fileHashArray };
+                    if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) is not { } knownSavePackageHash)
+                    {
+                        knownSavePackageHash = new KnownSavePackageHash { Sha256 = fileHashArray };
+                        await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
+                    }
+                    newSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
                     enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
                 }
                 await package.DisposeAsync().ConfigureAwait(false);
@@ -519,16 +523,11 @@ public partial class Archivist :
                 await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
                 if (enhancedPackageMemoryStream is not null)
                 {
-                    var creationTime = fileInfo.CreationTime;
-                    var lastWriteTime = fileInfo.LastWriteTime;
                     using var savePackageStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
                     await enhancedPackageMemoryStream.CopyToAsync(savePackageStream).ConfigureAwait(false);
                     await savePackageStream.FlushAsync().ConfigureAwait(false);
                     savePackageStream.Close();
                     await enhancedPackageMemoryStream.DisposeAsync().ConfigureAwait(false);
-                    fileInfo.Refresh();
-                    fileInfo.CreationTime = creationTime;
-                    fileInfo.LastWriteTime = lastWriteTime;
                 }
             }
             if (settings.ArchivistEnabled)
@@ -698,74 +697,63 @@ public partial class Archivist :
         var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
         if (!savesDirectory.Exists)
             return;
-        using var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4));
-        await Task.WhenAll(savesDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly)
+        foreach (var saveFile in savesDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly)
             .Where(file => GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name))
             .OrderBy(file => file.LastWriteTime)
-            .ToImmutableArray()
-            .Select(async saveFile =>
+            .ToImmutableArray())
+        {
+            var saveFileHash = await ModFileManifestModel.GetFileSha256HashAsync(saveFile.FullName).ConfigureAwait(false);
+            if (chronicle.Snapshots.FirstOrDefault(s => s.OriginalPackageSha256.SequenceEqual(saveFileHash)
+                || s.EnhancedPackageSha256.SequenceEqual(saveFileHash)) is not { } snapshot)
+                return;
+            string tempFileName;
+            using (var package = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false))
             {
-                await semaphore.WaitAsync().ConfigureAwait(false);
-                try
+                var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
+                var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+                if (saveGameDataKeys.Length is <= 0 or >= 2)
+                    return;
+                var saveGameDataKey = saveGameDataKeys[0];
+                IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"{saveGameDataKey.FullInstanceHex}.chronicle.sqlite")));
+                using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
+                    await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
+                if (await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
+                    return;
+                if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
+                    return;
+                if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
                 {
-                    var creationTime = saveFile.CreationTime;
-                    var lastWriteTime = saveFile.LastWriteTime;
-                    var saveFileHash = await ModFileManifestModel.GetFileSha256HashAsync(saveFile.FullName).ConfigureAwait(false);
-                    if (chronicle.Snapshots.FirstOrDefault(s => s.OriginalPackageSha256.SequenceEqual(saveFileHash)
-                        || s.EnhancedPackageSha256.SequenceEqual(saveFileHash)) is not { } snapshot)
-                        return;
-                    string tempFileName;
-                    using (var package = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false))
+                    var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
+                    var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
+                    if (saveGameData.SaveSlot is { } saveSlot)
                     {
-                        var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
-                        var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
-                        if (saveGameDataKeys.Length is <= 0 or >= 2)
-                            return;
-                        var saveGameDataKey = saveGameDataKeys[0];
-                        IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"{saveGameDataKey.FullInstanceHex}.chronicle.sqlite")));
-                        using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                        if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
-                            await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
-                        if (await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
-                            return;
-                        if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
-                            return;
-                        if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
-                        {
-                            var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
-                            var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
-                            if (saveGameData.SaveSlot is { } saveSlot)
-                            {
-                                saveSlot.SlotName = chronicle.GameNameOverride;
-                                await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
-                            }
-                        }
-                        byte[]? thumbnailBytes = null;
-                        if (propertySet.Thumbnail is { Length: > 0 } customThumbnailBytes)
-                            thumbnailBytes = customThumbnailBytes;
-                        else if (savePackageSnapshot.Thumbnail is { Length: > 0 } originalThumbnailBytes)
-                            thumbnailBytes = originalThumbnailBytes;
-                        if (thumbnailBytes is { Length: > 0 })
-                            foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
-                                await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, thumbnailBytes).ConfigureAwait(false);
-                        tempFileName = $"{saveFile.FullName}.tmp";
-                        await package.SaveAsAsync(tempFileName).ConfigureAwait(false);
-                        var newEnhancedHashBytes = (await ModFileManifestModel.GetFileSha256HashAsync(tempFileName).ConfigureAwait(false)).ToArray();
-                        savePackageSnapshot.EnhancedSavePackageHash = (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(ksph => ksph.Sha256 == newEnhancedHashBytes).ConfigureAwait(false))
-                            ?? new KnownSavePackageHash { Sha256 = newEnhancedHashBytes };
-                        await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
-                        await snapshot.ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
+                        saveSlot.SlotName = chronicle.GameNameOverride;
+                        await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
                     }
-                    File.Move(tempFileName, saveFile.FullName, overwrite: true);
-                    saveFile.Refresh();
-                    saveFile.CreationTime = creationTime;
-                    saveFile.LastAccessTime = lastWriteTime;
                 }
-                finally
+                byte[]? thumbnailBytes = null;
+                if (propertySet.Thumbnail is { Length: > 0 } customThumbnailBytes)
+                    thumbnailBytes = customThumbnailBytes;
+                else if (savePackageSnapshot.Thumbnail is { Length: > 0 } originalThumbnailBytes)
+                    thumbnailBytes = originalThumbnailBytes;
+                if (thumbnailBytes is { Length: > 0 })
+                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                        await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, thumbnailBytes).ConfigureAwait(false);
+                tempFileName = $"{saveFile.FullName}.tmp";
+                await package.SaveAsAsync(tempFileName).ConfigureAwait(false);
+                var newEnhancedHashBytes = (await ModFileManifestModel.GetFileSha256HashAsync(tempFileName).ConfigureAwait(false)).ToArray();
+                if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(ksph => ksph.Sha256 == newEnhancedHashBytes).ConfigureAwait(false) is not { } knownSavePackageHash)
                 {
-                    semaphore.Release();
+                    knownSavePackageHash = new KnownSavePackageHash { Sha256 = newEnhancedHashBytes };
+                    await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
                 }
-            })).ConfigureAwait(false);
+                savePackageSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
+                await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
+                await snapshot.ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
+            }
+            File.Move(tempFileName, saveFile.FullName, overwrite: true);
+        }
     }
 
     void ReconnectFolders() =>

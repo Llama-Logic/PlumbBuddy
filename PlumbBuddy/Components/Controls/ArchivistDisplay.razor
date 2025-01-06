@@ -142,11 +142,11 @@
 						}
 					</MudStack>
 					<MudStack Spacing="0">
-						<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Chronicle's Details" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)">
-							<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+						<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Chronicle's Details">
+							<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 						</MudTooltip>
-						<MudTooltip Arrow Color="Color.Secondary" Placement="Placement.Left" Text="Reapply Customizations to Existing Saves" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)">
-							<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRefresh" Color="Color.Secondary" OnClick="@(() => ReapplyEnhancementsAsync(selectedChronicle))" />
+						<MudTooltip Arrow Color="Color.Secondary" Placement="Placement.Left" Text="Reapply Customizations to Existing Saves">
+							<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRefresh" Color="Color.Secondary" OnClick="@(() => ReapplyEnhancementsAsync(selectedChronicle))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 						</MudTooltip>
 						<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="Show this Chronicle's Database">
 							<MudIconButton Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.DatabaseSearch" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowChronicleDatabaseAsync(selectedChronicle)))" />
