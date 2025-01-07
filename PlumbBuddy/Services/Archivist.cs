@@ -370,7 +370,7 @@ public partial class Archivist :
                 LastPlayedLotName = lastZone?.Name,
                 LastPlayedWorldName = lastNeighborhood?.Name,
                 LastWriteTime = fileInfo.LastWriteTime,
-                Label = $"Snapshot {await chronicleDbContext.SavePackageSnapshots.Select(sps => sps.Id).MaxAsync().ConfigureAwait(false) + 1:n0}",
+                Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
                 OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray },
                 Resources = []
             };
