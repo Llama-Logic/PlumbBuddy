@@ -504,11 +504,12 @@ public partial class Archivist :
                 && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                 || !customThumbnail.IsEmpty))
             {
-                if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
-                    && saveGameData.SaveSlot is { } saveSlot)
+                if (chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
+                    && saveGameData.SaveSlot is { } saveSlot
+                    && saveSlot.SlotName != gameNameOverride)
                 {
-                    saveSlot.SlotName = chroniclePropertySet.GameNameOverride.Trim();
-                    await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray()).ConfigureAwait(false);
+                    saveSlot.SlotName = gameNameOverride;
+                    await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
                 }
                 if (!customThumbnail.IsEmpty)
                     foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
