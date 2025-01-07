@@ -1402,7 +1402,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The friendly helper for Sims 4 mods.
+        ///   Looks up a localized string similar to The friendly helper for The Sims 4.
         /// </summary>
         internal static string MainMenu_TagLine {
             get {

@@ -1450,7 +1450,7 @@ Move available features on the left over to the required list on the right. What
     <value>Open Downloads Folder</value>
   </data>
   <data name="MainMenu_TagLine" xml:space="preserve">
-    <value>The friendly helper for Sims 4 mods</value>
+    <value>The friendly helper for The Sims 4</value>
   </data>
   <data name="MainMenu_Version" xml:space="preserve">
     <value>(Version {0})</value>

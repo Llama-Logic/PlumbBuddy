@@ -341,6 +341,6 @@ public class Chronicle :
     {
         foreach (var snapshot in snapshots.OrderBy(s => s.SavePackageSnapshotId))
             this.snapshots.Remove(snapshot);
-        EarliestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Min();
+        EarliestLastWriteTime = this.snapshots.Select(s => s.LastWriteTime).Min();
     }
 }

@@ -342,6 +342,10 @@ public class Snapshot :
                         .Where(d => d.Id < SavePackageSnapshotId)
                         .ExecuteDeleteAsync()
                         .ConfigureAwait(false);
+                    await dbContext.SavePackageResources
+                        .Where(spr => spr.Snapshots!.Count() == 0)
+                        .ExecuteDeleteAsync()
+                        .ConfigureAwait(false);
                     Chronicle.UnloadSnapshots(Chronicle.Snapshots.Where(s => s.SavePackageSnapshotId < SavePackageSnapshotId).ToImmutableArray());
                     await dbContext.Database.ExecuteSqlRawAsync("PRAGMA wal_checkpoint(TRUNCATE);").ConfigureAwait(false);
                     await dbContext.Database.ExecuteSqlRawAsync("VACUUM;").ConfigureAwait(false);

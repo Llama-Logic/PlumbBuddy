@@ -313,6 +313,8 @@ public partial class Archivist :
                     break;
                 length = newLength;
             }
+            var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
+            var fileHashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref fileHash);
             package = await DataBasePackedFile.FromPathAsync(fileInfo.FullName).ConfigureAwait(false);
             var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
             var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
@@ -327,232 +329,226 @@ public partial class Archivist :
             using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                 await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
-            var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
-            var fileHashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref fileHash);
             SavePackageSnapshot? newSnapshot = null;
-            if (!await chronicleDbContext.KnownSavePackageHashes
+            if (await chronicleDbContext.KnownSavePackageHashes
                 .AnyAsync(sps => sps.Sha256 == fileHashArray)
                 .ConfigureAwait(false))
+                return;
+            var chroniclePropertySet = await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false);
+            if (chroniclePropertySet is null)
             {
-                var chroniclePropertySet = await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false);
-                if (chroniclePropertySet is null)
+                var nucleusId = account.NucleusId;
+                var nucleusIdBytes = new byte[8];
+                Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
+                MemoryMarshal.Write(nucleusIdBytesSpan, in nucleusId);
+                var created = account.Created;
+                var createdBytes = new byte[8];
+                Span<byte> createdBytesSpan = createdBytes;
+                MemoryMarshal.Write(createdBytesSpan, in created);
+                chroniclePropertySet = new ChroniclePropertySet
                 {
-                    var nucleusId = account.NucleusId;
-                    var nucleusIdBytes = new byte[8];
-                    Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
-                    MemoryMarshal.Write(nucleusIdBytesSpan, in nucleusId);
-                    var created = account.Created;
-                    var createdBytes = new byte[8];
-                    Span<byte> createdBytesSpan = createdBytes;
-                    MemoryMarshal.Write(createdBytesSpan, in created);
-                    chroniclePropertySet = new ChroniclePropertySet
-                    {
-                        Created = createdBytes,
-                        Name = saveGameData.SaveSlot.SlotName,
-                        NucleusId = nucleusIdBytes,
-                    };
-                    await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
-                }
-                var lastSnapshot = await chronicleDbContext.SavePackageSnapshots
-                    .Include(s => s.Resources)
-                    .OrderByDescending(s => s.Id)
-                    .FirstOrDefaultAsync()
-                    .ConfigureAwait(false);
-                var activeHouseholdId = saveGameData.SaveSlot?.ActiveHouseholdId ?? default;
-                var activeHousehold = saveGameData.Households?.FirstOrDefault(h => h.HouseholdId == activeHouseholdId);
-                var zoneId = saveGameData.SaveSlot?.GameplayData?.CameraData?.ZoneId ?? default;
-                var lastZone = saveGameData.Zones?.FirstOrDefault(z => z.ZoneId == zoneId);
-                var neighborhoodId = lastZone?.NeighborhoodId ?? default;
-                var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
-                newSnapshot = new SavePackageSnapshot
-                {
-                    ActiveHouseholdName = activeHousehold?.Name,
-                    LastPlayedLotName = lastZone?.Name,
-                    LastPlayedWorldName = lastNeighborhood?.Name,
-                    LastWriteTime = fileInfo.LastWriteTime,
-                    Label = $"Snapshot {await chronicleDbContext.SavePackageSnapshots.CountAsync().ConfigureAwait(false) + 1:n0}",
-                    OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray },
-                    Resources = []
+                    Created = createdBytes,
+                    Name = saveGameData.SaveSlot.SlotName,
+                    NucleusId = nucleusIdBytes,
                 };
-                var contextLock = new AsyncLock();
-                using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
-                    await Task.WhenAll(packageKeys.Select(async key =>
+                await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
+            }
+            var lastSnapshot = await chronicleDbContext.SavePackageSnapshots
+                .Include(s => s.Resources)
+                .OrderByDescending(s => s.Id)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            var activeHouseholdId = saveGameData.SaveSlot?.ActiveHouseholdId ?? default;
+            var activeHousehold = saveGameData.Households?.FirstOrDefault(h => h.HouseholdId == activeHouseholdId);
+            var zoneId = saveGameData.SaveSlot?.GameplayData?.CameraData?.ZoneId ?? default;
+            var lastZone = saveGameData.Zones?.FirstOrDefault(z => z.ZoneId == zoneId);
+            var neighborhoodId = lastZone?.NeighborhoodId ?? default;
+            var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
+            newSnapshot = new SavePackageSnapshot
+            {
+                ActiveHouseholdName = activeHousehold?.Name,
+                LastPlayedLotName = lastZone?.Name,
+                LastPlayedWorldName = lastNeighborhood?.Name,
+                LastWriteTime = fileInfo.LastWriteTime,
+                Label = $"Snapshot {await chronicleDbContext.SavePackageSnapshots.Select(sps => sps.Id).MaxAsync().ConfigureAwait(false) + 1:n0}",
+                OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray },
+                Resources = []
+            };
+            var contextLock = new AsyncLock();
+            using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
+                await Task.WhenAll(packageKeys.Select(async key =>
+                {
+                    await semaphore.WaitAsync().ConfigureAwait(false);
+                    try
                     {
-                        await semaphore.WaitAsync().ConfigureAwait(false);
-                        try
+                        var keyBytes = new byte[16];
+                        Span<byte> keyBytesSpan = keyBytes;
+                        var type = key.Type;
+                        MemoryMarshal.Write(keyBytesSpan[0..4], in type);
+                        var group = key.Group;
+                        MemoryMarshal.Write(keyBytesSpan[4..8], in group);
+                        var fullInstance = key.FullInstance;
+                        MemoryMarshal.Write(keyBytesSpan[8..16], in fullInstance);
+                        var explicitCompressionMode = package.GetExplicitCompressionMode(key);
+                        var content =
+                                explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
+                            ? await package.GetRawAsync(key).ConfigureAwait(false)
+                            : await package.GetAsync(key).ConfigureAwait(false);
+                        var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
+                        if (type is ResourceType.SaveThumbnail4)
                         {
-                            var keyBytes = new byte[16];
-                            Span<byte> keyBytesSpan = keyBytes;
-                            var type = key.Type;
-                            MemoryMarshal.Write(keyBytesSpan[0..4], in type);
-                            var group = key.Group;
-                            MemoryMarshal.Write(keyBytesSpan[4..8], in group);
-                            var fullInstance = key.FullInstance;
-                            MemoryMarshal.Write(keyBytesSpan[8..16], in fullInstance);
-                            var explicitCompressionMode = package.GetExplicitCompressionMode(key);
-                            var content =
-                                  explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
-                                ? await package.GetRawAsync(key).ConfigureAwait(false)
-                                : await package.GetAsync(key).ConfigureAwait(false);
-                            var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
-                            if (type is ResourceType.SaveThumbnail4)
+                            try
                             {
-                                try
-                                {
-                                    var png = await package.GetTranslucentJpegAsPngAsync(key).ConfigureAwait(false);
-                                    newSnapshot.Thumbnail = MemoryMarshal.TryGetArray(png, out var segment) && segment.Array is { } array
-                                        ? array
-                                        : png.ToArray();
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}::{Key}", fileInfo.FullName, key);
-                                }
+                                var png = await package.GetTranslucentJpegAsPngAsync(key).ConfigureAwait(false);
+                                newSnapshot.Thumbnail = MemoryMarshal.TryGetArray(png, out var segment) && segment.Array is { } array
+                                    ? array
+                                    : png.ToArray();
                             }
-                            SavePackageResource? resource = null;
-                            using (var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false))
-                                resource = lastSnapshot?.Resources?.FirstOrDefault(r => r.Key.SequenceEqual(keyBytes));
-                            if (resource is not null)
+                            catch (Exception ex)
                             {
-                                var previousContent = await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false);
-                                if (!previousContent.Span.SequenceEqual(content.Span))
-                                {
-                                    using var patchStream = new MemoryStream();
-                                    BinaryPatch.Create(content.Span, previousContent.Span, patchStream);
-                                    ReadOnlyMemory<byte> patch = patchStream.ToArray();
-                                    resource.ContentZLib = compressedContent;
-                                    resource.ContentSize = content.Length;
-                                    using var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false);
-                                    await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
-                                    (
-                                        new ResourceSnapshotDelta
-                                        {
-                                            PatchZLib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray(),
-                                            PatchSize = patch.Length,
-                                            SavePackageResource = resource,
-                                            SavePackageSnapshot = newSnapshot
-                                        }
-                                    );
-                                }
+                                logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}::{Key}", fileInfo.FullName, key);
                             }
-                            else
-                                resource = new SavePackageResource
-                                {
-                                    Key = keyBytes,
-                                    CompressionType = explicitCompressionMode switch
+                        }
+                        SavePackageResource? resource = null;
+                        using (var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false))
+                            resource = lastSnapshot?.Resources?.FirstOrDefault(r => r.Key.SequenceEqual(keyBytes));
+                        if (resource is not null)
+                        {
+                            var previousContent = await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false);
+                            if (!previousContent.Span.SequenceEqual(content.Span))
+                            {
+                                using var patchStream = new MemoryStream();
+                                BinaryPatch.Create(content.Span, previousContent.Span, patchStream);
+                                ReadOnlyMemory<byte> patch = patchStream.ToArray();
+                                resource.ContentZLib = compressedContent;
+                                resource.ContentSize = content.Length;
+                                using var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false);
+                                await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
+                                (
+                                    new ResourceSnapshotDelta
                                     {
-                                        LlamaLogic.Packages.CompressionMode.ForceOff => SavePackageResourceCompressionType.None,
-                                        LlamaLogic.Packages.CompressionMode.SetDeletedFlag => SavePackageResourceCompressionType.Deleted,
-                                        LlamaLogic.Packages.CompressionMode.ForceInternal => SavePackageResourceCompressionType.Internal,
-                                        LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable => SavePackageResourceCompressionType.Streamable,
-                                        LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
-                                        _ => throw new NotSupportedException("unsupported DBPF resource compression")
-                                    },
-                                    ContentZLib = compressedContent,
-                                    ContentSize = content.Length,
-                                };
-                            using (var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false))
-                                newSnapshot.Resources!.Add(resource);
+                                        PatchZLib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray(),
+                                        PatchSize = patch.Length,
+                                        SavePackageResource = resource,
+                                        SavePackageSnapshot = newSnapshot
+                                    }
+                                );
+                            }
                         }
-                        finally
-                        {
-                            semaphore.Release();
-                        }
-                    })).ConfigureAwait(false);
-                if (isInSavesDirectory
-                    && isSingleEnqueuedFile
-                    && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null)
-                {
-                    newSnapshot.WasLive = true;
-                    using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                    await foreach (var modFile in pbDbContext.ModFiles
-                        .Where(mf => mf.FileType == ModsDirectoryFileType.Package || mf.FileType == ModsDirectoryFileType.ScriptArchive)
-                        .Include(mf => mf.ModFileHash)
-                        .AsAsyncEnumerable())
-                    {
-                        var modFileLastWrite = modFile.LastWrite ?? default;
-                        var modFilePath = modFile.Path;
-                        var modFileSha256 = modFile.ModFileHash!.Sha256;
-                        var modFileSize = modFile.Size ?? default;
-                        var snapshotModFile = await chronicleDbContext.SnapshotModFiles
-                            .FirstOrDefaultAsync
-                            (
-                                smf =>
-                                smf.LastWriteTime == modFileLastWrite
-                                && smf.Path == modFilePath
-                                && smf.Sha256 == modFileSha256
-                                && smf.Size == modFileSize
-                            )
-                            .ConfigureAwait(false);
-                        if (snapshotModFile is null)
-                        {
-                            snapshotModFile = new SnapshotModFile
+                        else
+                            resource = new SavePackageResource
                             {
-                                LastWriteTime = modFileLastWrite,
-                                Path = modFilePath,
-                                Sha256 = modFileSha256,
-                                Size = modFileSize
+                                Key = keyBytes,
+                                CompressionType = explicitCompressionMode switch
+                                {
+                                    LlamaLogic.Packages.CompressionMode.ForceOff => SavePackageResourceCompressionType.None,
+                                    LlamaLogic.Packages.CompressionMode.SetDeletedFlag => SavePackageResourceCompressionType.Deleted,
+                                    LlamaLogic.Packages.CompressionMode.ForceInternal => SavePackageResourceCompressionType.Internal,
+                                    LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable => SavePackageResourceCompressionType.Streamable,
+                                    LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
+                                    _ => throw new NotSupportedException("unsupported DBPF resource compression")
+                                },
+                                ContentZLib = compressedContent,
+                                ContentSize = content.Length,
                             };
-                            await chronicleDbContext.SnapshotModFiles.AddAsync(snapshotModFile).ConfigureAwait(false);
-                        }
-                        (snapshotModFile.Snapshots ??= []).Add(newSnapshot);
+                        using (var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false))
+                            newSnapshot.Resources!.Add(resource);
                     }
-                }
-                MemoryStream? enhancedPackageMemoryStream = null;
-                ReadOnlyMemory<byte> customThumbnail = chroniclePropertySet.Thumbnail;
-                if (isInSavesDirectory
-                    && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
-                    || !customThumbnail.IsEmpty))
-                {
-                    if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
-                        && saveGameData.SaveSlot is { } saveSlot)
+                    finally
                     {
-                        saveSlot.SlotName = chroniclePropertySet.GameNameOverride.Trim();
-                        await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray()).ConfigureAwait(false);
+                        semaphore.Release();
                     }
-                    if (!customThumbnail.IsEmpty)
-                        foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
-                            await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, chroniclePropertySet.Thumbnail).ConfigureAwait(false);
-                    enhancedPackageMemoryStream = new MemoryStream();
-                    await package.CopyToAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
-                    enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
-                    using var sha256 = SHA256.Create();
-                    fileHashArray = await sha256.ComputeHashAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
-                    if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) is not { } knownSavePackageHash)
-                    {
-                        knownSavePackageHash = new KnownSavePackageHash { Sha256 = fileHashArray };
-                        await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
-                    }
-                    newSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
-                    enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
-                }
-                await package.DisposeAsync().ConfigureAwait(false);
-                await chronicleDbContext.SavePackageSnapshots.AddAsync(newSnapshot).ConfigureAwait(false);
-                await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
-                if (enhancedPackageMemoryStream is not null)
+                })).ConfigureAwait(false);
+            if (isInSavesDirectory
+                && isSingleEnqueuedFile
+                && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null)
+            {
+                newSnapshot.WasLive = true;
+                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                await foreach (var modFile in pbDbContext.ModFiles
+                    .Where(mf => mf.FileType == ModsDirectoryFileType.Package || mf.FileType == ModsDirectoryFileType.ScriptArchive)
+                    .Include(mf => mf.ModFileHash)
+                    .AsAsyncEnumerable())
                 {
-                    using var savePackageStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
-                    await enhancedPackageMemoryStream.CopyToAsync(savePackageStream).ConfigureAwait(false);
-                    await savePackageStream.FlushAsync().ConfigureAwait(false);
-                    savePackageStream.Close();
-                    await enhancedPackageMemoryStream.DisposeAsync().ConfigureAwait(false);
+                    var modFileLastWrite = modFile.LastWrite ?? default;
+                    var modFilePath = modFile.Path;
+                    var modFileSha256 = modFile.ModFileHash!.Sha256;
+                    var modFileSize = modFile.Size ?? default;
+                    var snapshotModFile = await chronicleDbContext.SnapshotModFiles
+                        .FirstOrDefaultAsync
+                        (
+                            smf =>
+                            smf.LastWriteTime == modFileLastWrite
+                            && smf.Path == modFilePath
+                            && smf.Sha256 == modFileSha256
+                            && smf.Size == modFileSize
+                        )
+                        .ConfigureAwait(false);
+                    if (snapshotModFile is null)
+                    {
+                        snapshotModFile = new SnapshotModFile
+                        {
+                            LastWriteTime = modFileLastWrite,
+                            Path = modFilePath,
+                            Sha256 = modFileSha256,
+                            Size = modFileSize
+                        };
+                        await chronicleDbContext.SnapshotModFiles.AddAsync(snapshotModFile).ConfigureAwait(false);
+                    }
+                    (snapshotModFile.Snapshots ??= []).Add(newSnapshot);
                 }
             }
-            if (settings.ArchivistEnabled)
+            MemoryStream? enhancedPackageMemoryStream = null;
+            ReadOnlyMemory<byte> customThumbnail = chroniclePropertySet.Thumbnail;
+            if (isInSavesDirectory
+                && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
+                || !customThumbnail.IsEmpty))
             {
-                using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
-                if (!chronicleByNucleusIdAndCreated.TryGetValue((account.NucleusId, account.Created), out var chronicle))
+                if (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
+                    && saveGameData.SaveSlot is { } saveSlot)
                 {
-                    chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
-                    chronicleByNucleusIdAndCreated.Add((account.NucleusId, account.Created), chronicle);
-                    await chronicle.FirstLoadComplete.ConfigureAwait(false);
-                    chronicles.Add(chronicle);
+                    saveSlot.SlotName = chroniclePropertySet.GameNameOverride.Trim();
+                    await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray()).ConfigureAwait(false);
                 }
-                else if (newSnapshot is not null)
+                if (!customThumbnail.IsEmpty)
+                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                        await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, chroniclePropertySet.Thumbnail).ConfigureAwait(false);
+                enhancedPackageMemoryStream = new MemoryStream();
+                await package.CopyToAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
+                enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
+                using var sha256 = SHA256.Create();
+                fileHashArray = await sha256.ComputeHashAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
+                if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) is not { } knownSavePackageHash)
                 {
-                    await chronicle.ReloadScalarsAsync().ConfigureAwait(false);
-                    await chronicle.LoadSnapshotAsync(newSnapshot).ConfigureAwait(false);
+                    knownSavePackageHash = new KnownSavePackageHash { Sha256 = fileHashArray };
+                    await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
                 }
+                newSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
+                enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
+            }
+            await package.DisposeAsync().ConfigureAwait(false);
+            await chronicleDbContext.SavePackageSnapshots.AddAsync(newSnapshot).ConfigureAwait(false);
+            await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
+            if (enhancedPackageMemoryStream is not null)
+            {
+                using var savePackageStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
+                await enhancedPackageMemoryStream.CopyToAsync(savePackageStream).ConfigureAwait(false);
+                await savePackageStream.FlushAsync().ConfigureAwait(false);
+                savePackageStream.Close();
+                await enhancedPackageMemoryStream.DisposeAsync().ConfigureAwait(false);
+            }
+            using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
+            if (!chronicleByNucleusIdAndCreated.TryGetValue((account.NucleusId, account.Created), out var chronicle))
+            {
+                chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
+                chronicleByNucleusIdAndCreated.Add((account.NucleusId, account.Created), chronicle);
+                await chronicle.FirstLoadComplete.ConfigureAwait(false);
+                chronicles.Add(chronicle);
+            }
+            else if (newSnapshot is not null)
+            {
+                await chronicle.ReloadScalarsAsync().ConfigureAwait(false);
+                await chronicle.LoadSnapshotAsync(newSnapshot).ConfigureAwait(false);
             }
         }
         catch (DirectoryNotFoundException)
@@ -714,23 +710,23 @@ public partial class Archivist :
             var saveFileHash = await ModFileManifestModel.GetFileSha256HashAsync(saveFile.FullName).ConfigureAwait(false);
             if (chronicle.Snapshots.FirstOrDefault(s => s.OriginalPackageSha256.SequenceEqual(saveFileHash)
                 || s.EnhancedPackageSha256.SequenceEqual(saveFileHash)) is not { } snapshot)
-                return;
+                continue;
             string tempFileName;
             using (var package = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false))
             {
                 var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
                 var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
-                    return;
+                    continue;
                 var saveGameDataKey = saveGameDataKeys[0];
-                IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"{saveGameDataKey.FullInstanceHex}.chronicle.sqlite")));
+                IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"N-{chronicle.NucleusId:x16}-C-{chronicle.Created:x16}.chronicle.sqlite")));
                 using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                     await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
                 if (await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
-                    return;
+                    continue;
                 if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
-                    return;
+                    continue;
                 if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
                 {
                     var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
