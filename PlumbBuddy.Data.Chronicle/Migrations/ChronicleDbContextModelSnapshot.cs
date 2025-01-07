@@ -23,7 +23,12 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("BasisFullInstance")
+                    b.Property<byte[]>("BasisCreated")
+                        .HasMaxLength(8)
+                        .HasColumnType("BLOB")
+                        .IsFixedLength();
+
+                    b.Property<byte[]>("BasisNucleusId")
                         .HasMaxLength(8)
                         .HasColumnType("BLOB")
                         .IsFixedLength();
@@ -33,7 +38,7 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                         .HasColumnType("BLOB")
                         .IsFixedLength();
 
-                    b.Property<byte[]>("FullInstance")
+                    b.Property<byte[]>("Created")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("BLOB")
@@ -48,6 +53,12 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
 
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("NucleusId")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("BLOB")
+                        .IsFixedLength();
 
                     b.Property<byte[]>("Thumbnail")
                         .IsRequired()

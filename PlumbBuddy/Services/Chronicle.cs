@@ -11,10 +11,14 @@ namespace PlumbBuddy.Services;
 public class Chronicle :
     INotifyPropertyChanged
 {
-    public Chronicle(IDbContextFactory<ChronicleDbContext> dbContextFactory, IArchivist archivist)
+    public Chronicle(ILoggerFactory loggerFactory, ILogger<Chronicle> logger, IDbContextFactory<ChronicleDbContext> dbContextFactory, IArchivist archivist)
     {
+        ArgumentNullException.ThrowIfNull(loggerFactory);
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(dbContextFactory);
         ArgumentNullException.ThrowIfNull(archivist);
+        this.loggerFactory = loggerFactory;
+        this.logger = logger;
         this.dbContextFactory = dbContextFactory;
         this.archivist = archivist;
         snapshots = [];
@@ -24,33 +28,68 @@ public class Chronicle :
     }
 
     readonly IArchivist archivist;
-    ImmutableArray<byte> basisFullInstance = [];
+    ulong basisCreated;
+    ulong basisNucleusId;
     ImmutableArray<byte> basisOriginalPackageSha256 = [];
+    ulong created;
+    long databaseSize;
     readonly IDbContextFactory<ChronicleDbContext> dbContextFactory;
+    DateTimeOffset earliestLastWriteTime;
     readonly TaskCompletionSource firstLoadComplete;
-    ImmutableArray<byte> fullInstance = [];
     string? gameNameOverride;
-    DateTimeOffset? lastUpdated;
+    DateTimeOffset latestLastWriteTime;
+    readonly ILogger<Chronicle> logger;
+    readonly ILoggerFactory loggerFactory;
     string name = string.Empty;
     string? notes;
-    int snapshotCount;
+    ulong nucleusId;
     readonly ObservableCollection<Snapshot> snapshots;
-    string? thumbnailUri;
+    ImmutableArray<byte> thumbnail = [];
 
     public IArchivist Archivist =>
         archivist;
 
     public Snapshot? BasedOnSnapshot =>
-        archivist.Chronicles.FirstOrDefault(c => c.FullInstance.SequenceEqual(basisFullInstance)) is { } basisChronicle
+        archivist.Chronicles.FirstOrDefault(c => c.NucleusId == basisNucleusId && c.Created == basisCreated) is { } basisChronicle
         && basisChronicle.Snapshots.FirstOrDefault(s => s.OriginalPackageSha256.SequenceEqual(basisOriginalPackageSha256)) is { } basisSnapshot
         ? basisSnapshot
         : null;
 
+    public ulong BasisCreated =>
+        basisCreated;
+
+    public ulong BasisNucleusId =>
+        basisNucleusId;
+
+    public ulong Created =>
+        created;
+
+    public long DatabaseSize
+    {
+        get => databaseSize;
+        private set
+        {
+            if (databaseSize == value)
+                return;
+            databaseSize = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTimeOffset EarliestLastWriteTime
+    {
+        get => earliestLastWriteTime;
+        private set
+        {
+            if (earliestLastWriteTime == value)
+                return;
+            earliestLastWriteTime = value;
+            OnPropertyChanged();
+        }
+    }
+
     public Task FirstLoadComplete =>
         firstLoadComplete.Task;
-
-    public ImmutableArray<byte> FullInstance =>
-        fullInstance;
 
     public string? GameNameOverride
     {
@@ -65,8 +104,17 @@ public class Chronicle :
         }
     }
 
-    public DateTimeOffset? LastUpdated =>
-        lastUpdated;
+    public DateTimeOffset LatestLastWriteTime
+    {
+        get => latestLastWriteTime;
+        private set
+        {
+            if (latestLastWriteTime == value)
+                return;
+            latestLastWriteTime = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string Name
     {
@@ -94,21 +142,21 @@ public class Chronicle :
         }
     }
 
-    public int SnapshotCount =>
-        snapshotCount;
+    public ulong NucleusId =>
+        nucleusId;
 
     public ReadOnlyObservableCollection<Snapshot> Snapshots { get; }
 
-    [SuppressMessage("Design", "CA1056: URI-like properties should not be strings")]
-    public string? ThumbnailUri
+    public ImmutableArray<byte> Thumbnail
     {
-        get => thumbnailUri;
-        private set
+        get => thumbnail;
+        set
         {
-            if (thumbnailUri == value)
+            if (thumbnail.SequenceEqual(value))
                 return;
-            thumbnailUri = value;
+            thumbnail = value;
             OnPropertyChanged();
+            CommitUserUpdate(e => e.Thumbnail, [..value]);
         }
     }
 
@@ -136,24 +184,38 @@ public class Chronicle :
 
     public async Task ClearThumbnailAsync()
     {
-        using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is { } propertySet)
+        try
         {
-            propertySet.Thumbnail = [];
-            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-            ThumbnailUri = null;
+            using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is { } propertySet)
+            {
+                propertySet.Thumbnail = [];
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                Thumbnail = [];
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "encountered unexpected unhandled exception while clearing thumbnail for nucleus ID {NucleusId}, created {Created}", nucleusId, created);
         }
     }
 
     void CommitUserUpdate<T>(Expression<Func<ChroniclePropertySet, T>> expression, T value) =>
         _ = Task.Run(async () =>
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            var propertySet = new ChroniclePropertySet { Id = 1 };
-            dbContext.Attach(propertySet);
-            dbContext.Entry(propertySet).Property(expression).CurrentValue = value;
-            dbContext.Entry(propertySet).Property(expression).IsModified = true;
-            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            try
+            {
+                using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                var propertySet = new ChroniclePropertySet { Id = 1 };
+                dbContext.Attach(propertySet);
+                dbContext.Entry(propertySet).Property(expression).CurrentValue = value;
+                dbContext.Entry(propertySet).Property(expression).IsModified = true;
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "encountered unexpected unhandled exception while applying user update {Expression} for nucleus ID {NucleusId}, created {Created}", expression, nucleusId, created);
+            }
         });
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
@@ -166,37 +228,55 @@ public class Chronicle :
     {
         await ReloadScalarsAsync().ConfigureAwait(false);
         using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var savePackageSnapshot in dbContext.SavePackageSnapshots.Include(sps => sps.OriginalSavePackageHash).AsAsyncEnumerable())
+        await foreach (var savePackageSnapshot in dbContext.SavePackageSnapshots.Include(sps => sps.OriginalSavePackageHash).Include(sps => sps.EnhancedSavePackageHash).AsAsyncEnumerable())
             await LoadSnapshotAsync(savePackageSnapshot).ConfigureAwait(false);
         firstLoadComplete.SetResult();
     }
 
     public async Task LoadSnapshotAsync(SavePackageSnapshot savePackageSnapshot)
     {
-        var snapshot = new Snapshot(dbContextFactory, savePackageSnapshot, this);
-        await snapshot.FirstLoadComplete.ConfigureAwait(false);
-        snapshots.Add(snapshot);
+        ArgumentNullException.ThrowIfNull(savePackageSnapshot);
+        try
+        {
+            var snapshot = new Snapshot(loggerFactory.CreateLogger<Snapshot>(), dbContextFactory, savePackageSnapshot, this);
+            await snapshot.FirstLoadComplete.ConfigureAwait(false);
+            snapshots.Add(snapshot);
+            LatestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Max();
+            if (snapshots.Count is 1)
+                EarliestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Min();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "encountered unexpected unhandled exception while loading snapshot {SnapshotId} for nucleus ID {NucleusId}, created {Created}", savePackageSnapshot.Id, nucleusId, created);
+        }
     }
 
     public async Task ReloadScalarsAsync()
     {
-        using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is { } propertySet)
+        try
         {
-            var basisFullInstance = (propertySet.BasisFullInstance ?? []).ToImmutableArray();
+            using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            DatabaseSize = await dbContext.Database.SqlQueryRaw<long>("PRAGMA page_count;").AsAsyncEnumerable().FirstOrDefaultAsync().ConfigureAwait(false)
+                * await dbContext.Database.SqlQueryRaw<long>("PRAGMA page_size;").AsAsyncEnumerable().FirstOrDefaultAsync().ConfigureAwait(false);
+            if (await dbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false) is not { } propertySet)
+                return;
+            var basisNucleusId = MemoryMarshal.Read<ulong>(propertySet.BasisNucleusId ?? new byte[8]);
+            var basisCreated = MemoryMarshal.Read<ulong>(propertySet.BasisCreated ?? new byte[8]);
             var basisOriginalPackageSha256 = (propertySet.BasisOriginalPackageSha256 ?? []).ToImmutableArray();
-            if (!this.basisFullInstance.SequenceEqual(basisFullInstance)
+            if (this.basisNucleusId != basisNucleusId
+                || this.basisCreated != basisCreated
                 || !this.basisOriginalPackageSha256.SequenceEqual(basisOriginalPackageSha256))
             {
-                this.basisFullInstance = basisFullInstance;
+                this.basisNucleusId = basisNucleusId;
+                this.basisCreated = basisCreated;
                 this.basisOriginalPackageSha256 = basisOriginalPackageSha256;
                 OnPropertyChanged(nameof(BasedOnSnapshot));
             }
-            var fullInstance = propertySet.FullInstance.ToImmutableArray();
-            if (!this.fullInstance.SequenceEqual(fullInstance))
+            var created = MemoryMarshal.Read<ulong>(propertySet.Created ?? new byte[8]);
+            if (this.created != created)
             {
-                this.fullInstance = fullInstance;
-                OnPropertyChanged(nameof(FullInstance));
+                this.created = created;
+                OnPropertyChanged(nameof(Created));
             }
             if (gameNameOverride != propertySet.GameNameOverride)
             {
@@ -213,25 +293,17 @@ public class Chronicle :
                 notes = propertySet.Notes;
                 OnPropertyChanged(nameof(Notes));
             }
-            ThumbnailUri = propertySet.Thumbnail is { Length: > 0 } thumbnail
-                ? $"data:image/png;base64,{Convert.ToBase64String(thumbnail)}"
-                : null;
+            var nucleusId = MemoryMarshal.Read<ulong>(propertySet.NucleusId ?? new byte[8]);
+            if (this.nucleusId != nucleusId)
+            {
+                this.nucleusId = nucleusId;
+                OnPropertyChanged(nameof(NucleusId));
+            }
+            Thumbnail = propertySet.Thumbnail.ToImmutableArray();
         }
-        var currentLastUpdated = (await dbContext.SavePackageSnapshots
-        .OrderByDescending(sps => sps.Id)
-        .FirstOrDefaultAsync()
-            .ConfigureAwait(false))
-            ?.LastWriteTime;
-        if (lastUpdated != currentLastUpdated)
+        catch (Exception ex)
         {
-            lastUpdated = currentLastUpdated;
-            OnPropertyChanged(nameof(LastUpdated));
-        }
-        var currentSnapshotCount = await dbContext.SavePackageSnapshots.CountAsync().ConfigureAwait(false);
-        if (currentSnapshotCount != snapshotCount)
-        {
-            snapshotCount = currentSnapshotCount;
-            OnPropertyChanged(nameof(SnapshotCount));
+            logger.LogError(ex, "encountered unexpected unhandled exception while reloading scalars for nucleus ID {NucleusId}, created {Created}", nucleusId, created);
         }
     }
 
@@ -255,12 +327,20 @@ public class Chronicle :
             {
                 propertySet.Thumbnail = thumbnailMemoryStream.ToArray();
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(propertySet.Thumbnail)}";
+                Thumbnail = [..propertySet.Thumbnail];
             }
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "encountered unexpected unhandled exception while setting thumbnail for nucleus ID {NucleusId}, created {Created}", nucleusId, created);
             await dialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
         }
+    }
+
+    public void UnloadSnapshots(IEnumerable<Snapshot> snapshots)
+    {
+        foreach (var snapshot in snapshots.OrderBy(s => s.SavePackageSnapshotId))
+            this.snapshots.Remove(snapshot);
+        EarliestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Min();
     }
 }

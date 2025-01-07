@@ -1,3 +1,4 @@
+@inject IDialogService DialogService
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 
 <MudDialog Class="secondary-dialog">
@@ -12,15 +13,25 @@
 	<DialogContent>
 		<MudStack>
 			<MudTextField @bind-Value="@ChronicleName" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Label" AdornmentColor="Color.Secondary" HelperText="This is the name your new chronicle will have." Label="Name" Variant="Variant.Filled" />
-			<MudTextField @bind-Value="@PreviousSaveGameInstance" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.FormatListGroup" AdornmentColor="Color.Secondary" HelperText="Instances are numbers that uniquely identify new games you make in The Sims 4. This number being the same in different save files is how I know to group them as snapshots together in the same chronicle. The instance number displayed in the read-only field above is the one used by the chronicle from which you are currently creating a branch." Label="Existing Instance" ReadOnly Variant="Variant.Filled" />
-			<MudTextFieldExtended @bind-Value="@newSaveGameInstance" HelperText="In order for your branch to become a new chronicle, we need to specify an instance different from the pre-existing one above. I've generated a new one for you, but you can click the dice button on the right to make me do that as many times as you like." Label="New Instance" ReadOnly Variant="Variant.Filled">
-				<AdornmentStart>
-					<MudIcon Icon="@MaterialDesignIcons.Normal.FormatListGroupPlus" Color="Color.Secondary" />
-				</AdornmentStart>
-				<AdornmentEnd>
-					<MudIconButton Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.DiceMultiple" OnClick="RandomizeNewSaveGameInstanceOnClickHandler" />
-				</AdornmentEnd>
-			</MudTextFieldExtended>
+			<MudTextField @bind-Value="@Notes" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Note" AdornmentColor="Color.Secondary" Label="Notes" Lines="5" Variant="Variant.Filled" Clearable />
+			<MudTextField @bind-Value="@GameNameOverride" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" AdornmentColor="Color.Secondary" HelperText="I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4." Label="Game Name Override" Variant="Variant.Filled" Clearable />
+			<MudField Label="Custom Thumbnail" Variant="Variant.Filled">
+				<MudStack Spacing="1">
+					@if (!Thumbnail.IsDefaultOrEmpty)
+					{
+						<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(Thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
+					}
+					<MudStack Row>
+						<MudButton OnClick="BrowseForCustomThumbnailAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
+							Browse...
+						</MudButton>
+						@if (!Thumbnail.IsDefaultOrEmpty)
+						{
+							<MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" OnClick="ClearThumbnail" Variant="Variant.Filled" />
+						}
+					</MudStack>
+				</MudStack>
+			</MudField>
 		</MudStack>
 	</DialogContent>
 	<DialogActions>

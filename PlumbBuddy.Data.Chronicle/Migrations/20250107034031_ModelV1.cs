@@ -1,13 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable IDE0079
-#pragma warning disable CA1062
-#pragma warning disable CA1861
-#pragma warning disable IDE0053
-#pragma warning disable IDE0161
-#pragma warning disable IDE0300
 
 namespace PlumbBuddy.Data.Chronicle.Migrations
 {
@@ -23,9 +17,12 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FullInstance = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: false),
-                    BasisFullInstance = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: true),
+                    NucleusId = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: false),
+                    Created = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: false),
+                    BasisNucleusId = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: true),
+                    BasisCreated = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 8, nullable: true),
                     BasisOriginalPackageSha256 = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 32, nullable: true),
+                    GameNameOverride = table.Column<string>(type: "TEXT", nullable: true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", nullable: true),
                     Thumbnail = table.Column<byte[]>(type: "BLOB", nullable: false)

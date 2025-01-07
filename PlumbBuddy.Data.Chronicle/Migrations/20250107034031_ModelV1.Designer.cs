@@ -11,7 +11,7 @@ using PlumbBuddy.Data.Chronicle;
 namespace PlumbBuddy.Data.Chronicle.Migrations
 {
     [DbContext(typeof(ChronicleDbContext))]
-    [Migration("20250103080124_ModelV1")]
+    [Migration("20250107034031_ModelV1")]
     partial class ModelV1
     {
         /// <inheritdoc />
@@ -26,7 +26,12 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("BasisFullInstance")
+                    b.Property<byte[]>("BasisCreated")
+                        .HasMaxLength(8)
+                        .HasColumnType("BLOB")
+                        .IsFixedLength();
+
+                    b.Property<byte[]>("BasisNucleusId")
                         .HasMaxLength(8)
                         .HasColumnType("BLOB")
                         .IsFixedLength();
@@ -36,11 +41,14 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                         .HasColumnType("BLOB")
                         .IsFixedLength();
 
-                    b.Property<byte[]>("FullInstance")
+                    b.Property<byte[]>("Created")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("BLOB")
                         .IsFixedLength();
+
+                    b.Property<string>("GameNameOverride")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -48,6 +56,12 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
 
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("NucleusId")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("BLOB")
+                        .IsFixedLength();
 
                     b.Property<byte[]>("Thumbnail")
                         .IsRequired()

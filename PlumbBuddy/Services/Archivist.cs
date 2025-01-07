@@ -1,7 +1,5 @@
 using EA.Sims4.Persistence;
 using Google.Protobuf;
-using PlumbBuddy.Data.Chronicle;
-using System.IO;
 
 namespace PlumbBuddy.Services;
 
@@ -17,14 +15,15 @@ public partial class Archivist :
     static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
     static readonly System.Version protobufVersion = typeof(SaveGameData).Assembly.GetName().Version!;
 
-    [GeneratedRegex(@"(?<fullInstanceHex>^[\da-f]{16})\.chronicle\.sqlite$")]
+    [GeneratedRegex(@"^N\-(?<nucleusIdHex>[\da-f]{16})\-C\-(?<createdHex>[\da-f]{16})\.chronicle\.sqlite$")]
     private static partial Regex GetChronicleDatabaseFileNamePattern();
 
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
     private static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISmartSimObserver smartSimObserver, ISuperSnacks superSnacks)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISmartSimObserver smartSimObserver, ISuperSnacks superSnacks)
     {
+        ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -32,6 +31,7 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        this.loggerFactory = loggerFactory;
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
@@ -39,7 +39,7 @@ public partial class Archivist :
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.smartSimObserver = smartSimObserver;
         this.superSnacks = superSnacks;
-        chronicleByFullInstanceHex = [];
+        chronicleByNucleusIdAndCreated = [];
         chronicles = [];
         Chronicles = new(chronicles);
         chroniclesLock = new();
@@ -58,10 +58,11 @@ public partial class Archivist :
     bool canIngest;
     readonly ObservableCollection<Chronicle> chronicles;
     readonly AsyncLock chroniclesLock;
-    readonly Dictionary<string, Chronicle> chronicleByFullInstanceHex;
+    readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
     readonly AsyncLock connectionLock;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
+    readonly ILoggerFactory loggerFactory;
     readonly JsonFormatter protobufFormatter;
     bool isDisposed;
     readonly ILogger<Archivist> logger;
@@ -176,8 +177,8 @@ public partial class Archivist :
                 using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                     await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
-                var chronicle = new Chronicle(chronicleDbContextFactory, this);
-                chronicleByFullInstanceHex.Add(fileInfoAndMatch.Match.Groups["fullInstanceHex"].Value, chronicle);
+                var chronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
+                chronicleByNucleusIdAndCreated.Add((ulong.Parse(fileInfoAndMatch.Match.Groups["nucleusIdHex"].Value, NumberStyles.HexNumber), ulong.Parse(fileInfoAndMatch.Match.Groups["createdHex"].Value, NumberStyles.HexNumber)), chronicle);
                 await chronicle.FirstLoadComplete.ConfigureAwait(false);
                 chronicles.Add(chronicle);
             }
@@ -203,7 +204,7 @@ public partial class Archivist :
         pathsProcessingQueue?.CompleteAdding();
         pathsProcessingQueue = null;
         using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
-        chronicleByFullInstanceHex.Clear();
+        chronicleByNucleusIdAndCreated.Clear();
         chronicles.Clear();
         SelectedChronicle = null;
     }
@@ -318,7 +319,11 @@ public partial class Archivist :
             if (saveGameDataKeys.Length is <= 0 or >= 2)
                 throw new FormatException("save package contains invalid number of save game data resources");
             var saveGameDataKey = saveGameDataKeys[0];
-            IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"{saveGameDataKey.FullInstanceHex}.chronicle.sqlite")));
+            var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
+            var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
+            if (saveGameData.Account is not { } account)
+                return;
+            IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"N-{account.NucleusId:x16}-C-{account.Created:x16}.chronicle.sqlite")));
             using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                 await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
@@ -329,19 +334,22 @@ public partial class Archivist :
                 .AnyAsync(sps => sps.Sha256 == fileHashArray)
                 .ConfigureAwait(false))
             {
-                var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
-                var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
                 var chroniclePropertySet = await chronicleDbContext.ChroniclePropertySets.FirstOrDefaultAsync().ConfigureAwait(false);
                 if (chroniclePropertySet is null)
                 {
-                    var fullInstance = saveGameDataKey.FullInstance;
-                    var fullInstanceBytes = new byte[8];
-                    Span<byte> fullInstanceBytesSpan = fullInstanceBytes;
-                    MemoryMarshal.Write(fullInstanceBytesSpan, in fullInstance);
+                    var nucleusId = account.NucleusId;
+                    var nucleusIdBytes = new byte[8];
+                    Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
+                    MemoryMarshal.Write(nucleusIdBytesSpan, in nucleusId);
+                    var created = account.Created;
+                    var createdBytes = new byte[8];
+                    Span<byte> createdBytesSpan = createdBytes;
+                    MemoryMarshal.Write(createdBytesSpan, in created);
                     chroniclePropertySet = new ChroniclePropertySet
                     {
-                        FullInstance = fullInstanceBytes,
-                        Name = saveGameData.SaveSlot.SlotName
+                        Created = createdBytes,
+                        Name = saveGameData.SaveSlot.SlotName,
+                        NucleusId = nucleusIdBytes,
                     };
                     await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
                 }
@@ -533,10 +541,10 @@ public partial class Archivist :
             if (settings.ArchivistEnabled)
             {
                 using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
-                if (!chronicleByFullInstanceHex.TryGetValue(saveGameDataKey.FullInstanceHex, out var chronicle))
+                if (!chronicleByNucleusIdAndCreated.TryGetValue((account.NucleusId, account.Created), out var chronicle))
                 {
-                    chronicle = new(chronicleDbContextFactory, this);
-                    chronicleByFullInstanceHex.Add(saveGameDataKey.FullInstanceHex, chronicle);
+                    chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
+                    chronicleByNucleusIdAndCreated.Add((account.NucleusId, account.Created), chronicle);
                     await chronicle.FirstLoadComplete.ConfigureAwait(false);
                     chronicles.Add(chronicle);
                 }
@@ -583,6 +591,7 @@ public partial class Archivist :
         }
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ProcessPathsQueueAsync()
     {
         if (this.pathsProcessingQueue is not { } pathsProcessingQueue)

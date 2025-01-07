@@ -57,7 +57,7 @@ partial class SupportDiscordStepsDialog
             await DialogService.ShowInfoDialogAsync(AppText.SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption, AppText.SupportDiscordStepsDialog_ClearCache_AlreadyClear_Text);
             return;
         }
-        if (SmartSimObserver.ClearCache())
+        if (await SmartSimObserver.ClearCacheAsync())
             await DialogService.ShowSuccessDialogAsync(AppText.SupportDiscordStepsDialog_ClearCache_Success_Caption, AppText.SupportDiscordStepsDialog_ClearCache_Success_Text);
     }
 

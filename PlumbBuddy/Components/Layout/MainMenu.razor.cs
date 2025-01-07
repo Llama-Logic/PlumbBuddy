@@ -33,7 +33,7 @@ partial class MainMenu
     async Task HandleClearCacheOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
-        SmartSimObserver.ClearCache();
+        await SmartSimObserver.ClearCacheAsync();
     }
 
     async Task HandleCloseWindowOnClickAsync()

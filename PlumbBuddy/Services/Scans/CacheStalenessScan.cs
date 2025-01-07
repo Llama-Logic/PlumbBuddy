@@ -18,22 +18,21 @@ public sealed class CacheStalenessScan :
     readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
 
-    public override Task ResolveIssueAsync(object issueData, object resolutionData)
+    public override async Task ResolveIssueAsync(object issueData, object resolutionData)
     {
         if (issueData is string issueDataStr && issueDataStr is "stale" && resolutionData is string resolutionCmd)
         {
             if (resolutionCmd is "clear")
             {
-                smartSimObserver.ClearCache();
-                return Task.CompletedTask;
+                await smartSimObserver.ClearCacheAsync();
+                return;
             }
             if (resolutionCmd is "stopTellingMe")
             {
                 settings.ScanForCacheStaleness = false;
-                return Task.CompletedTask;
+                return;
             }
         }
-        return Task.CompletedTask;
     }
 
     public override IAsyncEnumerable<ScanIssue> ScanAsync() =>

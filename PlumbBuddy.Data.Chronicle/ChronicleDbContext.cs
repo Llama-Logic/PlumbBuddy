@@ -33,11 +33,19 @@ public class ChronicleDbContext :
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
         modelBuilder.Entity<ChroniclePropertySet>()
-            .Property(e => e.FullInstance)
+            .Property(e => e.NucleusId)
             .HasMaxLength(8)
             .IsFixedLength(true);
         modelBuilder.Entity<ChroniclePropertySet>()
-            .Property(e => e.BasisFullInstance)
+            .Property(e => e.Created)
+            .HasMaxLength(8)
+            .IsFixedLength(true);
+        modelBuilder.Entity<ChroniclePropertySet>()
+            .Property(e => e.BasisNucleusId)
+            .HasMaxLength(8)
+            .IsFixedLength(true);
+        modelBuilder.Entity<ChroniclePropertySet>()
+            .Property(e => e.BasisCreated)
             .HasMaxLength(8)
             .IsFixedLength(true);
         modelBuilder.Entity<ChroniclePropertySet>()

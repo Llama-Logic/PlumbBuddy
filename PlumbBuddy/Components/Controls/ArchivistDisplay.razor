@@ -1,6 +1,7 @@
 @inherits ReactiveComponentBase
 @inject IArchivist Archivist
 @inject IDialogService DialogService
+@inject ILogger<ArchivistDisplay> Logger
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
@@ -75,9 +76,9 @@
 	<MudItem xs="4">
 		<div class="chronicle-list overflow-y-auto rounded mud-paper-outlined">
 			<MudList T="Chronicle" @bind-SelectedValue="@(Binding(() => Archivist.SelectedChronicle).Value)" Color="Color.Secondary">
-				@foreach (var chronicle in ObservedCollection(() => Archivist.Chronicles).Where(IncludeChronicle).OrderByDescending(c => c.LastUpdated))
+				@foreach (var chronicle in ObservedCollection(() => Archivist.Chronicles).Where(IncludeChronicle).OrderByDescending(c => c.Snapshots.Select(s => s.LastWriteTime).Max()))
 				{
-					<MudListItem T="Chronicle" Value="@chronicle" Text="@Observed(() => chronicle.Name)" SecondaryText="@($"{Observed(() => chronicle.LastUpdated):g} - {"snapshot".ToQuantity(Observed(() => chronicle.SnapshotCount))}")" Icon="@MaterialDesignIcons.Normal.Altimeter" IconColor="Color.Secondary" />
+					<MudListItem T="Chronicle" Value="@chronicle" Text="@Observed(() => chronicle.Name)" SecondaryText="@($"{Observed(() => chronicle.LatestLastWriteTime):g} - {"snapshot".ToQuantity(ObservedCollection(() => chronicle.Snapshots).Count)}")" Icon="@MaterialDesignIcons.Normal.Altimeter" IconColor="Color.Secondary" />
 				}
 			</MudList>
 		</div>
@@ -91,27 +92,32 @@
 					isEditingChronicle = false;
 				}
 				<div class="d-flex gap-4 align-start">
-					@if (!isEditingChronicle && Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
+					@if (!isEditingChronicle && Observed(() => selectedChronicle.Thumbnail) is { Length: > 0 } thumbnail)
 					{
-						<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
+						<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
 					}
 					<MudStack Spacing="1" Class="flex-grow-1">
 						@if (isEditingChronicle)
 						{
-							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Name).Value" Variant="Variant.Filled" Label="Name" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" />
-							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Notes).Value" Variant="Variant.Filled" Label="Notes" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable />
-							<MudTextField @bind-Value="@Binding(() => selectedChronicle.GameNameOverride).Value" Variant="Variant.Filled" Label="Game Name Override" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" Adornment="Adornment.Start" Clearable HelperText="I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4." />
-							<MudField Label="Custom Thumbnail" Variant="Variant.Filled">
+							<MudPaper>
+								<MudAlert Severity="Severity.Warning">
+									Changes you make here take effect immediately, whether or not you've clicked the check.
+								</MudAlert>
+							</MudPaper>
+							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Name).Value" Variant="Variant.Filled" Label="Name" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" DebounceInterval="250" />
+							<MudTextField @bind-Value="@Binding(() => selectedChronicle.Notes).Value" Variant="Variant.Filled" Label="Notes" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
+							<MudTextField @bind-Value="@Binding(() => selectedChronicle.GameNameOverride).Value" Variant="Variant.Filled" Label="Game Name Override" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" Adornment="Adornment.Start" Clearable HelperText="I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4." DebounceInterval="250" />
+							<MudField Label="Custom Thumbnail" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ImageEdit">
 								<MudStack Spacing="1">
-									@if (Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
+									@if (Observed(() => selectedChronicle.Thumbnail) is { Length: > 0 } thumbnail)
 									{
-										<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
+										<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
 									}
 									<MudStack Row>
 										<MudButton OnClick="@(new Func<Task>(() => selectedChronicle.BrowseForCustomThumbnailAsync(DialogService)))" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
 											Browse...
 										</MudButton>
-										@if (Observed(() => selectedChronicle.ThumbnailUri) is { } thumbnailUri && !string.IsNullOrWhiteSpace(thumbnailUri))
+										@if (Observed(() => selectedChronicle.Thumbnail) is { Length: > 0 })
 										{
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" OnClick="selectedChronicle.ClearThumbnailAsync" Variant="Variant.Filled" />
 										}
@@ -124,7 +130,33 @@
 							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
 								@(Observed(() => selectedChronicle.Name))
 							</MudTextM3>
-							<MudMarkdown Value="@(Observed(() => selectedChronicle.Notes))" />
+							<MudGrid Justify="Justify.Center" Spacing="0">
+								<MudItem>
+									<MudTooltip Arrow Text="This is the amount of space this chronicle is using in your Archive folder.">
+										<MudChip Icon="@MaterialDesignIcons.Normal.Harddisk" Value="@(ByteSize.FromBytes(Observed(() => selectedChronicle.DatabaseSize)).Humanize())" />
+									</MudTooltip>
+								</MudItem>
+								<MudItem>
+									<MudTooltip Arrow Text="This was when the first snapshot's save was written to your saves folder.">
+										<MudChip Icon="@MaterialDesignIcons.Normal.CalendarStart" Value="@(Observed(() => selectedChronicle.EarliestLastWriteTime).ToString("g"))" />
+									</MudTooltip>
+								</MudItem>
+								<MudItem>
+									<MudTooltip Arrow Text="This was when the most recent snapshot's save was written to your saves folder.">
+										<MudChip Icon="@MaterialDesignIcons.Normal.CalendarEnd" Value="@(Observed(() => selectedChronicle.LatestLastWriteTime).ToString("g"))" />
+									</MudTooltip>
+								</MudItem>
+								<MudItem>
+									<MudTooltip Arrow Text="This is how many snapshots this chronicle currently has.">
+										<MudChip Icon="@MaterialDesignIcons.Normal.Timeline" Value="@("snapshot".ToQuantity(ObservedCollection(() => selectedChronicle.Snapshots).Count))" />
+									</MudTooltip>
+								</MudItem>
+							</MudGrid>
+							@if (Observed(() => selectedChronicle.Notes) is { } notes && !string.IsNullOrWhiteSpace(notes))
+							{
+								<MudDivider />
+								<MudMarkdown Value="@notes" />
+							}
 						}
 						@if (selectedChronicle.BasedOnSnapshot is { } basedOnSnapshot)
 						{
@@ -213,10 +245,10 @@
 											</MudTooltip>
 										}
 										<MudTooltip Arrow Text="Restore this Snapshot to The Sims 4 Saves Folder" Color="Color.Secondary">
-											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRestore" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => RestoreSavePackageAsync(context)))" />
+											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRestore" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => RestoreSavePackageAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="Create a New Chronicle by Branching from this Snapshot" Color="Color.Secondary">
-											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" />
+											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="Save this Snapshot in The Sims 4's Format" Color="Color.Secondary">
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileExport" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportSavePackageAsync(context)))" />
@@ -237,8 +269,13 @@
 												<MudStack Spacing="1" Class="flex-grow-1">
 													@if (context.IsEditing)
 													{
-														<MudTextField @bind-Value="@Binding(() => context.Label).Value" Variant="Variant.Filled" Label="Label" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" />
-														<MudTextField @bind-Value="@Binding(() => context.Notes).Value" Variant="Variant.Filled" Label="Notes" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable />
+														<MudPaper>
+															<MudAlert Severity="Severity.Warning">
+																Changes you make here take effect immediately, whether or not you've clicked the check.
+															</MudAlert>
+														</MudPaper>
+														<MudTextField @bind-Value="@Binding(() => context.Label).Value" Variant="Variant.Filled" Label="Label" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" DebounceInterval="250" />
+														<MudTextField @bind-Value="@Binding(() => context.Notes).Value" Variant="Variant.Filled" Label="Notes" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
 													}
 													else
 													{
@@ -269,10 +306,13 @@
 												</MudStack>
 												<MudStack Spacing="0">
 													<MudTooltip Arrow Placement="Placement.Left" Text="Edit this Snapshot's Details">
-														<MudToggleIconButton @bind-Toggled="@context.IsEditing" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" />
+														<MudToggleIconButton @bind-Toggled="@context.IsEditing" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 													</MudTooltip>
 													<MudTooltip Arrow Placement="Placement.Left" Text="Try to Find this Save in the Saves Folder">
 														<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowSavePackageInSavesDirectoryAsync(context)))" />
+													</MudTooltip>
+													<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="Permanently Delete all Snapshots preceding this one and Reclaim Space">
+														<MudIconButton Icon="@MaterialDesignIcons.Normal.TimelineRemove" Color="Color.Warning" OnClick="@(new Func<MouseEventArgs, Task>(e => DeletePreviousSnapshotsAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 													</MudTooltip>
 												</MudStack>
 											</div>

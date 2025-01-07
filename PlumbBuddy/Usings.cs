@@ -9,6 +9,7 @@ global using CsvHelper;
 global using CsvHelper.Configuration;
 global using H.NotifyIcon;
 global using Humanizer;
+global using Humanizer.Bytes;
 global using IniParser.Exceptions;
 global using IniParser.Parser;
 global using LlamaLogic.Packages;

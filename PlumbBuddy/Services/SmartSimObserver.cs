@@ -292,19 +292,31 @@ public partial class SmartSimObserver :
             && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(settings.InstallationFolderPath);
     }
 
-    public bool ClearCache()
+    public async Task<bool> ClearCacheAsync()
     {
         try
         {
             foreach (var cacheComponent in cacheComponents)
             {
-                cacheComponent.Refresh();
-                if (cacheComponent.Exists)
+                var retries = 20;
+                while (true)
                 {
-                    if (cacheComponent is DirectoryInfo directoryCacheComponent)
-                        directoryCacheComponent.Delete(true);
-                    else
-                        cacheComponent.Delete();
+                    try
+                    {
+                        cacheComponent.Refresh();
+                        if (cacheComponent.Exists)
+                        {
+                            if (cacheComponent is DirectoryInfo directoryCacheComponent)
+                                directoryCacheComponent.Delete(true);
+                            else
+                                cacheComponent.Delete();
+                        }
+                        break;
+                    }
+                    catch (UnauthorizedAccessException) when (--retries >= 0)
+                    {
+                        await Task.Delay(250).ConfigureAwait(false);
+                    }
                 }
             }
             return true;

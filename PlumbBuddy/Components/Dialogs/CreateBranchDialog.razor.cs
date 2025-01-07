@@ -1,32 +1,75 @@
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using Image = SixLabors.ImageSharp.Image;
+using ResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
+using ResizeOptions = SixLabors.ImageSharp.Processing.ResizeOptions;
+
 namespace PlumbBuddy.Components.Dialogs;
 
 partial class CreateBranchDialog
 {
-    public CreateBranchDialog() =>
-        RandomizeNewSaveGameInstanceOnClickHandler();
-
-    uint newSaveGameInstance;
-
     [Parameter]
     public string ChronicleName { get; set; } = string.Empty;
 
     [Parameter]
-    public uint PreviousSaveGameInstance { get; set; }
+    public string GameNameOverride { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Notes { get; set; } = string.Empty;
 
     [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
+    [Parameter]
+    public ImmutableArray<byte> Thumbnail { get; set; } = [];
+
+    async Task BrowseForCustomThumbnailAsync()
+    {
+        if (await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = "Select a Custom Thumbnail",
+            FileTypes = FilePickerFileType.Images
+        }).ConfigureAwait(false) is { } fileResult)
+        {
+            try
+            {
+                using var fileStream = await fileResult.OpenReadAsync().ConfigureAwait(false);
+                var thumbnail = await Image.LoadAsync<Rgba32>(fileStream).ConfigureAwait(false);
+                if (thumbnail.Width > 2048 || thumbnail.Height > 2048)
+                    thumbnail.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Size = new(2048, 2048),
+                        Mode = ResizeMode.Max,
+                        Sampler = KnownResamplers.Lanczos3
+                    }));
+                using var thumbnailMemoryStream = new MemoryStream();
+                await thumbnail.SaveAsPngAsync(thumbnailMemoryStream).ConfigureAwait(false);
+                Thumbnail = thumbnailMemoryStream.ToArray().ToImmutableArray();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
+            }
+        }
+    }
+
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());
 
-    [SuppressMessage("Security", "CA5394: Do not use insecure randomness", Justification = "There are no security concerns here.")]
-    void RandomizeNewSaveGameInstanceOnClickHandler()
-    {
-        Span<byte> byteSpan = stackalloc byte[4];
-        Random.Shared.NextBytes(byteSpan);
-        newSaveGameInstance = MemoryMarshal.Read<uint>(byteSpan);
-    }
+    void ClearThumbnail() =>
+        Thumbnail = [];
 
     void OkOnClickHandler() =>
-        MudDialog?.Close(DialogResult.Ok(new CreateBranchDialogResult { ChronicleName = ChronicleName, NewSaveGameInstance = newSaveGameInstance }));
+        MudDialog?.Close(DialogResult.Ok(new CreateBranchDialogResult
+        {
+            ChronicleName = ChronicleName,
+            GameNameOverride = string.IsNullOrWhiteSpace(GameNameOverride)
+                ? null
+                : GameNameOverride,
+            Notes = string.IsNullOrWhiteSpace(Notes)
+                ? null
+                : Notes,
+            Thumbnail = Thumbnail
+        }));
 }

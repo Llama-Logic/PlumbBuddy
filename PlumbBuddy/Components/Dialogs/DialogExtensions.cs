@@ -83,13 +83,15 @@ static class DialogExtensions
             return false;
         });
 
-    public static Task<CreateBranchDialogResult?> ShowCreateBranchDialogAsync(this IDialogService dialogService, string chronicleName, uint previousSaveGameInstance) =>
+    public static Task<CreateBranchDialogResult?> ShowCreateBranchDialogAsync(this IDialogService dialogService, string chronicleName, string notes, string gameNameOverride, ImmutableArray<byte> thumbnail) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
             var dialog = await dialogService.ShowAsync<CreateBranchDialog>("Create Branch", new DialogParameters<CreateBranchDialog>()
             {
                 { x => x.ChronicleName, chronicleName },
-                { x => x.PreviousSaveGameInstance, previousSaveGameInstance }
+                { x => x.Notes, notes },
+                { x => x.GameNameOverride, gameNameOverride },
+                { x => x.Thumbnail, thumbnail }
             }, new DialogOptions
             {
                 MaxWidth = MaxWidth.Small

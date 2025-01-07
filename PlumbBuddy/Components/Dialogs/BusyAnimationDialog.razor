@@ -10,7 +10,11 @@
 	<DialogContent>
 		@if (ProcessComplete is not null)
 		{
-			<div class="@animationClassName" style="width: @(AnimationWidth); height: @(AnimationHeight);"></div>
+			<MudGrid Justify="Justify.Center">
+				<MudItem>
+					<div class="@animationClassName" style="width: @(AnimationWidth); height: @(AnimationHeight);"></div>
+				</MudItem>
+			</MudGrid>
 		}
 	</DialogContent>
 </MudDialog>

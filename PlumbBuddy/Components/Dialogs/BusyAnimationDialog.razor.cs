@@ -37,7 +37,14 @@ partial class BusyAnimationDialog
         if (ProcessComplete is { } processComplete)
         {
             await JSRuntime.InvokeVoidAsync("loadLottie", AnimationPath, animationClassName);
-            await processComplete;
+            try
+            {
+                await processComplete;
+            }
+            catch
+            {
+                // all we care about is completion, not faults
+            }
             MudDialog?.Close(DialogResult.Ok(true));
         }
     }
