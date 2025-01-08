@@ -6,6 +6,7 @@
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
+@inject IUpdateManager UpdateManager
 
 <MudGrid Class="align-center">
 	<MudItem xs="12">
@@ -13,14 +14,20 @@
 			<MudPaper Outlined Class="px-4 py-2">
 				<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center">
 					<MudTooltip Color="Color.Secondary" Text="If this switch is flipped, I will connect to the Archive folder you have configured in Settings.">
-						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistEnabled).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Archive" ThumbOffIcon="@MaterialDesignIcons.Normal.ArchiveOff" Disabled="@(!Observed(() => Archivist.CanIngest))" />
+						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistEnabled).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Archive" ThumbOffIcon="@MaterialDesignIcons.Normal.ArchiveOff" />
 					</MudTooltip>
-					<MudTooltip Color="Color.Secondary" Text="@(Observed(() => Archivist.CanIngest) ? "If I'm enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them." : "For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.")">
-						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistAutoIngestSaves).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Autorenew" ThumbOffIcon="@MaterialDesignIcons.Normal.AutorenewOff" Disabled="@(!Observed(() => Archivist.CanIngest) || !Observed(() => Settings.ArchivistEnabled))" />
+					<MudTooltip Color="Color.Secondary" Text="If I'm enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them.">
+						<MudSwitchM3 @bind-Value="@Binding(() => Settings.ArchivistAutoIngestSaves).Value" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.Autorenew" ThumbOffIcon="@MaterialDesignIcons.Normal.AutorenewOff" Disabled="@(!Observed(() => Settings.ArchivistEnabled))" />
 					</MudTooltip>
 					<MudTooltip Arrow Color="Color.Secondary" Text="Scan a Folder for Saves">
-						<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.FolderSearch" Disabled="@(!Observed(() => Archivist.CanIngest) || !Observed(() => Settings.ArchivistEnabled))" OnClick="BrowseForFolderToScanAsync" />
+						<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.FolderSearch" Disabled="@(!Observed(() => Settings.ArchivistEnabled))" OnClick="BrowseForFolderToScanAsync" />
 					</MudTooltip>
+					@if (!Observed(() => Archivist.CanSafelyUpdateSaveGameData))
+					{
+						<MudTooltip Arrow Color="Color.Secondary" Text="I'm not currently up to date with your version of The Sims 4, so it's not safe for me to alter the meta data in your save games. This means I can't update their names or branch chronicles. You can click here to check if there's an update out for me that will get me caught up.">
+							<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.Update" OnClick="CheckForUpdateAsync" />
+						</MudTooltip>
+					}
 				</MudStack>
 			</MudPaper>
 			<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Class="flex-grow-1">
@@ -40,21 +47,9 @@
 				{
 					if (Observed(() => Settings.ArchivistAutoIngestSaves))
 					{
-						if (Observed(() => Archivist.CanIngest))
-						{
-							<MudTooltip Color="Color.Secondary" Text="I'm done archiving your save files.">
-								<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveCheck" Color="Color.Secondary" Style="font-size: 40px;" />
-							</MudTooltip>
-						}
-						else
-						{
-							<MudTooltip Color="Color.Secondary" Text="For your safety, I cannot currently secure your save files for you because my method of reading save files created by this version of The Sims 4 has not been tested. Hopefully, an update for me is already available (or will be soon) that can safely read your save files.">
-								<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveAlert" Color="Color.Secondary" Class="mt-1" Style="font-size: 40px;" />
-							</MudTooltip>
-							<MudTooltip Arrow Color="Color.Secondary" Text="Check for Update">
-								<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.Update" />
-							</MudTooltip>
-						}
+						<MudTooltip Color="Color.Secondary" Text="I'm done archiving your save files.">
+							<MudIcon Icon="@MaterialDesignIcons.Normal.ContentSaveCheck" Color="Color.Secondary" Style="font-size: 40px;" />
+						</MudTooltip>
 					}
 					else
 					{
@@ -158,7 +153,7 @@
 								<MudMarkdown Value="@notes" />
 							}
 						}
-						@if (selectedChronicle.BasedOnSnapshot is { } basedOnSnapshot)
+						@if (Observed(() => selectedChronicle.BasedOnSnapshot) is { } basedOnSnapshot)
 						{
 							<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CallSplit" Label="Based on" Variant="Variant.Filled">
 								<MudBreadcrumbs Items="@(new List<BreadcrumbItem> { new BreadcrumbItem(Observed(() => basedOnSnapshot.Chronicle.Name), "chronicle", icon: MaterialDesignIcons.Normal.Altimeter), new BreadcrumbItem($"{Observed(() => basedOnSnapshot.Label)} ({Observed(() => basedOnSnapshot.LastWriteTime):g})", "snapshot", icon: MaterialDesignIcons.Normal.Timeline) })" Class="pa-0">
@@ -248,7 +243,7 @@
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRestore" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => RestoreSavePackageAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="Create a New Chronicle by Branching from this Snapshot" Color="Color.Secondary">
-											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting || !Observed(() => Archivist.CanSafelyUpdateSaveGameData))" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="Save this Snapshot in The Sims 4's Format" Color="Color.Secondary">
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileExport" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportSavePackageAsync(context)))" />

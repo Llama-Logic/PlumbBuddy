@@ -1,3 +1,5 @@
+using ProtoBuf;
+
 namespace PlumbBuddy;
 
 static partial class Extensions
@@ -45,4 +47,11 @@ static partial class Extensions
 
     public static string ToHexString(this IEnumerable<byte> bytes) =>
         string.Join(string.Empty, bytes.Select(b => b.ToString("x2")));
+
+    public static ReadOnlyMemory<byte> ToProtobufMessage<T>(this T @object)
+    {
+        var writer = new ArrayBufferWriter<byte>();
+        ProtoBuf.Serializer.Serialize(writer, @object);
+        return writer.WrittenMemory;
+    }
 }

@@ -1,5 +1,5 @@
 using EA.Sims4.Persistence;
-using Google.Protobuf;
+using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
 
@@ -44,10 +44,9 @@ public partial class Archivist :
         Chronicles = new(chronicles);
         chroniclesLock = new();
         connectionLock = new();
-        protobufFormatter = new JsonFormatter(JsonFormatter.Settings.Default.WithIndentation());
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         this.smartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
-        ResampleCanIngest();
+        ResampleCanSafelyUpdateSaveGameData();
         if (this.settings.ArchivistEnabled)
             ConnectToFolders();
     }
@@ -55,7 +54,7 @@ public partial class Archivist :
     ~Archivist() =>
         Dispose(false);
 
-    bool canIngest;
+    bool canSafelyUpdateSaveGameData;
     readonly ObservableCollection<Chronicle> chronicles;
     readonly AsyncLock chroniclesLock;
     readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
@@ -63,7 +62,6 @@ public partial class Archivist :
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
     readonly ILoggerFactory loggerFactory;
-    readonly JsonFormatter protobufFormatter;
     bool isDisposed;
     readonly ILogger<Archivist> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
@@ -76,14 +74,14 @@ public partial class Archivist :
     ArchivistState state;
     readonly ISuperSnacks superSnacks;
 
-    public bool CanIngest
+    public bool CanSafelyUpdateSaveGameData
     {
-        get => canIngest;
+        get => canSafelyUpdateSaveGameData;
         private set
         {
-            if (canIngest == value)
+            if (canSafelyUpdateSaveGameData == value)
                 return;
-            canIngest = value;
+            canSafelyUpdateSaveGameData = value;
             OnPropertyChanged();
         }
     }
@@ -285,7 +283,7 @@ public partial class Archivist :
             if (pathsProcessingQueue is not null)
                 pathsProcessingQueue.Enqueue(Path.Combine(settings.UserDataFolderPath, "saves"));
             else
-                ResampleCanIngest();
+                ResampleCanSafelyUpdateSaveGameData();
         }
     }
 
@@ -321,8 +319,7 @@ public partial class Archivist :
             if (saveGameDataKeys.Length is <= 0 or >= 2)
                 throw new FormatException("save package contains invalid number of save game data resources");
             var saveGameDataKey = saveGameDataKeys[0];
-            var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
-            var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
+            var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
             if (saveGameData.Account is not { } account)
                 return;
             IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"N-{account.NucleusId:x16}-C-{account.Created:x16}.chronicle.sqlite")));
@@ -504,12 +501,13 @@ public partial class Archivist :
                 && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                 || !customThumbnail.IsEmpty))
             {
-                if (chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
+                if (CanSafelyUpdateSaveGameData
+                    && chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
                     && saveGameData.SaveSlot is { } saveSlot
                     && saveSlot.SlotName != gameNameOverride)
                 {
                     saveSlot.SlotName = gameNameOverride;
-                    await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
+                    await package.SetAsync(saveGameDataKey, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
                 }
                 if (!customThumbnail.IsEmpty)
                     foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
@@ -628,14 +626,14 @@ public partial class Archivist :
             }
             try
             {
-                ResampleCanIngest();
-                if (settings.ArchivistEnabled && CanIngest)
+                ResampleCanSafelyUpdateSaveGameData();
+                if (settings.ArchivistEnabled)
                 {
                     State = ArchivistState.Ingesting;
                     try
                     {
                         var savesDirectoryPath = Path.GetFullPath(Path.Combine(settings.UserDataFolderPath, "saves"));
-                        while (settings.ArchivistEnabled && CanIngest && nomNom.TryDequeue(out var path))
+                        while (settings.ArchivistEnabled && nomNom.TryDequeue(out var path))
                         {
                             FileSystemInfo? fileSystemInfo = File.Exists(path)
                                 ? new FileInfo(path)
@@ -678,7 +676,7 @@ public partial class Archivist :
                                         && !settings.ArchivistAutoIngestSaves)
                                         break;
                                 }
-                            ResampleCanIngest();
+                            ResampleCanSafelyUpdateSaveGameData();
                         }
                     }
                     finally
@@ -728,14 +726,16 @@ public partial class Archivist :
                     continue;
                 if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
                     continue;
-                if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
+                if (CanSafelyUpdateSaveGameData
+                    && !string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
                 {
-                    var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
-                    var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
-                    if (saveGameData.SaveSlot is { } saveSlot)
+                    var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                    if (chronicle.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
+                        && saveGameData.SaveSlot is { } saveSlot
+                        && saveSlot.SlotName != gameNameOverride)
                     {
                         saveSlot.SlotName = chronicle.GameNameOverride;
-                        await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
+                        await package.SetAsync(saveGameDataKey, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
                     }
                 }
                 byte[]? thumbnailBytes = null;
@@ -771,8 +771,9 @@ public partial class Archivist :
         await ConnectToFoldersAsync().ConfigureAwait(false);
     }
 
-    void ResampleCanIngest() =>
-        CanIngest = smartSimObserver.GameVersion is { } gameVersion
+    void ResampleCanSafelyUpdateSaveGameData() =>
+        CanSafelyUpdateSaveGameData =
+               smartSimObserver.GameVersion is { } gameVersion
             && new System.Version(gameVersion.Major, gameVersion.Minor, gameVersion.Build) is { } gameVersionWithoutRevision
             && gameVersionWithoutRevision <= protobufVersion;
 }

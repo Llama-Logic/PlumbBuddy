@@ -1,7 +1,7 @@
 using EA.Sims4.Persistence;
-using Google.Protobuf;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
+using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
 
@@ -257,6 +257,8 @@ public class Snapshot :
         ArgumentNullException.ThrowIfNull(chronicle);
         ArgumentNullException.ThrowIfNull(newChronicleName);
         ArgumentNullException.ThrowIfNull(onSerializationCompleted);
+        if (!chronicle.Archivist.CanSafelyUpdateSaveGameData)
+            return Task.FromResult<FileInfo?>(null);
         return Task.Run(async () =>
         {
             try
@@ -271,8 +273,7 @@ public class Snapshot :
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
                     throw new FormatException("save package contains invalid number of save game data resources");
                 var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameDataProtobuf = await package.GetAsync(saveGameDataKey).ConfigureAwait(false);
-                var saveGameData = SaveGameData.Parser.ParseFrom(saveGameDataProtobuf.Span);
+                var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
                 var compressionMode = package.GetExplicitCompressionMode(saveGameDataKey);
                 var slotId = GetOpenSlot(settings);
                 if (saveGameData.Account is not  { } account)
@@ -282,7 +283,7 @@ public class Snapshot :
                     throw new System.MissingFieldException("save game data does not contain save slot");
                 saveSlot.SlotId = slotId;
                 saveSlot.SlotName = newChronicleName;
-                await package.SetAsync(saveGameDataKey, saveGameData.ToByteArray(), compressionMode).ConfigureAwait(false);
+                await package.SetAsync(saveGameDataKey, saveGameData.ToProtobufMessage(), compressionMode).ConfigureAwait(false);
                 var nucleusId = account.NucleusId;
                 var nucleusIdBytes = new byte[8];
                 Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
@@ -526,14 +527,15 @@ public class Snapshot :
                     return null;
                 using var package = await RegeneratePackageAsync(dbContext, SavePackageSnapshotId).ConfigureAwait(false);
                 var keys = await package.GetKeysAsync().ConfigureAwait(false);
-                foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
-                {
-                    var saveGameData = SaveGameData.Parser.ParseFrom((await package.GetAsync(key).ConfigureAwait(false)).Span);
-                    saveGameData.SaveSlot.SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
-                        ? $"{chronicle.Name}: {Label}"
-                        : chronicle.GameNameOverride.Trim();
-                    await package.SetAsync(key, saveGameData.ToByteArray(), package.GetExplicitCompressionMode(key)).ConfigureAwait(false);
-                }
+                if (chronicle.Archivist.CanSafelyUpdateSaveGameData)
+                    foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
+                    {
+                        var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(key).ConfigureAwait(false));
+                        saveGameData.SaveSlot.SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
+                            ? $"{chronicle.Name}: {Label}"
+                            : chronicle.GameNameOverride.Trim();
+                        await package.SetAsync(key, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(key)).ConfigureAwait(false);
+                    }
                 ReadOnlyMemory<byte> thumbnail = propertySet.Thumbnail;
                 if (!thumbnail.IsEmpty)
                     foreach (var saveThumbnail4Key in keys.Where(key => key.Type is ResourceType.SaveThumbnail4))

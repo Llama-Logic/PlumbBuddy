@@ -4,7 +4,7 @@ public interface IArchivist :
     IDisposable,
     INotifyPropertyChanged
 {
-    bool CanIngest { get; }
+    bool CanSafelyUpdateSaveGameData { get; }
 
     Chronicle? SelectedChronicle { get; set; }
 
