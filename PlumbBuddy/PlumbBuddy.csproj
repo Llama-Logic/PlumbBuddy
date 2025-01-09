@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.2.9</ApplicationDisplayVersion>
-        <ApplicationVersion>1.2.9</ApplicationVersion>
+        <ApplicationDisplayVersion>1.2.10</ApplicationDisplayVersion>
+        <ApplicationVersion>1.2.10</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -186,6 +186,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="wwwroot\img\custom-themes\deaderpool\" />
       <Folder Include="wwwroot\js\lottie\" />
     </ItemGroup>
 

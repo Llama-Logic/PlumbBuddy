@@ -6,15 +6,15 @@
 		<MudStack Row="true">
 			<MudIcon Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" />
 			<MudTextM3 Typo="TypoM3.Title" Color="Color.Secondary">
-				Create Branch
+				@MarkupLocalizer[nameof(AppText.CreateBranchDialog_Caption)]
 			</MudTextM3>
 		</MudStack>
 	</TitleContent>
 	<DialogContent>
 		<MudStack>
-			<MudTextField @bind-Value="@ChronicleName" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Label" AdornmentColor="Color.Secondary" HelperText="This is the name your new chronicle will have." Label="Name" Variant="Variant.Filled" />
-			<MudTextField @bind-Value="@Notes" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Note" AdornmentColor="Color.Secondary" Label="Notes" Lines="5" Variant="Variant.Filled" Clearable />
-			<MudTextField @bind-Value="@GameNameOverride" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" AdornmentColor="Color.Secondary" HelperText="I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4." Label="Game Name Override" Variant="Variant.Filled" Clearable />
+			<MudTextField @bind-Value="@ChronicleName" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Label" AdornmentColor="Color.Secondary" HelperText="@(AppText.CreateBranchDialog_Name_HelperText)" Label="@(AppText.Common_Name)" Variant="Variant.Filled" />
+			<MudTextField @bind-Value="@Notes" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Note" AdornmentColor="Color.Secondary" Label="@(AppText.Common_Notes)" Lines="5" Variant="Variant.Filled" Clearable />
+			<MudTextField @bind-Value="@GameNameOverride" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" AdornmentColor="Color.Secondary" HelperText="@(AppText.CreateBranchDialog_GameNameOverride_HelperText)" Label="@(AppText.CreateBranchDialog_GameNameOverride_Label)" Variant="Variant.Filled" Clearable />
 			<MudField Label="Custom Thumbnail" Variant="Variant.Filled">
 				<MudStack Spacing="1">
 					@if (!Thumbnail.IsDefaultOrEmpty)
@@ -23,7 +23,7 @@
 					}
 					<MudStack Row>
 						<MudButton OnClick="BrowseForCustomThumbnailAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
-							Browse...
+							@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
 						</MudButton>
 						@if (!Thumbnail.IsDefaultOrEmpty)
 						{

@@ -1,5 +1,6 @@
 @implements IDisposable
 @inject IAppLifecycleManager AppLifecycleManager
+@inject ICustomThemes CustomThemes
 @inject IDialogService DialogService
 @inject ILogger<MainMenu> Logger
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
@@ -14,7 +15,7 @@
 
 <div style="height: 100vh; position: fixed;">
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
-        <MudImage Src="/img/PlumbBuddyLogo.svg" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
+		<MudImage Src="@(Settings.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme) && customTheme.CustomAppLogo ? $"/img/custom-themes/{customThemeName}/applogo.svg" : "/img/PlumbBuddyLogo.svg")" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>
     <MudIconButton Icon="@MaterialDesignIcons.Normal.Close" Style="position: absolute; top: 0; right: 0;" OnClick="HandleCloseMenuOnClickAsync" />
     <MudTextM3 Typo="TypoM3.Headline" Size="Size.Medium" Align="Align.Center">

@@ -2,6 +2,8 @@ namespace PlumbBuddy.Models;
 
 public class CustomTheme
 {
+    public bool CustomAppLogo { get; set; }
+
     public required string DisplayName { get; set; }
 
     public required string Description { get; set; }

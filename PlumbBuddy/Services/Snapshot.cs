@@ -572,10 +572,7 @@ public class Snapshot :
     {
         ArgumentNullException.ThrowIfNull(dialogService);
         if (!Chronicle.Thumbnail.IsDefaultOrEmpty
-            && !await dialogService.ShowCautionDialogAsync("Just want to make sure...",
-            """
-            You have a custom thumbnail set for this chronicle already, and maybe just accidentally clicked this button or you're one of those fun explorative users. Either way, if we continue, the custom thumbnail you already have will be overwritten with the one from this snapshot.
-            """))
+            && !await dialogService.ShowCautionDialogAsync(AppText.Archivist_Snapshot_UseThumbnailForChronicle_Caution_Caption, AppText.Archivist_Snapshot_UseThumbnailForChronicle_Caution_Text))
             return;
         try
         {
@@ -590,7 +587,7 @@ public class Snapshot :
         catch (Exception ex)
         {
             logger.LogError(ex, "encountered unexpected unhandled exception while setting nucleus ID {NucleusId}, created {Created} thumbnail from snapshot {SnapshotId} original", chronicle.NucleusId, chronicle.Created, SavePackageSnapshotId);
-            await dialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
+            await dialogService.ShowErrorDialogAsync(AppText.Archivist_SelectCustomThumbnail_Failed, $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
         }
     }
 }

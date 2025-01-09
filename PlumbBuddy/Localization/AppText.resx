@@ -289,7 +289,7 @@
     <value>This is the number of &lt;strong&gt;uncompiled&lt;/strong&gt; Python scripts I found in script mod files in your Mods folder.</value>
   </data>
   <data name="HUD_PythonScripts_Tip_CreatorsNote" xml:space="preserve">
-    <value>&lt;em&gt;Creator's Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in .script mod files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;</value>
+    <value>&lt;em&gt;Creator's Note: If The Sims 4 works at all with Python scripts, it does so by interpreting them. Maxis' SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script mod files. This means they will either underperform &lt;strong&gt;considerably&lt;/strong&gt; or not work at all. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7 and omiting the scripts themselves from the script mod files to avoid confusion and unintended side effects.&lt;/em&gt;</value>
   </data>
   <data name="HUD_ByteCodeFiles_Tip_Caption" xml:space="preserve">
     <value>Python Byte Code Files</value>
@@ -2541,5 +2541,252 @@ More detailed technical information is available in my log.</value>
   </data>
   <data name="FoldersSelector_ArchiveFolder" xml:space="preserve">
     <value>Archive Folder</value>
+  </data>
+  <data name="Archivist_Enabled_Tip" xml:space="preserve">
+    <value>If this switch is flipped, I will connect to the Archive folder you have configured in Settings.</value>
+  </data>
+  <data name="Archivist_AutoIngestSaves_Tip" xml:space="preserve">
+    <value>If I'm enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them.</value>
+  </data>
+  <data name="Archivist_ScanFolderForSaves_Tip" xml:space="preserve">
+    <value>Scan a Folder for Saves</value>
+  </data>
+  <data name="Archivist_CheckForUpdate_Tip" xml:space="preserve">
+    <value>I'm not currently up to date with your version of The Sims 4, so it's not safe for me to alter the meta data in your save games. This means I can't update their names or branch chronicles. You can click here to check if there's an update out for me that will get me caught up.</value>
+  </data>
+  <data name="Archivist_Status_WaitingForMDC_Tip" xml:space="preserve">
+    <value>Since I want to correctly capture your mod list in snapshots, I'm waiting for mod cataloging to finish.</value>
+  </data>
+  <data name="Archivist_Status_AutoIngestFinished_Tip" xml:space="preserve">
+    <value>I'm done archiving your save files.</value>
+  </data>
+  <data name="Archivist_Status_Finished_Tip" xml:space="preserve">
+    <value>I am connected to your archive.</value>
+  </data>
+  <data name="Archivist_Status_Offline_Tip" xml:space="preserve">
+    <value>I'm disconnected from your archive.</value>
+  </data>
+  <data name="Archivist_SearchChronicles_Label" xml:space="preserve">
+    <value>Search Chronicles</value>
+  </data>
+  <data name="Archivist_Chronicle_Snapshot" xml:space="preserve">
+    <value>snapshot</value>
+  </data>
+  <data name="Archivist_Chronicle_SecondaryText_Format" xml:space="preserve">
+    <value>{0:g} - {1}</value>
+    <comment>{0:g} = The write time of the chronicle's most recent snapshot; {1} = The number of snapshots</comment>
+  </data>
+  <data name="Archivist_Editor_Warning" xml:space="preserve">
+    <value>Changes you make here take effect immediately, whether or not you've clicked the check.</value>
+  </data>
+  <data name="Common_Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Archivist_Chronicle_GameNameOverride_Label" xml:space="preserve">
+    <value>Game Name Override</value>
+  </data>
+  <data name="Archivist_Chronicle_GameNameOverride_HelperText" xml:space="preserve">
+    <value>I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4.</value>
+  </data>
+  <data name="Archivist_Chronicle_CustomThumbnail_Label" xml:space="preserve">
+    <value>Custom Thumbnail</value>
+  </data>
+  <data name="Archivist_Chronicle_DatabaseSize_Tip" xml:space="preserve">
+    <value>This is the amount of space this chronicle is using in your Archive folder.</value>
+  </data>
+  <data name="Archivist_Chronicle_FirstSnapshot_Tip" xml:space="preserve">
+    <value>This was when the first snapshot's save was written to your saves folder.</value>
+  </data>
+  <data name="Archivist_Chronicle_LastSnapshot_Tip" xml:space="preserve">
+    <value>This was when the most recent snapshot's save was written to your saves folder.</value>
+  </data>
+  <data name="Archivist_Chronicle_Snapshots_Tip" xml:space="preserve">
+    <value>This is how many snapshots this chronicle currently has.</value>
+  </data>
+  <data name="Archivist_Chronicle_BasedOn_Label" xml:space="preserve">
+    <value>Based on</value>
+  </data>
+  <data name="Archivist_Chronicle_BasedOn_Branch_Tip" xml:space="preserve">
+    <value>Navigate to this Chronicle</value>
+  </data>
+  <data name="Archivist_Chronicle_BasedOn_Snapshot_Tip" xml:space="preserve">
+    <value>Navigate to this Snapshot's Chronicle, Search for its Date, and Show its Details</value>
+  </data>
+  <data name="Archivist_Chronicle_Edit_Tip" xml:space="preserve">
+    <value>Edit this Chronicle's Details</value>
+  </data>
+  <data name="Archivist_Chronicle_ReapplyCustomizations_Tip" xml:space="preserve">
+    <value>Reapply Customizations to Existing Saves</value>
+  </data>
+  <data name="Archivist_Chronicle_ShowDatabase_Tip" xml:space="preserve">
+    <value>Show this Chronicle's Database</value>
+  </data>
+  <data name="Archivist_Chronicle_Snapshots_Heading" xml:space="preserve">
+    <value>Snapshots</value>
+  </data>
+  <data name="Archivist_Snapshot_ViewDetails_Tip" xml:space="preserve">
+    <value>View Details about this Snapshot</value>
+  </data>
+  <data name="Archivist_Snapshot_Tag_Live_Tip" xml:space="preserve">
+    <value>The game had just written the save from which this snapshot was taken. Click here to search for all Live snapshots.</value>
+  </data>
+  <data name="Archivist_Snapshot_Tag_Live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="Archivist_Snapshot_Tag_ActiveHousehold_Tip" xml:space="preserve">
+    <value>This is the household you were controlling when this snapshot's save was written. Click here to search for all snapshots during which this was the case.</value>
+  </data>
+  <data name="Archivist_Snapshot_Tag_Lot_Tip" xml:space="preserve">
+    <value>This is the lot you were on when this snapshot's save was written. Click here to search for all snapshots during which this was the case.</value>
+  </data>
+  <data name="Archivist_Snapshot_Tag_World_Tip" xml:space="preserve">
+    <value>This is the world you were in when this snapshot's save was written. Click here to search for all snapshots during which this was the case.</value>
+  </data>
+  <data name="Archivist_Snapshot_Restore_Tip" xml:space="preserve">
+    <value>Restore this Snapshot to The Sims 4 Saves Folder</value>
+  </data>
+  <data name="Archivist_Snapshot_Branch_Tip" xml:space="preserve">
+    <value>Create a New Chronicle by Branching from this Snapshot</value>
+  </data>
+  <data name="Archivist_Snapshot_Export_Tip" xml:space="preserve">
+    <value>Save this Snapshot in The Sims 4's Format</value>
+  </data>
+  <data name="Common_Label" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="Archivist_Snapshot_UseThumbnailForChronicle_Label" xml:space="preserve">
+    <value>Use Thumbnail for Chronicle</value>
+  </data>
+  <data name="Archivist_Snapshot_ExportModList_Label" xml:space="preserve">
+    <value>Export Mod List</value>
+  </data>
+  <data name="Archivist_Snapshot_Edit_Tip" xml:space="preserve">
+    <value>Edit this Snapshot's Details</value>
+  </data>
+  <data name="Archivist_Snapshot_FindInSavesDirectory_Tip" xml:space="preserve">
+    <value>Try to Find this Save in the Saves Folder</value>
+  </data>
+  <data name="Archivist_Snapshot_DeletePrior_Tip" xml:space="preserve">
+    <value>Permanently Delete all Snapshots preceding this one and Reclaim Space</value>
+  </data>
+  <data name="Archivist_Error_Caption" xml:space="preserve">
+    <value>Whoops, Something Went Wrong</value>
+  </data>
+  <data name="Archivist_Busy_Branching" xml:space="preserve">
+    <value>Creating and Slotting First Save Package</value>
+  </data>
+  <data name="Archivist_Error_Text" xml:space="preserve">
+    <value>If you want to know more, I may have written some technical mumbo-jumbo to my log file.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_DeletePriorSnapshot_Caution_Caption" xml:space="preserve">
+    <value>Are you sure you want to do this?</value>
+  </data>
+  <data name="Archivist_DeletePriorSnapshot_Caution_Text" xml:space="preserve">
+    <value>All snapshots in this chronicle prior to this one will be permanently lost.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_DeletePriorSnapshot_Caution2_Text" xml:space="preserve">
+    <value>I **seriously** cannot undo this if you change your mind. This is your **last chance** to turn back.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_DeletePriorSnapshot_Caution2_Caption" xml:space="preserve">
+    <value>Okay I mean, are you REALLY sure?</value>
+  </data>
+  <data name="Archivist_Busy_DeletingPriorSnapshots" xml:space="preserve">
+    <value>Deleting Previous Snapshots</value>
+  </data>
+  <data name="Archivist_Busy_ActuallyDeletingPriorSnapshots" xml:space="preserve">
+    <value>Actually Deleting Previous Snapshots</value>
+  </data>
+  <data name="Archivist_Busy_Exporting" xml:space="preserve">
+    <value>Reconstructing and Exporting Save Package</value>
+  </data>
+  <data name="Archivist_Busy_ReapplyingEnhancements" xml:space="preserve">
+    <value>Reapplying Customizations to Existing Saves</value>
+  </data>
+  <data name="Archivist_ReapplyEnhancements_Caution_Caption" xml:space="preserve">
+    <value>This Might Take a While ⏱️</value>
+  </data>
+  <data name="Archivist_ReapplyEnhancements_Caution_Text" xml:space="preserve">
+    <value>I will need to go through each of your save files for this chronicle to alter them with your current customizations (and restore the original thumbnail if you're removed a custom one). Depending on how many saves you still have in The Sims 4 for this chronicle, you may want to grab a magazine or pull up YouTube while I'm doing this.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_Restore_Caution_Text" xml:space="preserve">
+    <value>I will happily restore this snapshot for you, but you should know that *if I do*, The Sims 4 will regard it as the most recent save in this chronicle, even though *you and I both know* that it... really isn't. Things might get a little confusing in here as you continue to save after loading this restored snapshot, if you intend to keep "bouncing around".
+
+On the *other hand*, consider **creating a branch**. If your goal is to make a "What If?" style spin-off of your Sims' reality at a certain point in time and you intend to play both of them (even if one just occasionally), it will help you if you branch into a new chronicle. I'll change some numbers in the restored save file to make The Sims 4 see it as a different game, which will allow me to keep tracking of your save progression through both versions of reality separate and orderly 🧼. And, *on top of all that*, I'll actually end up using even *less* of your disk space with a separate chronicle for the other timeline, based on how my compression works.
+
+Or, ya know, maybe your intent here is to go back in time to correct a mistake and you have no interest in playing with the snapshots taken after this one. In that case, it's fine to just click the orange OK to accept that you've sat through my lecture 🥱 and to proceed with the restore.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_Restore_Caution_Caption" xml:space="preserve">
+    <value>Are you sure you don't want to create a branch?</value>
+  </data>
+  <data name="Archivist_Busy_Restoring" xml:space="preserve">
+    <value>Reconstructing and Slotting Save Package</value>
+  </data>
+  <data name="Archivist_ShowChronicleDatabase_Caution_Caption" xml:space="preserve">
+    <value>Please Be Cautious ✋</value>
+  </data>
+  <data name="Archivist_ShowChronicleDatabase_Caution_Text" xml:space="preserve">
+    <value>Chronicle databases contain everything that is needed to bring your saves, no matter how long they've been gone from your game, back from the Netherworld 🪦. They are *memory*, 🐶 precious and 🌻 pure. I'll show you the one for this chronicle, but only if you *promise* me you'll treat it nicely.
+
+(Basically don't move it, delete it, open it... you know... give it odd looks. Be polite and keep your hands to yourself!)</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_ShowSavePackageInSavesDirectory_Question_Text" xml:space="preserve">
+    <value>I need to carefully examine the saves you currently have to see if I can find a match. I'll pop open your saves folder with it selected if I find it, or tell if you I couldn't find it.
+
+You sure you want me to go looking for it?</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Archivist_ShowSavePackageInSavesDirectory_Question_Caption" xml:space="preserve">
+    <value>This Might Take Some Time...</value>
+  </data>
+  <data name="Archivist_Busy_FindingSavePackageInSavesDirectory" xml:space="preserve">
+    <value>Having a Look at Your Saves Folder</value>
+  </data>
+  <data name="Archivist_ShowSavePackageInSavesDirectory_NotFound_Caption" xml:space="preserve">
+    <value>This Save Exists Now Only in My Memory</value>
+  </data>
+  <data name="Archivist_ShowSavePackageInSavesDirectory_NotFound_Text" xml:space="preserve">
+    <value>It seems the game decided to finally let this one pass on 🪽 to conserve your storage space. But, I can bring it back if you want 🫴, just restore or branch from this snapshot.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="CreateBranchDialog_Caption" xml:space="preserve">
+    <value>Create Branch</value>
+  </data>
+  <data name="CreateBranchDialog_Name_HelperText" xml:space="preserve">
+    <value>This is the name your new chronicle will have.</value>
+  </data>
+  <data name="CreateBranchDialog_GameNameOverride_HelperText" xml:space="preserve">
+    <value>I will set the save's game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle's saves when loading in The Sims 4.</value>
+  </data>
+  <data name="CreateBranchDialog_GameNameOverride_Label" xml:space="preserve">
+    <value>Game Name Override</value>
+  </data>
+  <data name="Archivist_Warning_CannotReadSaveFile" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to archive the save file at this location:&lt;br /&gt;
+&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>{0} = Full Path to the Save File; {1} = Error Type; {2} = Error Message</comment>
+  </data>
+  <data name="Archivist_SelectCustomThumbnail_Caption" xml:space="preserve">
+    <value>Select a Custom Thumbnail</value>
+  </data>
+  <data name="Archivist_SelectCustomThumbnail_Failed" xml:space="preserve">
+    <value>Setting the Custom Thumbnail Failed</value>
+  </data>
+  <data name="Archivist_Snapshot_UseThumbnailForChronicle_Caution_Caption" xml:space="preserve">
+    <value>Just want to make sure...</value>
+  </data>
+  <data name="Archivist_Snapshot_UseThumbnailForChronicle_Caution_Text" xml:space="preserve">
+    <value>You have a custom thumbnail set for this chronicle already, and maybe just accidentally clicked this button or you're one of those fun explorative users. Either way, if we continue, the custom thumbnail you already have will be overwritten with the one from this snapshot.</value>
   </data>
 </root>

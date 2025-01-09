@@ -37,7 +37,88 @@ amethyst-lilac:
     archivist:
       dark: archivist-dark.png
       light: archivist-light.png
+      position: center
       size: contain
+
+codebleu:
+  display_name: CodeBleu
+  description: |
+    Visit on [itch.io](https://codebleu.itch.io/)!
+  default_border_radius: 2px
+  font: Ubuntu
+  palette_dark:
+    Background: '#101018ff'
+    Surface: '#20203080'
+    TextPrimary: '#ffffffff'
+    TextSecondary: '#96c8faff'
+    TextDisabled: '#878787ff'
+    Primary: '#5d6cefff'
+    Secondary: '#2b8ca4ff'
+    Tertiary: '#2bbd6aff'
+    Info: '#8888ffff'
+    Success: '#2d9632ff'
+    Warning: '#f4af2fff'
+    Error: '#e24b69ff'
+    DrawerBackground: '#18306080'
+    DrawerText: '#ffffffff'
+    DrawerIcons: '#e1e1e1ff'
+    AppbarBackground: '#18306080'
+    AppbarText: '#ffffffff'
+  backgrounded_tabs:
+    mod-health:
+      dark: mod-health.jpg
+      light: mod-health.jpg
+    catalog:
+      dark: catalog.jpg
+      light: catalog.jpg
+    manifest-editor:
+      dark: manifest-editor.jpg
+      light: manifest-editor.jpg
+    archivist:
+      dark: archivist.jpg
+      light: archivist.jpg
+      position: center
+
+deaderpool:
+  display_name: Deaderpool
+  description: |
+    Visit on [Patreon](https://www.patreon.com/mccc_deaderpool)!
+  custom_app_logo: true
+  default_border_radius: 6px
+  palette_dark:
+    Background: '#140000ff'
+    Surface: '#14000080'
+    TextPrimary: '#f5e9d4ff'
+    TextSecondary: '#b1a591ff'
+    TextDisabled: '#878787ff'
+    LinesDefault: '#f5e9d4ff'
+    LinesInput: '#941c2fff'
+    Primary: '#ad7934ff'
+    Secondary: '#ad5034ff'
+    Tertiary: '#ad3440ff'
+    Info: '#e1ad66ff'
+    Success: '#08b043ff'
+    # Warning: '#f4af2fff'
+    # Error: '#e24b69ff'
+    DrawerBackground: '#140000ff'
+    DrawerText: '#f5e9d4ff'
+    DrawerIcons: '#f5e9d4ff'
+    AppbarBackground: '#f5e9e2ff'
+    AppbarText: '#941c2fff'
+  backgrounded_tabs:
+    mod-health:
+      dark: mod-health.jpg
+      light: mod-health.jpg
+    catalog:
+      dark: catalog.jpg
+      light: catalog.jpg
+    manifest-editor:
+      dark: manifest-editor.jpg
+      light: manifest-editor.jpg
+    archivist:
+      dark: archivist.jpg
+      light: archivist.jpg
+      position: center
 
 littlbowbub:
   display_name: Littlbowbub
@@ -69,6 +150,7 @@ littlbowbub:
     archivist:
       dark: archivist.png
       light: archivist.png
+      position: center
 
 little-ms-sam:
   display_name: LittleMsSam
@@ -125,6 +207,7 @@ little-ms-sam:
     archivist:
       dark: none.png
       light: none.png
+      position: center
 
 sim-realist:
   display_name: Sim Realist
@@ -149,3 +232,4 @@ sim-realist:
     archivist:
       dark: archivist.png
       light: archivist.png
+      position: center

@@ -61,6 +61,631 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to If I&apos;m enabled and this switch is flipped, I will secure every save your game writes, whether through normal game operation or mod features like MC Command Center Auto Save, in my library from which you can review them, restore them, and set your own customizations for them..
+        /// </summary>
+        internal static string Archivist_AutoIngestSaves_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_AutoIngestSaves_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actually Deleting Previous Snapshots.
+        /// </summary>
+        internal static string Archivist_Busy_ActuallyDeletingPriorSnapshots {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_ActuallyDeletingPriorSnapshots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating and Slotting First Save Package.
+        /// </summary>
+        internal static string Archivist_Busy_Branching {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_Branching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting Previous Snapshots.
+        /// </summary>
+        internal static string Archivist_Busy_DeletingPriorSnapshots {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_DeletingPriorSnapshots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconstructing and Exporting Save Package.
+        /// </summary>
+        internal static string Archivist_Busy_Exporting {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_Exporting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Having a Look at Your Saves Folder.
+        /// </summary>
+        internal static string Archivist_Busy_FindingSavePackageInSavesDirectory {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_FindingSavePackageInSavesDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reapplying Customizations to Existing Saves.
+        /// </summary>
+        internal static string Archivist_Busy_ReapplyingEnhancements {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_ReapplyingEnhancements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconstructing and Slotting Save Package.
+        /// </summary>
+        internal static string Archivist_Busy_Restoring {
+            get {
+                return ResourceManager.GetString("Archivist_Busy_Restoring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m not currently up to date with your version of The Sims 4, so it&apos;s not safe for me to alter the meta data in your save games. This means I can&apos;t update their names or branch chronicles. You can click here to check if there&apos;s an update out for me that will get me caught up..
+        /// </summary>
+        internal static string Archivist_CheckForUpdate_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_CheckForUpdate_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate to this Chronicle.
+        /// </summary>
+        internal static string Archivist_Chronicle_BasedOn_Branch_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_BasedOn_Branch_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Based on.
+        /// </summary>
+        internal static string Archivist_Chronicle_BasedOn_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_BasedOn_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigate to this Snapshot&apos;s Chronicle, Search for its Date, and Show its Details.
+        /// </summary>
+        internal static string Archivist_Chronicle_BasedOn_Snapshot_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_BasedOn_Snapshot_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom Thumbnail.
+        /// </summary>
+        internal static string Archivist_Chronicle_CustomThumbnail_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_CustomThumbnail_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the amount of space this chronicle is using in your Archive folder..
+        /// </summary>
+        internal static string Archivist_Chronicle_DatabaseSize_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_DatabaseSize_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit this Chronicle&apos;s Details.
+        /// </summary>
+        internal static string Archivist_Chronicle_Edit_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_Edit_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This was when the first snapshot&apos;s save was written to your saves folder..
+        /// </summary>
+        internal static string Archivist_Chronicle_FirstSnapshot_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_FirstSnapshot_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will set the save&apos;s game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle&apos;s saves when loading in The Sims 4..
+        /// </summary>
+        internal static string Archivist_Chronicle_GameNameOverride_HelperText {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_GameNameOverride_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Name Override.
+        /// </summary>
+        internal static string Archivist_Chronicle_GameNameOverride_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_GameNameOverride_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This was when the most recent snapshot&apos;s save was written to your saves folder..
+        /// </summary>
+        internal static string Archivist_Chronicle_LastSnapshot_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_LastSnapshot_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reapply Customizations to Existing Saves.
+        /// </summary>
+        internal static string Archivist_Chronicle_ReapplyCustomizations_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_ReapplyCustomizations_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:g} - {1}.
+        /// </summary>
+        internal static string Archivist_Chronicle_SecondaryText_Format {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_SecondaryText_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show this Chronicle&apos;s Database.
+        /// </summary>
+        internal static string Archivist_Chronicle_ShowDatabase_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_ShowDatabase_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to snapshot.
+        /// </summary>
+        internal static string Archivist_Chronicle_Snapshot {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_Snapshot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Snapshots.
+        /// </summary>
+        internal static string Archivist_Chronicle_Snapshots_Heading {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_Snapshots_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is how many snapshots this chronicle currently has..
+        /// </summary>
+        internal static string Archivist_Chronicle_Snapshots_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_Snapshots_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to do this?.
+        /// </summary>
+        internal static string Archivist_DeletePriorSnapshot_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_DeletePriorSnapshot_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All snapshots in this chronicle prior to this one will be permanently lost..
+        /// </summary>
+        internal static string Archivist_DeletePriorSnapshot_Caution_Text {
+            get {
+                return ResourceManager.GetString("Archivist_DeletePriorSnapshot_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Okay I mean, are you REALLY sure?.
+        /// </summary>
+        internal static string Archivist_DeletePriorSnapshot_Caution2_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_DeletePriorSnapshot_Caution2_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I **seriously** cannot undo this if you change your mind. This is your **last chance** to turn back..
+        /// </summary>
+        internal static string Archivist_DeletePriorSnapshot_Caution2_Text {
+            get {
+                return ResourceManager.GetString("Archivist_DeletePriorSnapshot_Caution2_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes you make here take effect immediately, whether or not you&apos;ve clicked the check..
+        /// </summary>
+        internal static string Archivist_Editor_Warning {
+            get {
+                return ResourceManager.GetString("Archivist_Editor_Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If this switch is flipped, I will connect to the Archive folder you have configured in Settings..
+        /// </summary>
+        internal static string Archivist_Enabled_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Enabled_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, Something Went Wrong.
+        /// </summary>
+        internal static string Archivist_Error_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_Error_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you want to know more, I may have written some technical mumbo-jumbo to my log file..
+        /// </summary>
+        internal static string Archivist_Error_Text {
+            get {
+                return ResourceManager.GetString("Archivist_Error_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Might Take a While ⏱️.
+        /// </summary>
+        internal static string Archivist_ReapplyEnhancements_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_ReapplyEnhancements_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will need to go through each of your save files for this chronicle to alter them with your current customizations (and restore the original thumbnail if you&apos;re removed a custom one). Depending on how many saves you still have in The Sims 4 for this chronicle, you may want to grab a magazine or pull up YouTube while I&apos;m doing this..
+        /// </summary>
+        internal static string Archivist_ReapplyEnhancements_Caution_Text {
+            get {
+                return ResourceManager.GetString("Archivist_ReapplyEnhancements_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you don&apos;t want to create a branch?.
+        /// </summary>
+        internal static string Archivist_Restore_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_Restore_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will happily restore this snapshot for you, but you should know that *if I do*, The Sims 4 will regard it as the most recent save in this chronicle, even though *you and I both know* that it... really isn&apos;t. Things might get a little confusing in here as you continue to save after loading this restored snapshot, if you intend to keep &quot;bouncing around&quot;.
+        ///
+        ///On the *other hand*, consider **creating a branch**. If your goal is to make a &quot;What If?&quot; style spin-off of your Sims&apos; reality at a certain point in tim [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Archivist_Restore_Caution_Text {
+            get {
+                return ResourceManager.GetString("Archivist_Restore_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scan a Folder for Saves.
+        /// </summary>
+        internal static string Archivist_ScanFolderForSaves_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_ScanFolderForSaves_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search Chronicles.
+        /// </summary>
+        internal static string Archivist_SearchChronicles_Label {
+            get {
+                return ResourceManager.GetString("Archivist_SearchChronicles_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a Custom Thumbnail.
+        /// </summary>
+        internal static string Archivist_SelectCustomThumbnail_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_SelectCustomThumbnail_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Setting the Custom Thumbnail Failed.
+        /// </summary>
+        internal static string Archivist_SelectCustomThumbnail_Failed {
+            get {
+                return ResourceManager.GetString("Archivist_SelectCustomThumbnail_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please Be Cautious ✋.
+        /// </summary>
+        internal static string Archivist_ShowChronicleDatabase_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_ShowChronicleDatabase_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chronicle databases contain everything that is needed to bring your saves, no matter how long they&apos;ve been gone from your game, back from the Netherworld 🪦. They are *memory*, 🐶 precious and 🌻 pure. I&apos;ll show you the one for this chronicle, but only if you *promise* me you&apos;ll treat it nicely.
+        ///
+        ///(Basically don&apos;t move it, delete it, open it... you know... give it odd looks. Be polite and keep your hands to yourself!).
+        /// </summary>
+        internal static string Archivist_ShowChronicleDatabase_Caution_Text {
+            get {
+                return ResourceManager.GetString("Archivist_ShowChronicleDatabase_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Save Exists Now Only in My Memory.
+        /// </summary>
+        internal static string Archivist_ShowSavePackageInSavesDirectory_NotFound_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_ShowSavePackageInSavesDirectory_NotFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It seems the game decided to finally let this one pass on 🪽 to conserve your storage space. But, I can bring it back if you want 🫴, just restore or branch from this snapshot..
+        /// </summary>
+        internal static string Archivist_ShowSavePackageInSavesDirectory_NotFound_Text {
+            get {
+                return ResourceManager.GetString("Archivist_ShowSavePackageInSavesDirectory_NotFound_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Might Take Some Time....
+        /// </summary>
+        internal static string Archivist_ShowSavePackageInSavesDirectory_Question_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_ShowSavePackageInSavesDirectory_Question_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I need to carefully examine the saves you currently have to see if I can find a match. I&apos;ll pop open your saves folder with it selected if I find it, or tell if you I couldn&apos;t find it.
+        ///
+        ///You sure you want me to go looking for it?.
+        /// </summary>
+        internal static string Archivist_ShowSavePackageInSavesDirectory_Question_Text {
+            get {
+                return ResourceManager.GetString("Archivist_ShowSavePackageInSavesDirectory_Question_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a New Chronicle by Branching from this Snapshot.
+        /// </summary>
+        internal static string Archivist_Snapshot_Branch_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Branch_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permanently Delete all Snapshots preceding this one and Reclaim Space.
+        /// </summary>
+        internal static string Archivist_Snapshot_DeletePrior_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_DeletePrior_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit this Snapshot&apos;s Details.
+        /// </summary>
+        internal static string Archivist_Snapshot_Edit_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Edit_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save this Snapshot in The Sims 4&apos;s Format.
+        /// </summary>
+        internal static string Archivist_Snapshot_Export_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Export_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Mod List.
+        /// </summary>
+        internal static string Archivist_Snapshot_ExportModList_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_ExportModList_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Try to Find this Save in the Saves Folder.
+        /// </summary>
+        internal static string Archivist_Snapshot_FindInSavesDirectory_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_FindInSavesDirectory_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore this Snapshot to The Sims 4 Saves Folder.
+        /// </summary>
+        internal static string Archivist_Snapshot_Restore_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Restore_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the household you were controlling when this snapshot&apos;s save was written. Click here to search for all snapshots during which this was the case..
+        /// </summary>
+        internal static string Archivist_Snapshot_Tag_ActiveHousehold_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Tag_ActiveHousehold_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Live.
+        /// </summary>
+        internal static string Archivist_Snapshot_Tag_Live {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Tag_Live", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The game had just written the save from which this snapshot was taken. Click here to search for all Live snapshots..
+        /// </summary>
+        internal static string Archivist_Snapshot_Tag_Live_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Tag_Live_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the lot you were on when this snapshot&apos;s save was written. Click here to search for all snapshots during which this was the case..
+        /// </summary>
+        internal static string Archivist_Snapshot_Tag_Lot_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Tag_Lot_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the world you were in when this snapshot&apos;s save was written. Click here to search for all snapshots during which this was the case..
+        /// </summary>
+        internal static string Archivist_Snapshot_Tag_World_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_Tag_World_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Just want to make sure....
+        /// </summary>
+        internal static string Archivist_Snapshot_UseThumbnailForChronicle_Caution_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_UseThumbnailForChronicle_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have a custom thumbnail set for this chronicle already, and maybe just accidentally clicked this button or you&apos;re one of those fun explorative users. Either way, if we continue, the custom thumbnail you already have will be overwritten with the one from this snapshot..
+        /// </summary>
+        internal static string Archivist_Snapshot_UseThumbnailForChronicle_Caution_Text {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_UseThumbnailForChronicle_Caution_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Thumbnail for Chronicle.
+        /// </summary>
+        internal static string Archivist_Snapshot_UseThumbnailForChronicle_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_UseThumbnailForChronicle_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Details about this Snapshot.
+        /// </summary>
+        internal static string Archivist_Snapshot_ViewDetails_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_ViewDetails_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m done archiving your save files..
+        /// </summary>
+        internal static string Archivist_Status_AutoIngestFinished_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Status_AutoIngestFinished_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I am connected to your archive..
+        /// </summary>
+        internal static string Archivist_Status_Finished_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Status_Finished_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m disconnected from your archive..
+        /// </summary>
+        internal static string Archivist_Status_Offline_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Status_Offline_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Since I want to correctly capture your mod list in snapshots, I&apos;m waiting for mod cataloging to finish..
+        /// </summary>
+        internal static string Archivist_Status_WaitingForMDC_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Status_WaitingForMDC_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to archive the save file at this location:&lt;br /&gt;
+        ///&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string Archivist_Warning_CannotReadSaveFile {
+            get {
+                return ResourceManager.GetString("Archivist_Warning_CannotReadSaveFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ask for Help.
         /// </summary>
         internal static string CatalogDisplay_AskForHelp {
@@ -295,6 +920,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Label.
+        /// </summary>
+        internal static string Common_Label {
+            get {
+                return ResourceManager.GetString("Common_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Learn more.
         /// </summary>
         internal static string Common_LearnMore {
@@ -327,6 +961,15 @@ namespace PlumbBuddy.Localization {
         internal static string Common_No {
             get {
                 return ResourceManager.GetString("Common_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notes.
+        /// </summary>
+        internal static string Common_Notes {
+            get {
+                return ResourceManager.GetString("Common_Notes", resourceCulture);
             }
         }
         
@@ -471,6 +1114,42 @@ namespace PlumbBuddy.Localization {
         internal static string Common_Yes {
             get {
                 return ResourceManager.GetString("Common_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Branch.
+        /// </summary>
+        internal static string CreateBranchDialog_Caption {
+            get {
+                return ResourceManager.GetString("CreateBranchDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will set the save&apos;s game name to whatever you enter here, if you enter something, so that you can easily distinguish this chronicle&apos;s saves when loading in The Sims 4..
+        /// </summary>
+        internal static string CreateBranchDialog_GameNameOverride_HelperText {
+            get {
+                return ResourceManager.GetString("CreateBranchDialog_GameNameOverride_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Name Override.
+        /// </summary>
+        internal static string CreateBranchDialog_GameNameOverride_Label {
+            get {
+                return ResourceManager.GetString("CreateBranchDialog_GameNameOverride_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the name your new chronicle will have..
+        /// </summary>
+        internal static string CreateBranchDialog_Name_HelperText {
+            get {
+                return ResourceManager.GetString("CreateBranchDialog_Name_HelperText", resourceCulture);
             }
         }
         
@@ -943,7 +1622,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: While The Sims 4 will work with Python scripts, it does so by interpretting them. Maxis&apos; SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in .script mod files. This means they will underperform &lt;strong&gt;considerably&lt;/strong&gt;. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7.&lt;/em&gt;.
+        ///   Looks up a localized string similar to &lt;em&gt;Creator&apos;s Note: If The Sims 4 works at all with Python scripts, it does so by interpreting them. Maxis&apos; SmartSim engine &lt;strong&gt;does not&lt;/strong&gt; Just-in-Time compile Python scripts in script mod files. This means they will either underperform &lt;strong&gt;considerably&lt;/strong&gt; or not work at all. If these are your script mod files, strongly consider compiling their scripts to byte code using Python 3.7 and omiting the scripts themselves from the script mod files to avoid confusion and unintended side effect [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HUD_PythonScripts_Tip_CreatorsNote {
             get {

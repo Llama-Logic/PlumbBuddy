@@ -563,17 +563,7 @@ public partial class Archivist :
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", fileInfo.FullName);
-            superSnacks.OfferRefreshments(new MarkupString(string.Format(
-                """
-                <h3>Whoops!</h3>
-                I ran into a problem trying to archive the save file at this location:<br />
-                <strong>{0}</strong><br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{1}: {2}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """, fileInfo.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Archivist_Warning_CannotReadSaveFile, fileInfo.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
             {
                 options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.ContentSaveAlert;

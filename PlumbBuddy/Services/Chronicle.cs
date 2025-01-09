@@ -166,7 +166,7 @@ public class Chronicle :
     {
         if (await FilePicker.Default.PickAsync(new PickOptions
         {
-            PickerTitle = "Select a Custom Thumbnail",
+            PickerTitle = AppText.Archivist_SelectCustomThumbnail_Caption,
             FileTypes = FilePickerFileType.Images
         }).ConfigureAwait(false) is { } fileResult)
         {
@@ -177,7 +177,7 @@ public class Chronicle :
             }
             catch (Exception ex)
             {
-                await dialogService.ShowErrorDialogAsync("Set Thumbnail Failed", $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
+                await dialogService.ShowErrorDialogAsync(AppText.Archivist_SelectCustomThumbnail_Failed, $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
             }
         }
     }
