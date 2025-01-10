@@ -13,7 +13,6 @@ public partial class Archivist :
         .Order()
         .ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
     static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
-    static readonly System.Version protobufVersion = typeof(SaveGameData).Assembly.GetName().Version!;
 
     [GeneratedRegex(@"^N\-(?<nucleusIdHex>[\da-f]{16})\-C\-(?<createdHex>[\da-f]{16})\.chronicle\.sqlite$")]
     private static partial Regex GetChronicleDatabaseFileNamePattern();
@@ -45,8 +44,6 @@ public partial class Archivist :
         chroniclesLock = new();
         connectionLock = new();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
-        this.smartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
-        ResampleCanSafelyUpdateSaveGameData();
         if (this.settings.ArchivistEnabled)
             ConnectToFolders();
     }
@@ -54,7 +51,6 @@ public partial class Archivist :
     ~Archivist() =>
         Dispose(false);
 
-    bool canSafelyUpdateSaveGameData;
     readonly ObservableCollection<Chronicle> chronicles;
     readonly AsyncLock chroniclesLock;
     readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
@@ -73,18 +69,6 @@ public partial class Archivist :
     readonly ISmartSimObserver smartSimObserver;
     ArchivistState state;
     readonly ISuperSnacks superSnacks;
-
-    public bool CanSafelyUpdateSaveGameData
-    {
-        get => canSafelyUpdateSaveGameData;
-        private set
-        {
-            if (canSafelyUpdateSaveGameData == value)
-                return;
-            canSafelyUpdateSaveGameData = value;
-            OnPropertyChanged();
-        }
-    }
 
     public ReadOnlyObservableCollection<Chronicle> Chronicles { get; }
 
@@ -219,7 +203,6 @@ public partial class Archivist :
         {
             DisconnectFromFolders();
             settings.PropertyChanged -= HandleSettingsPropertyChanged;
-            smartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
             isDisposed = true;
         }
     }
@@ -276,17 +259,6 @@ public partial class Archivist :
         }
     }
 
-    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ISmartSimObserver.GameVersion))
-        {
-            if (pathsProcessingQueue is not null)
-                pathsProcessingQueue.Enqueue(Path.Combine(settings.UserDataFolderPath, "saves"));
-            else
-                ResampleCanSafelyUpdateSaveGameData();
-        }
-    }
-
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 
@@ -319,8 +291,9 @@ public partial class Archivist :
             if (saveGameDataKeys.Length is <= 0 or >= 2)
                 throw new FormatException("save package contains invalid number of save game data resources");
             var saveGameDataKey = saveGameDataKeys[0];
-            var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
-            if (saveGameData.Account is not { } account)
+            var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+            if (saveGameData.SaveSlot is not { } saveSlot
+                || saveGameData.Account is not { } account)
                 return;
             IDbContextFactory<ChronicleDbContext> chronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"N-{account.NucleusId:x16}-C-{account.Created:x16}.chronicle.sqlite")));
             using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
@@ -345,7 +318,7 @@ public partial class Archivist :
                 chroniclePropertySet = new ChroniclePropertySet
                 {
                     Created = createdBytes,
-                    Name = saveGameData.SaveSlot.SlotName,
+                    Name = saveSlot.SlotName,
                     NucleusId = nucleusIdBytes,
                 };
                 await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
@@ -355,9 +328,8 @@ public partial class Archivist :
                 .OrderByDescending(s => s.Id)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-            var activeHouseholdId = saveGameData.SaveSlot?.ActiveHouseholdId ?? default;
-            var activeHousehold = saveGameData.Households?.FirstOrDefault(h => h.HouseholdId == activeHouseholdId);
-            var zoneId = saveGameData.SaveSlot?.GameplayData?.CameraData?.ZoneId ?? default;
+            var activeHousehold = saveGameData.Households.FirstOrDefault(h => h.HouseholdId == saveSlot.ActiveHouseholdId);
+            var zoneId = saveSlot.GameplayData?.CameraData?.ZoneId ?? default;
             var lastZone = saveGameData.Zones?.FirstOrDefault(z => z.ZoneId == zoneId);
             var neighborhoodId = lastZone?.NeighborhoodId ?? default;
             var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
@@ -501,9 +473,7 @@ public partial class Archivist :
                 && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                 || !customThumbnail.IsEmpty))
             {
-                if (CanSafelyUpdateSaveGameData
-                    && chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
-                    && saveGameData.SaveSlot is { } saveSlot
+                if (chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
                     && saveSlot.SlotName != gameNameOverride)
                 {
                     saveSlot.SlotName = gameNameOverride;
@@ -616,7 +586,6 @@ public partial class Archivist :
             }
             try
             {
-                ResampleCanSafelyUpdateSaveGameData();
                 if (settings.ArchivistEnabled)
                 {
                     State = ArchivistState.Ingesting;
@@ -666,7 +635,6 @@ public partial class Archivist :
                                         && !settings.ArchivistAutoIngestSaves)
                                         break;
                                 }
-                            ResampleCanSafelyUpdateSaveGameData();
                         }
                     }
                     finally
@@ -716,10 +684,9 @@ public partial class Archivist :
                     continue;
                 if (await chronicleDbContext.SavePackageSnapshots.Include(sps => sps.EnhancedSavePackageHash).FirstOrDefaultAsync(sps => sps.Id == snapshot.SavePackageSnapshotId).ConfigureAwait(false) is not { } savePackageSnapshot)
                     continue;
-                if (CanSafelyUpdateSaveGameData
-                    && !string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
+                if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
                 {
-                    var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
                     if (chronicle.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
                         && saveGameData.SaveSlot is { } saveSlot
                         && saveSlot.SlotName != gameNameOverride)
@@ -760,10 +727,4 @@ public partial class Archivist :
         await DisconnectFromFoldersAsync().ConfigureAwait(false);
         await ConnectToFoldersAsync().ConfigureAwait(false);
     }
-
-    void ResampleCanSafelyUpdateSaveGameData() =>
-        CanSafelyUpdateSaveGameData =
-               smartSimObserver.GameVersion is { } gameVersion
-            && new System.Version(gameVersion.Major, gameVersion.Minor, gameVersion.Build) is { } gameVersionWithoutRevision
-            && gameVersionWithoutRevision <= protobufVersion;
 }

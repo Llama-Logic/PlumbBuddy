@@ -4,8 +4,6 @@ public interface IArchivist :
     IDisposable,
     INotifyPropertyChanged
 {
-    bool CanSafelyUpdateSaveGameData { get; }
-
     Chronicle? SelectedChronicle { get; set; }
 
     ArchivistState State { get; }

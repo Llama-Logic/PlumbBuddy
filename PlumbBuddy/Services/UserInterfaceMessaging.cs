@@ -75,7 +75,6 @@ public sealed class UserInterfaceMessaging :
         }
         return false;
     }
-
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 

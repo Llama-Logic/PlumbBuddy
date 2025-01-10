@@ -21,12 +21,6 @@
 					<MudTooltip Arrow Color="Color.Secondary" Text="@(AppText.Archivist_ScanFolderForSaves_Tip)">
 						<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.FolderSearch" Disabled="@(!Observed(() => Settings.ArchivistEnabled))" OnClick="BrowseForFolderToScanAsync" />
 					</MudTooltip>
-					@if (!Observed(() => Archivist.CanSafelyUpdateSaveGameData))
-					{
-						<MudTooltip Arrow Color="Color.Secondary" Text="@(AppText.Archivist_CheckForUpdate_Tip)">
-							<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.Update" OnClick="CheckForUpdateAsync" />
-						</MudTooltip>
-					}
 				</MudStack>
 			</MudPaper>
 			<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Class="flex-grow-1">
@@ -244,7 +238,7 @@
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRestore" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => RestoreSavePackageAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Branch_Tip)" Color="Color.Secondary">
-											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting || !Observed(() => Archivist.CanSafelyUpdateSaveGameData))" />
+											<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(context)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
 										</MudTooltip>
 										<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Export_Tip)" Color="Color.Secondary">
 											<MudIconButton Icon="@MaterialDesignIcons.Normal.FileExport" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportSavePackageAsync(context)))" />

@@ -3,6 +3,22 @@ namespace PlumbBuddy.Components.Pages;
 partial class Home
 {
     int activePanelIndex;
+    bool keepPanelsAlive;
+
+    public int ActivePanelIndex
+    {
+        get => activePanelIndex;
+        set
+        {
+            if (activePanelIndex == value)
+                return;
+            if (value is 3)
+                keepPanelsAlive = true;
+            else if (activePanelIndex is 3 && !ManifestEditor.RequestToRemainAlive)
+                keepPanelsAlive = false;
+            activePanelIndex = value;
+        }
+    }
 
     /// <inheritdoc />
     public void Dispose()

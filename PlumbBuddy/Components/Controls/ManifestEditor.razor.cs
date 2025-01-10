@@ -22,6 +22,8 @@ partial class ManifestEditor
     ];
     static readonly AsyncManualResetEvent compositionResetEvent = new(true);
 
+    public static bool RequestToRemainAlive { get; private set; }
+
     [GeneratedRegex(@"^https?://.*")]
     private static partial Regex GetUrlPattern();
 
@@ -584,10 +586,23 @@ partial class ManifestEditor
 
     public void Dispose()
     {
+        foreach (var component in components)
+        {
+            component.PropertyChanged -= HandleComponentPropertyChanged;
+            try
+            {
+                component.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // 🤷‍♂️
+            }
+        }
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
         UserInterfaceMessaging.IsModScaffoldedInquired -= HandleUserInterfaceMessagingIsModScaffoldedInquired;
+        RequestToRemainAlive = false;
     }
 
     async Task HandleAddCatalogedRequiredModOnClickedAsync()
@@ -837,6 +852,7 @@ partial class ManifestEditor
             StateHasChanged();
             if (components.Count is 0)
                 return true;
+            RequestToRemainAlive = true;
         }
         if (activeIndex is 1)
         {
@@ -1235,6 +1251,7 @@ partial class ManifestEditor
         stepper?.ForceRender();
         isLoading = false;
         StateHasChanged();
+        RequestToRemainAlive = false;
     }
 
     void UpdateComponentsStructure()

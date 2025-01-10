@@ -11,7 +11,7 @@
 @inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <div class="main-tabs-backdrop"></div>
-<MudTabs @bind-ActivePanelIndex="@activePanelIndex" Centered KeepPanelsAlive MinimumTabWidth="200px" Class="main-tabs">
+<MudTabs @bind-ActivePanelIndex="@ActivePanelIndex" Centered MinimumTabWidth="200px" KeepPanelsAlive="@keepPanelsAlive" Class="main-tabs">
 	<MudTabPanel Text="@StringLocalizer[nameof(AppText.Home_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus" IconColor="Color.Primary" BadgeColor="@(SmartSimObserver.ScanIssues.Any(si => si.Type is ScanIssueType.Dead or ScanIssueType.Sick) ? Color.Error : Color.Warning)" BadgeData="@(ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.AnalyzingTopology && SmartSimObserver.ScanIssues.Any(si => si.Type is not ScanIssueType.Healthy) ? SmartSimObserver.ScanIssues.Count(si => si.Type is not ScanIssueType.Healthy) : null)">
         <div class="mod-health-tab-container">
             <div class="background"></div>

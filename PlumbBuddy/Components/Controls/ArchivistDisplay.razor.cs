@@ -33,15 +33,6 @@ partial class ArchivistDisplay
         await Archivist.AddPathToProcessAsync(new DirectoryInfo(folder.Path));
     }
 
-    async Task CheckForUpdateAsync()
-    {
-        var (version, releaseNotes, downloadUrl) = await UpdateManager.CheckForUpdateAsync();
-        if (version is not null)
-            await UpdateManager.PresentUpdateAsync(version, releaseNotes, downloadUrl);
-        else
-            await DialogService.ShowInfoDialogAsync(AppText.MainMenu_CheckForUpdate_UpToDate_Caption, AppText.MainMenu_CheckForUpdate_UpToDate_Text);
-    }
-
     async Task CreateBranchAsync(Snapshot snapshot)
     {
         if (Archivist.SelectedChronicle is not { } chronicle

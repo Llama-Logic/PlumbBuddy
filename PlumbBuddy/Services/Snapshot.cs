@@ -257,8 +257,6 @@ public class Snapshot :
         ArgumentNullException.ThrowIfNull(chronicle);
         ArgumentNullException.ThrowIfNull(newChronicleName);
         ArgumentNullException.ThrowIfNull(onSerializationCompleted);
-        if (!chronicle.Archivist.CanSafelyUpdateSaveGameData)
-            return Task.FromResult<FileInfo?>(null);
         return Task.Run(async () =>
         {
             try
@@ -273,7 +271,7 @@ public class Snapshot :
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
                     throw new FormatException("save package contains invalid number of save game data resources");
                 var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
                 var compressionMode = package.GetExplicitCompressionMode(saveGameDataKey);
                 var slotId = GetOpenSlot(settings);
                 if (saveGameData.Account is not  { } account)
@@ -527,15 +525,14 @@ public class Snapshot :
                     return null;
                 using var package = await RegeneratePackageAsync(dbContext, SavePackageSnapshotId).ConfigureAwait(false);
                 var keys = await package.GetKeysAsync().ConfigureAwait(false);
-                if (chronicle.Archivist.CanSafelyUpdateSaveGameData)
-                    foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
-                    {
-                        var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(key).ConfigureAwait(false));
-                        saveGameData.SaveSlot.SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
-                            ? $"{chronicle.Name}: {Label}"
-                            : chronicle.GameNameOverride.Trim();
-                        await package.SetAsync(key, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(key)).ConfigureAwait(false);
-                    }
+                foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
+                {
+                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(key).ConfigureAwait(false));
+                    (saveGameData.SaveSlot ??= new()).SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
+                        ? $"{chronicle.Name}: {Label}"
+                        : chronicle.GameNameOverride.Trim();
+                    await package.SetAsync(key, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(key)).ConfigureAwait(false);
+                }
                 ReadOnlyMemory<byte> thumbnail = propertySet.Thumbnail;
                 if (!thumbnail.IsEmpty)
                     foreach (var saveThumbnail4Key in keys.Where(key => key.Type is ResourceType.SaveThumbnail4))
