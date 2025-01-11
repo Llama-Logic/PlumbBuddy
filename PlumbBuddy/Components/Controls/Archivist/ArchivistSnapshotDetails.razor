@@ -1,0 +1,69 @@
+@inherits ReactiveComponentBase
+@inject IArchivist Archivist
+@inject IDialogService DialogService
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings
+
+@if (Snapshot is { } snapshot && Observed(() => snapshot.ShowDetails))
+{
+	<MudTr>
+		<td colspan="3" class="relative py-4">
+			<div class="d-flex gap-4 align-start px-4">
+				@if (Observed(() => snapshot.ThumbnailUri) is { Length: > 0 } thumbnailUri)
+				{
+					<MudImage Src="@thumbnailUri" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
+				}
+				<MudStack Spacing="1" Class="flex-grow-1">
+					@if (snapshot.IsEditing)
+					{
+						<MudPaper>
+							<MudAlert Severity="Severity.Warning">
+								@MarkupLocalizer[nameof(AppText.Archivist_Editor_Warning)]
+							</MudAlert>
+						</MudPaper>
+						<MudTextField @bind-Value="@Binding(() => snapshot.Label).Value" Variant="Variant.Filled" Label="@(AppText.Common_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" DebounceInterval="250" />
+						<MudTextField @bind-Value="@Binding(() => snapshot.Notes).Value" Variant="Variant.Filled" Label="@(AppText.Common_Notes)" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
+					}
+					else
+					{
+						<MudTextM3 Typo="TypoM3.Title" Class="mt-2">
+							<MudHighlighter Text="@(Observed(() => snapshot.Label))" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+						</MudTextM3>
+						@if (Observed(() => snapshot.Notes) is { } notes && !string.IsNullOrWhiteSpace(notes))
+						{
+							<div class="manual-markdown">
+								<MudHighlighter Text="@(Markdown.Parse(notes).ToHtml())" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" Markup />
+							</div>
+						}
+					}
+					<MudStack Row>
+						@if (Observed(() => snapshot.ThumbnailUri) is { Length: > 0 })
+						{
+							<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.ImageCheck" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" OnClick="@(new Func<MouseEventArgs, Task>(e => snapshot.UseThumbnailForChronicleAsync(DialogService)))">
+								@MarkupLocalizer[nameof(AppText.Archivist_Snapshot_UseThumbnailForChronicle_Label)]
+							</MudButton>
+						}
+						@if (snapshot.WasLive)
+						{
+							<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Outline.InvoiceExport" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportModListAsync(snapshot)))">
+								@MarkupLocalizer[nameof(AppText.Archivist_Snapshot_ExportModList_Label)]
+							</MudButton>
+						}
+					</MudStack>
+				</MudStack>
+				<MudStack Spacing="0">
+					<MudTooltip Arrow Placement="Placement.Left" Text="@(AppText.Archivist_Snapshot_Edit_Tip)">
+						<MudToggleIconButton @bind-Toggled="@snapshot.IsEditing" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+					</MudTooltip>
+					<MudTooltip Arrow Placement="Placement.Left" Text="@(AppText.Archivist_Snapshot_FindInSavesDirectory_Tip)">
+						<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowSavePackageInSavesDirectoryAsync(snapshot)))" />
+					</MudTooltip>
+					<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="@(AppText.Archivist_Snapshot_DeletePrior_Tip)">
+						<MudIconButton Icon="@MaterialDesignIcons.Normal.TimelineRemove" Color="Color.Warning" OnClick="@(new Func<MouseEventArgs, Task>(e => DeletePreviousSnapshotsAsync(snapshot)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+					</MudTooltip>
+				</MudStack>
+			</div>
+		</td>
+	</MudTr>
+}

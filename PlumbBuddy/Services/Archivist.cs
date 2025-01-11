@@ -1,9 +1,9 @@
-using EA.Sims4.Persistence;
 using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
+[SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
 public partial class Archivist :
     IArchivist
 {
@@ -20,7 +20,7 @@ public partial class Archivist :
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
     private static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISmartSimObserver smartSimObserver, ISuperSnacks superSnacks)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
@@ -28,7 +28,6 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
-        ArgumentNullException.ThrowIfNull(smartSimObserver);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.loggerFactory = loggerFactory;
         this.logger = logger;
@@ -36,7 +35,6 @@ public partial class Archivist :
         this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
-        this.smartSimObserver = smartSimObserver;
         this.superSnacks = superSnacks;
         chronicleByNucleusIdAndCreated = [];
         chronicles = [];
@@ -51,9 +49,10 @@ public partial class Archivist :
     ~Archivist() =>
         Dispose(false);
 
+    readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
     readonly ObservableCollection<Chronicle> chronicles;
     readonly AsyncLock chroniclesLock;
-    readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
+    string chroniclesSearchText = string.Empty;
     readonly AsyncLock connectionLock;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
@@ -66,11 +65,23 @@ public partial class Archivist :
     readonly IPlatformFunctions platformFunctions;
     Chronicle? selectedChronicle;
     readonly ISettings settings;
-    readonly ISmartSimObserver smartSimObserver;
+    string snapshotsSearchText = string.Empty;
     ArchivistState state;
     readonly ISuperSnacks superSnacks;
 
     public ReadOnlyObservableCollection<Chronicle> Chronicles { get; }
+
+    public string ChroniclesSearchText
+    {
+        get => chroniclesSearchText;
+        set
+        {
+            if (chroniclesSearchText == value)
+                return;
+            chroniclesSearchText = value;
+            OnPropertyChanged();
+        }
+    }
 
     public Chronicle? SelectedChronicle
     {
@@ -78,6 +89,18 @@ public partial class Archivist :
         set
         {
             selectedChronicle = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SnapshotsSearchText
+    {
+        get => snapshotsSearchText;
+        set
+        {
+            if (snapshotsSearchText == value)
+                return;
+            snapshotsSearchText = value;
             OnPropertyChanged();
         }
     }

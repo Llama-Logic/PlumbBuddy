@@ -1676,7 +1676,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Script Mod File.
+        ///   Looks up a localized string similar to Script Mod Files.
         /// </summary>
         internal static string HUD_ScriptArchives_Tip_Caption {
             get {
@@ -2149,6 +2149,24 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestComponentEditor_ComponentName_Placeholder {
             get {
                 return ResourceManager.GetString("ManifestComponentEditor_ComponentName_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the SHA 256 hash of this component&apos;s file&apos;s current content, which is needed when constructing built-in manifests..
+        /// </summary>
+        internal static string ManifestComponentEditor_ContentSha256_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ContentSha256_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Content SHA 256.
+        /// </summary>
+        internal static string ManifestComponentEditor_ContentSha256_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_ContentSha256_Label", resourceCulture);
             }
         }
         

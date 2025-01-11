@@ -1,0 +1,109 @@
+@inherits ReactiveComponentBase
+@inject IArchivist Archivist
+@inject IDialogService DialogService
+@inject ILogger<ArchivistChronicleHeader> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings
+
+@if (Chronicle is { } chronicle)
+{
+	@if (Observed(() => Archivist.State) is ArchivistState.Ingesting && isEditingChronicle)
+	{
+		isEditingChronicle = false;
+	}
+	<div class="d-flex gap-4 align-start">
+		@if (!isEditingChronicle && Observed(() => chronicle.Thumbnail) is { Length: > 0 } thumbnail)
+		{
+			<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
+		}
+		<MudStack Spacing="1" Class="flex-grow-1">
+			@if (isEditingChronicle)
+			{
+				<MudPaper>
+					<MudAlert Severity="Severity.Warning">
+						@MarkupLocalizer[nameof(AppText.Archivist_Editor_Warning)]
+					</MudAlert>
+				</MudPaper>
+				<MudTextField @bind-Value="@Binding(() => chronicle.Name).Value" Variant="Variant.Filled" Label="@(AppText.Common_Name)" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" DebounceInterval="250" />
+				<MudTextField @bind-Value="@Binding(() => chronicle.Notes).Value" Variant="Variant.Filled" Label="@(AppText.Common_Name)" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
+				<MudTextField @bind-Value="@Binding(() => chronicle.GameNameOverride).Value" Variant="Variant.Filled" Label="@(AppText.Archivist_Chronicle_GameNameOverride_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" Adornment="Adornment.Start" Clearable HelperText="@(AppText.Archivist_Chronicle_GameNameOverride_HelperText)" DebounceInterval="250" />
+				<MudField Label="@(AppText.Archivist_Chronicle_CustomThumbnail_Label)" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ImageEdit">
+					<MudStack Spacing="1">
+						@if (Observed(() => chronicle.Thumbnail) is { Length: > 0 } thumbnail)
+						{
+							<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" />
+						}
+						<MudStack Row>
+							<MudButton OnClick="@(new Func<Task>(() => chronicle.BrowseForCustomThumbnailAsync(DialogService)))" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
+								Browse...
+							</MudButton>
+							@if (Observed(() => chronicle.Thumbnail) is { Length: > 0 })
+							{
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" OnClick="chronicle.ClearThumbnailAsync" Variant="Variant.Filled" />
+							}
+						</MudStack>
+					</MudStack>
+				</MudField>
+			}
+			else
+			{
+				<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+					@(Observed(() => chronicle.Name))
+				</MudTextM3>
+				<MudGrid Justify="Justify.Center" Spacing="0">
+					<MudItem>
+						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_DatabaseSize_Tip)">
+							<MudChip Icon="@MaterialDesignIcons.Normal.Harddisk" Value="@(ByteSize.FromBytes(Observed(() => chronicle.DatabaseSize)).Humanize())" />
+						</MudTooltip>
+					</MudItem>
+					<MudItem>
+						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_FirstSnapshot_Tip)">
+							<MudChip Icon="@MaterialDesignIcons.Normal.CalendarStart" Value="@(Observed(() => chronicle.EarliestLastWriteTime).ToString("g"))" />
+						</MudTooltip>
+					</MudItem>
+					<MudItem>
+						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_LastSnapshot_Tip)">
+							<MudChip Icon="@MaterialDesignIcons.Normal.CalendarEnd" Value="@(Observed(() => chronicle.LatestLastWriteTime).ToString("g"))" />
+						</MudTooltip>
+					</MudItem>
+					<MudItem>
+						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_Snapshots_Tip)">
+							<MudChip Icon="@MaterialDesignIcons.Normal.Timeline" Value="@(AppText.Archivist_Chronicle_Snapshot.ToQuantity(ObservedCollection(() => chronicle.Snapshots).Count))" />
+						</MudTooltip>
+					</MudItem>
+				</MudGrid>
+				@if (Observed(() => chronicle.Notes) is { } notes && !string.IsNullOrWhiteSpace(notes))
+				{
+					<MudDivider />
+					<MudMarkdown Value="@notes" />
+				}
+			}
+			@if (Observed(() => chronicle.BasedOnSnapshot) is { } basedOnSnapshot)
+			{
+				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CallSplit" Label="@(AppText.Archivist_Chronicle_BasedOn_Label)" Variant="Variant.Filled">
+					<MudBreadcrumbs Items="@(new List<BreadcrumbItem> { new BreadcrumbItem(Observed(() => basedOnSnapshot.Chronicle.Name), "chronicle", icon: MaterialDesignIcons.Normal.Altimeter), new BreadcrumbItem($"{Observed(() => basedOnSnapshot.Label)} ({Observed(() => basedOnSnapshot.LastWriteTime):g})", "snapshot", icon: MaterialDesignIcons.Normal.Timeline) })" Class="pa-0">
+						<ItemTemplate>
+							<MudTooltip Arrow Text="@(context.Href == "snapshot" ? AppText.Archivist_Chronicle_BasedOn_Snapshot_Tip : AppText.Archivist_Chronicle_BasedOn_Branch_Tip)">
+								<MudButton Variant="Variant.Text" StartIcon="@(context.Icon)" OnClick="@(() => NavigateToBasis(context.Href))">
+									@context.Text
+								</MudButton>
+							</MudTooltip>
+						</ItemTemplate>
+					</MudBreadcrumbs>
+				</MudField>
+			}
+		</MudStack>
+		<MudStack Spacing="0">
+			<MudTooltip Arrow Placement="Placement.Left" Text="@(AppText.Archivist_Chronicle_Edit_Tip)">
+				<MudToggleIconButton @bind-Toggled="@isEditingChronicle" Icon="@MaterialDesignIcons.Normal.Pencil" ToggledIcon="@MaterialDesignIcons.Normal.Check" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+			</MudTooltip>
+			<MudTooltip Arrow Color="Color.Secondary" Placement="Placement.Left" Text="@(AppText.Archivist_Chronicle_ReapplyCustomizations_Tip)">
+				<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRefresh" Color="Color.Secondary" OnClick="@(() => ReapplyEnhancementsAsync(chronicle))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+			</MudTooltip>
+			<MudTooltip Arrow Color="Color.Warning" Placement="Placement.Left" Text="@(AppText.Archivist_Chronicle_ShowDatabase_Tip)">
+				<MudIconButton Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.DatabaseSearch" OnClick="@(new Func<MouseEventArgs, Task>(e => ShowChronicleDatabaseAsync(chronicle)))" />
+			</MudTooltip>
+		</MudStack>
+	</div>
+}

@@ -274,7 +274,7 @@
     <value>Because Mods are disabled in your Game Options, these resources will not be loaded by The Sims 4.</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Caption" xml:space="preserve">
-    <value>Script Mod File</value>
+    <value>Script Mod Files</value>
   </data>
   <data name="HUD_ScriptArchives_Tip_Description" xml:space="preserve">
     <value>This is the number of .ts4script files I was able to catalog in your Mods folder.</value>
@@ -2788,5 +2788,11 @@ More detailed technical information is available in my log.</value>
   </data>
   <data name="Archivist_Snapshot_UseThumbnailForChronicle_Caution_Text" xml:space="preserve">
     <value>You have a custom thumbnail set for this chronicle already, and maybe just accidentally clicked this button or you're one of those fun explorative users. Either way, if we continue, the custom thumbnail you already have will be overwritten with the one from this snapshot.</value>
+  </data>
+  <data name="ManifestComponentEditor_ContentSha256_Label" xml:space="preserve">
+    <value>Content SHA 256</value>
+  </data>
+  <data name="ManifestComponentEditor_ContentSha256_HelperText" xml:space="preserve">
+    <value>This is the SHA 256 hash of this component's file's current content, which is needed when constructing built-in manifests.</value>
   </data>
 </root>

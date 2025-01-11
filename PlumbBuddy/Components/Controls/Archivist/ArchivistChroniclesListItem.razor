@@ -1,0 +1,3 @@
+@inherits ReactiveComponentBase
+
+<MudListItem T="Chronicle" Value="@Chronicle" Text="@Observed(() => Chronicle!.Name)" SecondaryText="@(string.Format(AppText.Archivist_Chronicle_SecondaryText_Format, Observed(() => Chronicle!.LatestLastWriteTime), AppText.Archivist_Chronicle_Snapshot.ToQuantity(ObservedCollection(() => Chronicle!.Snapshots).Count)))" Icon="@MaterialDesignIcons.Normal.Altimeter" IconColor="Color.Secondary" />

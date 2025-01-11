@@ -4,7 +4,11 @@ public interface IArchivist :
     IDisposable,
     INotifyPropertyChanged
 {
+    string ChroniclesSearchText { get; set; }
+
     Chronicle? SelectedChronicle { get; set; }
+
+    string SnapshotsSearchText { get; set; }
 
     ArchivistState State { get; }
 

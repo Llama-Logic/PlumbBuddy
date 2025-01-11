@@ -1,0 +1,33 @@
+@inherits ReactiveComponentBase
+@inject IArchivist Archivist
+@inject IDialogService DialogService
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
+<div class="chronicle-details overflow-auto rounded mud-paper-outlined pa-4">
+	@if (Observed(() => Archivist.SelectedChronicle) is { } selectedChronicle)
+	{
+		<ArchivistChronicleHeader Chronicle="@selectedChronicle" />
+		<MudGrid Justify="Justify.Center" Spacing="1">
+			<MudItem xs="12">
+				<MudTable T="Snapshot" Items="@(ObservedCollection(() => selectedChronicle.Snapshots).OrderByDescending(s => s.LastWriteTime))" Breakpoint="Breakpoint.Sm" Dense Filter="IncludeSnapshot" Virtualize Class="mt-2">
+					<ToolBarContent>
+						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+							@MarkupLocalizer[nameof(AppText.Archivist_Chronicle_Snapshots_Heading)]
+						</MudTextM3>
+						<MudSpacer />
+						<MudTextField @bind-Value="@(Binding(() => Archivist.SnapshotsSearchText).Value)" Placeholder="@(AppText.Common_Search)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+					</ToolBarContent>
+					<RowTemplate>
+						<ArchivistSnapshotRow Snapshot="@context" />
+					</RowTemplate>
+					<ChildRowContent>
+						<ArchivistSnapshotDetails Snapshot="@context" />
+					</ChildRowContent>
+					<PagerContent>
+						<MudTablePager />
+					</PagerContent>
+				</MudTable>
+			</MudItem>
+		</MudGrid>
+	}
+</div>

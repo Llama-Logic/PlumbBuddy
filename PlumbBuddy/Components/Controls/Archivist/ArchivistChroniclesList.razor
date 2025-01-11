@@ -1,0 +1,11 @@
+@inherits ReactiveComponentBase
+@inject IArchivist Archivist
+
+<div class="chronicle-list overflow-y-auto rounded mud-paper-outlined">
+	<MudList T="Chronicle" @bind-SelectedValue="@(Binding(() => Archivist.SelectedChronicle).Value)" Color="Color.Secondary">
+		@foreach (var chronicle in ObservedCollection(() => Archivist.Chronicles).Where(IncludeChronicle).OrderByDescending(c => c.Snapshots.Select(s => s.LastWriteTime).Max()))
+		{
+			<ArchivistChroniclesListItem Chronicle="@chronicle" />
+		}
+	</MudList>
+</div>

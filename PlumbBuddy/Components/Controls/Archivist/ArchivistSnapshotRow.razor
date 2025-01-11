@@ -1,0 +1,70 @@
+@inherits ReactiveComponentBase
+@inject IArchivist Archivist
+@inject IDialogService DialogService
+@inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings
+
+@if (Snapshot is { } snapshot)
+{
+	<MudTd>
+		<MudStack Row AlignItems="AlignItems.Center">
+			<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_ViewDetails_Tip)">
+				<MudToggleIconButton @bind-Toggled="@(Binding(() => snapshot.ShowDetails).Value)" Icon="@MaterialDesignIcons.Normal.ChevronRight" ToggledIcon="@MaterialDesignIcons.Normal.ChevronDown" Size="Size.Small" />
+			</MudTooltip>
+			<MudIcon Icon="@MaterialDesignIcons.Normal.Timeline" Size="Size.Small" />
+			<MudTextM3>
+				<MudHighlighter Text="@(Observed(() => snapshot.LastWriteTime).ToString("g"))" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+			</MudTextM3>
+		</MudStack>
+	</MudTd>
+	<MudTd DataLabel="Label">
+		<MudTextM3>
+			<MudHighlighter Text="@(Observed(() => snapshot.Label))" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+		</MudTextM3>
+	</MudTd>
+	<MudTd>
+		<MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Spacing="1">
+			@if (snapshot.WasLive)
+			{
+				<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Tag_Live_Tip)">
+					<MudChip T="object" Size="Size.Small" Icon="@MaterialDesignIcons.Normal.GamepadSquare" Class="ma-0" OnClick="@(new Action<MouseEventArgs>(e => Archivist.SnapshotsSearchText = AppText.Archivist_Snapshot_Tag_Live))">
+						<MudHighlighter Text="@(AppText.Archivist_Snapshot_Tag_Live)" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+					</MudChip>
+				</MudTooltip>
+			}
+			@if (snapshot.ActiveHouseholdName is { } activeHouseholdName)
+			{
+				<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Tag_ActiveHousehold_Tip)">
+					<MudChip T="object" Size="Size.Small" Icon="@MaterialDesignIcons.Normal.Home" Class="ma-0" OnClick="@(new Action<MouseEventArgs>(e => Archivist.SnapshotsSearchText = activeHouseholdName))">
+						<MudHighlighter Text="@activeHouseholdName" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+					</MudChip>
+				</MudTooltip>
+			}
+			@if (snapshot.LastPlayedLotName is { } lastPlayedLotName)
+			{
+				<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Tag_Lot_Tip)">
+					<MudChip T="object" Size="Size.Small" Icon="@MaterialDesignIcons.Normal.MapMarker" Class="ma-0" OnClick="@(new Action<MouseEventArgs>(e => Archivist.SnapshotsSearchText = lastPlayedLotName))">
+						<MudHighlighter Text="@lastPlayedLotName" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+					</MudChip>
+				</MudTooltip>
+			}
+			@if (snapshot.LastPlayedWorldName is { } lastPlayedWorldName)
+			{
+				<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Tag_World_Tip)">
+					<MudChip T="object" Size="Size.Small" Icon="@MaterialDesignIcons.Normal.Map" Class="ma-0" OnClick="@(new Action<MouseEventArgs>(e => Archivist.SnapshotsSearchText = lastPlayedWorldName))">
+						<MudHighlighter Text="@lastPlayedWorldName" HighlightedText="@Observed(() => Archivist.SnapshotsSearchText)" />
+					</MudChip>
+				</MudTooltip>
+			}
+			<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Restore_Tip)" Color="Color.Secondary">
+				<MudIconButton Icon="@MaterialDesignIcons.Normal.FileRestore" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => RestoreSavePackageAsync(snapshot)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+			</MudTooltip>
+			<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Branch_Tip)" Color="Color.Secondary">
+				<MudIconButton Icon="@MaterialDesignIcons.Normal.CallSplit" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => CreateBranchAsync(snapshot)))" Disabled="@(Observed(() => Archivist.State) is ArchivistState.Ingesting)" />
+			</MudTooltip>
+			<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Export_Tip)" Color="Color.Secondary">
+				<MudIconButton Icon="@MaterialDesignIcons.Normal.FileExport" Color="Color.Secondary" Size="Size.Small" OnClick="@(new Func<MouseEventArgs, Task>(e => ExportSavePackageAsync(snapshot)))" />
+			</MudTooltip>
+		</MudStack>
+	</MudTd>
+}
