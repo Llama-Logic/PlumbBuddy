@@ -2795,4 +2795,21 @@ More detailed technical information is available in my log.</value>
   <data name="ManifestComponentEditor_ContentSha256_HelperText" xml:space="preserve">
     <value>This is the SHA 256 hash of this component's file's current content, which is needed when constructing built-in manifests.</value>
   </data>
+  <data name="Archivist_Warning_CannotConnectToArchivesFolder" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to connect to your Archive folder at this location:&lt;br /&gt;
+&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+I've had to disable myself until you can fix this, and it's important that you understand that &lt;strong&gt;I am not currently safeguarding your save files&lt;/strong&gt;! More detailed technical information is available in my log.</value>
+    <comment>{0} = Archives Folder Path; {1} = Error Type; {2} = Error Message</comment>
+  </data>
+  <data name="Archivist_Notification_CannotConnectToArchivesFolder_Caption" xml:space="preserve">
+    <value>Your Save Files Are Not Being Archived</value>
+  </data>
+  <data name="Archivist_Notification_CannotConnectToArchivesFolder_Test" xml:space="preserve">
+    <value>I cannot find or correctly interact with your configured archives folder, which means I'm unable to back up your save files. Click here to learn more.</value>
+  </data>
 </root>

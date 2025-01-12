@@ -20,12 +20,13 @@ public partial class Archivist :
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
     private static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
+        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(superSnacks);
@@ -33,6 +34,7 @@ public partial class Archivist :
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
+        this.appLifecycleManager = appLifecycleManager;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
@@ -49,6 +51,7 @@ public partial class Archivist :
     ~Archivist() =>
         Dispose(false);
 
+    readonly IAppLifecycleManager appLifecycleManager;
     readonly Dictionary<(ulong nucleusId, ulong created), Chronicle> chronicleByNucleusIdAndCreated;
     readonly ObservableCollection<Chronicle> chronicles;
     readonly AsyncLock chroniclesLock;
@@ -138,19 +141,28 @@ public partial class Archivist :
         var savesFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
         if (!savesFolder.Exists)
             return;
-        var archiveFolder = new DirectoryInfo(settings.ArchiveFolderPath);
-        if (!archiveFolder.Exists)
+        DirectoryInfo archiveFolder;
+        try
         {
-            var creationStack = new Stack<DirectoryInfo>();
-            creationStack.Push(archiveFolder);
-            var archiveAncestorFolder = archiveFolder.Parent;
-            while (archiveAncestorFolder is not null && !archiveAncestorFolder.Exists)
+            archiveFolder = new DirectoryInfo(settings.ArchiveFolderPath);
+            if (!archiveFolder.Exists)
             {
-                creationStack.Push(archiveAncestorFolder);
-                archiveAncestorFolder = archiveAncestorFolder.Parent;
+                var creationStack = new Stack<DirectoryInfo>();
+                creationStack.Push(archiveFolder);
+                var archiveAncestorFolder = archiveFolder.Parent;
+                while (archiveAncestorFolder is not null && !archiveAncestorFolder.Exists)
+                {
+                    creationStack.Push(archiveAncestorFolder);
+                    archiveAncestorFolder = archiveAncestorFolder.Parent;
+                }
+                while (creationStack.TryPop(out var folderToCreate))
+                    folderToCreate.Create();
             }
-            while (creationStack.TryPop(out var folderToCreate))
-                folderToCreate.Create();
+        }
+        catch (Exception ex)
+        {
+            await RouteCriticalExceptionAsync(ex).ConfigureAwait(false);
+            return;
         }
         pathsProcessingQueue = new();
         fileSystemWatcher = new FileSystemWatcher(Path.Combine(settings.UserDataFolderPath, "saves"))
@@ -169,7 +181,8 @@ public partial class Archivist :
         fileSystemWatcher.Renamed += HandleFileSystemWatcherRenamed;
         fileSystemWatcher.EnableRaisingEvents = true;
         _ = Task.Run(ProcessPathsQueueAsync);
-        using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
+        using (var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false))
+        {
             foreach (var fileInfoAndMatch in archiveFolder.GetFiles("*.*", SearchOption.TopDirectoryOnly)
                 .Select(fileInfo => new
                 {
@@ -187,6 +200,8 @@ public partial class Archivist :
                 await chronicle.FirstLoadComplete.ConfigureAwait(false);
                 chronicles.Add(chronicle);
             }
+            await Task.WhenAll(chronicles.Select(c => c.FirstLoadComplete)).ConfigureAwait(false);
+        }
         if (settings.ArchivistAutoIngestSaves)
             await pathsProcessingQueue.EnqueueAsync(Path.Combine(settings.UserDataFolderPath, "saves")).ConfigureAwait(false);
     }
@@ -295,6 +310,10 @@ public partial class Archivist :
         DataBasePackedFile? package = null;
         try
         {
+            var wasLive =
+                   isInSavesDirectory
+                && isSingleEnqueuedFile
+                && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null;
             fileInfo.Refresh();
             var length = fileInfo.Length;
             while (true)
@@ -307,6 +326,8 @@ public partial class Archivist :
                 length = newLength;
             }
             var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
+            if (chronicles.Any(c => c.Snapshots.Any(s => s.OriginalPackageSha256.SequenceEqual(fileHash) || s.EnhancedPackageSha256.SequenceEqual(fileHash))))
+                return;
             var fileHashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref fileHash);
             package = await DataBasePackedFile.FromPathAsync(fileInfo.FullName).ConfigureAwait(false);
             var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
@@ -383,7 +404,7 @@ public partial class Archivist :
                         MemoryMarshal.Write(keyBytesSpan[8..16], in fullInstance);
                         var explicitCompressionMode = package.GetExplicitCompressionMode(key);
                         var content =
-                                explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
+                              explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
                             ? await package.GetRawAsync(key).ConfigureAwait(false)
                             : await package.GetAsync(key).ConfigureAwait(false);
                         var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
@@ -451,9 +472,7 @@ public partial class Archivist :
                         semaphore.Release();
                     }
                 })).ConfigureAwait(false);
-            if (isInSavesDirectory
-                && isSingleEnqueuedFile
-                && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null)
+            if (wasLive)
             {
                 newSnapshot.WasLive = true;
                 using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
@@ -749,5 +768,23 @@ public partial class Archivist :
     {
         await DisconnectFromFoldersAsync().ConfigureAwait(false);
         await ConnectToFoldersAsync().ConfigureAwait(false);
+    }
+
+    async Task RouteCriticalExceptionAsync(Exception ex)
+    {
+        settings.ArchivistEnabled = false;
+        logger.LogError(ex, "connecting to the archives folder at this path failed: {ArchivesFolderPath}", settings.ArchiveFolderPath);
+        superSnacks.OfferRefreshments
+        (
+            new MarkupString(string.Format(AppText.Archivist_Warning_CannotConnectToArchivesFolder, settings.ArchiveFolderPath, ex.GetType().Name, ex.Message)),
+            Severity.Error,
+            options =>
+            {
+                options.Icon = MaterialDesignIcons.Normal.ArchiveAlert;
+                options.RequireInteraction = true;
+            }
+        );
+        if (!appLifecycleManager.IsVisible)
+            await platformFunctions.SendLocalNotificationAsync(AppText.Archivist_Notification_CannotConnectToArchivesFolder_Caption, AppText.Archivist_Notification_CannotConnectToArchivesFolder_Test).ConfigureAwait(false);
     }
 }

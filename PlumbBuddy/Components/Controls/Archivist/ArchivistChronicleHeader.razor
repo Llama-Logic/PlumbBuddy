@@ -26,7 +26,7 @@
 					</MudAlert>
 				</MudPaper>
 				<MudTextField @bind-Value="@Binding(() => chronicle.Name).Value" Variant="Variant.Filled" Label="@(AppText.Common_Name)" AdornmentIcon="@MaterialDesignIcons.Normal.Label" Adornment="Adornment.Start" DebounceInterval="250" />
-				<MudTextField @bind-Value="@Binding(() => chronicle.Notes).Value" Variant="Variant.Filled" Label="@(AppText.Common_Name)" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
+				<MudTextField @bind-Value="@Binding(() => chronicle.Notes).Value" Variant="Variant.Filled" Label="@(AppText.Common_Notes)" Lines="5" AdornmentIcon="@MaterialDesignIcons.Normal.Note" Adornment="Adornment.Start" Clearable DebounceInterval="250" />
 				<MudTextField @bind-Value="@Binding(() => chronicle.GameNameOverride).Value" Variant="Variant.Filled" Label="@(AppText.Archivist_Chronicle_GameNameOverride_Label)" AdornmentIcon="@MaterialDesignIcons.Normal.Rename" Adornment="Adornment.Start" Clearable HelperText="@(AppText.Archivist_Chronicle_GameNameOverride_HelperText)" DebounceInterval="250" />
 				<MudField Label="@(AppText.Archivist_Chronicle_CustomThumbnail_Label)" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ImageEdit">
 					<MudStack Spacing="1">

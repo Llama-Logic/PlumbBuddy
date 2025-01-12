@@ -358,6 +358,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your Save Files Are Not Being Archived.
+        /// </summary>
+        internal static string Archivist_Notification_CannotConnectToArchivesFolder_Caption {
+            get {
+                return ResourceManager.GetString("Archivist_Notification_CannotConnectToArchivesFolder_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I cannot find or correctly interact with your configured archives folder, which means I&apos;m unable to back up your save files. Click here to learn more..
+        /// </summary>
+        internal static string Archivist_Notification_CannotConnectToArchivesFolder_Test {
+            get {
+                return ResourceManager.GetString("Archivist_Notification_CannotConnectToArchivesFolder_Test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This Might Take a While ⏱️.
         /// </summary>
         internal static string Archivist_ReapplyEnhancements_Caution_Caption {
@@ -666,6 +684,22 @@ namespace PlumbBuddy.Localization {
         internal static string Archivist_Status_WaitingForMDC_Tip {
             get {
                 return ResourceManager.GetString("Archivist_Status_WaitingForMDC_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to connect to your Archive folder at this location:&lt;br /&gt;
+        ///&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{1}: {2}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///I&apos;ve had to disable myself until you can fix this, and it&apos;s important that you understand that &lt;strong&gt;I am not currently safeguarding your save files&lt;/strong&gt;! More detailed technical information is available in my log..
+        /// </summary>
+        internal static string Archivist_Warning_CannotConnectToArchivesFolder {
+            get {
+                return ResourceManager.GetString("Archivist_Warning_CannotConnectToArchivesFolder", resourceCulture);
             }
         }
         
