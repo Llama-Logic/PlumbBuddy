@@ -98,8 +98,6 @@ deaderpool:
     Tertiary: '#ad3440ff'
     Info: '#e1ad66ff'
     Success: '#08b043ff'
-    # Warning: '#f4af2fff'
-    # Error: '#e24b69ff'
     DrawerBackground: '#140000ff'
     DrawerText: '#f5e9d4ff'
     DrawerIcons: '#f5e9d4ff'
@@ -119,6 +117,41 @@ deaderpool:
       dark: archivist.jpg
       light: archivist.jpg
       position: center
+
+helen-the-hunter:
+  display_name: Helen the Hunter
+  description: |
+    Visit on [Patreon](https://www.patreon.com/BrightOrangeSunset)!
+  palette_dark:
+    Primary: '#f4491aff'
+    Secondary: '#ff7000ff'
+    Tertiary: '#f0be41ff'
+    Info: '#f8b98bff'
+    Success: '#007f4e80'
+    Warning: '#f8c11dff'
+    Error: '#c31401ff'
+    AppbarText: '#ffebd2ff'
+    DrawerText: '#fcd3a2ff'
+    DrawerIcons: '#ff7000ff'
+    DrawerBackground: '#67432120'
+    Surface: '#63121380'
+    Background: '#674321ff'
+    TextPrimary: '#ffebd2ff'
+    TextSecondary: '#fcd3a2ff'
+    TextDisabled: '#9e8e79ff'
+  backgrounded_tabs:
+    mod-health:
+      dark: mod-health.jpg
+      light: mod-health.jpg
+    catalog:
+      dark: catalogue.jpg
+      light: catalogue.jpg
+    manifest-editor:
+      dark: manifest-editor.jpg
+      light: manifest-editor.jpg
+    archivist:
+      dark: archivist.jpg
+      light: archivist.jpg
 
 littlbowbub:
   display_name: Littlbowbub
@@ -196,18 +229,53 @@ little-ms-sam:
     ActionDefault: '#F1F1F1ff'
   backgrounded_tabs:
     mod-health:
-      dark: none.png
-      light: none.png
+      dark: null
+      light: null
     catalog:
-      dark: none.png
-      light: none.png
+      dark: null
+      light: null
     manifest-editor:
-      dark: none.png
-      light: none.png
+      dark: null
+      light: null
     archivist:
-      dark: none.png
-      light: none.png
-      position: center
+      dark: null
+      light: null
+
+meg:
+  display_name: Meg
+  description: |
+    Visit on [Patreon](https://www.patreon.com/meg_toastie_sim)!
+  font: Segoe UI
+  palette_dark:
+    Primary: '#b1a9f6ff'
+    Secondary: '#594ae2ff'
+    Tertiary: '#6029a7ff'
+    Info: '#8146d7ff'
+    Success: '#b1a9f6ff'
+    Warning: '#e24b7bff'
+    Error: '#760505ff'
+    AppbarText: '#fbfbfbff'
+    DrawerText: '#fbfbfbff'
+    DrawerIcons: '#b1a9f6ff'
+    LinesDefault: '#b1a9f6ff'
+    LinesInputs: '#b1a9f6ff'
+    Divider: '#b1a9f6ff'
+    TextPrimary: '#fbfbfbff'
+    TextSecondary: '#fbfbfbff'
+    ActionDefault: '#b1a9f6ff'
+  backgrounded_tabs:
+    mod-health:
+      dark: null
+      light: null
+    catalog:
+      dark: null
+      light: null
+    manifest-editor:
+      dark: null
+      light: null
+    archivist:
+      dark: null
+      light: null
 
 sim-realist:
   display_name: Sim Realist

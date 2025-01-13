@@ -106,10 +106,10 @@ partial class Home
         {
             if (backgroundedTabs.TryGetValue("mod-health", out var modHealth))
             {
-                if ((modHealth?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (modHealth?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                if ((modHealth?.TryGetValue("dark", out var dark) ?? false) && (modHealth?.TryGetValue("light", out var light) ?? false))
                 {
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
                 }
                 else
                 {
@@ -125,10 +125,10 @@ partial class Home
             }
             if (backgroundedTabs.TryGetValue("catalog", out var catalog))
             {
-                if ((catalog?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (catalog?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                if ((catalog?.TryGetValue("dark", out var dark) ?? false) && (catalog?.TryGetValue("light", out var light) ?? false))
                 {
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
                 }
                 else
                 {
@@ -144,10 +144,10 @@ partial class Home
             }
             if (backgroundedTabs.TryGetValue("archivist", out var archivist))
             {
-                if ((archivist?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (archivist?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                if ((archivist?.TryGetValue("dark", out var dark) ?? false) && (archivist?.TryGetValue("light", out var light) ?? false))
                 {
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
                 }
                 else
                 {
@@ -163,10 +163,10 @@ partial class Home
             }
             if (backgroundedTabs.TryGetValue("manifest-editor", out var manifestEditor))
             {
-                if ((manifestEditor?.TryGetValue("dark", out var dark) ?? false) && !string.IsNullOrWhiteSpace(dark) && (manifestEditor?.TryGetValue("light", out var light) ?? false) && !string.IsNullOrWhiteSpace(light))
+                if ((manifestEditor?.TryGetValue("dark", out var dark) ?? false) && (manifestEditor?.TryGetValue("light", out var light) ?? false))
                 {
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", $"url('/img/custom-themes/{customThemeName}/{dark}')");
-                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", $"url('/img/custom-themes/{customThemeName}/{light}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
                 }
                 else
                 {
