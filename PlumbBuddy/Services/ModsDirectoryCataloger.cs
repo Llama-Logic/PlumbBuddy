@@ -533,12 +533,7 @@ public class ModsDirectoryCataloger :
                 var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
                 await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-                var pathCollation = platformFunctions.FileSystemStringComparison switch
-                {
-                    StringComparison.Ordinal => "BINARY",
-                    StringComparison.OrdinalIgnoreCase => "NOCASE",
-                    _ => throw new NotSupportedException($"Cannot translate {platformFunctions.FileSystemStringComparison} to SQLite collation")
-                };
+                var pathCollation = platformFunctions.FileSystemSQliteCollation;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection
                 await pbDbContext.Database.ExecuteSqlRawAsync
                 (

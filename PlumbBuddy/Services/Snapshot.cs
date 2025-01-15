@@ -359,8 +359,9 @@ public class Snapshot :
             }
         });
 
-    public async Task<FileInfo?> ExportModListAsync()
+    public async Task<FileInfo?> ExportModListAsync(IPlatformFunctions platformFunctions)
     {
+        ArgumentNullException.ThrowIfNull(platformFunctions);
         try
         {
             using var dbContext = await dbContextFactory.CreateDbContextAsync();
@@ -369,10 +370,11 @@ public class Snapshot :
             using var csvStream = new MemoryStream();
             using var csvStreamWriter = new StreamWriter(csvStream);
             using var csvWriter = new CsvWriter(csvStreamWriter, new CsvConfiguration(CultureInfo.InvariantCulture));
+            var collation = platformFunctions.FileSystemSQliteCollation;
             await csvWriter.WriteRecordsAsync((await dbContext.SavePackageSnapshots
                 .Where(sps => sps.Id == SavePackageSnapshotId)
                 .SelectMany(sps => sps.ModFiles!)
-                .OrderBy(mf => mf.Path)
+                .OrderBy(mf => EF.Functions.Collate(mf.Path, collation))
                 .ToListAsync())
                 .Select(mf => new
                 {

@@ -71,6 +71,8 @@ partial class PlatformFunctions :
         GetThumbsDotDbPattern()
     ];
 
+    public string FileSystemSQliteCollation { get; } = "NOCASE";
+
     public StringComparison FileSystemStringComparison =>
         StringComparison.OrdinalIgnoreCase;
 

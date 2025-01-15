@@ -5,6 +5,7 @@ public interface IPlatformFunctions :
 {
     IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> DiscardableFileNamePatterns { get; }
+    string FileSystemSQliteCollation { get; }
     StringComparison FileSystemStringComparison { get; }
     IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> ForeignFileNamePatterns { get; }

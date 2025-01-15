@@ -23,7 +23,7 @@ partial class ArchivistSnapshotDetails
 
     async Task ExportModListAsync(Snapshot snapshot)
     {
-        if (await snapshot.ExportModListAsync() is { } exportedFile)
+        if (await snapshot.ExportModListAsync(PlatformFunctions) is { } exportedFile)
             PlatformFunctions.ViewFile(exportedFile);
     }
 

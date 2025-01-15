@@ -341,8 +341,12 @@ partial class ManifestEditor
                 StateHasChanged();
             });
 
-        string getComponentRelativePath(ModComponent component) =>
-            component.File.FullName[(commonComponentDirectory!.FullName.Length + 1)..];
+        string getComponentRelativePath(ModComponent component)
+        {
+            if (commonComponentDirectory is null)
+                throw new NullReferenceException("common component directory is null");
+            return component.File.FullName[(commonComponentDirectory.FullName.Length + 1)..];
+        }
 
         static void addTransformedCollectionElements<TManifestElement, TEditorElement>(ICollection<TManifestElement> collection, IEnumerable<TEditorElement> elements, Func<TEditorElement, TManifestElement> manifestElementSelector)
         {
@@ -354,207 +358,250 @@ partial class ManifestEditor
             addTransformedCollectionElements(collection, elements, element => element);
 
         var toolingResourceTypes = Enum.GetValues<ResourceType>()
-            .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceToolingMetadataAttribute>() is not null)
+            .Where(type => typeof(ResourceType).GetField(type.ToString())?.GetCustomAttribute<ResourceToolingMetadataAttribute>() is not null)
             .ToImmutableHashSet();
         var imageAndStringTableTypes = Enum.GetValues<ResourceType>()
-            .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.DirectDrawSurface or ResourceFileType.PortableNetworkGraphic or ResourceFileType.Ts4TranslucentJointPhotographicExpertsGroupImage)
+            .Where(type => typeof(ResourceType).GetField(type.ToString())?.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.DirectDrawSurface or ResourceFileType.PortableNetworkGraphic or ResourceFileType.Ts4TranslucentJointPhotographicExpertsGroupImage)
             .Concat([ResourceType.StringTable])
             .ToImmutableHashSet();
         var tuningAndSimDataTypes = Enum.GetValues<ResourceType>()
-            .Where(type => typeof(ResourceType).GetField(type.ToString())!.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.TuningMarkup)
+            .Where(type => typeof(ResourceType).GetField(type.ToString())?.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType is ResourceFileType.TuningMarkup)
             .Concat([ResourceType.SimData, ResourceType.CombinedTuning])
             .ToImmutableHashSet();
 
         var filesWithAlteredManifests = new List<FileInfo>();
+        var succeeded = false;
 
         try
         {
             // stage 1: wipe all components clean of manifests
-            foreach (var component in components)
+            try
             {
-                await updateStatusAsync(0, StringLocalizer["ManifestEditor_Composing_Status_RemovingManifests", getComponentRelativePath(component)]).ConfigureAwait(false);
-                if (component.FileObjectModel is DataBasePackedFile dbpf)
-                    await ModFileManifestModel.DeleteModFileManifestsAsync(dbpf).ConfigureAwait(false);
-                else if (component.FileObjectModel is ZipArchive zipArchive)
-                    ModFileManifestModel.DeleteModFileManifests(zipArchive);
-                else
-                    throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
+                foreach (var component in components)
+                {
+                    await updateStatusAsync(0, StringLocalizer["ManifestEditor_Composing_Status_RemovingManifests", getComponentRelativePath(component)]).ConfigureAwait(false);
+                    if (component.FileObjectModel is DataBasePackedFile dbpf)
+                        await ModFileManifestModel.DeleteModFileManifestsAsync(dbpf).ConfigureAwait(false);
+                    else if (component.FileObjectModel is ZipArchive zipArchive)
+                        ModFileManifestModel.DeleteModFileManifests(zipArchive);
+                    else
+                        throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
+                }
             }
+            catch (Exception ex)
+            {
+                throw new Exception("unhandled exception during manifest composition stage 1", ex);
+            }
+
+            var componentManifests = new Dictionary<ModComponent, ModFileManifestModel?>();
 
             // stage 2: initialize component manifests and compute hashes
-            var componentManifests = new Dictionary<ModComponent, ModFileManifestModel?>();
-            foreach (var component in components)
+            try
             {
-                var componentRelativePath = getComponentRelativePath(component);
-                await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_ComputingHash", componentRelativePath]).ConfigureAwait(false);
-                ImmutableArray<byte> hash;
-                HashSet<ResourceKey>? hashResourceKeys = null;
-                if (component.FileObjectModel is DataBasePackedFile dbpf)
+                foreach (var component in components)
                 {
-                    var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
-                    static HashSet<ResourceKey> getHashResourceKeys(IReadOnlyList<ResourceKey> keys, int hashingLevel, ImmutableHashSet<ResourceType> toolingResourceTypes, ImmutableHashSet<ResourceType> imageAndStringTableTypes, ImmutableHashSet<ResourceType> tuningAndSimDataTypes)
+                    var componentRelativePath = getComponentRelativePath(component);
+                    await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_ComputingHash", componentRelativePath]).ConfigureAwait(false);
+                    ImmutableArray<byte> hash;
+                    HashSet<ResourceKey>? hashResourceKeys = null;
+                    if (component.FileObjectModel is DataBasePackedFile dbpf)
                     {
-                        var result = new HashSet<ResourceKey>();
-                        foreach (var key in keys)
+                        var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
+                        static HashSet<ResourceKey> getHashResourceKeys(IReadOnlyList<ResourceKey> keys, int hashingLevel, ImmutableHashSet<ResourceType> toolingResourceTypes, ImmutableHashSet<ResourceType> imageAndStringTableTypes, ImmutableHashSet<ResourceType> tuningAndSimDataTypes)
                         {
-                            var type = key.Type;
-                            if (toolingResourceTypes.Contains(type))
-                                continue;
-                            if (hashingLevel is < 2 && imageAndStringTableTypes.Contains(type))
-                                continue;
-                            if (hashingLevel is < 1 && tuningAndSimDataTypes.Contains(type))
-                                continue;
-                            result.Add(key);
+                            var result = new HashSet<ResourceKey>();
+                            foreach (var key in keys)
+                            {
+                                var type = key.Type;
+                                if (toolingResourceTypes.Contains(type))
+                                    continue;
+                                if (hashingLevel is < 2 && imageAndStringTableTypes.Contains(type))
+                                    continue;
+                                if (hashingLevel is < 1 && tuningAndSimDataTypes.Contains(type))
+                                    continue;
+                                result.Add(key);
+                            }
+                            return result;
                         }
-                        return result;
-                    }
-                    var thisHashingLevel = hashingLevel - 1;
-                    while (++thisHashingLevel is <= 2)
-                    {
-                        var possibleHashResourceKeys = getHashResourceKeys(keys, thisHashingLevel, toolingResourceTypes, imageAndStringTableTypes, tuningAndSimDataTypes);
-                        if (possibleHashResourceKeys.Count is 0)
+                        var thisHashingLevel = hashingLevel - 1;
+                        while (++thisHashingLevel is <= 2)
+                        {
+                            var possibleHashResourceKeys = getHashResourceKeys(keys, thisHashingLevel, toolingResourceTypes, imageAndStringTableTypes, tuningAndSimDataTypes);
+                            if (possibleHashResourceKeys.Count is 0)
+                                continue;
+                            hashResourceKeys = possibleHashResourceKeys;
+                            break;
+                        }
+                        if (hashResourceKeys is null)
                             continue;
-                        hashResourceKeys = possibleHashResourceKeys;
-                        break;
+                        hash = await ModFileManifestModel.GetModFileHashAsync(dbpf, hashResourceKeys).ConfigureAwait(false);
                     }
-                    if (hashResourceKeys is null)
-                        continue;
-                    hash = await ModFileManifestModel.GetModFileHashAsync(dbpf, hashResourceKeys).ConfigureAwait(false);
-                }
-                else if (component.FileObjectModel is ZipArchive zipArchive)
-                    hash = ModFileManifestModel.GetModFileHash(zipArchive);
-                else
-                    throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
-                await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_InitializingManifest", componentRelativePath]).ConfigureAwait(false);
-                var tuningName = component.FileObjectModel is DataBasePackedFile
-                    ? (
-                        string.IsNullOrWhiteSpace(component.ManifestResourceName)
-                        ? $"llamalogic:manifest_{Guid.NewGuid():n}"
-                        : component.ManifestResourceName
-                    )
-                    : null;
-                var model = new ModFileManifestModel
-                {
-                    ElectronicArtsPromoCode = string.IsNullOrWhiteSpace(electronicArtsPromoCode) ? null : electronicArtsPromoCode,
-                    Hash = hash,
-                    Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
-                    TuningFullInstance = tuningName is null ? 0 : Fnv64.SetHighBit(Fnv64.GetHash(tuningName)),
-                    TuningName = tuningName,
-                    Url = Uri.TryCreate(url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
-                    Version = versionEnabled && !string.IsNullOrWhiteSpace(version) ? version : null
-                };
-                addCollectionElements(model.Creators, creators);
-                addCollectionElements(model.Exclusivities, component.Exclusivities);
-                addCollectionElements(model.Features, features);
-                if (hashResourceKeys is not null)
-                    model.HashResourceKeys.UnionWith(hashResourceKeys);
-                addCollectionElements(model.IncompatiblePacks, incompatiblePacks);
-                addTransformedCollectionElements(model.RequiredMods, requiredMods, requiredMod =>
-                {
-                    var model = new ModFileManifestModelRequiredMod
+                    else if (component.FileObjectModel is ZipArchive zipArchive)
+                        hash = ModFileManifestModel.GetModFileHash(zipArchive);
+                    else
+                        throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
+                    await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_InitializingManifest", componentRelativePath]).ConfigureAwait(false);
+                    var tuningName = component.FileObjectModel is DataBasePackedFile
+                        ? (
+                            string.IsNullOrWhiteSpace(component.ManifestResourceName)
+                            ? $"llamalogic:manifest_{Guid.NewGuid():n}"
+                            : component.ManifestResourceName
+                        )
+                        : null;
+                    var model = new ModFileManifestModel
                     {
-                        IgnoreIfHashAvailable = (requiredMod.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
-                        IgnoreIfHashUnavailable = (requiredMod.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [.. unavailableSequence] : [],
-                        IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackAvailable) ? null : requiredMod.IgnoreIfPackAvailable,
-                        IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable) ? null : requiredMod.IgnoreIfPackUnavailable,
-                        Name = requiredMod.Name ?? string.Empty,
-                        RequirementIdentifier = string.IsNullOrWhiteSpace(requiredMod.RequirementIdentifier) ? null : requiredMod.RequirementIdentifier,
-                        Url = Uri.TryCreate(requiredMod.Url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
-                        Version = string.IsNullOrWhiteSpace(requiredMod.Version) ? null : requiredMod.Version
-                    };
-                    addCollectionElements(model.Creators, requiredMod.Creators);
-                    foreach (var hash in requiredMod.Hashes)
-                        if (hash.TryToByteSequence(out var sequence))
-                            model.Hashes.Add([..sequence]);
-                    addCollectionElements(model.RequiredFeatures, requiredMod.RequiredFeatures);
-                    return model;
-                });
-                addCollectionElements(model.RequiredPacks, requiredPacks);
-                var hexHash = hash.ToHexString();
-                if (!component.SubsumedHashes.Contains(hexHash, StringComparer.OrdinalIgnoreCase))
-                    filesWithAlteredManifests.Add(component.File);
-                addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Except([hexHash], StringComparer.OrdinalIgnoreCase).Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
-                componentManifests.Add(component, model);
-            }
-
-            // stage 3: generate cross reference requirements
-            var crossReferenceRequirements = new List<(ModComponent component, ModFileManifestModelRequiredMod requiredModModel)>();
-            foreach (var component in components.Where(component => component.IsRequired))
-            {
-                await updateStatusAsync(2, StringLocalizer["ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
-                if (componentManifests.TryGetValue(component, out var manifest) && manifest?.Hash is { } hash && !hash.IsDefaultOrEmpty)
-                {
-                    var model = new ModFileManifestModelRequiredMod
-                    {
-                        IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [..availableSequence] : [],
-                        IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [..unavailableSequence] : [],
-                        IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable) ? null : component.IgnoreIfPackAvailable,
-                        IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable) ? null : component.IgnoreIfPackUnavailable,
+                        ElectronicArtsPromoCode = string.IsNullOrWhiteSpace(electronicArtsPromoCode) ? null : electronicArtsPromoCode,
+                        Hash = hash,
                         Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
-                        RequirementIdentifier = string.IsNullOrWhiteSpace(component.RequirementIdentifier) ? null : component.RequirementIdentifier,
+                        TuningFullInstance = tuningName is null ? 0 : Fnv64.SetHighBit(Fnv64.GetHash(tuningName)),
+                        TuningName = tuningName,
                         Url = Uri.TryCreate(url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
                         Version = versionEnabled && !string.IsNullOrWhiteSpace(version) ? version : null
                     };
                     addCollectionElements(model.Creators, creators);
-                    model.Hashes.Add(hash);
-                    crossReferenceRequirements.Add((component, model));
+                    addCollectionElements(model.Exclusivities, component.Exclusivities);
+                    addCollectionElements(model.Features, features);
+                    if (hashResourceKeys is not null)
+                        model.HashResourceKeys.UnionWith(hashResourceKeys);
+                    addCollectionElements(model.IncompatiblePacks, incompatiblePacks);
+                    addTransformedCollectionElements(model.RequiredMods, requiredMods, requiredMod =>
+                    {
+                        var model = new ModFileManifestModelRequiredMod
+                        {
+                            IgnoreIfHashAvailable = (requiredMod.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
+                            IgnoreIfHashUnavailable = (requiredMod.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [.. unavailableSequence] : [],
+                            IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackAvailable) ? null : requiredMod.IgnoreIfPackAvailable,
+                            IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable) ? null : requiredMod.IgnoreIfPackUnavailable,
+                            Name = requiredMod.Name ?? string.Empty,
+                            RequirementIdentifier = string.IsNullOrWhiteSpace(requiredMod.RequirementIdentifier) ? null : requiredMod.RequirementIdentifier,
+                            Url = Uri.TryCreate(requiredMod.Url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
+                            Version = string.IsNullOrWhiteSpace(requiredMod.Version) ? null : requiredMod.Version
+                        };
+                        addCollectionElements(model.Creators, requiredMod.Creators);
+                        foreach (var hash in requiredMod.Hashes)
+                            if (hash.TryToByteSequence(out var sequence))
+                                model.Hashes.Add([.. sequence]);
+                        addCollectionElements(model.RequiredFeatures, requiredMod.RequiredFeatures);
+                        return model;
+                    });
+                    addCollectionElements(model.RequiredPacks, requiredPacks);
+                    var hexHash = hash.ToHexString();
+                    if (!component.SubsumedHashes.Contains(hexHash, StringComparer.OrdinalIgnoreCase))
+                        filesWithAlteredManifests.Add(component.File);
+                    addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Except([hexHash], StringComparer.OrdinalIgnoreCase).Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
+                    componentManifests.Add(component, model);
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("unhandled exception during manifest composition stage 2", ex);
+            }
+
+            var crossReferenceRequirements = new List<(ModComponent component, ModFileManifestModelRequiredMod requiredModModel)>();
+
+            // stage 3: generate cross reference requirements
+            try
+            {
+                foreach (var component in components.Where(component => component.IsRequired))
+                {
+                    await updateStatusAsync(2, StringLocalizer["ManifestEditor_Composing_Status_GeneratingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
+                    if (componentManifests.TryGetValue(component, out var manifest) && manifest?.Hash is { } hash && !hash.IsDefaultOrEmpty)
+                    {
+                        var model = new ModFileManifestModelRequiredMod
+                        {
+                            IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
+                            IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [.. unavailableSequence] : [],
+                            IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable) ? null : component.IgnoreIfPackAvailable,
+                            IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable) ? null : component.IgnoreIfPackUnavailable,
+                            Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
+                            RequirementIdentifier = string.IsNullOrWhiteSpace(component.RequirementIdentifier) ? null : component.RequirementIdentifier,
+                            Url = Uri.TryCreate(url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
+                            Version = versionEnabled && !string.IsNullOrWhiteSpace(version) ? version : null
+                        };
+                        addCollectionElements(model.Creators, creators);
+                        model.Hashes.Add(hash);
+                        crossReferenceRequirements.Add((component, model));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("unhandled exception during manifest composition stage 3", ex);
             }
 
             // stage 4: add cross reference requirements
-            foreach (var component in components)
+            try
             {
-                await updateStatusAsync(3, StringLocalizer["ManifestEditor_Composing_Status_AddingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
-                if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
+                foreach (var component in components)
                 {
-                    var requirementIndex = -1;
-                    foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements.Where(t => t.component != component && (string.IsNullOrWhiteSpace(component.RequirementIdentifier) || component.RequirementIdentifier != t.component.RequirementIdentifier)))
-                        manifest.RequiredMods.Insert(++requirementIndex, requiredModModel);
+                    await updateStatusAsync(3, StringLocalizer["ManifestEditor_Composing_Status_AddingCrossReferenceRequirements", getComponentRelativePath(component)]).ConfigureAwait(false);
+                    if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
+                    {
+                        var requirementIndex = -1;
+                        foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements.Where(t => t.component != component && (string.IsNullOrWhiteSpace(component.RequirementIdentifier) || component.RequirementIdentifier != t.component.RequirementIdentifier)))
+                            manifest.RequiredMods.Insert(++requirementIndex, requiredModModel);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("unhandled exception during manifest composition stage 1", ex);
             }
 
             if (!batchOverlayVisible)
                 compositionResetEvent.Reset();
 
             // stage 5: commit manifests
-            foreach (var component in components)
+            try
             {
-                if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
+                foreach (var component in components)
                 {
-                    var componentRelativePath = getComponentRelativePath(component);
-                    await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", componentRelativePath]).ConfigureAwait(false);
-                    if (component.FileObjectModel is DataBasePackedFile dbpf)
+                    if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
-                        await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
-                        await dbpf.SaveAsync().ConfigureAwait(false);
-                    }
-                    else if (component.FileObjectModel is ZipArchive zipArchive)
-                        await ModFileManifestModel.SetModFileManifestAsync(zipArchive, manifest).ConfigureAwait(false);
-                    else
-                        throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
-                    component.FileObjectModel.Dispose();
-                    await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", componentRelativePath]).ConfigureAwait(false);
-                    var scaffolding = new ManifestedModFileScaffolding
-                    {
-                        ModName = name.Trim(),
-                        IsRequired = component.IsRequired,
-                        ComponentName = (component.Name ?? string.Empty).Trim(),
-                        HashingLevel = hashingLevel
-                    };
-                    foreach (var otherComponent in components.Except([component]))
-                    {
-                        var referencedModFile = new ManifestedModFileScaffoldingReferencedModFile
+                        var componentRelativePath = getComponentRelativePath(component);
+                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", componentRelativePath]).ConfigureAwait(false);
+                        if (component.FileObjectModel is DataBasePackedFile dbpf)
                         {
-                            LocalAbsolutePath = otherComponent.File.FullName
+                            await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
+                            await dbpf.SaveAsync().ConfigureAwait(false);
+                        }
+                        else if (component.FileObjectModel is ZipArchive zipArchive)
+                            await ModFileManifestModel.SetModFileManifestAsync(zipArchive, manifest).ConfigureAwait(false);
+                        else
+                            throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
+                        component.FileObjectModel.Dispose();
+                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", componentRelativePath]).ConfigureAwait(false);
+                        var scaffolding = new ManifestedModFileScaffolding
+                        {
+                            ModName = name.Trim(),
+                            IsRequired = component.IsRequired,
+                            ComponentName = (component.Name ?? string.Empty).Trim(),
+                            HashingLevel = hashingLevel
                         };
-                        var relativePath = Path.GetRelativePath(component.File.Directory!.FullName, referencedModFile.LocalAbsolutePath);
-                        if (relativePath != referencedModFile.LocalAbsolutePath)
-                            referencedModFile.LocalRelativePath = relativePath;
-                        scaffolding.OtherModComponents.Add(referencedModFile);
+                        foreach (var otherComponent in components.Except([component]))
+                        {
+                            var referencedModFile = new ManifestedModFileScaffoldingReferencedModFile
+                            {
+                                LocalAbsolutePath = otherComponent.File.FullName
+                            };
+                            if (component.File.Directory is { } componentFileDirectory)
+                            {
+                                var relativePath = Path.GetRelativePath(componentFileDirectory.FullName, referencedModFile.LocalAbsolutePath);
+                                if (relativePath != referencedModFile.LocalAbsolutePath)
+                                    referencedModFile.LocalRelativePath = relativePath;
+                            }
+                            scaffolding.OtherModComponents.Add(referencedModFile);
+                        }
+                        await scaffolding.CommitForAsync(component.File, Settings).ConfigureAwait(false);
                     }
-                    await scaffolding.CommitForAsync(component.File, Settings).ConfigureAwait(false);
                 }
             }
+            catch (Exception ex)
+            {
+                throw new Exception("unhandled exception during manifest composition stage 5", ex);
+            }
+
+            succeeded = true;
         }
         catch (Exception ex)
         {
@@ -568,7 +615,7 @@ partial class ManifestEditor
         await updateStatusAsync(5, AppText.ManifestEditor_Composing_Status_Finished).ConfigureAwait(false);
         await Task.Delay(1000).ConfigureAwait(false);
 
-        if (!batchOverlayVisible)
+        if (!batchOverlayVisible && succeeded)
             await DialogService.ShowSuccessDialogAsync(AppText.ManifestEditor_Composing_Success_Caption, AppText.ManifestEditor_Composing_Success_Text).ConfigureAwait(false);
 
         await StaticDispatcher.DispatchAsync(async () =>

@@ -67,6 +67,8 @@ partial class PlatformFunctions :
         GetDotLocalizedPattern()
     ];
 
+    public string FileSystemSQliteCollation { get; } = "BINARY";
+
     public StringComparison FileSystemStringComparison =>
         StringComparison.Ordinal;
 
