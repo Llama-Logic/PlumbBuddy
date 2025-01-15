@@ -16,5 +16,7 @@ public interface IArchivist :
 
     Task AddPathToProcessAsync(FileSystemInfo fileSystemInfo);
 
+    Task LoadChronicleAsync(Chronicle chronicle);
+
     Task ReapplyEnhancementsAsync(Chronicle chronicle);
 }

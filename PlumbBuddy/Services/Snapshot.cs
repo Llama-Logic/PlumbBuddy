@@ -251,8 +251,9 @@ public class Snapshot :
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         });
 
-    public Task<FileInfo?> CreateBranchAsync(ISettings settings, Chronicle chronicle, string newChronicleName, string? notes, string? gameNameOverride, ImmutableArray<byte> thumbnail, Action onSerializationCompleted)
+    public Task<FileInfo?> CreateBranchAsync(ILoggerFactory loggerFactory, ISettings settings, Chronicle chronicle, string newChronicleName, string? notes, string? gameNameOverride, ImmutableArray<byte> thumbnail, Action onSerializationCompleted)
     {
+        ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(chronicle);
         ArgumentNullException.ThrowIfNull(newChronicleName);
@@ -306,6 +307,11 @@ public class Snapshot :
                     Thumbnail = [..thumbnail]
                 }).ConfigureAwait(false);
                 await newChronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
+                var archivist = Chronicle.Archivist;
+                var newChronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), newChronicleDbContextFactory, archivist);
+                await newChronicle.FirstLoadComplete.ConfigureAwait(false);
+                await archivist.LoadChronicleAsync(newChronicle).ConfigureAwait(false);
+                archivist.SelectedChronicle = newChronicle;
                 var slotIdHex = slotId.ToString("x8");
                 foreach (var existingFile in new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"))
                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)

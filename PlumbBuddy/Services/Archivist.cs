@@ -297,6 +297,15 @@ public partial class Archivist :
         }
     }
 
+    public async Task LoadChronicleAsync(Chronicle chronicle)
+    {
+        ArgumentNullException.ThrowIfNull(chronicle);
+        await chronicle.FirstLoadComplete.ConfigureAwait(false);
+        using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
+        chronicleByNucleusIdAndCreated.Add((chronicle.NucleusId, chronicle.Created), chronicle);
+        chronicles.Add(chronicle);
+    }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 

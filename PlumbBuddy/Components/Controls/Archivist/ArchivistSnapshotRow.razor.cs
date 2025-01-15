@@ -12,7 +12,7 @@ partial class ArchivistSnapshotRow
             return;
         var taskCompletionSource = new TaskCompletionSource();
         DialogService.ShowBusyAnimationDialog("secondary-dialog", MudBlazor.Color.Secondary, MaterialDesignIcons.Normal.CallSplit, AppText.Archivist_Busy_Branching, "json/archivist-constructing.json", "550px", "550px", taskCompletionSource.Task);
-        if (await snapshot.CreateBranchAsync(Settings, chronicle, createBranchDialogResult.ChronicleName, createBranchDialogResult.Notes, createBranchDialogResult.GameNameOverride, createBranchDialogResult.Thumbnail, taskCompletionSource.SetResult) is { } exportedFile)
+        if (await snapshot.CreateBranchAsync(LoggerFactory, Settings, chronicle, createBranchDialogResult.ChronicleName, createBranchDialogResult.Notes, createBranchDialogResult.GameNameOverride, createBranchDialogResult.Thumbnail, taskCompletionSource.SetResult) is { } exportedFile)
             PlatformFunctions.ViewFile(exportedFile);
         else
         {
