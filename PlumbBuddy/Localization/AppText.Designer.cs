@@ -2933,6 +2933,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I found a version number either in a previous manifest for this mod or in its first selected mod file&apos;s name if this is your first time manifesting it. If you do keep version numbers in the name of your mod files, you can just change the version here when you&apos;re updating the mod&apos;s manifest for publishing and I will rename your mod files for you accordingly..
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_OriginalVersionFound_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_OriginalVersionFound_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quick Semantic Versioning Links.
         /// </summary>
         internal static string ManifestEditor_CrossMod_SemanticVersioning_Label {

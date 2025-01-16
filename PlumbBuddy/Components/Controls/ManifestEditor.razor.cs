@@ -24,6 +24,9 @@ partial class ManifestEditor
 
     public static bool RequestToRemainAlive { get; private set; }
 
+    [GeneratedRegex(@"(?<major>\d+)\.(?<minor>\d+)(\.(?<patch>\d+))?", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex GetSemVerInModFileNamePattern();
+
     [GeneratedRegex(@"^https?://.*")]
     private static partial Regex GetUrlPattern();
 
@@ -62,6 +65,7 @@ partial class ManifestEditor
     string loadingText = string.Empty;
     ModComponentEditor? modComponentEditor;
     string name = string.Empty;
+    string originalVersion = string.Empty;
     readonly List<ModRequirement> requiredMods = [];
     IReadOnlyList<string> requiredPacks = [];
     ChipSetField? requiredPacksChipSetField;
@@ -555,11 +559,9 @@ partial class ManifestEditor
             try
             {
                 foreach (var component in components)
-                {
                     if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
-                        var componentRelativePath = getComponentRelativePath(component);
-                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", componentRelativePath]).ConfigureAwait(false);
+                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", getComponentRelativePath(component)]).ConfigureAwait(false);
                         if (component.FileObjectModel is DataBasePackedFile dbpf)
                         {
                             await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
@@ -570,7 +572,33 @@ partial class ManifestEditor
                         else
                             throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                         component.FileObjectModel.Dispose();
-                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", componentRelativePath]).ConfigureAwait(false);
+                    }
+                if (versionEnabled && !string.IsNullOrWhiteSpace(version) && !string.IsNullOrEmpty(originalVersion))
+                    foreach (var component in components)
+                        if (component.File is { } file
+                            && file.Directory is { } directory
+                            && file.Name.Contains(originalVersion, StringComparison.Ordinal))
+                        {
+                            var newFilePath = Path.GetFullPath(Path.Combine(directory.FullName, file.Name.Replace(originalVersion, version, StringComparison.Ordinal)));
+                            var newFile = new FileInfo(newFilePath);
+                            if (Path.GetFullPath(file.FullName) != newFilePath && !newFile.Exists)
+                            {
+                                ManifestedModFileScaffolding.DeleteFor(file);
+                                File.Move(file.FullName, newFilePath);
+                                newFile.Refresh();
+                                var tcs = new TaskCompletionSource();
+                                StaticDispatcher.Dispatch(() =>
+                                {
+                                    component.File = newFile;
+                                    tcs.SetResult();
+                                });
+                                await tcs.Task.ConfigureAwait(false);
+                            }
+                        }
+                foreach (var component in components)
+                    if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
+                    {
+                        await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", getComponentRelativePath(component)]).ConfigureAwait(false);
                         var scaffolding = new ManifestedModFileScaffolding
                         {
                             ModName = name.Trim(),
@@ -594,7 +622,6 @@ partial class ManifestEditor
                         }
                         await scaffolding.CommitForAsync(component.File, Settings).ConfigureAwait(false);
                     }
-                }
             }
             catch (Exception ex)
             {
@@ -847,7 +874,13 @@ partial class ManifestEditor
                 else
                 {
                     batchContinue = true;
-                    creators = [.. Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                    creators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                    var semVerPatternMatch = GetSemVerInModFileNamePattern().Match(selectStepFile.Name);
+                    if (semVerPatternMatch.Success)
+                    {
+                        versionEnabled = true;
+                        version = semVerPatternMatch.Value;
+                    }
                 }
                 if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings) is { } scaffolding)
                 {
@@ -899,6 +932,7 @@ partial class ManifestEditor
             StateHasChanged();
             if (components.Count is 0)
                 return true;
+            originalVersion = version;
             RequestToRemainAlive = true;
         }
         if (activeIndex is 1)

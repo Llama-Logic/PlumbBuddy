@@ -13,255 +13,266 @@
 @inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <div class="relative" style="height: 100%;">
-    <MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
-        <MudStepperExtended @ref="stepper" Animation="@(!batchOverlayVisible)" LocalizedStrings="@(MarkupLocalizer.StepperLocalizedStrings)" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%; padding: 24px;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
-            <ChildContent>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Select_Label)]">
-                    <ChildContent>
-                        <div class="step-content">
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Heading_1)]
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Heading_2)]
-                            </MudTextM3>
-                            <MudGrid Justify="Justify.Center" Class="mb-4">
-                                <MudItem xs="10">
-                                    <MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
-                                        @MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Guidance)]
-                                    </MudTextM3>
-                                    <MudForm @ref="selectStepForm" Class="mt-4">
-                                        <ModFileSelector Label="@StringLocalizer[nameof(AppText.ManifestEditor_Select_Picker_Label)]" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
-                                    </MudForm>
-                                </MudItem>
-                                <MudFlexBreak />
-                                <MudItem>
-                                    <MudTooltip Color="Color.Tertiary" Arrow Text="@StringLocalizer[nameof(AppText.ManifestEditor_Select_CheckForScaffoldingLocation_Tip)]">
-                                        <MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_CheckForScaffoldingLocation_Label)]</MudSwitchM3>
-                                    </MudTooltip>
-                                </MudItem>
-                                <MudFlexBreak />
-                                <MudItem>
-                                    <MudTooltip Arrow Color="Color.Tertiary" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Select_BatchUpdate_Tip)]">
-                                        <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.ArrowDecisionAuto" OnClick="HandleUpdateAllManifestsInAFolderAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_BatchUpdate_Label)]</MudButton>
-                                    </MudTooltip>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Tag" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Label)]">
-                    <ChildContent>
-                        <div class="step-content">
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Details_Heading_1)]
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Details_Heading_2)]
-                            </MudTextM3>
-                            <MudGrid Justify="Justify.Center" Class="mb-4">
-                                <MudItem xs="8">
-                                    <MudForm @ref="@detailsStepForm">
-                                        <MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.Common_Name)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_ModName_HelperText)]" Immediate Class="mt-4" />
-                                        <ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.Common_Creators)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_HelperText)]" Class="mt-4" />
-                                        <MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)]" Immediate Class="mt-4">
-                                            <AdornmentStart>
-                                                <MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
-                                            </AdornmentStart>
-                                            <AdornmentEnd>
-                                                <MudTooltip Arrow Color="Color.Info" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_OpenInWebBrowser_Tip)]">
-                                                    <MudIconButton Icon="@MaterialDesignIcons.Normal.Web" Color="Color.Info" OnClick="HandleOpenDownloadPageUrlInBrowserAsync" />
-                                                </MudTooltip>
-                                                <MudTooltip Arrow Color="Color.Warning" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Tip)]">
-                                                    <MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
-                                                    <MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                                                        <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
-                                                            <MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_1)]" />
-                                                            <MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_2)]" />
-                                                        </MudAlert>
-                                                    </MudPopover>
-                                                </MudTooltip>
-                                                <MudTooltip Arrow Color="Color.Success" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsToDo_Tip)]">
-                                                    <MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
-                                                    <MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
-                                                        <MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
-                                                            <MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsToDo_Popover)]" />
-                                                        </MudAlert>
-                                                    </MudPopover>
-                                                </MudTooltip>
-                                            </AdornmentEnd>
-                                        </MudTextFieldExtended>
-                                    </MudForm>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCheck" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Components_Label)]">
-                    <ChildContent>
-                        <div class="step-content">
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Components_Heading_1)]
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Components_Heading_2)]
-                            </MudTextM3>
-                            <MudGrid Justify="Justify.Center" Class="mb-4">
-                                <MudItem Class="mt-4" xs="8">
-                                    <MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
-                                        @if (ComponentsStepSelectedComponent is { } component)
-                                        {
-                                            <ModComponentEditor @ref="@modComponentEditor" ModComponent="@component" />
-                                        }
-                                    </MudPaper>
-                                </MudItem>
-                                <MudItem Class="mt-4" xs="4">
-                                    <MudPaper Class="overflow-y-auto" Style="height: calc(100vh - 435px);">
-                                        <MudTreeView T="ModComponent" @bind-SelectedValue="@ComponentsStepSelectedComponent" @bind-SelectedValues="@componentsStepSelectedComponents" Color="Color.Tertiary" SelectionMode="@componentsStepSelectionMode" Items="@componentTreeItemData" AutoExpand AutoSelectParent ExpandOnDoubleClick Hover Class="manifest-editor-components-step-tree-view" Style="overflow-wrap: anywhere;">
-                                            <ItemTemplate>
-                                                <MudTreeViewItem @bind-Expanded="@context.Expanded" CanExpand="@context.Expandable" Icon="@context.Icon" Items="@context.Children" Text="@context.Text" Value="@context.Value" />
-                                            </ItemTemplate>
-                                        </MudTreeView>
-                                    </MudPaper>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                        <div class="absolute" style="left: 48px; right: 24px; transform: translateY(5px);">
-                            <MudGrid>
-                                <MudItem xs="8" Class="pr-8">
-                                    <MudStack Justify="Justify.FlexEnd" Row>
-                                        @if (ComponentsStepSelectedComponent is not null)
-                                        {
-                                            <MudTooltip Arrow Placement="Placement.Top">
-                                                <ChildContent>
-                                                    <MudFab StartIcon="@MaterialDesignIcons.Normal.ContentDuplicate" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDuplicateComponentSettingsClickedAsync" />
-                                                </ChildContent>
-                                                <TooltipContent>
-                                                    <MudStack Row="true">
-                                                        <MudIcon Icon="@MaterialDesignIcons.Normal.ContentDuplicate" />
-                                                        <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.ManifestEditor_Components_DuplicateSettings_Tip_Caption)]</MudTextM3>
-                                                    </MudStack>
-                                                    <MudDivider />
-                                                    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                                        @MarkupLocalizer[nameof(AppText.ManifestEditor_Components_DuplicateSettings_Tip_Description)]
-                                                    </MudTextM3>
-                                                </TooltipContent>
-                                            </MudTooltip>
-                                        }
-                                    </MudStack>
-                                </MudItem>
-                                <MudItem xs="4" Class="pl-8">
-                                    <MudStack Row>
-                                        <MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
-                                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
-                                        {
-                                            <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
-                                                <MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
-                                            </MudTooltip>
-                                        }
-                                        <MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
-                                    </MudStack>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Asterisk" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_Label)]">
-                    <ChildContent>
-                        <div class="step-content">
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_Heading_1)]
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_Heading_2)]
-                            </MudTextM3>
-                            <MudForm @ref="@requirementsStepForm">
-                                <MudGrid Justify="Justify.Center" Class="my-4 align-center">
-                                    <MudItem xs="8">
-                                        @if (PublicCatalogs.PackCatalog is { } packCatalog)
-                                        {
-                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@RequiredPackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder)]" />
-                                        }
-                                        else
-                                        {
-                                            <ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)]" />
-                                        }
-                                    </MudItem>
-                                    <MudItem xs="8">
-                                        <MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_Label)]" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_HelperText)]" Disabled="@(requiredPacks.Count == 0)" />
-                                    </MudItem>
-                                    <MudItem xs="8">
-                                        @if (PublicCatalogs.PackCatalog is { } packCatalog)
-                                        {
-                                            <MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@IncompatiblePackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder)]" />
-                                        }
-                                        else
-                                        {
-                                            <ChipSetField @ref="@incompatibleChipSetField" @bind-Values="@incompatiblePacks" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)]" />
-                                        }
-                                    </MudItem>
-                                    <MudFlexBreak />
-                                    <MudItem>
-                                        <MudStack Row>
-                                            <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
-                                            <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_SelectModFileFromCatalog)">
-                                                <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
-                                            </MudTooltip>
-                                            @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
-                                            {
-                                                <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
-                                                    <MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
-                                                </MudTooltip>
-                                            }
-                                        </MudStack>
-                                    </MudItem>
-                                    <MudItem Class="ml-n4">
-                                        <MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
-                                        <MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight">
-                                            <MudAlert Severity="Severity.Info" Style="max-width: 525px;">
-                                                <MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Popover)]" />
-                                            </MudAlert>
-                                        </MudPopover>
-                                    </MudItem>
-                                    <MudFlexBreak />
-                                    <MudItem xs="8">
-                                        <MudExpansionPanels MultiExpansion>
-                                            @foreach (var requiredMod in requiredMods)
-                                            {
-                                                <MudExpansionPanel Text="@requiredMod.Name" Icon="@MaterialDesignIcons.Normal.PuzzleCheck">
-                                                    <ChildContent>
-                                                        <MudStack Class="align-center">
-                                                            <ModRequirementEditor ModRequirement="@requiredMod" />
-                                                            <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_RemoveRequirement_Label)]</MudButton>
-                                                        </MudStack>
-                                                    </ChildContent>
-                                                </MudExpansionPanel>
-                                            }
-                                        </MudExpansionPanels>
-                                    </MudItem>
-                                </MudGrid>
-                            </MudForm>
-                        </div>
-                    </ChildContent>
-                </MudStepExtended>
-                <MudStepExtended Icon="@MaterialDesignIcons.Normal.Offer" Title="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Label)]">
-                    <ChildContent>
-                        <div class="step-content">
-                            <MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_Heading_1)]
-                            </MudTextM3>
-                            <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
-                                @MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_Heading_2)]
-                            </MudTextM3>
-                            <MudGrid Justify="Justify.Center" Class="my-4 align-center">
-                                <MudItem>
-                                    <MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_VersionToggle_Label)]</MudSwitchM3>
-                                </MudItem>
-                                <MudItem>
-                                    <MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Version_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Timeline" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
-                                </MudItem>
-                                <MudFlexBreak />
-                                <MudItem>
+	<MudLoading Loading="@isLoading" Text="@loadingText" Color="Color.Tertiary" Overlap Darken>
+		<MudStepperExtended @ref="stepper" Animation="@(!batchOverlayVisible)" LocalizedStrings="@(MarkupLocalizer.StepperLocalizedStrings)" Color="Color.Tertiary" Variant="Variant.Filled" HeaderBadgeView="HeaderBadgeView.GreyOutIncomplete" HeaderTextView="HeaderTextView.All" HeaderSize="Size.Large" ShowPreviousButton="!isComposing" Class="mud-width-full" Style="height: 100%; padding: 24px;" PreventStepChangeAsync="HandlePreventStepChangeAsync">
+			<ChildContent>
+				<MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCertificate" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Select_Label)]">
+					<ChildContent>
+						<div class="step-content">
+							<MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Heading_1)]
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Heading_2)]
+							</MudTextM3>
+							<MudGrid Justify="Justify.Center" Class="mb-4">
+								<MudItem xs="10">
+									<MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
+										@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Guidance)]
+									</MudTextM3>
+									<MudForm @ref="selectStepForm" Class="mt-4">
+										<ModFileSelector Label="@StringLocalizer[nameof(AppText.ManifestEditor_Select_Picker_Label)]" @bind-File="selectStepFile" @bind-FileType="selectStepFileType" Disabled="components.Count > 0" />
+									</MudForm>
+								</MudItem>
+								<MudFlexBreak />
+								<MudItem>
+									<MudTooltip Color="Color.Tertiary" Arrow Text="@StringLocalizer[nameof(AppText.ManifestEditor_Select_CheckForScaffoldingLocation_Tip)]">
+										<MudSwitchM3 @bind-Value="WriteScaffoldingToSubdirectory" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FolderCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderCancel">@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_CheckForScaffoldingLocation_Label)]</MudSwitchM3>
+									</MudTooltip>
+								</MudItem>
+								<MudFlexBreak />
+								<MudItem>
+									<MudTooltip Arrow Color="Color.Tertiary" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Select_BatchUpdate_Tip)]">
+										<MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.ArrowDecisionAuto" OnClick="HandleUpdateAllManifestsInAFolderAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_BatchUpdate_Label)]</MudButton>
+									</MudTooltip>
+								</MudItem>
+							</MudGrid>
+						</div>
+					</ChildContent>
+				</MudStepExtended>
+				<MudStepExtended Icon="@MaterialDesignIcons.Normal.Tag" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Label)]">
+					<ChildContent>
+						<div class="step-content">
+							<MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Details_Heading_1)]
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Details_Heading_2)]
+							</MudTextM3>
+							<MudGrid Justify="Justify.Center" Class="mb-4">
+								<MudItem xs="8">
+									<MudForm @ref="@detailsStepForm">
+										<MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.Common_Name)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_ModName_HelperText)]" Immediate Class="mt-4" />
+										<ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.Common_Creators)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_HelperText)]" Class="mt-4" />
+										<MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)]" Immediate Class="mt-4">
+											<AdornmentStart>
+												<MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
+											</AdornmentStart>
+											<AdornmentEnd>
+												<MudTooltip Arrow Color="Color.Info" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_OpenInWebBrowser_Tip)]">
+													<MudIconButton Icon="@MaterialDesignIcons.Normal.Web" Color="Color.Info" OnClick="HandleOpenDownloadPageUrlInBrowserAsync" />
+												</MudTooltip>
+												<MudTooltip Arrow Color="Color.Warning" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Tip)]">
+													<MudToggleIconButton @bind-Toggled="@UrlProhibitiveGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Color="Color.Warning" />
+													<MudPopover Open="@UrlProhibitiveGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
+														<MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.HandFrontRight" Style="max-width: 525px;">
+															<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_1)]" />
+															<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsNotToDo_Popover_2)]" />
+														</MudAlert>
+													</MudPopover>
+												</MudTooltip>
+												<MudTooltip Arrow Color="Color.Success" Text="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsToDo_Tip)]">
+													<MudToggleIconButton @bind-Toggled="@UrlEncouragingGuidanceOpen" Icon="@MaterialDesignIcons.Normal.HandClap" Color="Color.Success" />
+													<MudPopover Open="@UrlEncouragingGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight" Style="transform: translateY(-28px);">
+														<MudAlert Severity="Severity.Success" Icon="@MaterialDesignIcons.Normal.HandClap" Style="max-width: 525px;">
+															<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Details_SeeThingsToDo_Popover)]" />
+														</MudAlert>
+													</MudPopover>
+												</MudTooltip>
+											</AdornmentEnd>
+										</MudTextFieldExtended>
+									</MudForm>
+								</MudItem>
+							</MudGrid>
+						</div>
+					</ChildContent>
+				</MudStepExtended>
+				<MudStepExtended Icon="@MaterialDesignIcons.Normal.FileCheck" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Components_Label)]">
+					<ChildContent>
+						<div class="step-content">
+							<MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Components_Heading_1)]
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Components_Heading_2)]
+							</MudTextM3>
+							<MudGrid Justify="Justify.Center" Class="mb-4">
+								<MudItem Class="mt-4" xs="8">
+									<MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
+										@if (ComponentsStepSelectedComponent is { } component)
+										{
+											<ModComponentEditor @ref="@modComponentEditor" ModComponent="@component" />
+										}
+									</MudPaper>
+								</MudItem>
+								<MudItem Class="mt-4" xs="4">
+									<MudPaper Class="overflow-y-auto" Style="height: calc(100vh - 435px);">
+										<MudTreeView T="ModComponent" @bind-SelectedValue="@ComponentsStepSelectedComponent" @bind-SelectedValues="@componentsStepSelectedComponents" Color="Color.Tertiary" SelectionMode="@componentsStepSelectionMode" Items="@componentTreeItemData" AutoExpand AutoSelectParent ExpandOnDoubleClick Hover Class="manifest-editor-components-step-tree-view" Style="overflow-wrap: anywhere;">
+											<ItemTemplate>
+												<MudTreeViewItem @bind-Expanded="@context.Expanded" CanExpand="@context.Expandable" Icon="@context.Icon" Items="@context.Children" Text="@context.Text" Value="@context.Value" />
+											</ItemTemplate>
+										</MudTreeView>
+									</MudPaper>
+								</MudItem>
+							</MudGrid>
+						</div>
+						<div class="absolute" style="left: 48px; right: 24px; transform: translateY(5px);">
+							<MudGrid>
+								<MudItem xs="8" Class="pr-8">
+									<MudStack Justify="Justify.FlexEnd" Row>
+										@if (ComponentsStepSelectedComponent is not null)
+										{
+											<MudTooltip Arrow Placement="Placement.Top">
+												<ChildContent>
+													<MudFab StartIcon="@MaterialDesignIcons.Normal.ContentDuplicate" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDuplicateComponentSettingsClickedAsync" />
+												</ChildContent>
+												<TooltipContent>
+													<MudStack Row="true">
+														<MudIcon Icon="@MaterialDesignIcons.Normal.ContentDuplicate" />
+														<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.ManifestEditor_Components_DuplicateSettings_Tip_Caption)]</MudTextM3>
+													</MudStack>
+													<MudDivider />
+													<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+														@MarkupLocalizer[nameof(AppText.ManifestEditor_Components_DuplicateSettings_Tip_Description)]
+													</MudTextM3>
+												</TooltipContent>
+											</MudTooltip>
+										}
+									</MudStack>
+								</MudItem>
+								<MudItem xs="4" Class="pl-8">
+									<MudStack Row>
+										<MudFab StartIcon="@MaterialDesignIcons.Normal.FilePlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleAddFilesClickedAsync" />
+										@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+										{
+											<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+												<MudFab StartIcon="@MaterialDesignIcons.Normal.EyedropperPlus" Size="Size.Medium" Color="Color.Tertiary" OnClick="HandleDropFilesClickedAsync" />
+											</MudTooltip>
+										}
+										<MudFab StartIcon="@MaterialDesignIcons.Normal.FileRemove" Size="Size.Medium" Color="Color.Warning" OnClick="HandleRemoveFilesClickedAsync" />
+									</MudStack>
+								</MudItem>
+							</MudGrid>
+						</div>
+					</ChildContent>
+				</MudStepExtended>
+				<MudStepExtended Icon="@MaterialDesignIcons.Normal.Asterisk" Title="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_Label)]">
+					<ChildContent>
+						<div class="step-content">
+							<MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_Heading_1)]
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_Heading_2)]
+							</MudTextM3>
+							<MudForm @ref="@requirementsStepForm">
+								<MudGrid Justify="Justify.Center" Class="my-4 align-center">
+									<MudItem xs="8">
+										@if (PublicCatalogs.PackCatalog is { } packCatalog)
+										{
+											<MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@RequiredPackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Selector_Placeholder)]" />
+										}
+										else
+										{
+											<ChipSetField @ref="@requiredPacksChipSetField" @bind-Values="@requiredPacks" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.ExpandAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonal" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_Freeform_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RequiredPacks_HelperText)]" />
+										}
+									</MudItem>
+									<MudItem xs="8">
+										<MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_Label)]" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_HelperText)]" Disabled="@(requiredPacks.Count == 0)" />
+									</MudItem>
+									<MudItem xs="8">
+										@if (PublicCatalogs.PackCatalog is { } packCatalog)
+										{
+											<MudSelectExtended T="KeyValuePair<string, PackDescription>" @bind-SelectedValues="@IncompatiblePackPairs" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).ToList())" ToStringFunc="@(mnkv => mnkv is { } kv && kv.Value is { } value ? $"{value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" ValuePresenter="ValuePresenter.Chip" ChipSize="Size.Medium" ChipCloseable Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" Clearable MultiSelection SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Selector_Placeholder)]" />
+										}
+										else
+										{
+											<ChipSetField @ref="@incompatibleChipSetField" @bind-Values="@incompatiblePacks" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.CollapseAll" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_Freeform_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_IncompatiblePacks_HelperText)]" />
+										}
+									</MudItem>
+									<MudFlexBreak />
+									<MudItem>
+										<MudStack Row>
+											<MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
+											<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_SelectModFileFromCatalog)">
+												<MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
+											</MudTooltip>
+											@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+											{
+												<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+													<MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.EyedropperPlus" OnClick="HandleDropRequiredModOnClickedAsync" />
+												</MudTooltip>
+											}
+										</MudStack>
+									</MudItem>
+									<MudItem Class="ml-n4">
+										<MudToggleIconButton @bind-Toggled="@addRequiredModGuidanceOpen" Icon="@MaterialDesignIcons.Outline.Information" Color="Color.Info" />
+										<MudPopover Open="@addRequiredModGuidanceOpen" AnchorOrigin="Origin.TopRight" Fixed TransformOrigin="Origin.BottomRight">
+											<MudAlert Severity="Severity.Info" Style="max-width: 525px;">
+												<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Popover)]" />
+											</MudAlert>
+										</MudPopover>
+									</MudItem>
+									<MudFlexBreak />
+									<MudItem xs="8">
+										<MudExpansionPanels MultiExpansion>
+											@foreach (var requiredMod in requiredMods)
+											{
+												<MudExpansionPanel Text="@requiredMod.Name" Icon="@MaterialDesignIcons.Normal.PuzzleCheck">
+													<ChildContent>
+														<MudStack Class="align-center">
+															<ModRequirementEditor ModRequirement="@requiredMod" />
+															<MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_RemoveRequirement_Label)]</MudButton>
+														</MudStack>
+													</ChildContent>
+												</MudExpansionPanel>
+											}
+										</MudExpansionPanels>
+									</MudItem>
+								</MudGrid>
+							</MudForm>
+						</div>
+					</ChildContent>
+				</MudStepExtended>
+				<MudStepExtended Icon="@MaterialDesignIcons.Normal.Offer" Title="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Label)]">
+					<ChildContent>
+						<div class="step-content">
+							<MudTextM3 Typo="TypoM3.Title" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_Heading_1)]
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
+								@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_Heading_2)]
+							</MudTextM3>
+							<MudGrid Justify="Justify.Center" Class="my-4 align-center">
+								<MudItem>
+									<MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_VersionToggle_Label)]</MudSwitchM3>
+								</MudItem>
+								<MudItem>
+									<MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Version_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Timeline" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
+								</MudItem>
+								<MudFlexBreak />
+								@if (!string.IsNullOrWhiteSpace(originalVersion) && versionEnabled)
+								{
+									<MudItem xs="8">
+										<MudPaper>
+											<MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Outline.TimelineCheck">
+												<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_OriginalVersionFound_Label)]" />
+											</MudAlert>
+										</MudPaper>
+									</MudItem>
+									<MudFlexBreak />
+								}
+								<MudItem>
                                     <MudPaper Class="pa-4">
                                         <MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_SemanticVersioning_Label)]</MudTextM3>
                                         <MudStack Row Class="align-center mt-2">

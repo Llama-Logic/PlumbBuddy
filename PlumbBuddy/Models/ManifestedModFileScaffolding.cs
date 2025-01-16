@@ -3,6 +3,35 @@ namespace PlumbBuddy.Models;
 public sealed class ManifestedModFileScaffolding :
     IParsable<ManifestedModFileScaffolding>
 {
+    public static void DeleteFor(FileInfo modFile)
+    {
+        ArgumentNullException.ThrowIfNull(modFile);
+        var scaffoldingFile = new FileInfo(GetScaffoldingPath(modFile, true));
+        if (scaffoldingFile.Exists)
+        {
+            try
+            {
+                scaffoldingFile.Delete();
+            }
+            catch
+            {
+                // just trying to help... 😟
+            }
+        }
+        scaffoldingFile = new FileInfo(GetScaffoldingPath(modFile, false));
+        if (scaffoldingFile.Exists)
+        {
+            try
+            {
+                scaffoldingFile.Delete();
+            }
+            catch
+            {
+                // just trying to help... 😟
+            }
+        }
+    }
+
     static string GetScaffoldingPath(FileInfo modFile, bool useScaffoldingSubdirectory)
     {
         var fileName = $"{modFile.Name}.manifest_scaffolding.yml";
