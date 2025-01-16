@@ -257,15 +257,21 @@
 								<MudItem>
 									<MudSwitchM3 @bind-Value="@versionEnabled" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.TimelineCheck" ThumbOffIcon="@MaterialDesignIcons.Normal.TimelineQuestion">@MarkupLocalizer[nameof(AppText.ManifestEditor_CrossMod_VersionToggle_Label)]</MudSwitchM3>
 								</MudItem>
+								@if (!string.IsNullOrWhiteSpace(originalVersion))
+								{
+									<MudItem>
+										<MudTextField @bind-Value="@originalVersion" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_FoundVersion_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TimelineCheck" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
+									</MudItem>
+								}
 								<MudItem>
-									<MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Version_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Timeline" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
+									<MudTextField @bind-Value="@version" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_Version_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TimelinePlus" Immediate Disabled="@(!versionEnabled)" Style="max-width: 200px;" />
 								</MudItem>
 								<MudFlexBreak />
 								@if (!string.IsNullOrWhiteSpace(originalVersion) && versionEnabled)
 								{
 									<MudItem xs="8">
 										<MudPaper>
-											<MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Outline.TimelineCheck">
+											<MudAlert Severity="Severity.Info" Icon="@MaterialDesignIcons.Outline.TimelineQuestion">
 												<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestEditor_CrossMod_OriginalVersionFound_Label)]" />
 											</MudAlert>
 										</MudPaper>

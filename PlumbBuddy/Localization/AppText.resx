@@ -495,7 +495,7 @@ If only *parts* of your mod need to be present or not based on whether packs or 
     <value>Sometimes it's helping others shine. 💁‍♀️</value>
   </data>
   <data name="ManifestEditor_CrossMod_Version_Label" xml:space="preserve">
-    <value>Version</value>
+    <value>New Version</value>
   </data>
   <data name="ManifestEditor_CrossMod_VersionToggle_Label" xml:space="preserve">
     <value>I maintain versions of my mod.</value>
@@ -2813,7 +2813,12 @@ I've had to disable myself until you can fix this, and it's important that you u
     <value>I cannot find or correctly interact with your configured archives folder, which means I'm unable to back up your save files. Click here to learn more.</value>
   </data>
   <data name="ManifestEditor_CrossMod_OriginalVersionFound_Label" xml:space="preserve">
-    <value>I found a version number either in a previous manifest for this mod or in its first selected mod file's name if this is your first time manifesting it. If you do keep version numbers in the name of your mod files, you can just change the version here when you're updating the mod's manifest for publishing and I will rename your mod files for you accordingly.</value>
+    <value>I found a version either in a previous manifest for this mod or in its first selected mod file's name, if this is your first time manifesting it. If you do keep versions in the name of your mod files, you can just change the version here when you're updating the mod's manifest for publishing and I will rename your mod files for you accordingly.
+
+*If you put versions in your mod's file's names and the **Current Version** above is incomplete, please manually complete it to match how it appears in your file's names so that I can modify it for you correctly when you change the **New Version** here.*</value>
     <comment>This is in Markdown.</comment>
+  </data>
+  <data name="ManifestEditor_CrossMod_FoundVersion_Label" xml:space="preserve">
+    <value>Current Version</value>
   </data>
 </root>

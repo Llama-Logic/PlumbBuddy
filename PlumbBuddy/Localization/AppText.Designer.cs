@@ -2906,6 +2906,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current Version.
+        /// </summary>
+        internal static string ManifestEditor_CrossMod_FoundVersion_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_CrossMod_FoundVersion_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 🕹️ Entertaining the player ourselves isn&apos;t the only way we can bring value..
         /// </summary>
         internal static string ManifestEditor_CrossMod_Heading_1 {
@@ -2933,7 +2942,9 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I found a version number either in a previous manifest for this mod or in its first selected mod file&apos;s name if this is your first time manifesting it. If you do keep version numbers in the name of your mod files, you can just change the version here when you&apos;re updating the mod&apos;s manifest for publishing and I will rename your mod files for you accordingly..
+        ///   Looks up a localized string similar to I found a version either in a previous manifest for this mod or in its first selected mod file&apos;s name, if this is your first time manifesting it. If you do keep versions in the name of your mod files, you can just change the version here when you&apos;re updating the mod&apos;s manifest for publishing and I will rename your mod files for you accordingly.
+        ///
+        ///*If you put versions in your mod&apos;s file&apos;s names and the **Current Version** above is incomplete, please manually complete it to match how it appears in your file&apos; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ManifestEditor_CrossMod_OriginalVersionFound_Label {
             get {
@@ -2978,7 +2989,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Version.
+        ///   Looks up a localized string similar to New Version.
         /// </summary>
         internal static string ManifestEditor_CrossMod_Version_Label {
             get {

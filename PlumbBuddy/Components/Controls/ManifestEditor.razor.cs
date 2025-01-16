@@ -601,7 +601,7 @@ partial class ManifestEditor
                         await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_CreatingScaffolding", getComponentRelativePath(component)]).ConfigureAwait(false);
                         var scaffolding = new ManifestedModFileScaffolding
                         {
-                            ModName = name.Trim(),
+                            ModName = (name ?? string.Empty).Trim(),
                             IsRequired = component.IsRequired,
                             ComponentName = (component.Name ?? string.Empty).Trim(),
                             HashingLevel = hashingLevel
