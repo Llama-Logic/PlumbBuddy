@@ -225,15 +225,15 @@ public sealed class DependencyScan :
                 resolutionType |= MissingDependencyModResolutionType.UnspecifiedDependencySource;
             if (modWithMissingDependencyMod.Name == modWithMissingDependencyMod.DependencyName)
                 resolutionType |= MissingDependencyModResolutionType.IdenticallyNamed;
-            return resolutionType switch
-            {
-                MissingDependencyModResolutionType.BrokenFile =>
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.BrokenFile))
+                return
                 (
                     AppText.Scan_Dependency_BrokenFile_Caption,
                     string.Format(AppText.Scan_Dependency_BrokenFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     null
-                ),
-                MissingDependencyModResolutionType.ReinstallFile =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.ReinstallFile))
+                return
                 (
                     AppText.Scan_Dependency_ReinstallFile_Caption,
                     string.Format(AppText.Scan_Dependency_ReinstallFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
@@ -245,8 +245,9 @@ public sealed class DependencyScan :
                         Data = "downloadDependent",
                         Url = modWithMissingDependencyMod.Url
                     }
-                ),
-                MissingDependencyModResolutionType.ReinstallMod =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.ReinstallMod))
+                return
                 (
                     string.Format(AppText.Scan_Dependency_ReinstallMod_Caption, modWithMissingDependencyMod.Name),
                     string.Format(AppText.Scan_Dependency_ReinstallMod_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
@@ -258,8 +259,9 @@ public sealed class DependencyScan :
                         Data = "downloadDependent",
                         Url = modWithMissingDependencyMod.Url
                     }
-                ),
-                MissingDependencyModResolutionType.FileNeedsDownload =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.FileNeedsDownload))
+                return
                 (
                     AppText.Scan_Dependency_FileNeedsDownload_Caption,
                     string.Format(AppText.Scan_Dependency_FileNeedsDownload_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
@@ -271,8 +273,9 @@ public sealed class DependencyScan :
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
                     }
-                ),
-                MissingDependencyModResolutionType.ModNeedsDownload =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.ModNeedsDownload))
+                return
                 (
                     string.Format(AppText.Scan_Dependency_ModNeedsDownload_Caption, modWithMissingDependencyMod.Name),
                     string.Format(AppText.Scan_Dependency_ModNeedsDownload_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
@@ -284,8 +287,9 @@ public sealed class DependencyScan :
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
                     }
-                ),
-                MissingDependencyModResolutionType.FileNeedsDependency =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.FileNeedsDependency))
+                return
                 (
                     string.Format(AppText.Scan_Dependency_FileNeedsDependency_Caption, modWithMissingDependencyMod.DependencyName),
                     string.Format(AppText.Scan_Dependency_FileNeedsDependency_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
@@ -297,8 +301,9 @@ public sealed class DependencyScan :
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
                     }
-                ),
-                MissingDependencyModResolutionType type when type.HasFlag(MissingDependencyModResolutionType.IdenticallyNamed) =>
+                );
+            if (resolutionType.HasFlag(MissingDependencyModResolutionType.IdenticallyNamed))
+                return
                 (
                     string.Format(AppText.Scan_Dependency_IdenticallyNamed_Caption, modWithMissingDependencyMod.Name),
                     string.Format(AppText.Scan_Dependency_IdenticallyNamed_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
@@ -310,8 +315,8 @@ public sealed class DependencyScan :
                         Data = "downloadComponent",
                         Url = modWithMissingDependencyMod.Url
                     }
-                ),
-                _ =>
+                );
+            return
                 (
                     string.Format(AppText.Scan_Dependency_ModNeedsMod_Caption, modWithMissingDependencyMod.Name, modWithMissingDependencyMod.DependencyName),
                     string.Format(AppText.Scan_Dependency_ModNeedsMod_Description, modWithMissingDependencyMod.Name, getByLine(modWithMissingDependencyMod.Creators), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
@@ -323,8 +328,7 @@ public sealed class DependencyScan :
                         Data = "downloadDependency",
                         Url = modWithMissingDependencyMod.DependencyUrl
                     }
-                )
-            };
+                );
         }
         var commonRequirementIdentifiersValuesBySolitude = commonRequirementIdentifiers.Values
             .Where(list => list.Count == list.First().CommonRequirementIdentifiers)
@@ -349,7 +353,7 @@ public sealed class DependencyScan :
                         (
                             modWithMissingDependencyMod.FilePaths.Select(filePath => new ScanIssueResolution()
                             {
-                                Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, modWithMissingDependencyMod.Name ?? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback),
+                                Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, string.IsNullOrWhiteSpace(modWithMissingDependencyMod.Name) ? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback : modWithMissingDependencyMod.Name),
                                 Icon = MaterialDesignIcons.Normal.FileFind,
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
