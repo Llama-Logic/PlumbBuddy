@@ -21,4 +21,6 @@ public class ResourceSnapshotDelta
 
     [Required]
     public required int PatchSize { get; set; }
+
+    public SavePackageResourceCompressionType? CompressionType { get; set; }
 }

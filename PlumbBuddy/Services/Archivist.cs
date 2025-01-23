@@ -417,6 +417,15 @@ public partial class Archivist :
                             ? await package.GetRawAsync(key).ConfigureAwait(false)
                             : await package.GetAsync(key).ConfigureAwait(false);
                         var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
+                        var compressionType = explicitCompressionMode switch
+                        {
+                            LlamaLogic.Packages.CompressionMode.ForceOff => SavePackageResourceCompressionType.None,
+                            LlamaLogic.Packages.CompressionMode.SetDeletedFlag => SavePackageResourceCompressionType.Deleted,
+                            LlamaLogic.Packages.CompressionMode.ForceInternal => SavePackageResourceCompressionType.Internal,
+                            LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable => SavePackageResourceCompressionType.Streamable,
+                            LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
+                            _ => throw new NotSupportedException("unsupported DBPF resource compression")
+                        };
                         if (type is ResourceType.SaveThumbnail4)
                         {
                             try
@@ -437,6 +446,7 @@ public partial class Archivist :
                         if (resource is not null)
                         {
                             var previousContent = await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false);
+                            var previousCompressionType = resource.CompressionType;
                             if (!previousContent.Span.SequenceEqual(content.Span))
                             {
                                 using var patchStream = new MemoryStream();
@@ -444,6 +454,7 @@ public partial class Archivist :
                                 ReadOnlyMemory<byte> patch = patchStream.ToArray();
                                 resource.ContentZLib = compressedContent;
                                 resource.ContentSize = content.Length;
+                                resource.CompressionType = compressionType;
                                 using var heldContextLock = await contextLock.LockAsync().ConfigureAwait(false);
                                 await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
                                 (
@@ -451,6 +462,7 @@ public partial class Archivist :
                                     {
                                         PatchZLib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray(),
                                         PatchSize = patch.Length,
+                                        CompressionType = previousCompressionType,
                                         SavePackageResource = resource,
                                         SavePackageSnapshot = newSnapshot
                                     }
@@ -461,15 +473,7 @@ public partial class Archivist :
                             resource = new SavePackageResource
                             {
                                 Key = keyBytes,
-                                CompressionType = explicitCompressionMode switch
-                                {
-                                    LlamaLogic.Packages.CompressionMode.ForceOff => SavePackageResourceCompressionType.None,
-                                    LlamaLogic.Packages.CompressionMode.SetDeletedFlag => SavePackageResourceCompressionType.Deleted,
-                                    LlamaLogic.Packages.CompressionMode.ForceInternal => SavePackageResourceCompressionType.Internal,
-                                    LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable => SavePackageResourceCompressionType.Streamable,
-                                    LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
-                                    _ => throw new NotSupportedException("unsupported DBPF resource compression")
-                                },
+                                CompressionType = compressionType,
                                 ContentZLib = compressedContent,
                                 ContentSize = content.Length,
                             };

@@ -59,7 +59,8 @@ public class Snapshot :
                         .Select(d => new
                         {
                             d.PatchZLib,
-                            d.PatchSize
+                            d.PatchSize,
+                            d.CompressionType
                         })
                         .ToList()
                 })
@@ -70,26 +71,30 @@ public class Snapshot :
                     try
                     {
                         var contentStream = fromReadOnlyMemory(await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false));
+                        var compressionType = resource.CompressionType;
                         try
                         {
+                            Span<byte> keyBytes = resource.Key;
+                            var key = new ResourceKey
+                            (
+                                MemoryMarshal.Read<ResourceType>(keyBytes[0..4]),
+                                MemoryMarshal.Read<uint>(keyBytes[4..8]),
+                                MemoryMarshal.Read<ulong>(keyBytes[8..16])
+                            );
                             foreach (var delta in resource.Deltas)
                             {
                                 using var oldContentStream = contentStream;
                                 contentStream = new MemoryStream();
                                 var patch = await DataBasePackedFile.ZLibDecompressAsync(delta.PatchZLib, delta.PatchSize).ConfigureAwait(false);
                                 BinaryPatch.Apply(oldContentStream, () => fromReadOnlyMemory(patch), contentStream);
+                                if (delta.CompressionType is { } deltaCompressionType)
+                                    compressionType = deltaCompressionType;
                             }
-                            Span<byte> keyBytes = resource.Key;
                             await package.SetAsync
                             (
-                                new ResourceKey
-                                (
-                                    MemoryMarshal.Read<ResourceType>(keyBytes[0..4]),
-                                    MemoryMarshal.Read<uint>(keyBytes[4..8]),
-                                    MemoryMarshal.Read<ulong>(keyBytes[8..16])
-                                ),
+                                key,
                                 contentStream.ToArray().AsMemory(),
-                                resource.CompressionType switch
+                                compressionType switch
                                 {
                                     SavePackageResourceCompressionType.None => LlamaLogic.Packages.CompressionMode.ForceOff,
                                     SavePackageResourceCompressionType.Deleted => LlamaLogic.Packages.CompressionMode.SetDeletedFlag,
