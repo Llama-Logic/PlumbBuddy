@@ -1,0 +1,22 @@
+@inherits ReactiveComponentBase
+@inject ICatalog Catalog
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<MudGrid Justify="Justify.Center" Class="align-center">
+	<MudItem Class="flex-grow-1">
+		<MudPaper Outlined>
+			<MudAlert Severity="Severity.Info">@MarkupLocalizer[nameof(AppText.CatalogDisplay_UserAssistanceNote)]</MudAlert>
+		</MudPaper>
+	</MudItem>
+	<MudItem>
+		<MudTextField T="string" @bind-Value="@Binding(() => Catalog.ModsSearchText).Value" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.CatalogDisplay_SearchCatalog)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" Style="background-color: var(--mud-palette-surface);" />
+	</MudItem>	
+	<MudFlexBreak />
+	<MudItem xs="4">
+		<CatalogDisplayModsList />
+	</MudItem>
+	<MudItem xs="8">
+		<CatalogDisplayModDetails />
+    </MudItem>
+</MudGrid>

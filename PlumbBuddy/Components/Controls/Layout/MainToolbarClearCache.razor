@@ -1,0 +1,53 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISettings Settings
+@inject ISmartSimObserver SmartSimObserver
+
+<MudTooltip Arrow="true">
+	<ChildContent>
+		<MudIconButton Icon="@MaterialDesignIcons.Normal.Eraser" Color="@(Observed(() => Settings.CacheStatus) is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="@SmartSimObserver.ClearCacheAsync" Disabled="@(Settings.CacheStatus is SmartSimCacheStatus.Clear || Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Sleeping)" />
+	</ChildContent>
+	<TooltipContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@MaterialDesignIcons.Normal.Eraser" />
+			<MudTextM3 Typo="TypoM3.Title">
+				@MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
+			</MudTextM3>
+		</MudStack>
+		<MudDivider />
+		@if (Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Sleeping)
+		{
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Sleeping)]
+			</MudTextM3>
+		}
+		@if (Observed(() => ModsDirectoryCataloger.State) is not ModsDirectoryCatalogerState.Sleeping)
+		{
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip)]
+			</MudTextM3>
+			@if (Observed(() => Settings.CacheStatus) is SmartSimCacheStatus.Clear)
+			{
+				<MudDivider />
+				<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+					@MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_AlreadyClear)]
+				</MudTextM3>
+			}
+			@if (Observed(() => Settings.CacheStatus) is SmartSimCacheStatus.Normal)
+			{
+				<MudDivider />
+				<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+					@MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Clearable)]
+				</MudTextM3>
+			}
+			@if (Observed(() => Settings.CacheStatus) is SmartSimCacheStatus.Stale)
+			{
+				<MudDivider />
+				<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+					@MarkupLocalizer[nameof(AppText.MainLayout_ClearCache_Tip_Stale)]
+				</MudTextM3>
+			}
+		}
+	</TooltipContent>
+</MudTooltip>

@@ -1,0 +1,13 @@
+@inherits ReactiveComponentBase
+@inject ICatalog Catalog
+@inject ISettings Settings;
+
+<div class="catalog-list overflow-y-auto rounded mud-paper-outlined">
+	<MudList T="CatalogModKey" @bind-SelectedValue="@Binding(() => Catalog.SelectedModKey).Value">
+		@if (Observed(() => Catalog.Mods) is { } mods)
+			foreach (var (modKey, modValue) in mods.Where(kv => IncludeMod(kv)).OrderBy(kv => kv.Key.Name).ThenBy(kv => kv.Key.Creators ?? kv.Key.Url?.ToString()))
+			{
+				<MudListItem T="CatalogModKey" Value="@modKey" Text="@modKey.Name" SecondaryText="@(modKey.Creators ?? modKey.Url?.ToString())" Icon="@MaterialDesignIcons.Normal.Certificate" IconColor="Color.Primary" />
+			}
+	</MudList>
+</div>

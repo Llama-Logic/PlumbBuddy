@@ -1,0 +1,25 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+
+@if (Observed(() => ModsDirectoryCataloger.ProgressMax) is { } progressMax)
+{
+	<div class="d-inline-block" style="width: 100px;">
+		<MudProgressLinear Color="Color.Primary" Max="@progressMax" Value="@Observed(() => ModsDirectoryCataloger.ProgressValue)" Buffer />
+	</div>
+	<MudTooltip Arrow="true" Color="Color.Info">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Info" Value="@(Observed(() => ModsDirectoryCataloger.EstimatedStateTimeRemaining) is { } estimatedTimeRemaining ? estimatedTimeRemaining.ToString("mm':'ss") : AppText.HUD_CatalogingETA_Tip_Estimating)" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.Timer" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_CatalogingETA_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_CatalogingETA_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}

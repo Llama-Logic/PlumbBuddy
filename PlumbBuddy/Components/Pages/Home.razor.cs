@@ -20,35 +20,20 @@ partial class Home
         }
     }
 
-    /// <inheritdoc />
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
-        SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
-        UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
-    }
-
-    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-            StaticDispatcher.Dispatch(StateHasChanged);
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            Settings.PropertyChanged -= HandleSettingsPropertyChanged;
+            UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
+        }
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.Theme))
             StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
-        else if (e.PropertyName is nameof(ISettings.DevToolsUnlocked)
-            or nameof(ISettings.ShowThemeManager)
-            or nameof(ISettings.Type))
-            StaticDispatcher.Dispatch(StateHasChanged);
-    }
-
-    void HandleSmartSimObserverPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ISmartSimObserver.ScanIssues))
-            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     void HandleUserInterfaceMessagingBeginManifestingModRequested(object? sender, BeginManifestingModRequestedEventArgs e)
@@ -64,9 +49,7 @@ partial class Home
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
-        SmartSimObserver.PropertyChanged += HandleSmartSimObserverPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
     }
 

@@ -16,6 +16,7 @@ static class Configuration
         services.AddSingleton<IGlobalExceptionCatcher, GlobalExceptionCatcher>();
         services.AddSingleton<IUpdateManager, UpdateManager>();
         services.AddSingleton<IUserInterfaceMessaging, UserInterfaceMessaging>();
+        services.AddSingleton<ICatalog, Catalog>();
         services.AddSingleton<IArchivist, Archivist>();
         return services;
     }

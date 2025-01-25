@@ -1,0 +1,21 @@
+@inherits ReactiveComponentBase
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISmartSimObserver SmartSimObserver
+
+<MudGrid Justify="Justify.Center" Class="scan-issues-container">
+	@if (Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
+	{
+		foreach (var scanIssue in ObservedCollection(() => SmartSimObserver.ScanIssues))
+		{
+			<ModHealthDisplayScanIssue ScanIssue="@scanIssue" />
+		}
+	}
+	else if (Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Sleeping)
+	{
+		<ModHealthDisplaySleeping />
+	}
+	else
+	{
+		<ModHealthDisplayRefreshing />
+	}
+</MudGrid>

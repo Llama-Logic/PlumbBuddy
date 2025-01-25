@@ -1,0 +1,41 @@
+@inject ICatalog Catalog
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<MudTable T="CatalogModKey" Items="@Dependents" Breakpoint="Breakpoint.Md" Dense Filter="IncludeDependent" Class="mt-2">
+	<ToolBarContent>
+		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">@MarkupLocalizer[nameof(AppText.CatalogDisplay_Dependents)]</MudTextM3>
+		<MudSpacer />
+		<MudTextField @bind-Value="@dependentsSearchText" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate Clearable DebounceInterval="250" />
+	</ToolBarContent>
+	<HeaderContent>
+		<MudTh>@StringLocalizer[nameof(AppText.Common_Name)]</MudTh>
+		<MudTh>@StringLocalizer[nameof(AppText.Common_Creators)]</MudTh>
+		<MudTh>@StringLocalizer[nameof(AppText.Common_Url)]</MudTh>
+		<MudTh></MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Name)]">
+			<MudTextM3>
+				<MudHighlighter Text="@context.Name" HighlightedText="@dependentsSearchText" />
+			</MudTextM3>
+		</MudTd>
+		<MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Creators)]">
+			<MudTextM3>
+				<MudHighlighter Text="@context.Creators" HighlightedText="@dependentsSearchText" />
+			</MudTextM3>
+		</MudTd>
+		<MudTd DataLabel="@StringLocalizer[nameof(AppText.Common_Url)]">
+			<MudLink Href="@context.Url?.ToString()">
+				<MudHighlighter Text="@context.Url?.ToString()" HighlightedText="@dependentsSearchText" />
+			</MudLink>
+		</MudTd>
+		<MudTd>
+			<MudStack Row Justify="Justify.FlexEnd">
+				<MudTooltip Text="@StringLocalizer[nameof(AppText.CatalogDisplay_Dependents_OpenCatalogEntry_Tip)]" Arrow>
+					<MudIconButton Icon="@MaterialDesignIcons.Normal.OpenInApp" Size="Size.Small" OnClick="@(() => Catalog.SelectedModKey = context)" />
+				</MudTooltip>
+			</MudStack>
+		</MudTd>
+	</RowTemplate>
+</MudTable>

@@ -1,0 +1,42 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings;
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<MudTable T="FileInfo" Items="@Files" Breakpoint="Breakpoint.Md" Dense Filter="IncludeFile" Class="mt-2">
+	<ToolBarContent>
+		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+			@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files)]
+			</MudTextM3>
+		<MudSpacer />
+		<MudTextField @bind-Value="@filesSearchText" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+	</ToolBarContent>
+	<HeaderContent>
+		<MudTh>
+			@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]
+		</MudTh>
+		<MudTh></MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd DataLabel="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]">
+			<MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0">
+				<ItemTemplate Context="item">
+					<MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+						<MudIcon Icon="@item.Icon" />
+						<MudTextM3>
+							<MudHighlighter Text="@item.Text" HighlightedText="@filesSearchText" />
+						</MudTextM3>
+					</MudStack>
+				</ItemTemplate>
+			</MudBreadcrumbs>
+		</MudTd>
+		<MudTd>
+			<MudStack Row Justify="Justify.FlexEnd">
+				<MudTooltip Text="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ViewThisFile_Tip)]" Arrow>
+					<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="(() => PlatformFunctions.ViewFile(context))" />
+				</MudTooltip>
+			</MudStack>
+		</MudTd>
+	</RowTemplate>
+</MudTable>

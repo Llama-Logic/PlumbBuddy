@@ -8,12 +8,6 @@ partial class MainMenu
     [Parameter]
     public EventCallback CloseDrawer { get; set; }
 
-    public void Dispose()
-    {
-        ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
-    }
-
     async Task HandleAskForHelpOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
@@ -45,12 +39,6 @@ partial class MainMenu
     Task HandleCloseMenuOnClickAsync() =>
         CloseDrawer.InvokeAsync();
 
-    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-            StaticDispatcher.Dispatch(StateHasChanged);
-    }
-
     async Task HandleOpenDownloadsFolderOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
@@ -73,14 +61,6 @@ partial class MainMenu
     {
         await CloseDrawer.InvokeAsync();
         PlatformFunctions.ViewDirectory(MauiProgram.AppDataDirectory);
-    }
-
-    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(ISettings.CacheStatus))
-            StaticDispatcher.Dispatch(StateHasChanged);
-        else if (e.PropertyName == nameof(ISettings.DevToolsUnlocked))
-            StaticDispatcher.Dispatch(StateHasChanged);
     }
 
     async Task HandleReonboardOnClickAsync()
@@ -151,12 +131,5 @@ partial class MainMenu
                 Snackbar.Add(AppText.MainMenu_DevTools_Snack_InversionOfControlChange, Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.RestartAlert);
             }
         }
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
-        Settings.PropertyChanged += HandleSettingsPropertyChanged;
     }
 }

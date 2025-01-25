@@ -31,8 +31,6 @@ public partial class MainLayout
     DotNetObjectReference<MainLayout>? javaScriptThis;
     bool manualLightDarkModeToggleEnabled;
     bool? manualLightDarkModeToggle;
-    int packageCount;
-    int scriptArchiveCount;
     bool themeManagerOpen = false;
     ThemeManagerTheme themeManagerTheme = new()
     {
@@ -122,13 +120,15 @@ public partial class MainLayout
         }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
-        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
-        SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
-        javaScriptThis?.Dispose();
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            Settings.PropertyChanged -= HandleSettingsPropertyChanged;
+            SuperSnacks.RefreshmentsOffered -= HandleSuperSnacksRefreshmentsOffered;
+            javaScriptThis?.Dispose();
+        }
     }
 
     bool? GetSettingsSelectedThemeIsDarkMode()
@@ -147,20 +147,9 @@ public partial class MainLayout
         return null;
     }
 
-    async Task HandleAskForHelpOnClickAsync() =>
-        await DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs);
-
-    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-            StaticDispatcher.Dispatch(StateHasChanged);
-    }
-
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ISettings.CacheStatus))
-            StaticDispatcher.Dispatch(StateHasChanged);
-        else if (e.PropertyName is nameof(ISettings.ShowThemeManager))
+        if (e.PropertyName is nameof(ISettings.ShowThemeManager))
             StaticDispatcher.Dispatch(() =>
             {
                 manualLightDarkModeToggleEnabled = false;
@@ -219,11 +208,8 @@ public partial class MainLayout
             app.Windows[0].Title = "PlumbBuddy";
         if (Settings.ShowThemeManager)
             StateHasChanged();
-        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SuperSnacks.RefreshmentsOffered += HandleSuperSnacksRefreshmentsOffered;
-        packageCount = ModsDirectoryCataloger.PackageCount;
-        scriptArchiveCount = ModsDirectoryCataloger.ScriptArchiveCount;
     }
 
     /// <inheritdoc/>

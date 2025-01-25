@@ -1,0 +1,27 @@
+@inherits ReactiveComponentBase
+@inject IDialogService DialogService
+@inject ILogger<MainToolbarAskForHelp> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPublicCatalogs PublicCatalogs
+
+<MudTooltip Arrow="true">
+	<ChildContent>
+		<MudIconButton Icon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs))" />
+	</ChildContent>
+	<TooltipContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@MaterialDesignIcons.Normal.FaceAgent" />
+			<MudTextM3 Typo="TypoM3.Title">
+				@MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
+			</MudTextM3>
+		</MudStack>
+		<MudDivider />
+		<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+			@MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip)]
+		</MudTextM3>
+		<MudDivider />
+		<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+			@MarkupLocalizer[nameof(AppText.MainLayout_AskForHelp_Tip_ModGuidance), MaterialDesignIcons.Normal.Book, MaterialDesignIcons.Normal.FaceAgent]
+		</MudTextM3>
+	</TooltipContent>
+</MudTooltip>

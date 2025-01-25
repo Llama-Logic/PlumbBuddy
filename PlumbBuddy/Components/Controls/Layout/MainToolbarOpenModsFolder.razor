@@ -1,0 +1,31 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISmartSimObserver SmartSimObserver
+
+<MudTooltip Arrow="true">
+	<ChildContent>
+		<MudIconButton Icon="@MaterialDesignIcons.Normal.FolderPound" OnClick="SmartSimObserver.OpenModsFolder" Disabled="@(Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Sleeping)" />
+	</ChildContent>
+	<TooltipContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@MaterialDesignIcons.Normal.FolderPound" />
+			<MudTextM3 Typo="TypoM3.Title">
+				@MarkupLocalizer[nameof(AppText.MainMenu_OpenModsFolder_Label)]
+			</MudTextM3>
+		</MudStack>
+		<MudDivider />
+		@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+		{
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip_Sleeping)]
+			</MudTextM3>
+		}
+		@if (ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping)
+		{
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.MainLayout_OpenModsFolder_Tip)]
+			</MudTextM3>
+		}
+	</TooltipContent>
+</MudTooltip>

@@ -1,0 +1,26 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
+<MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+	<MudCard Outlined="true" Class="scan-issue scan-issue-refreshing">
+		<MudCardHeader>
+			<CardHeaderAvatar>
+				<MudAvatar Variant="Variant.Outlined">
+					<MudIcon Icon="@MaterialDesignIcons.Normal.FolderSync" Size="Size.Large" />
+				</MudAvatar>
+			</CardHeaderAvatar>
+			<CardHeaderContent>
+				<MudTextM3 Typo="TypoM3.Title">
+					@MarkupLocalizer[nameof(AppText.ScanIssuesDisplay_MDCRefreshing_Caption)]
+				</MudTextM3>
+			</CardHeaderContent>
+		</MudCardHeader>
+		<MudCardContent>
+			<MudTextM3 Typo="TypoM3.Body">
+				@MarkupLocalizer[nameof(AppText.ScanIssuesDisplay_MDCRefreshing_Description)]
+			</MudTextM3>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.AlertCircle" Size="Size.Large" Color="Color.Warning" Class="mt-4">
+				@MarkupLocalizer[nameof(AppText.ScanIssuesDisplay_MDCRefreshing_Warning)]
+			</MudChip>
+		</MudCardContent>
+	</MudCard>
+</MudItem>

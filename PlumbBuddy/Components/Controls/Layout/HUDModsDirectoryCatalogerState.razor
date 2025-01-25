@@ -1,0 +1,107 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+
+@if (Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Composing)
+{
+	<MudTooltip Arrow="true" Color="Color.Tertiary">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.FileSign" Color="Color.Tertiary">
+				<ChildContent>@MarkupLocalizer[nameof(AppText.HUD_ComposingManifests_Tip_Caption)]</ChildContent>
+			</MudChip>
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.FileSign" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_ComposingManifests_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_ComposingManifests_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+{
+	<MudTooltip Arrow="true" Color="Color.Dark">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.Sleep" Color="Color.Dark">
+				<ChildContent>@MarkupLocalizer[nameof(AppText.HUD_Sleeping_Tip_Caption)]</ChildContent>
+			</MudChip>
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_Sleeping_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_Sleeping_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Debouncing)
+{
+	<MudTooltip Arrow="true" Color="Color.Tertiary">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.Timer" Color="Color.Tertiary" Class="plumbbuddy-is-thinking">
+				<ChildContent>@MarkupLocalizer[nameof(AppText.HUD_Waiting_Tip_Caption)]</ChildContent>
+			</MudChip>
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.Timer" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_Waiting_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_Waiting_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging)
+{
+	<MudTooltip Arrow="true" Color="Color.Primary">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.CubeScan" Color="Color.Primary" Class="plumbbuddy-is-thinking">
+				<ChildContent>
+					@MarkupLocalizer[nameof(AppText.HUD_CatalogingMods_Tip_Caption)]
+				</ChildContent>
+			</MudChip>
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.CubeScan" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_CatalogingMods_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_CatalogingMods_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+	<HUDModsDirectoryCatalogerCatalogingProgress />
+}
+@if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology)
+{
+	<MudTooltip Arrow="true" Color="Color.Secondary">
+		<ChildContent>
+			<MudChip T="string" Icon="@MaterialDesignIcons.Normal.SelectCompare" Color="Color.Secondary" Class="plumbbuddy-is-thinking">
+				<ChildContent>@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Caption)]</ChildContent>
+			</MudChip>
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.SelectCompare" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_AnalyzingTopology_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}

@@ -1,0 +1,31 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISettings Settings
+@inject ISmartSimObserver SmartSimObserver
+
+@if (Observed(() => Settings.Type) is not UserType.Casual && Observed(() => ModsDirectoryCataloger.PackageCount) > 0)
+{
+	<MudTooltip Arrow="true">
+		<ChildContent>
+			<MudChip T="int" Icon="@(Observed(() => SmartSimObserver.IsModsDisabledGameSettingOn) ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" Value="@ModsDirectoryCataloger.PackageCount" Color="@(SmartSimObserver.IsModsDisabledGameSettingOn ? Color.Warning : Color.Default)" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@(SmartSimObserver.IsModsDisabledGameSettingOn ? MaterialDesignIcons.Normal.PackageVariantClosedRemove : MaterialDesignIcons.Normal.PackageVariantClosedCheck)" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_Packages_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_Packages_Tip_Description)]
+			</MudTextM3>
+			@if (SmartSimObserver.IsModsDisabledGameSettingOn)
+			{
+				<MudDivider />
+				<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+					@MarkupLocalizer[nameof(AppText.HUD_Packages_Tip_Description_ModsDisabled)]
+				</MudTextM3>
+			}
+		</TooltipContent>
+	</MudTooltip>
+}

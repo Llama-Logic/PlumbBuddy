@@ -1,0 +1,89 @@
+@inherits ReactiveComponentBase
+@inject ICatalog Catalog
+@inject IDialogService DialogService
+@inject ILogger<CatalogDisplayModDetails> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPublicCatalogs PublicCatalogs
+@inject ISmartSimObserver SmartSimObserver
+@inject IStringLocalizer<AppText> StringLocalizer
+
+<div class="catalog-details overflow-y-auto rounded mud-paper-outlined pa-4">
+	<MudGrid Justify="Justify.Center" Spacing="1">
+		@if (Observed(() => Catalog.Mods) is { } mods && Observed(() => Catalog.SelectedModKey) is { } selectedModKey && mods.TryGetValue(selectedModKey, out var selectedMod))
+		{
+			var version = selectedMod.Select(t => t.manifest.Version).Where(v => !string.IsNullOrWhiteSpace(v)).Cast<string>().GroupBy(v => v).OrderByDescending(g => g.Key)?.FirstOrDefault()?.Key;
+			var hashHex = selectedMod.Select(t => t.manifest.Hash).First().ToHexString();
+			var requiredPackCodes = selectedMod.SelectMany(t => t.manifest.RequiredPacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
+			var incompatiblePackCodes = selectedMod.SelectMany(t => t.manifest.IncompatiblePacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
+			var installedPackCodes = Observed(() => SmartSimObserver.InstalledPackCodes).ToImmutableHashSet();
+			var creators = selectedMod.SelectMany(t => t.manifest.Creators).Distinct().ToImmutableArray();
+			var files = selectedMod.SelectMany(t => t.files).DistinctBy(fi => fi.FullName).OrderBy(fi => fi.FullName).ToImmutableArray();
+			var dependencies = selectedMod.SelectMany(t => t.dependencies).Distinct().OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
+			var indexableDependents = selectedMod.SelectMany(t => t.dependents).Distinct().Where(mods.ContainsKey).OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
+			<MudItem Style="text-align: center;">
+				<MudTextM3 Typo="TypoM3.Headline">
+					@(selectedModKey.Name)
+					@if (!string.IsNullOrWhiteSpace(version))
+					{
+						<small>&#x20;@version</small>
+					}
+				</MudTextM3>
+			</MudItem>
+			<MudFlexBreak />
+			@if (selectedModKey.Url is { } url)
+			{
+				<MudItem>
+					<MudLink Href="@url.ToString()">@url</MudLink>
+				</MudItem>
+			}
+			<MudFlexBreak />
+			@if (creators.Length is > 0)
+			{
+				<MudItem>
+					<MudStack Row Spacing="0">
+						@foreach (var creator in creators)
+						{
+							<MudChip T="string" Text="@creator" Icon="@MaterialDesignIcons.Normal.Account" Color="Color.Primary" />
+						}
+					</MudStack>
+				</MudItem>
+				<MudFlexBreak />
+			}
+			<MudItem>
+				<MudStack Row>
+					<MudTooltip Arrow Text="@StringLocalizer["CatalogDisplay_AskForHelp_Tip", selectedModKey.Name]" Color="Color.Info">
+						<MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))" StartIcon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info">@MarkupLocalizer[nameof(AppText.CatalogDisplay_AskForHelp)]</MudButton>
+					</MudTooltip>
+					@foreach (var requiredPackCode in requiredPackCodes)
+					{
+						<MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
+							<MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(requiredPackCode, DialogService, creators, selectedMod.Select(mod => mod.manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
+						</MudTooltip>
+					}
+					@foreach (var incompatiblePackCode in incompatiblePackCodes)
+					{
+						<MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(incompatiblePackCode) ? "CatalogDisplay_IncompatiblePack_Installed_Tip" : "CatalogDisplay_IncompatiblePack_NotInstalled_Tip", selectedModKey.Name, incompatiblePackCode])" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
+							<MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Browser.OpenAsync(new Uri("https://jamesturner.yt/disablepacks", UriKind.Absolute), BrowserLaunchMode.External))" StartIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
+						</MudTooltip>
+					}
+				</MudStack>
+			</MudItem>
+			<MudFlexBreak />
+			<MudItem xs="12">
+				<CatalogDisplayModDetailsFiles Files="@files" />
+			</MudItem>
+			@if (dependencies.Length is > 0)
+			{
+				<MudItem xs="12">
+					<CatalogDisplayModDetailsDependencies Dependencies="@dependencies" />
+				</MudItem>
+			}
+			@if (indexableDependents.Length is > 0)
+			{
+				<MudItem xs="12">
+					<CatalogDisplayModDetailsDependents Dependents="@indexableDependents" />
+				</MudItem>
+			}
+		}
+	</MudGrid>
+</div>

@@ -1,0 +1,31 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISettings Settings
+@inject ISmartSimObserver SmartSimObserver
+
+@if (Observed(() => Settings.Type) is UserType.Creator && Observed(() => ModsDirectoryCataloger.PythonByteCodeFileCount) > 0)
+{
+	<MudTooltip Arrow="true">
+		<ChildContent>
+			<MudChip T="int" Icon="@MaterialDesignIcons.Normal.Speedometer" Value="@ModsDirectoryCataloger.PythonByteCodeFileCount" Color="Color.Default" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.Speedometer" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_ByteCodeFiles_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_ByteCodeFiles_Tip_Description)]
+			</MudTextM3>
+			@if (Observed(() => SmartSimObserver.IsModsDisabledGameSettingOn) || !Observed(() => SmartSimObserver.IsScriptModsEnabledGameSettingOn))
+			{
+				<MudDivider />
+				<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify" Color="Color.Warning">
+					@MarkupLocalizer[nameof(AppText.HUD_ByteCodeFiles_Tip_ModsDisabled)]
+				</MudTextM3>
+			}
+		</TooltipContent>
+	</MudTooltip>
+}

@@ -1,0 +1,23 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+
+<MudItem xs="12" md="6" lg="4" xl="3" xxl="2">
+	<MudCard Outlined="true" Class="scan-issue scan-issue-sleeping">
+		<MudCardHeader>
+			<CardHeaderAvatar>
+				<MudAvatar Variant="Variant.Outlined">
+					<MudIcon Icon="@MaterialDesignIcons.Normal.Sleep" Size="Size.Large" />
+				</MudAvatar>
+			</CardHeaderAvatar>
+			<CardHeaderContent>
+				<MudTextM3 Typo="TypoM3.Title">
+					@MarkupLocalizer[nameof(AppText.ScanIssuesDisplay_MDCAsleep_Caption)]
+				</MudTextM3>
+			</CardHeaderContent>
+		</MudCardHeader>
+		<MudCardContent>
+			<MudTextM3 Typo="TypoM3.Body">
+				@MarkupLocalizer[nameof(AppText.ScanIssuesDisplay_MDCAsleep_Description)]
+			</MudTextM3>
+		</MudCardContent>
+	</MudCard>
+</MudItem>

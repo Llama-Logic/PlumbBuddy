@@ -1,0 +1,27 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject ISettings Settings
+
+@if (Observed(() => Settings.Type) is UserType.Creator && Observed(() => ModsDirectoryCataloger.PythonScriptCount) > 0)
+{
+	<MudTooltip Arrow="true" Color="Color.Warning">
+		<ChildContent>
+			<MudChip T="int" Icon="@MaterialDesignIcons.Normal.SpeedometerSlow" Value="@ModsDirectoryCataloger.PythonScriptCount" Color="Color.Warning" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.SpeedometerSlow" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_PythonScripts_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_PythonScripts_Tip_Description)]
+			</MudTextM3>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_PythonScripts_Tip_CreatorsNote)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}

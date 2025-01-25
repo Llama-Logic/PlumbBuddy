@@ -1,0 +1,20 @@
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject ISmartSimObserver SmartSimObserver
+
+<MudTooltip Arrow="true">
+	<ChildContent>
+		<MudIconButton Icon="@MaterialDesignIcons.Normal.FolderDownload" OnClick="SmartSimObserver.OpenDownloadsFolderAsync" />
+	</ChildContent>
+	<TooltipContent>
+		<MudStack Row="true">
+			<MudIcon Icon="@MaterialDesignIcons.Normal.FolderDownload" />
+			<MudTextM3 Typo="TypoM3.Title">
+				@MarkupLocalizer[nameof(AppText.MainMenu_OpenDownloadsFolder_Label)]
+			</MudTextM3>
+		</MudStack>
+		<MudDivider />
+		<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+			@MarkupLocalizer[nameof(AppText.MainLayout_OpenDownloadsFolder_Tip)]
+		</MudTextM3>
+	</TooltipContent>
+</MudTooltip>
