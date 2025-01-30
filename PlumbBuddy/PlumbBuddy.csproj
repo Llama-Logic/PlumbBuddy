@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.2.21</ApplicationDisplayVersion>
-        <ApplicationVersion>1.2.21</ApplicationVersion>
+        <ApplicationDisplayVersion>1.2.22</ApplicationDisplayVersion>
+        <ApplicationVersion>1.2.22</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -78,7 +78,7 @@
         <PackageReference Include="H.NotifyIcon.Maui" Version="2.1.4" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="ini-parser" Version="2.5.2" />
-        <PackageReference Include="LlamaLogic.Packages" Version="2.20.0" />
+        <PackageReference Include="LlamaLogic.Packages" Version="2.21.2" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.112.481" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.11" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
