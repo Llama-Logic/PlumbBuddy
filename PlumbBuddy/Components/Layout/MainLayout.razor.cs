@@ -1,3 +1,5 @@
+using Windows.Media.Devices;
+
 namespace PlumbBuddy.Components.Layout;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -104,7 +106,6 @@ public partial class MainLayout
                 typography.H4.FontFamily = fontFamily;
                 typography.H5.FontFamily = fontFamily;
                 typography.H6.FontFamily = fontFamily;
-                typography.Input.FontFamily = fontFamily;
                 typography.Overline.FontFamily = fontFamily;
                 typography.Subtitle1.FontFamily = fontFamily;
                 typography.Subtitle2.FontFamily = fontFamily;

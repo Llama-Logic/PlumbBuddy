@@ -19,7 +19,7 @@ partial class CreateBranchDialog
     public string Notes { get; set; } = string.Empty;
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public ImmutableArray<byte> Thumbnail { get; set; } = [];

@@ -45,7 +45,7 @@ partial class OnboardingDialog
     }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     bool ScanForCacheStaleness
     {

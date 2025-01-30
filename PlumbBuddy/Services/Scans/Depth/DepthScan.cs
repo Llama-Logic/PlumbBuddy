@@ -56,7 +56,7 @@ public abstract class DepthScan :
                         options.Icon = MaterialDesignIcons.Normal.FolderQuestion;
                         options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 30000;
-                        options.Onclick = _ =>
+                        options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
@@ -75,7 +75,7 @@ public abstract class DepthScan :
                         options.Icon = MaterialDesignIcons.Normal.FolderSwap;
                         options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 30000;
-                        options.Onclick = _ =>
+                        options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
@@ -100,7 +100,7 @@ public abstract class DepthScan :
                         options.Icon = MaterialDesignIcons.Normal.FolderAlert;
                         options.Action = AppText.Common_ShowMe;
                         options.VisibleStateDuration = 60000;
-                        options.Onclick = _ =>
+                        options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
@@ -134,7 +134,7 @@ public abstract class DepthScan :
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
                     options.Action = AppText.Common_ShowMe;
                     options.VisibleStateDuration = 30000;
-                    options.Onclick = _ =>
+                    options.OnClick = _ =>
                     {
                         platformFunctions.ViewFile(newFile);
                         return Task.CompletedTask;

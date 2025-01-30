@@ -20,7 +20,7 @@ partial class SupportDiscordStepsDialog
     public bool IsPatchDay { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     Dictionary<string, Collection<SupportDiscordStep>> Steps =>
         CreatorName is { } creatorName

@@ -6,6 +6,8 @@ public interface IArchivist :
 {
     string ChroniclesSearchText { get; set; }
 
+    string? DiagnosticStatus { get; }
+
     Chronicle? SelectedChronicle { get; set; }
 
     string SnapshotsSearchText { get; set; }

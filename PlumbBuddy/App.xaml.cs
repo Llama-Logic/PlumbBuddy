@@ -5,13 +5,15 @@ public partial class App :
 {
     //const string packCodesModelMigration = "20241015012905_ModelV1";
 
-    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
+    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IUpdateManager updateManager, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
     {
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(updateManager);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         this.settings = settings;
+        this.updateManager = updateManager;
         this.appLifecycleManager = appLifecycleManager;
         this.userInterfaceMessaging = userInterfaceMessaging;
         using var pbDbContext = pbDbContextFactory.CreateDbContext();
@@ -130,6 +132,7 @@ public partial class App :
 
     readonly IAppLifecycleManager appLifecycleManager;
     readonly ISettings settings;
+    readonly IUpdateManager updateManager;
     readonly IUserInterfaceMessaging userInterfaceMessaging;
 
     protected override Window CreateWindow(IActivationState? activationState) =>

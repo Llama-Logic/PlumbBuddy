@@ -33,7 +33,7 @@ public sealed class UpdateManager :
                         options.Icon = MaterialDesignIcons.Normal.NewBox;
                         options.Action = "Turn Them On";
                         options.ActionColor = MudBlazor.Color.Success;
-                        options.Onclick = _ =>
+                        options.OnClick = _ =>
                         {
                             settings.ScanForCorruptMods = true;
                             settings.ScanForCorruptScriptMods = true;
@@ -50,13 +50,23 @@ public sealed class UpdateManager :
                         options.Icon = MaterialDesignIcons.Normal.NewBox;
                         options.Action = "Turn It On";
                         options.ActionColor = MudBlazor.Color.Success;
-                        options.Onclick = _ =>
+                        options.OnClick = _ =>
                         {
                             settings.OfferPatchDayModUpdatesHelp = true;
                             return Task.CompletedTask;
                         };
                         options.RequireInteraction = true;
                     });
+                }
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: 0 })
+                {
+                    var mdcDatabase = new FileInfo(Path.Combine(MauiProgram.AppDataDirectory.FullName, "PlumbBuddy.sqlite"));
+                    if (mdcDatabase.Exists)
+                    {
+                        mdcDatabase.Delete();
+                        this.logger.LogInformation("The existing Mods Directory Cataloger database has been deleted so that it will be rebuilt.");
+                        superSnacks.OfferRefreshments(new MarkupString("Apologies for the inconvenience, but new features have been added which have invalidated my scan of your Mods folder, so I need to do it again."), Severity.Info, options => options.Icon = MaterialDesignIcons.Normal.CogRefresh);
+                    }
                 }
             }
             else
@@ -144,7 +154,7 @@ public sealed class UpdateManager :
                 superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.UpdateManager_Info_Available, version)), Severity.Info, options =>
                 {
                     options.Icon = MaterialDesignIcons.Normal.Update;
-                    options.Onclick = async _ => await PresentUpdateAsync(version, releaseNotes, downloadUrl);
+                    options.OnClick = async _ => await PresentUpdateAsync(version, releaseNotes, downloadUrl);
                     options.RequireInteraction = true;
                     options.ShowCloseIcon = true;
                 });

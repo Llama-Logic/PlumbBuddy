@@ -29,7 +29,12 @@
 		}
 		else if (Observed(() => Archivist.State) is ArchivistState.Ingesting)
 		{
-			<MudProgressLinear Color="Color.Secondary" Indeterminate Rounded Size="Size.Large" />
+			<MudProgressLinear Color="Color.Secondary" Indeterminate Rounded Size="Size.Large">
+				@if (Observed(() => Settings.DevToolsUnlocked))
+				{
+					@(Observed(() => Archivist.DiagnosticStatus))
+				}
+			</MudProgressLinear>
 		}
 		else if (Observed(() => Settings.ArchivistEnabled))
 		{

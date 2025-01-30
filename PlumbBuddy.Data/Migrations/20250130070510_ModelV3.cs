@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PlumbBuddy.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ModelV1 : Migration
+    public partial class ModelV3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,7 +90,8 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Sha256 = table.Column<byte[]>(type: "BLOB", fixedLength: true, maxLength: 32, nullable: false),
-                    ResourcesAndManifestsCataloged = table.Column<bool>(type: "INTEGER", nullable: false)
+                    ResourcesAndManifestsCataloged = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsCorrupt = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,12 +179,11 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Path = table.Column<string>(type: "TEXT", nullable: true),
+                    Path = table.Column<string>(type: "TEXT", nullable: false),
                     Creation = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     LastWrite = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     Size = table.Column<long>(type: "INTEGER", nullable: true),
-                    FileType = table.Column<int>(type: "INTEGER", nullable: false),
-                    AbsenceNoticed = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                    FileType = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -241,7 +241,11 @@ namespace PlumbBuddy.Data.Migrations
                     TuningFullInstance = table.Column<long>(type: "INTEGER", nullable: true),
                     KeyType = table.Column<int>(type: "INTEGER", nullable: true),
                     KeyGroup = table.Column<int>(type: "INTEGER", nullable: true),
-                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: true)
+                    KeyFullInstance = table.Column<long>(type: "INTEGER", nullable: true),
+                    ContactEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    ContactUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    MessageToTranslators = table.Column<string>(type: "TEXT", nullable: true),
+                    TranslationSubmissionUrl = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -440,6 +444,27 @@ namespace PlumbBuddy.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ModFileManifestRepurposedLanguages",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileManifestId = table.Column<long>(type: "INTEGER", nullable: false),
+                    From = table.Column<string>(type: "TEXT", nullable: false),
+                    To = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFileManifestRepurposedLanguages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModFileManifestRepurposedLanguages_ModFileManifests_ModFileManifestId",
+                        column: x => x.ModFileManifestId,
+                        principalTable: "ModFileManifests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ModFileManifestResourceKeys",
                 columns: table => new
                 {
@@ -455,6 +480,27 @@ namespace PlumbBuddy.Data.Migrations
                     table.PrimaryKey("PK_ModFileManifestResourceKeys", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ModFileManifestResourceKeys_ModFileManifests_ModFileManifestId",
+                        column: x => x.ModFileManifestId,
+                        principalTable: "ModFileManifests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ModFileManifestTranslators",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ModFileManifestId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Language = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ModFileManifestTranslators", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ModFileManifestTranslators_ModFileManifests_ModFileManifestId",
                         column: x => x.ModFileManifestId,
                         principalTable: "ModFileManifests",
                         principalColumn: "Id",
@@ -673,6 +719,11 @@ namespace PlumbBuddy.Data.Migrations
                 column: "RequiredPacksId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ModFileManifestRepurposedLanguages_ModFileManifestId",
+                table: "ModFileManifestRepurposedLanguages",
+                column: "ModFileManifestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ModFileManifestResourceKeys_ModFileManifestId",
                 table: "ModFileManifestResourceKeys",
                 column: "ModFileManifestId");
@@ -696,6 +747,11 @@ namespace PlumbBuddy.Data.Migrations
                 name: "IX_ModFileManifests_ModFileHashId",
                 table: "ModFileManifests",
                 column: "ModFileHashId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ModFileManifestTranslators_ModFileManifestId",
+                table: "ModFileManifestTranslators",
+                column: "ModFileManifestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ModFileResources_ModFileHashId",
@@ -806,7 +862,13 @@ namespace PlumbBuddy.Data.Migrations
                 name: "ModFileManifestPackCode1");
 
             migrationBuilder.DropTable(
+                name: "ModFileManifestRepurposedLanguages");
+
+            migrationBuilder.DropTable(
                 name: "ModFileManifestResourceKeys");
+
+            migrationBuilder.DropTable(
+                name: "ModFileManifestTranslators");
 
             migrationBuilder.DropTable(
                 name: "ModFileResourceTopologySnapshot");

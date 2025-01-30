@@ -29,7 +29,7 @@ partial class BusyAnimationDialog
     public Task? ProcessComplete { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

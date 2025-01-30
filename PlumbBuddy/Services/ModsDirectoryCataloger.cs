@@ -37,6 +37,8 @@ public class ModsDirectoryCataloger :
     {
         var modManifest = new ModFileManifest
         {
+            ContactEmail = modFileManifestModel.ContactEmail,
+            ContactUrl = modFileManifestModel.ContactUrl,
             Creators = await TransformNormalizedEntitySequence
             (
                 pbDbContext,
@@ -59,7 +61,7 @@ public class ModsDirectoryCataloger :
                 (
                     pbDbContext,
                     pbDbContext => pbDbContext.ElectronicArtsPromoCodes,
-                    nameof(ModFileManifestHash.Sha256),
+                    nameof(ElectronicArtsPromoCode.Code),
                     code => eapc => eapc.Code == code,
                     modFileManifestModel.ElectronicArtsPromoCode
                 ).ConfigureAwait(false)
@@ -97,6 +99,7 @@ public class ModsDirectoryCataloger :
                 modFileManifestModel.IncompatiblePacks
             ).ToListAsync().ConfigureAwait(false),
             Key = key,
+            MessageToTranslators = modFileManifestModel.MessageToTranslators,
             Name = modFileManifestModel.Name,
             RequiredPacks = await TransformNormalizedEntitySequence
             (
@@ -121,6 +124,17 @@ public class ModsDirectoryCataloger :
             Url = modFileManifestModel.Url,
             Version = modFileManifestModel.Version
         };
+        if (modFileManifestModel.RepurposedLanguages.Count > 0)
+        {
+            var repurposedLanguages = new List<ModFileManifestRepurposedLanguage>();
+            foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages)
+                repurposedLanguages.Add(new ModFileManifestRepurposedLanguage
+                {
+                    From = repurposedLanguage.From,
+                    To = repurposedLanguage.To
+                });
+            modManifest.RepurposedLanguages = repurposedLanguages;
+        }
         if (modFileManifestModel.RequiredMods.Count > 0)
         {
             var requiredMods = new List<RequiredMod>();
@@ -210,6 +224,17 @@ public class ModsDirectoryCataloger :
                     Version = requiredMod.Version
                 });
             modManifest.RequiredMods = requiredMods;
+        }
+        if (modFileManifestModel.Translators.Count > 0)
+        {
+            var modFileManifestTranslators = new List<ModFileManifestTranslator>();
+            foreach (var translator in modFileManifestModel.Translators)
+                modFileManifestTranslators.Add(new ModFileManifestTranslator
+                {
+                    Language = translator.Language,
+                    Name = translator.Name
+                });
+            modManifest.Translators = modFileManifestTranslators;
         }
         return modManifest;
     }
@@ -635,7 +660,7 @@ public class ModsDirectoryCataloger :
                     if (modFileHash is null)
                     {
                         var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
-                        await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged) VALUES ({0}, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
+                        await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged, IsCorrupt) VALUES ({0}, 0, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
                         modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
                         if (modFileHash.IsCorrupt)
                         {

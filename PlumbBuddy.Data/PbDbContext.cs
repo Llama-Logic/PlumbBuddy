@@ -24,11 +24,13 @@ public class PbDbContext :
     public DbSet<ModFileManifestHash> ModFileManifestHashes { get; set; }
     public DbSet<ModFileManifestResourceKey> ModFileManifestResourceKeys { get; set; }
     public DbSet<ModFileManifest> ModFileManifests { get; set; }
+    public DbSet<ModFileManifestRepurposedLanguage> ModFileManifestRepurposedLanguages { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
     public DbSet<RequirementIdentifier> RequirementIdentifiers { get; set; }
     public DbSet<ScriptModArchiveEntry> ScriptModArchiveEntries { get; set; }
     public DbSet<TopologySnapshot> TopologySnapshots { get; set; }
+    public DbSet<ModFileManifestTranslator> ModFileManifestTranslators { get; set; }
 
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -66,6 +68,12 @@ public class PbDbContext :
             .IsFixedLength(true);
         modelBuilder.Entity<ModFileManifest>()
             .Property(e => e.Url)
+            .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModFileManifest>()
+            .Property(e => e.ContactUrl)
+            .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModFileManifest>()
+            .Property(e => e.TranslationSubmissionUrl)
             .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<RequiredMod>()
             .Property(e => e.Url)

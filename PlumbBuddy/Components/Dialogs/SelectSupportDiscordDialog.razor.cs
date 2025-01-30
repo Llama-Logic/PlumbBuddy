@@ -19,7 +19,7 @@ partial class SelectSupportDiscordDialog
     public bool IsPatchDay { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public IReadOnlyDictionary<string, SupportDiscord>? SupportDiscords { get; set; }

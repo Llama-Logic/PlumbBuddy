@@ -8,7 +8,7 @@ partial class SelectManifestDialog
     public IReadOnlyDictionary<ResourceKey, ModFileManifestModel>? Manifests { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());

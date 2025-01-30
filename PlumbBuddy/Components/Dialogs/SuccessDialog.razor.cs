@@ -9,7 +9,7 @@ partial class SuccessDialog
     public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     void OkOnClickHandler() =>
         MudDialog?.Close(DialogResult.Ok(true));

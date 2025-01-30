@@ -21,7 +21,7 @@ partial class SettingsDialog
     bool OfferPatchDayModUpdatesHelp { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     bool ScanForCacheStaleness { get; set; }
 

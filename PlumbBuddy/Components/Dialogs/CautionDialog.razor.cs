@@ -9,7 +9,7 @@ partial class CautionDialog
     public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());

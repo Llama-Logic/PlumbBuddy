@@ -34,8 +34,52 @@ article.mud-markdown-body > *:last-child {
     transition: opacity 0.5s ease-in-out;
 }
 
-.mud-popover.mud-tooltip {
-    max-width: 325px;
+.mud-tooltip {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-style: solid;
+    border-width: 1px;
+    max-width: 345px !important;
+}
+
+.mud-tooltip-default {
+    background-color: var(--mud-palette-surface) !important;
+    border-color: var(--mud-palette-lines-default);
+}
+
+.mud-tooltip.mud-theme-info {
+    background-color: var(--mud-palette-info) !important;
+    border-color: var(--mud-palette-info);
+}
+
+.mud-tooltip.mud-theme-success {
+    background-color: var(--mud-palette-success) !important;
+    border-color: var(--mud-palette-success);
+}
+
+.mud-tooltip.mud-theme-warning {
+    background-color: var(--mud-palette-warning) !important;
+    border-color: var(--mud-palette-warning);
+}
+
+.mud-tooltip.mud-theme-error {
+    background-color: var(--mud-palette-error) !important;
+    border-color: var(--mud-palette-error);
+}
+
+.mud-tooltip.mud-theme-primary {
+    background-color: var(--mud-palette-primary) !important;
+    border-color: var(--mud-palette-primary);
+}
+
+.mud-tooltip.mud-theme-secondary {
+    background-color: var(--mud-palette-secondary) !important;
+    border-color: var(--mud-palette-secondary);
+}
+
+.mud-tooltip.mud-theme-tertiary {
+    background-color: var(--mud-palette-tertiary) !important;
+    border-color: var(--mud-palette-tertiary);
 }
 
 .mud-thememanager-button {

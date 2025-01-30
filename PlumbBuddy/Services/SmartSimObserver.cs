@@ -148,7 +148,7 @@ public partial class SmartSimObserver :
                             var lifetimeScope = blazorFramework.MainLayoutLifetimeScope!;
                             var dialogService = lifetimeScope.Resolve<IDialogService>();
                             var publicCatalogs = lifetimeScope.Resolve<IPublicCatalogs>();
-                            options.Onclick = async _ => await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, isPatchDay: true);
+                            options.OnClick = async _ => await dialogService.ShowAskForHelpDialogAsync(logger, publicCatalogs, isPatchDay: true);
                         });
                         _ = Task.Run(async () => await platformFunctions.SendLocalNotificationAsync(AppText.SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption, AppText.SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Text));
                     }
@@ -329,7 +329,7 @@ public partial class SmartSimObserver :
                 {
                     options.RequireInteraction = true;
                     options.Icon = MaterialDesignIcons.Normal.EraserVariant;
-                    options.Onclick = async _ =>
+                    options.OnClick = async _ =>
                     {
                         var dialogService = blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>();
                         if (await dialogService.GetSupportDiscordAsync(logger, publicCatalogs, "PlumbBuddy") is not { } plumbBuddySupportDiscord)

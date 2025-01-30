@@ -9,7 +9,7 @@ partial class SelectFeaturesDialog
     public ModFileManifestModel? Manifest { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     void CancelOnClickHandler() =>
         MudDialog?.Close(DialogResult.Cancel());

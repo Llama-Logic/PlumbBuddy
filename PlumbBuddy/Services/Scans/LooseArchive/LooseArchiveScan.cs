@@ -64,7 +64,7 @@ public abstract class LooseArchiveScan :
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
                     options.Action = AppText.Common_ShowMe;
                     options.VisibleStateDuration = 30000;
-                    options.Onclick = _ =>
+                    options.OnClick = _ =>
                     {
                         platformFunctions.ViewFile(newFile);
                         return Task.CompletedTask;

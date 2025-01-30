@@ -109,6 +109,20 @@ public class ModFileManifest
     /// </summary>
     public long? KeyFullInstance { get; set; }
 
+    public string? ContactEmail { get; set; }
+
+    public Uri? ContactUrl { get; set; }
+
+    public string? MessageToTranslators { get; set; }
+
+    public Uri? TranslationSubmissionUrl { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFileManifestRepurposedLanguage>? RepurposedLanguages { get; set; }
+
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
+    public ICollection<ModFileManifestTranslator>? Translators { get; set; }
+
     /// <summary>
     /// Convert this entity to its LLP model equivalent
     /// </summary>
@@ -116,8 +130,11 @@ public class ModFileManifest
     {
         var model = new ModFileManifestModel
         {
+            ContactEmail = ContactEmail,
+            ContactUrl = ContactUrl,
             ElectronicArtsPromoCode = ElectronicArtsPromoCode?.Code,
             Hash = (InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+            MessageToTranslators = MessageToTranslators,
             Name = Name,
             TuningFullInstance = TuningFullInstance is null ? 0UL : unchecked((ulong)TuningFullInstance),
             TuningName = TuningName,
@@ -141,6 +158,11 @@ public class ModFileManifest
         addCollectionElements(Features, model.Features, entity => entity.Name);
         addHashSetElements(HashResourceKeys, model.HashResourceKeys, entity => new ResourceKey(unchecked((ResourceType)(uint)entity.KeyType), unchecked((uint)entity.KeyGroup), unchecked((ulong)entity.KeyFullInstance)));
         addCollectionElements(IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
+        addCollectionElements(RepurposedLanguages, model.RepurposedLanguages, entity => new ModFileManifestModelRepurposedLanguage
+        {
+            From = entity.From,
+            To = entity.To
+        });
         addCollectionElements(RequiredMods, model.RequiredMods, entity =>
         {
             var requiredMod = new ModFileManifestModelRequiredMod
@@ -161,6 +183,11 @@ public class ModFileManifest
         });
         addCollectionElements(RequiredPacks, model.RequiredPacks, entity => entity.Code);
         addHashSetElements(SubsumedHashes, model.SubsumedHashes, entity => [..entity.Sha256]);
+        addCollectionElements(Translators, model.Translators, entity => new ModFileManifestModelTranslator
+        {
+            Language = entity.Language,
+            Name = entity.Name
+        });
         return model;
     }
 }

@@ -9,7 +9,7 @@ partial class QuestionDialog
     public string Text { get; set; } = string.Empty;
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public bool UserCanCancel { get; set; }

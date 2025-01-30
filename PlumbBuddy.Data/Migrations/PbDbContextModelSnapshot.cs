@@ -15,7 +15,7 @@ namespace PlumbBuddy.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
 
             modelBuilder.Entity("ModCreatorModFileManifest", b =>
                 {
@@ -332,6 +332,12 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<long>("CalculatedModFileManifestHashId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContactUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<long?>("ElectronicArtsPromoCodeId")
                         .HasColumnType("INTEGER");
 
@@ -347,11 +353,17 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<int?>("KeyType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("MessageToTranslators")
+                        .HasColumnType("TEXT");
+
                     b.Property<long>("ModFileHashId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TranslationSubmissionUrl")
                         .HasColumnType("TEXT");
 
                     b.Property<long?>("TuningFullInstance")
@@ -399,6 +411,30 @@ namespace PlumbBuddy.Data.Migrations
                     b.ToTable("ModFileManifestHashes");
                 });
 
+            modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestRepurposedLanguage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("From")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ModFileManifestId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("To")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModFileManifestId");
+
+                    b.ToTable("ModFileManifestRepurposedLanguages");
+                });
+
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestResourceKey", b =>
                 {
                     b.Property<long>("Id")
@@ -422,6 +458,30 @@ namespace PlumbBuddy.Data.Migrations
                     b.HasIndex("ModFileManifestId");
 
                     b.ToTable("ModFileManifestResourceKeys");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestTranslator", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ModFileManifestId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModFileManifestId");
+
+                    b.ToTable("ModFileManifestTranslators");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileResource", b =>
@@ -790,10 +850,32 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("ModFileHash");
                 });
 
+            modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestRepurposedLanguage", b =>
+                {
+                    b.HasOne("PlumbBuddy.Data.ModFileManifest", "ModFileManifest")
+                        .WithMany("RepurposedLanguages")
+                        .HasForeignKey("ModFileManifestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ModFileManifest");
+                });
+
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestResourceKey", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.ModFileManifest", "ModFileManifest")
                         .WithMany("HashResourceKeys")
+                        .HasForeignKey("ModFileManifestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ModFileManifest");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestTranslator", b =>
+                {
+                    b.HasOne("PlumbBuddy.Data.ModFileManifest", "ModFileManifest")
+                        .WithMany("Translators")
                         .HasForeignKey("ModFileManifestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -884,7 +966,11 @@ namespace PlumbBuddy.Data.Migrations
                 {
                     b.Navigation("HashResourceKeys");
 
+                    b.Navigation("RepurposedLanguages");
+
                     b.Navigation("RequiredMods");
+
+                    b.Navigation("Translators");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileManifestHash", b =>

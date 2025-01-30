@@ -6,7 +6,7 @@ partial class DeleteErrorLogsDialog
     public IReadOnlyList<string>? FilePaths { get; set; }
 
     [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public IEnumerable<string>? SelectedFilePaths { get; set; }
