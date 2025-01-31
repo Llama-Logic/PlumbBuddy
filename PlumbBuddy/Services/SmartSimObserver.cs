@@ -307,7 +307,10 @@ public partial class SmartSimObserver :
                         if (cacheComponent.Exists)
                         {
                             if (cacheComponent is DirectoryInfo directoryCacheComponent)
-                                directoryCacheComponent.Delete(true);
+                            {
+                                foreach (var cacheSubComponent in directoryCacheComponent.GetFiles("*.*", SearchOption.AllDirectories))
+                                    cacheSubComponent.Delete();
+                            }
                             else
                                 cacheComponent.Delete();
                         }
@@ -851,7 +854,7 @@ public partial class SmartSimObserver :
     {
         foreach (var cacheComponent in cacheComponents)
             cacheComponent.Refresh();
-        var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce.Exists);
+        var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce is DirectoryInfo dce ? dce.GetFiles("*.*", SearchOption.AllDirectories).Length > 0 : ce.Exists);
         if (settings.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
         {
             settings.CacheStatus = SmartSimCacheStatus.Normal;

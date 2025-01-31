@@ -326,7 +326,7 @@ public partial class Archivist :
 
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
-    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, bool isSingleEnqueuedFile)
+    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, bool isSingleEnqueuedFile, bool gameWasRunningAtStart)
     {
         DataBasePackedFile? package = null;
         try
@@ -335,10 +335,10 @@ public partial class Archivist :
             var wasLive =
                    isInSavesDirectory
                 && isSingleEnqueuedFile
-                && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null;
+                && gameWasRunningAtStart;
             fileInfo.Refresh();
             var length = fileInfo.Length;
-            while (true)
+            while (gameWasRunningAtStart)
             {
                 await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
                 fileInfo.Refresh();
@@ -391,7 +391,7 @@ public partial class Archivist :
                 };
                 await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
             }
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Get Last Snapshot";
+            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Last Snapshot";
             var lastSnapshot = await chronicleDbContext.SavePackageSnapshots
                 .OrderByDescending(s => s.Id)
                 .FirstOrDefaultAsync()
@@ -411,7 +411,7 @@ public partial class Archivist :
                 OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray },
                 Resources = []
             };
-            var newSnapshotLock = new AsyncLock();
+            var contextLock = new AsyncLock();
             using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
                 await Task.WhenAll(packageKeys.Select(async key =>
                 {
@@ -441,7 +441,7 @@ public partial class Archivist :
                             LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
                             _ => throw new NotSupportedException("unsupported DBPF resource compression")
                         };
-                        if (type is ResourceType.SaveThumbnail4)
+                        if (type is ResourceType.SaveGameHouseholdThumbnail)
                         {
                             try
                             {
@@ -458,8 +458,15 @@ public partial class Archivist :
                         SavePackageResource? resource = null;
                         if (lastSnapshot is not null)
                         {
-                            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Load Previous {key}";
-                            resource = await chronicleDbContext.SavePackageResources.FirstOrDefaultAsync(spr => spr.Snapshots!.Any(sps => sps.Id == lastSnapshot.Id) && spr.Key == keyBytes).ConfigureAwait(false);
+                            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Load Prev {key}";
+                            using var supplementaryChronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                            resource = await supplementaryChronicleDbContext.SavePackageResources.FirstOrDefaultAsync(spr => spr.Snapshots!.Any(sps => sps.Id == lastSnapshot.Id) && spr.Key == keyBytes).ConfigureAwait(false);
+                            if (resource is not null)
+                            {
+                                supplementaryChronicleDbContext.Entry(resource).State = EntityState.Detached;
+                                using var heldContextLockForAttach = await contextLock.LockAsync().ConfigureAwait(false);
+                                chronicleDbContext.Update(resource);
+                            }
                         }
                         if (resource is not null)
                         {
@@ -474,12 +481,14 @@ public partial class Archivist :
                                 resource.ContentZLib = compressedContent;
                                 resource.ContentSize = content.Length;
                                 resource.CompressionType = compressionType;
-                                using var heldContextLock = await newSnapshotLock.LockAsync().ConfigureAwait(false);
+                                DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Comp Delta {key}";
+                                var patchZlib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray();
+                                using var heldContextLockForAddDelta = await contextLock.LockAsync().ConfigureAwait(false);
                                 await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
                                 (
                                     new ResourceSnapshotDelta
                                     {
-                                        PatchZLib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray(),
+                                        PatchZLib = patchZlib,
                                         PatchSize = patch.Length,
                                         CompressionType = previousCompressionType,
                                         SavePackageResource = resource,
@@ -496,8 +505,8 @@ public partial class Archivist :
                                 ContentZLib = compressedContent,
                                 ContentSize = content.Length,
                             };
-                        using (var heldContextLock = await newSnapshotLock.LockAsync().ConfigureAwait(false))
-                            newSnapshot.Resources!.Add(resource);
+                        using var heldContextLockForAddResource = await contextLock.LockAsync().ConfigureAwait(false);
+                        newSnapshot.Resources!.Add(resource);
                     }
                     finally
                     {
@@ -556,7 +565,7 @@ public partial class Archivist :
                     await package.SetAsync(saveGameDataKey, saveGameData.ToProtobufMessage(), package.GetExplicitCompressionMode(saveGameDataKey)).ConfigureAwait(false);
                 }
                 if (!customThumbnail.IsEmpty)
-                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveGameHouseholdThumbnail))
                         await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, chroniclePropertySet.Thumbnail).ConfigureAwait(false);
                 enhancedPackageMemoryStream = new MemoryStream();
                 await package.CopyToAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
@@ -666,6 +675,7 @@ public partial class Archivist :
                 if (settings.ArchivistEnabled)
                 {
                     State = ArchivistState.Ingesting;
+                    var gameWasRunningAtStart = await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null;
                     try
                     {
                         var savesDirectoryPath = Path.GetFullPath(Path.Combine(settings.UserDataFolderPath, "saves"));
@@ -700,7 +710,7 @@ public partial class Archivist :
                                 && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(singleSaveFile.Name)))
                             {
                                 DiagnosticStatus = $"Single: {singleSaveFile.Name}";
-                                await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, true).ConfigureAwait(false);
+                                await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, true, gameWasRunningAtStart).ConfigureAwait(false);
                             }
                             else if (Directory.Exists(path))
                                 foreach (var directoryFileInfo in new DirectoryInfo(path)
@@ -710,7 +720,7 @@ public partial class Archivist :
                                     .ToImmutableArray())
                                 {
                                     DiagnosticStatus = $"Batch: {directoryFileInfo.Name}";
-                                    await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, false).ConfigureAwait(false);
+                                    await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, false, gameWasRunningAtStart).ConfigureAwait(false);
                                     if (!settings.ArchivistEnabled
                                         || isInSavesDirectory
                                         && !settings.ArchivistAutoIngestSaves)
@@ -782,7 +792,7 @@ public partial class Archivist :
                 else if (savePackageSnapshot.Thumbnail is { Length: > 0 } originalThumbnailBytes)
                     thumbnailBytes = originalThumbnailBytes;
                 if (thumbnailBytes is { Length: > 0 })
-                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                    foreach (var saveThumbnail4Key in packageKeys.Where(key => key.Type is ResourceType.SaveGameHouseholdThumbnail))
                         await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, thumbnailBytes).ConfigureAwait(false);
                 tempFileName = $"{saveFile.FullName}.tmp";
                 await package.SaveAsAsync(tempFileName).ConfigureAwait(false);

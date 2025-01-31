@@ -32,7 +32,9 @@
 			<MudProgressLinear Color="Color.Secondary" Indeterminate Rounded Size="Size.Large">
 				@if (Observed(() => Settings.DevToolsUnlocked))
 				{
-					@(Observed(() => Archivist.DiagnosticStatus))
+					<div class="mud-width-full">
+						<MudChip Icon="@MaterialDesignIcons.Normal.ArchiveCog" Color="Color.Secondary" Value="@(Observed(() => Archivist.DiagnosticStatus))" Label="true" Class="ml-4" Style="backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); background-color: color-mix(in srgb, transparent, color-mix(in srgb, var(--mud-palette-surface), var(--mud-palette-secondary) 35%) 40%); border: 1px solid var(--mud-palette-secondary);" />
+					</div>
 				}
 			</MudProgressLinear>
 		}

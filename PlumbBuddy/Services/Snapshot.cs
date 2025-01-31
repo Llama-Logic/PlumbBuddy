@@ -1,4 +1,3 @@
-using EA.Sims4.Persistence;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
 using Serializer = ProtoBuf.Serializer;
@@ -548,7 +547,7 @@ public class Snapshot :
                 }
                 ReadOnlyMemory<byte> thumbnail = propertySet.Thumbnail;
                 if (!thumbnail.IsEmpty)
-                    foreach (var saveThumbnail4Key in keys.Where(key => key.Type is ResourceType.SaveThumbnail4))
+                    foreach (var saveThumbnail4Key in keys.Where(key => key.Type is ResourceType.SaveGameHouseholdThumbnail))
                         await package.SetPngAsTranslucentJpegAsync(saveThumbnail4Key, thumbnail).ConfigureAwait(false);
                 using var packageStream = await ConvertPackageToExcludedStreamAsync(dbContext, package).ConfigureAwait(false);
                 var slotId = GetOpenSlot(settings);
