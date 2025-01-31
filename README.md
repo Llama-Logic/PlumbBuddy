@@ -1,5 +1,5 @@
 <h1>PlumbBuddy</h1>
-The friendly helper for Sims 4 mods—crafted with care, open for all.
+The friendly helper for Sims 4 players—crafted with care, open for all.
 
 <!-- TOC -->
 
@@ -28,7 +28,7 @@ The friendly helper for Sims 4 mods—crafted with care, open for all.
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Llama-Logic/PlumbBuddy/total)
 ![Version Badge](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fraw.githubusercontent.com%2FLlama-Logic%2FPlumbBuddy%2Frefs%2Fheads%2Fmain%2FPlumbBuddy%2FPlumbBuddy.csproj&query=%2FProject%2FPropertyGroup%2FApplicationVersion%2Ftext()&label=version)
 ![GitHub Tag](https://img.shields.io/github/v/tag/Llama-Logic/PlumbBuddy?label=latest%20tag)
-![Creator Themes Badge](https://img.shields.io/badge/creator%20themes-4-blue)
+![Creator Themes Badge](https://img.shields.io/badge/creator%20themes-8-blue)
 ![GitHub language count](https://img.shields.io/github/languages/count/Llama-Logic/PlumbBuddy)
 ![GitHub top language](https://img.shields.io/github/languages/top/Llama-Logic/PlumbBuddy)
 ![GitHub License](https://img.shields.io/github/license/Llama-Logic/LlamaLogic)
