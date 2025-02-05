@@ -1,5 +1,3 @@
-using Windows.Media.Devices;
-
 namespace PlumbBuddy.Components.Layout;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
