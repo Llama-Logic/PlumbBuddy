@@ -68,6 +68,7 @@
     <ItemGroup>
         <PackageReference Include="Autofac" Version="8.2.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="BlazorMonaco" Version="3.3.0" />
         <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
         <PackageReference Include="BsDiff" Version="1.1.0" />
         <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.0.0" />
@@ -78,14 +79,14 @@
         <PackageReference Include="H.NotifyIcon.Maui" Version="2.1.4" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="ini-parser" Version="2.5.2" />
-        <PackageReference Include="LlamaLogic.Packages" Version="2.22.0" />
+        <PackageReference Include="LlamaLogic.Packages" Version="2.22.2" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.112.481" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.12" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.93" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.93" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
-        <PackageReference Include="MudBlazor" Version="8.0.0" />
+        <PackageReference Include="MudBlazor" Version="8.2.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="8.0.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />

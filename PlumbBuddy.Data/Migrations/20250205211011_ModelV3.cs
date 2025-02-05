@@ -1,13 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable IDE0079
-#pragma warning disable CA1062
-#pragma warning disable CA1861
-#pragma warning disable IDE0053
-#pragma warning disable IDE0161
-#pragma warning disable IDE0300
 
 namespace PlumbBuddy.Data.Migrations
 {
@@ -450,8 +444,8 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ModFileManifestId = table.Column<long>(type: "INTEGER", nullable: false),
-                    From = table.Column<string>(type: "TEXT", nullable: false),
-                    To = table.Column<string>(type: "TEXT", nullable: false)
+                    ActualLocale = table.Column<string>(type: "TEXT", nullable: false),
+                    GameLocale = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

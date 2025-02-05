@@ -11,8 +11,8 @@ public class ModFileManifestRepurposedLanguage
     public ModFileManifest? ModFileManifest { get; set; }
 
     [Required]
-    public required string From { get; set; } = string.Empty;
+    public required string ActualLocale { get; set; } = string.Empty;
 
     [Required]
-    public required string To { get; set; } = string.Empty;
+    public required string GameLocale { get; set; } = string.Empty;
 }

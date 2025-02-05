@@ -121,7 +121,7 @@ public partial class MainPage :
         }
         blazorWebView.Opacity = 0.01;
         blazorWebView.IsVisible = true;
-        await Task.Delay(250);
+        await Task.Delay(750);
         await Task.WhenAll(pleaseWait.FadeTo(0, 500), blazorWebView.FadeTo(1, 500));
         pleaseWait.IsVisible = false;
     }

@@ -22,10 +22,16 @@
             <CatalogDisplay />
         </div>
     </MudTabPanel>
-	<MudTabPanel Text="Archivist" Icon="@MaterialDesignIcons.Normal.ArchiveClock" IconColor="Color.Secondary">
+	<MudTabPanel Text="@(AppText.Home_Archivist_Label)" Icon="@MaterialDesignIcons.Normal.ArchiveClock" IconColor="Color.Secondary">
 		<div class="archivist-tab-container">
 			<div class="background"></div>
 			<ArchivistDisplay />
+		</div>
+	</MudTabPanel>
+	<MudTabPanel Text="@(AppText.Home_Parlay_Label)" Icon="@MaterialDesignIcons.Normal.TranslateVariant" IconColor="Color.Secondary">
+		<div class="parlay-tab-container">
+			<div class="background"></div>
+			<ParlayDisplay />
 		</div>
 	</MudTabPanel>
 	@if (Observed(() => Settings.Type) is UserType.Creator)

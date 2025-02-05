@@ -322,6 +322,7 @@ public partial class SmartSimObserver :
                     }
                 }
             }
+            ResampleCacheClarity();
             return true;
         }
         catch (Exception ex)
@@ -369,219 +370,251 @@ public partial class SmartSimObserver :
 
     void ConnectToInstallationDirectory()
     {
+        IDisposable? fileSystemWatcherConnectionLockHeld = null;
         try
         {
-            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-            if (fileSystemWatcherConnectionLockHeld is null)
+            try
+            {
+                fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+                if (fileSystemWatcherConnectionLockHeld is null)
+                    return;
+            }
+            catch (OperationCanceledException)
+            {
                 return;
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        if (settings.Onboarded && Directory.Exists(settings.InstallationFolderPath))
-        {
-            if (installationDirectoryWatcher is null)
-            {
-                ResampleGameVersion();
-                installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
-                {
-                    IncludeSubdirectories = true,
-                    NotifyFilter =
-                          NotifyFilters.CreationTime
-                        | NotifyFilters.DirectoryName
-                        | NotifyFilters.FileName
-                        | NotifyFilters.LastWrite
-                        | NotifyFilters.Size
-                };
-                installationDirectoryWatcher.Changed += InstallationDirectoryFileSystemEntryChangedHandler;
-                installationDirectoryWatcher.Created += InstallationDirectoryFileSystemEntryCreatedHandler;
-                installationDirectoryWatcher.Deleted += InstallationDirectoryFileSystemEntryDeletedHandler;
-                installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
-                installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
-                installationDirectoryWatcher.EnableRaisingEvents = true;
             }
-            CheckIfSteam();
-            if (packsDirectoryWatcher is null)
+            if (settings.Onboarded && Directory.Exists(settings.InstallationFolderPath))
             {
-                packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
+                if (installationDirectoryWatcher is null)
                 {
-                    IncludeSubdirectories = true,
-                    NotifyFilter =
-                          NotifyFilters.CreationTime
-                        | NotifyFilters.DirectoryName
-                        | NotifyFilters.FileName
-                        | NotifyFilters.LastWrite
-                        | NotifyFilters.Size
-                };
-                packsDirectoryWatcher.Changed += PacksDirectoryFileSystemEntryChangedHandler;
-                packsDirectoryWatcher.Created += PacksDirectoryFileSystemEntryCreatedHandler;
-                packsDirectoryWatcher.Deleted += PacksDirectoryFileSystemEntryDeletedHandler;
-                packsDirectoryWatcher.Error += PacksDirectoryWatcherErrorHandler;
-                packsDirectoryWatcher.Renamed += PacksDirectoryFileSystemEntryRenamedHandler;
-                packsDirectoryWatcher.EnableRaisingEvents = true;
+                    ResampleGameVersion();
+                    installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
+                    {
+                        IncludeSubdirectories = true,
+                        NotifyFilter =
+                              NotifyFilters.CreationTime
+                            | NotifyFilters.DirectoryName
+                            | NotifyFilters.FileName
+                            | NotifyFilters.LastWrite
+                            | NotifyFilters.Size
+                    };
+                    installationDirectoryWatcher.Changed += InstallationDirectoryFileSystemEntryChangedHandler;
+                    installationDirectoryWatcher.Created += InstallationDirectoryFileSystemEntryCreatedHandler;
+                    installationDirectoryWatcher.Deleted += InstallationDirectoryFileSystemEntryDeletedHandler;
+                    installationDirectoryWatcher.Error += InstallationDirectoryWatcherErrorHandler;
+                    installationDirectoryWatcher.Renamed += InstallationDirectoryFileSystemEntryRenamedHandler;
+                    installationDirectoryWatcher.EnableRaisingEvents = true;
+                }
+                CheckIfSteam();
+                if (packsDirectoryWatcher is null)
+                {
+                    packsDirectoryWatcher = new FileSystemWatcher(PacksDirectoryPath)
+                    {
+                        IncludeSubdirectories = true,
+                        NotifyFilter =
+                              NotifyFilters.CreationTime
+                            | NotifyFilters.DirectoryName
+                            | NotifyFilters.FileName
+                            | NotifyFilters.LastWrite
+                            | NotifyFilters.Size
+                    };
+                    packsDirectoryWatcher.Changed += PacksDirectoryFileSystemEntryChangedHandler;
+                    packsDirectoryWatcher.Created += PacksDirectoryFileSystemEntryCreatedHandler;
+                    packsDirectoryWatcher.Deleted += PacksDirectoryFileSystemEntryDeletedHandler;
+                    packsDirectoryWatcher.Error += PacksDirectoryWatcherErrorHandler;
+                    packsDirectoryWatcher.Renamed += PacksDirectoryFileSystemEntryRenamedHandler;
+                    packsDirectoryWatcher.EnableRaisingEvents = true;
+                }
+                ResampleInstalledPackCodes();
+                UpdateScanInitializationStatus();
             }
-            ResampleInstalledPackCodes();
-            UpdateScanInitializationStatus();
+        }
+        finally
+        {
+            fileSystemWatcherConnectionLockHeld?.Dispose();
         }
     }
 
     async void ConnectToUserDataDirectory()
     {
+        IDisposable? fileSystemWatcherConnectionLockHeld = null;
         try
         {
-            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-            if (fileSystemWatcherConnectionLockHeld is null)
+            try
+            {
+                fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+                if (fileSystemWatcherConnectionLockHeld is null)
+                    return;
+            }
+            catch (OperationCanceledException)
+            {
                 return;
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        if (settings.Onboarded && Directory.Exists(settings.UserDataFolderPath))
-        {
-            ResampleGameOptions();
-            cacheComponents =
-            [
-                new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
+            }
+            if (settings.Onboarded && Directory.Exists(settings.UserDataFolderPath))
+            {
+                ResampleGameOptions();
+                cacheComponents =
+                [
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
                 new FileInfo(Path.Combine(settings.UserDataFolderPath, "clientDB.package")),
                 new FileInfo(Path.Combine(settings.UserDataFolderPath, "houseDescription-client.package")),
                 new FileInfo(Path.Combine(settings.UserDataFolderPath, "localthumbcache.package")),
                 new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "cachestr")),
                 new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "onlinethumbnailcache"))
-            ];
-            ResampleCacheClarity();
-            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-            var userDataFolderTextAndHtmlFiles = new DirectoryInfo(settings.UserDataFolderPath)
-                .GetFiles("*.*", SearchOption.TopDirectoryOnly)
-                .Where(f => (f.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase)
-                    || f.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase)
-                    || f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase)
-                    || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase))
-                    && (f.Name.Contains("exception", StringComparison.OrdinalIgnoreCase)
-                    || f.Name.Contains("crash", StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-            var userDataFolderTextAndHtmlFilesOfInterest = await pbDbContext.FilesOfInterest
-                .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty) == foi.Path
-                    && (foi.Path.ToUpper().Replace("EXCEPTION", string.Empty) != foi.Path.ToUpper()
-                    || foi.Path.ToUpper().Replace("CRASH", string.Empty) != foi.Path.ToUpper())
-                    && (foi.FileType == ModsDirectoryFileType.TextFile || foi.FileType == ModsDirectoryFileType.HtmlFile))
-                .ToListAsync().ConfigureAwait(false);
-            await pbDbContext.FilesOfInterest.AddRangeAsync(userDataFolderTextAndHtmlFiles
-                .Where(f => !userDataFolderTextAndHtmlFilesOfInterest.Any(foi => foi.Path == f.Name))
-                .Select(f =>
-                    new FileOfInterest
-                    {
-                        Path = f.Name,
-                        FileType = f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase) || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase)
-                        ? ModsDirectoryFileType.HtmlFile
-                        : ModsDirectoryFileType.TextFile
-                    })).ConfigureAwait(false);
-            await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-            var existingFileOfInterestPaths = userDataFolderTextAndHtmlFiles
-                .Select(f => f.Name)
-                .ToList();
-            await pbDbContext.FilesOfInterest
-                .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty).Length == foi.Path.Length
-                    && !Enumerable.Contains(existingFileOfInterestPaths, foi.Path))
-                .ExecuteDeleteAsync().ConfigureAwait(false);
-            if (userDataDirectoryWatcher is not null)
-                return;
-            userDataDirectoryWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
-            {
-                IncludeSubdirectories = true,
-                NotifyFilter =
-                      NotifyFilters.CreationTime
-                    | NotifyFilters.DirectoryName
-                    | NotifyFilters.FileName
-                    | NotifyFilters.LastWrite
-                    | NotifyFilters.Size
-            };
-            userDataDirectoryWatcher.Changed += UserDataDirectoryFileSystemEntryChangedHandler;
-            userDataDirectoryWatcher.Created += UserDataDirectoryFileSystemEntryCreatedHandler;
-            userDataDirectoryWatcher.Deleted += UserDataDirectoryFileSystemEntryDeletedHandler;
-            userDataDirectoryWatcher.Error += UserDataDirectoryWatcherErrorHandler;
-            userDataDirectoryWatcher.Renamed += UserDataDirectoryFileSystemEntryRenamedHandler;
-            userDataDirectoryWatcher.EnableRaisingEvents = true;
-            UpdateScanInitializationStatus();
-            PutCatalogerToBedIfGameIsRunning();
-            modsDirectoryCataloger.Catalog(string.Empty);
-            FreshenGlobalManifest(force: true);
+                ];
+                ResampleCacheClarity();
+                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                var userDataFolderTextAndHtmlFiles = new DirectoryInfo(settings.UserDataFolderPath)
+                    .GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                    .Where(f => (f.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase)
+                        || f.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase)
+                        || f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase)
+                        || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase))
+                        && (f.Name.Contains("exception", StringComparison.OrdinalIgnoreCase)
+                        || f.Name.Contains("crash", StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+                var userDataFolderTextAndHtmlFilesOfInterest = await pbDbContext.FilesOfInterest
+                    .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty) == foi.Path
+                        && (foi.Path.ToUpper().Replace("EXCEPTION", string.Empty) != foi.Path.ToUpper()
+                        || foi.Path.ToUpper().Replace("CRASH", string.Empty) != foi.Path.ToUpper())
+                        && (foi.FileType == ModsDirectoryFileType.TextFile || foi.FileType == ModsDirectoryFileType.HtmlFile))
+                    .ToListAsync().ConfigureAwait(false);
+                await pbDbContext.FilesOfInterest.AddRangeAsync(userDataFolderTextAndHtmlFiles
+                    .Where(f => !userDataFolderTextAndHtmlFilesOfInterest.Any(foi => foi.Path == f.Name))
+                    .Select(f =>
+                        new FileOfInterest
+                        {
+                            Path = f.Name,
+                            FileType = f.Extension.Equals(".html", StringComparison.OrdinalIgnoreCase) || f.Extension.Equals(".htm", StringComparison.OrdinalIgnoreCase)
+                            ? ModsDirectoryFileType.HtmlFile
+                            : ModsDirectoryFileType.TextFile
+                        })).ConfigureAwait(false);
+                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+                var existingFileOfInterestPaths = userDataFolderTextAndHtmlFiles
+                    .Select(f => f.Name)
+                    .ToList();
+                await pbDbContext.FilesOfInterest
+                    .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty).Length == foi.Path.Length
+                        && !Enumerable.Contains(existingFileOfInterestPaths, foi.Path))
+                    .ExecuteDeleteAsync().ConfigureAwait(false);
+                if (userDataDirectoryWatcher is not null)
+                    return;
+                userDataDirectoryWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
+                {
+                    IncludeSubdirectories = true,
+                    NotifyFilter =
+                          NotifyFilters.CreationTime
+                        | NotifyFilters.DirectoryName
+                        | NotifyFilters.FileName
+                        | NotifyFilters.LastWrite
+                        | NotifyFilters.Size
+                };
+                userDataDirectoryWatcher.Changed += UserDataDirectoryFileSystemEntryChangedHandler;
+                userDataDirectoryWatcher.Created += UserDataDirectoryFileSystemEntryCreatedHandler;
+                userDataDirectoryWatcher.Deleted += UserDataDirectoryFileSystemEntryDeletedHandler;
+                userDataDirectoryWatcher.Error += UserDataDirectoryWatcherErrorHandler;
+                userDataDirectoryWatcher.Renamed += UserDataDirectoryFileSystemEntryRenamedHandler;
+                userDataDirectoryWatcher.EnableRaisingEvents = true;
+                UpdateScanInitializationStatus();
+                PutCatalogerToBedIfGameIsRunning();
+                modsDirectoryCataloger.Catalog(string.Empty);
+                FreshenGlobalManifest(force: true);
+            }
+        }
+        finally
+        {
+            fileSystemWatcherConnectionLockHeld?.Dispose();
         }
     }
 
     void DisconnectFromInstallationDirectoryWatcher()
     {
+        IDisposable? fileSystemWatcherConnectionLockHeld = null;
         try
         {
-            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-            if (fileSystemWatcherConnectionLockHeld is null)
+            try
+            {
+                fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+                if (fileSystemWatcherConnectionLockHeld is null)
+                    return;
+            }
+            catch (OperationCanceledException)
+            {
                 return;
+            }
+            if (installationDirectoryWatcher is not null)
+            {
+                installationDirectoryWatcher.Changed -= InstallationDirectoryFileSystemEntryChangedHandler;
+                installationDirectoryWatcher.Created -= InstallationDirectoryFileSystemEntryCreatedHandler;
+                installationDirectoryWatcher.Deleted -= InstallationDirectoryFileSystemEntryDeletedHandler;
+                installationDirectoryWatcher.Error -= InstallationDirectoryWatcherErrorHandler;
+                installationDirectoryWatcher.Renamed -= InstallationDirectoryFileSystemEntryRenamedHandler;
+                installationDirectoryWatcher.Dispose();
+                installationDirectoryWatcher = null;
+            }
+            if (packsDirectoryWatcher is not null)
+            {
+                packsDirectoryWatcher.Changed -= PacksDirectoryFileSystemEntryChangedHandler;
+                packsDirectoryWatcher.Created -= PacksDirectoryFileSystemEntryCreatedHandler;
+                packsDirectoryWatcher.Deleted -= PacksDirectoryFileSystemEntryDeletedHandler;
+                packsDirectoryWatcher.Error -= PacksDirectoryWatcherErrorHandler;
+                packsDirectoryWatcher.Renamed -= PacksDirectoryFileSystemEntryRenamedHandler;
+                packsDirectoryWatcher.Dispose();
+                packsDirectoryWatcher = null;
+            }
         }
-        catch (OperationCanceledException)
+        finally
         {
-            return;
-        }
-        if (installationDirectoryWatcher is not null)
-        {
-            installationDirectoryWatcher.Changed -= InstallationDirectoryFileSystemEntryChangedHandler;
-            installationDirectoryWatcher.Created -= InstallationDirectoryFileSystemEntryCreatedHandler;
-            installationDirectoryWatcher.Deleted -= InstallationDirectoryFileSystemEntryDeletedHandler;
-            installationDirectoryWatcher.Error -= InstallationDirectoryWatcherErrorHandler;
-            installationDirectoryWatcher.Renamed -= InstallationDirectoryFileSystemEntryRenamedHandler;
-            installationDirectoryWatcher.Dispose();
-            installationDirectoryWatcher = null;
-        }
-        if (packsDirectoryWatcher is not null)
-        {
-            packsDirectoryWatcher.Changed -= PacksDirectoryFileSystemEntryChangedHandler;
-            packsDirectoryWatcher.Created -= PacksDirectoryFileSystemEntryCreatedHandler;
-            packsDirectoryWatcher.Deleted -= PacksDirectoryFileSystemEntryDeletedHandler;
-            packsDirectoryWatcher.Error -= PacksDirectoryWatcherErrorHandler;
-            packsDirectoryWatcher.Renamed -= PacksDirectoryFileSystemEntryRenamedHandler;
-            packsDirectoryWatcher.Dispose();
-            packsDirectoryWatcher = null;
+            fileSystemWatcherConnectionLockHeld?.Dispose();
         }
     }
 
     void DisconnectFromUserDataDirectoryWatcher()
     {
+        IDisposable? fileSystemWatcherConnectionLockHeld = null;
         try
         {
-            using var fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
-            if (fileSystemWatcherConnectionLockHeld is null)
-                return;
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        if (userDataDirectoryWatcher is not null)
-        {
-            var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
-            userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
-            userDataDirectoryWatcher.Created -= UserDataDirectoryFileSystemEntryCreatedHandler;
-            userDataDirectoryWatcher.Deleted -= UserDataDirectoryFileSystemEntryDeletedHandler;
-            userDataDirectoryWatcher.Error -= UserDataDirectoryWatcherErrorHandler;
-            userDataDirectoryWatcher.Renamed -= UserDataDirectoryFileSystemEntryRenamedHandler;
-            userDataDirectoryWatcher.Dispose();
-            userDataDirectoryWatcher = null;
-            if (globalModsManifestPackageFile.Exists)
+            try
             {
-                try
-                {
-                    globalModsManifestPackageFile.Delete();
-                }
-                catch (IOException)
-                {
-                }
-                globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+                fileSystemWatcherConnectionLockHeld = fileSystemWatcherConnectionLock.Lock(new CancellationToken(true));
+                if (fileSystemWatcherConnectionLockHeld is null)
+                    return;
             }
-            cacheComponents = [];
-            IsModsDisabledGameSettingOn = false;
-            IsScriptModsEnabledGameSettingOn = true;
-            IsShowModListStartupGameSettingOn = false;
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            if (userDataDirectoryWatcher is not null)
+            {
+                var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
+                userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
+                userDataDirectoryWatcher.Created -= UserDataDirectoryFileSystemEntryCreatedHandler;
+                userDataDirectoryWatcher.Deleted -= UserDataDirectoryFileSystemEntryDeletedHandler;
+                userDataDirectoryWatcher.Error -= UserDataDirectoryWatcherErrorHandler;
+                userDataDirectoryWatcher.Renamed -= UserDataDirectoryFileSystemEntryRenamedHandler;
+                userDataDirectoryWatcher.Dispose();
+                userDataDirectoryWatcher = null;
+                if (globalModsManifestPackageFile.Exists)
+                {
+                    try
+                    {
+                        globalModsManifestPackageFile.Delete();
+                    }
+                    catch (IOException)
+                    {
+                    }
+                    globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+                }
+                cacheComponents = [];
+                IsModsDisabledGameSettingOn = false;
+                IsScriptModsEnabledGameSettingOn = true;
+                IsShowModListStartupGameSettingOn = false;
+            }
+        }
+        finally
+        {
+            fileSystemWatcherConnectionLockHeld?.Dispose();
         }
     }
 

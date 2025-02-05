@@ -179,6 +179,18 @@ class Settings :
         }
     }
 
+    public string ParlayName
+    {
+        get => preferences.Get(nameof(ParlayName), string.Empty);
+        set
+        {
+            if (ParlayName == value)
+                return;
+            preferences.Set(nameof(ParlayName), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ScanForCacheStaleness
     {
         get => preferences.Get(nameof(ScanForCacheStaleness), true);

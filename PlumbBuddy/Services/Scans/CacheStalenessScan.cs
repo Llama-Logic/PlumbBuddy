@@ -39,6 +39,7 @@ public sealed class CacheStalenessScan :
         AsyncEnumerable.Empty<ScanIssue>().Append
         (
             modsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology
+            && settings.CacheStatus is not SmartSimCacheStatus.Clear
             ?
             new()
             {

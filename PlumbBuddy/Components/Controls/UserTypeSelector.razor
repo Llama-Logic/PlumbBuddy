@@ -1,6 +1,6 @@
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 
-<MudCarousel TData="object" @bind-SelectedIndex="@UserTypeSelectedIndex" AutoCycle="false" BulletsPosition="Position.Start" Class="user-type-carousel mud-width-full" ShowArrows ShowBullets>
+<MudCarousel TData="object" @bind-SelectedIndex="@UserTypeSelectedIndex" AutoCycle="false" BulletsPosition="MudBlazor.Position.Start" Class="user-type-carousel mud-width-full" ShowArrows ShowBullets>
     <BulletTemplate Context="selected">
         <div Class="mud-button-root mud-icon-button mud-icon-button-color-inherit mud-ripple mud-ripple-icon">
             <span class="mud-icon-button-label">

@@ -67,16 +67,21 @@ partial class Home
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-position", "center");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-health-size", "cover");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-dark", "url('/img/ArchivistBackgroundDark.png')");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-light", "url('/img/ArchivistBackgroundLight.png')");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-position", "bottom");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-repeat", "unset");
-        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-size", "cover");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-dark", "url('/img/CatalogBackgroundDark.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-light", "url('/img/CatalogBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-position", "center");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", "cover");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-dark", "url('/img/ArchivistBackgroundDark.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-light", "url('/img/ArchivistBackgroundLight.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-position", "bottom");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-repeat", "unset");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-size", "cover");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-dark", "url('/img/ParlayBackgroundDark.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-light", "url('/img/ParlayBackgroundLight.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-position", "center");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-repeat", "unset");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-size", "cover");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-dark", "url('/img/ManifestEditorBackgroundDark.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-light", "url('/img/ManifestEditorBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-position", "center");
@@ -143,6 +148,25 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-repeat", repeat);
                 if ((archivist?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-size", size);
+            }
+            if (backgroundedTabs.TryGetValue("parlay", out var parlay))
+            {
+                if ((parlay?.TryGetValue("dark", out var dark) ?? false) && (parlay?.TryGetValue("light", out var light) ?? false))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-dark", $"url('/img/custom-themes/{customThemeName}/catalog-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-light", $"url('/img/custom-themes/{customThemeName}/catalog-light.png')");
+                }
+                if ((parlay?.TryGetValue("position", out var position) ?? false) && !string.IsNullOrWhiteSpace(position))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-position", position);
+                if ((parlay?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-repeat", repeat);
+                if ((parlay?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-parlay-size", size);
             }
             if (backgroundedTabs.TryGetValue("manifest-editor", out var manifestEditor))
             {

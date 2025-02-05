@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20250130070510_ModelV3")]
+    [Migration("20250205211011_ModelV3")]
     partial class ModelV3
     {
         /// <inheritdoc />
@@ -420,16 +420,16 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("From")
+                    b.Property<string>("ActualLocale")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GameLocale")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ModFileManifestId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("To")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

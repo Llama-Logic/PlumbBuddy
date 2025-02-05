@@ -1458,6 +1458,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archivist.
+        /// </summary>
+        internal static string Home_Archivist_Label {
+            get {
+                return ResourceManager.GetString("Home_Archivist_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Catalog.
         /// </summary>
         internal static string Home_Catalog_Label {
@@ -1481,6 +1490,15 @@ namespace PlumbBuddy.Localization {
         internal static string Home_ModHealth_Label {
             get {
                 return ResourceManager.GetString("Home_ModHealth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parlay.
+        /// </summary>
+        internal static string Home_Parlay_Label {
+            get {
+                return ResourceManager.GetString("Home_Parlay_Label", resourceCulture);
             }
         }
         

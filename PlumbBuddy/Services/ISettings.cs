@@ -17,6 +17,7 @@ public interface ISettings :
     Version? LastGameVersion { get; set; }
     bool OfferPatchDayModUpdatesHelp { get; set; }
     bool Onboarded { get; set; }
+    string ParlayName { get; set; }
     bool ScanForCacheStaleness { get; set; }
     bool ScanForCorruptMods { get; set; }
     bool ScanForCorruptScriptMods { get; set; }

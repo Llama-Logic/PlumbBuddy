@@ -2821,4 +2821,10 @@ I've had to disable myself until you can fix this, and it's important that you u
   <data name="ManifestEditor_CrossMod_FoundVersion_Label" xml:space="preserve">
     <value>Current Version</value>
   </data>
+  <data name="Home_Archivist_Label" xml:space="preserve">
+    <value>Archivist</value>
+  </data>
+  <data name="Home_Parlay_Label" xml:space="preserve">
+    <value>Parlay</value>
+  </data>
 </root>

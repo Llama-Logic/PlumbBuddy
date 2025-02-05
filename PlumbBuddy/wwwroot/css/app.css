@@ -15,6 +15,11 @@
     --plumbbuddy-tab-background-archivist-position: bottom;
     --plumbbuddy-tab-background-archivist-repeat: unset;
     --plumbbuddy-tab-background-archivist-size: cover;
+    --plumbbuddy-tab-background-parlay-dark: url('/img/ParlayBackgroundDark.png');
+    --plumbbuddy-tab-background-parlay-light: url('/img/ParlayBackgroundLight.png');
+    --plumbbuddy-tab-background-parlay-position: center;
+    --plumbbuddy-tab-background-parlay-repeat: unset;
+    --plumbbuddy-tab-background-parlay-size: cover;
     --plumbbuddy-tab-background-manifest-editor-dark: url('/img/ManifestEditorBackgroundDark.png');
     --plumbbuddy-tab-background-manifest-editor-light: url('/img/ManifestEditorBackgroundLight.png');
     --plumbbuddy-tab-background-manifest-position: center;
@@ -107,7 +112,7 @@ div.mud-input-control.no-material-variant .mud-input > * {
     -webkit-backdrop-filter: blur(2px);
 }
 
-.mud-paper, .mud-dialog, .mud-drawer, .mud-appbar, .mud-input-filled, .mud-alert-filled-normal, .mud-alert-filled-info, .mud-alert-filled-success, .mud-alert-filled-warning, .mud-alert-filled-error {
+.mud-paper, .mud-dialog, .mud-drawer, .mud-appbar, .mud-input-filled, .mud-alert-filled-normal, .mud-alert-filled-info, .mud-alert-filled-success, .mud-alert-filled-warning, .mud-alert-filled-error, th.mud-table-cell {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -343,4 +348,59 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
     height: calc(100vh - 242px);
     -webkit-backdrop-filter: blur(10px);
+}
+
+div.monaco-editor {
+    background-color: color-mix(in srgb, transparent, var(--mud-palette-background) 50%);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    outline: 1px solid var(--mud-palette-lines-default);
+}
+
+div.margin {
+    background-color: var(--mud-palette-background) !important;
+}
+
+div.monaco-editor-background {
+    background-color: transparent;
+}
+
+div.monaco-editor .margin {
+    display: none !important;
+}
+
+div.monaco-editor span.mtk1 {
+    color: var(--mud-palette-text-primary);
+}
+
+.table-cell-align-top {
+    vertical-align: top;
+}
+
+.parlay-string-display {
+    font-family: monospace;
+}
+
+/* male token */
+.parlay-string-display .male-token, div[data-mode-id='ts4-stbl'] span.mtk4 {
+    color: var(--mud-palette-info);
+}
+
+/* female token */
+.parlay-string-display .female-token, div[data-mode-id='ts4-stbl'] span.mtk3 {
+    color: var(--mud-palette-success);
+}
+
+/* ungendered token */
+.parlay-string-display .token, div[data-mode-id='ts4-stbl'] span.mtk5 {
+    color: var(--mud-palette-secondary);
+}
+
+/* escape sequences */
+.parlay-string-display .escape-sequence, div[data-mode-id='ts4-stbl'] span.mtk2 {
+    color: var(--mud-palette-primary);
+}
+
+.parlay-editor {
+    height: 100px;
 }

@@ -68,6 +68,26 @@
         z-index: -10;
     }
 
+.parlay-tab-container {
+    height: calc(100vh - 112px);
+    overflow-y: auto;
+    padding: 24px;
+}
+
+    .parlay-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-parlay-light);
+        background-position: var(--plumbbuddy-tab-background-parlay-position);
+        background-repeat: var(--plumbbuddy-tab-background-parlay-repeat);
+        background-size: var(--plumbbuddy-tab-background-parlay-size);
+        height: 100vh;
+        left: 0;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        width: 100vw;
+        z-index: -10;
+    }
+
 .manifest-editor-tab-container {
     height: calc(100vh - 112px);
     overflow: hidden;
@@ -98,6 +118,10 @@
 
     .archivist-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-archivist-dark);
+    }
+
+    .parlay-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-parlay-dark);
     }
 
     .manifest-editor-tab-container .background {

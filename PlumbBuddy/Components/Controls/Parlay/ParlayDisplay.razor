@@ -1,0 +1,135 @@
+@inherits ReactiveComponentBase
+@inject IJSRuntime JSRuntime
+@inject IParlay Parlay
+@inject ISettings Settings
+
+<MudGrid Justify="Justify.Center">
+	@if (Observed(() => Parlay.Packages) is { Count: > 0 } packages)
+	{
+		<MudItem xs="12">
+			<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="Package Containing String Tables" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+		</MudItem>
+	}
+	@if (Observed(() => Parlay.SelectedPackage) is { } selectedPackage && selectedPackage.StringTables is { Count: > 0 } stringTables)
+	{
+		<MudItem xs="6">
+			<MudSelectExtended @bind-Value="@Binding(() => Parlay.ShownStringTable).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.TableLarge" Color="Color.Secondary" ItemCollection="@(stringTables.OrderBy(st => st.Locale.NativeName).ThenBy(st => st.StringTableKey.Group).ThenBy(st => st.StringTableKey.FullInstance).ToImmutableArray())" Label="Show Existing String Table" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+		</MudItem>
+		<MudItem xs="3">
+			<MudSelectExtended @bind-Value="@Binding(() => Parlay.TranslationLocale).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.TableColumnPlusAfter" Color="Color.Secondary" ItemCollection="@(Parlay.TranslationLocales)" Label="Translate to Language" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+		</MudItem>
+		<MudItem xs="3">
+			<MudTextField @bind-Value="@Binding(() => Settings.ParlayName).Value" Adornment="Adornment.Start" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.Account" Immediate Label="Translator" Variant="Variant.Filled" />
+		</MudItem>
+	}
+	@if (Observed(() => Parlay.StringTableEntries) is { } stringTableEntries && ObservedCollection(() => stringTableEntries).Count > 0)
+	{
+		<MudItem xs="12">
+			<MudPaper>
+				@if (Observed(() => Parlay.TranslationLocale) is null)
+				{
+					<MudTable Dense Hover Items="@stringTableEntries" Filter="IncludeEntry" FixedHeader Height="calc(100vh - 384px)">
+						<ToolBarContent>
+							<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+								Strings
+							</MudTextM3>
+							<MudSpacer />
+							<MudTextField @bind-Value="@Binding(() => Parlay.EntrySearchText).Value" Placeholder="@(AppText.Common_Search)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+						</ToolBarContent>
+						<HeaderContent>
+							<MudTh>
+								<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Hash)">
+									Hash
+								</MudTableSortLabel>
+							</MudTh>
+							<MudTh>
+								<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Original)">
+									Original
+								</MudTableSortLabel>
+							</MudTh>
+						</HeaderContent>
+						<RowTemplate>
+							<MudTd DataLabel="Hash">
+								<code>
+									@(context.Hash.ToString("x8"))
+								</code>
+							</MudTd>
+							<MudTd DataLabel="Original">
+								<div class="parlay-string-display">
+									@HighlightForDisplay(context.Original)
+								</div>
+							</MudTd>
+						</RowTemplate>
+					</MudTable>
+				}
+				else
+				{
+					<MudTable @ref="@stringTable" CanCancelEdit Class="parlay-string-table" Dense EditButtonPosition="TableEditButtonPosition.End" Filter="IncludeEntry" FixedHeader Height="calc(100vh - 384px)" Hover Items="@stringTableEntries" OnPreviewEditClick="HandleStringTableOnPreviewEditClick" RowEditCancel="HandleStringTableRowEditCancel" RowEditCommit="HandleStringTableRowEditCommit">
+						<ToolBarContent>
+							<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+								Strings
+							</MudTextM3>
+							<MudSpacer />
+							<MudTextField @bind-Value="@Binding(() => Parlay.EntrySearchText).Value" Placeholder="@(AppText.Common_Search)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+						</ToolBarContent>
+						<ColGroup>
+							<col width="10%" />
+							<col width="40%" />
+							<col width="40%" />
+							<col width="10%" />
+						</ColGroup>
+						<HeaderContent>
+							<MudTh>
+								<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Hash)">
+									Hash
+								</MudTableSortLabel>
+							</MudTh>
+							<MudTh>
+								<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Original)">
+									Original
+								</MudTableSortLabel>
+							</MudTh>
+							<MudTh>
+								<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Translation)">
+									Translation
+								</MudTableSortLabel>
+							</MudTh>
+						</HeaderContent>
+						<RowTemplate>
+							<MudTd DataLabel="Hash" Class="table-cell-align-top">
+								<code>
+									@(context.Hash.ToString("x8"))
+								</code>
+							</MudTd>
+							<MudTd DataLabel="Original" Class="table-cell-align-top">
+								<div class="parlay-string-display">
+									@HighlightForDisplay(context.Original)
+								</div>
+							</MudTd>
+							<MudTd DataLabel="Translation" Class="table-cell-align-top">
+								<div class="parlay-string-display">
+									@HighlightForDisplay(context.Translation)
+								</div>
+							</MudTd>
+						</RowTemplate>
+						<RowEditingTemplate>
+							<MudTd DataLabel="Hash" Class="table-cell-align-top">
+								<code>
+									@(context.Hash.ToString("x8"))
+								</code>
+							</MudTd>
+							<MudTd DataLabel="Original" Class="table-cell-align-top">
+								<div class="parlay-string-display">
+									@HighlightForDisplay(context.Original)
+								</div>
+							</MudTd>
+							<MudTd DataLabel="Translation" Class="table-cell-align-top">
+								<StandaloneCodeEditor @ref="@standaloneCodeEditor" ConstructionOptions="CreateEditorOptions" CssClass="parlay-editor" OnDidChangeModelContent="HandleEditorOnDidChangeModelContent" OnDidInit="HandleEditorOnDidInitAsync" OnKeyUp="HandleEditorKeyUp" />
+							</MudTd>
+						</RowEditingTemplate>
+					</MudTable>
+				}
+			</MudPaper>
+		</MudItem>
+	}
+</MudGrid>

@@ -160,8 +160,8 @@ public class ModFileManifest
         addCollectionElements(IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
         addCollectionElements(RepurposedLanguages, model.RepurposedLanguages, entity => new ModFileManifestModelRepurposedLanguage
         {
-            From = entity.From,
-            To = entity.To
+            ActualLocale = entity.ActualLocale,
+            GameLocale = entity.GameLocale
         });
         addCollectionElements(RequiredMods, model.RequiredMods, entity =>
         {

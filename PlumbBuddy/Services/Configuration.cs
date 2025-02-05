@@ -18,6 +18,7 @@ static class Configuration
         services.AddSingleton<IUserInterfaceMessaging, UserInterfaceMessaging>();
         services.AddSingleton<ICatalog, Catalog>();
         services.AddSingleton<IArchivist, Archivist>();
+        services.AddSingleton<IParlay, Parlay>();
         return services;
     }
 }

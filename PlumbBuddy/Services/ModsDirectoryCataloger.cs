@@ -130,8 +130,8 @@ public class ModsDirectoryCataloger :
             foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages)
                 repurposedLanguages.Add(new ModFileManifestRepurposedLanguage
                 {
-                    From = repurposedLanguage.From,
-                    To = repurposedLanguage.To
+                    ActualLocale = repurposedLanguage.ActualLocale,
+                    GameLocale = repurposedLanguage.GameLocale
                 });
             modManifest.RepurposedLanguages = repurposedLanguages;
         }

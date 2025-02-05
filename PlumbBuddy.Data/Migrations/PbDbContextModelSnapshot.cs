@@ -417,16 +417,16 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("From")
+                    b.Property<string>("ActualLocale")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GameLocale")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ModFileManifestId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("To")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
