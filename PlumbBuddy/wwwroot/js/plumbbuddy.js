@@ -400,6 +400,16 @@ window.loadLottie = (animationPath, animationClassName) =>
         path: animationPath
     });
 
+window.mudTableCommitAndMove = (editingRowSelector, addend) => {
+    const editingRow = document.querySelector(editingRowSelector);
+    const tbody = editingRow.parentElement;
+    const editingRowIndex = Array.from(tbody.children).indexOf(editingRow);
+    editingRow.querySelector('.mud-icon-button').click();
+    if (addend) {
+        Array.from(tbody.children)[editingRowIndex + addend].click();
+    }
+};
+
 window.registerExternalLinkHandler = handlerInstance =>
     document.body.addEventListener('click', e => {
         if (e.target.tagName === 'A' && e.target.href && !e.target.href.startsWith(window.location.origin)) {

@@ -133,6 +133,27 @@ public static class MauiProgram
         if (configureMauiAppBuilder is not null)
             configureMauiAppBuilder(builder);
 
+        if (Preferences.Get(nameof(ISettings.VersionAtLastStartup), null) is string versionAtLastStartupStr
+            && Version.TryParse(versionAtLastStartupStr, out var versionAtLastStartup))
+        {
+            var mauiVersion = AppInfo.Version;
+            var currentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
+            if (currentVersion != versionAtLastStartup
+                && versionAtLastStartup is { } lastVersion
+                && lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 2 })
+            {
+                var mdcDatabase = new FileInfo(Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite"));
+                if (mdcDatabase.Exists)
+                    mdcDatabase.Delete();
+                var mdcDatabaseSharedMemory = new FileInfo(Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite-shm"));
+                if (mdcDatabaseSharedMemory.Exists)
+                    mdcDatabaseSharedMemory.Delete();
+                var mdcDatabaseWriteAheadLog = new FileInfo(Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite-wal"));
+                if (mdcDatabaseWriteAheadLog.Exists)
+                    mdcDatabaseWriteAheadLog.Delete();
+            }
+        }
+
         return builder.Build();
     }
 }

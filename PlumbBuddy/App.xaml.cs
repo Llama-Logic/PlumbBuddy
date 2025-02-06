@@ -5,15 +5,13 @@ public partial class App :
 {
     //const string packCodesModelMigration = "20241015012905_ModelV1";
 
-    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IUpdateManager updateManager, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
+    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        ArgumentNullException.ThrowIfNull(updateManager);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         this.settings = settings;
-        this.updateManager = updateManager;
         this.appLifecycleManager = appLifecycleManager;
         this.userInterfaceMessaging = userInterfaceMessaging;
         using var pbDbContext = pbDbContextFactory.CreateDbContext();
@@ -87,17 +85,6 @@ public partial class App :
             pendingMigrations = pbDbContext.Database.GetPendingMigrations();
             pbDbContext.Database.Migrate();
         }
-        //if (pendingMigrations.Contains(packCodesModelMigration))
-        //{
-        //    pbDbContext.PackCodes.Add(new PackCode { Code = "FP01" });
-        //    for (var ep = 1; ep <= 20; ++ep)
-        //        pbDbContext.PackCodes.Add(new PackCode { Code = $"EP{ep:00}" });
-        //    for (var gp = 1; gp <= 20; ++gp)
-        //        pbDbContext.PackCodes.Add(new PackCode { Code = $"GP{gp:00}" });
-        //    for (var sp = 1; sp <= 60; ++sp)
-        //        pbDbContext.PackCodes.Add(new PackCode { Code = $"SP{sp:00}" });
-        //    pbDbContext.SaveChanges();
-        //}
 #if DEBUG
         var naughtyStrings = new List<string>();
         var numbers = Enumerable.Range(0, 20).Select(i => (object?)i).ToArray();
@@ -132,7 +119,6 @@ public partial class App :
 
     readonly IAppLifecycleManager appLifecycleManager;
     readonly ISettings settings;
-    readonly IUpdateManager updateManager;
     readonly IUserInterfaceMessaging userInterfaceMessaging;
 
     protected override Window CreateWindow(IActivationState? activationState) =>

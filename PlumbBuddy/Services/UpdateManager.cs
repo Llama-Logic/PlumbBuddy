@@ -58,21 +58,10 @@ public sealed class UpdateManager :
                         options.RequireInteraction = true;
                     });
                 }
-                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: 0 })
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 2 })
                 {
-                    var mdcDatabase = new FileInfo(Path.Combine(MauiProgram.AppDataDirectory.FullName, "PlumbBuddy.sqlite"));
-                    var mdcDatabaseSharedMemory = new FileInfo(Path.Combine(MauiProgram.AppDataDirectory.FullName, "PlumbBuddy.sqlite-shm"));
-                    var mdcDatabaseWriteAheadLog = new FileInfo(Path.Combine(MauiProgram.AppDataDirectory.FullName, "PlumbBuddy.sqlite-wal"));
-                    if (mdcDatabase.Exists)
-                    {
-                        mdcDatabase.Delete();
-                        this.logger.LogInformation("The existing Mods Directory Cataloger database has been deleted so that it will be rebuilt.");
-                        superSnacks.OfferRefreshments(new MarkupString("Apologies for the inconvenience, but new features have been added which have invalidated my scan of your Mods folder, so I need to scan it again."), Severity.Info, options => options.Icon = MaterialDesignIcons.Normal.CogRefresh);
-                    }
-                    if (mdcDatabaseSharedMemory.Exists)
-                        mdcDatabaseSharedMemory.Delete();
-                    if (mdcDatabaseWriteAheadLog.Exists)
-                        mdcDatabaseWriteAheadLog.Delete();
+                    this.logger.LogInformation("The existing Mods Directory Cataloger database has been deleted so that it will be rebuilt.");
+                    superSnacks.OfferRefreshments(new MarkupString("Apologies for the inconvenience, but new features have been added which have invalidated my scan of your Mods folder, so I need to scan it again."), Severity.Info, options => options.Icon = MaterialDesignIcons.Normal.CogRefresh);
                 }
             }
             else

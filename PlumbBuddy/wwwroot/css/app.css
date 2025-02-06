@@ -379,6 +379,7 @@ div.monaco-editor span.mtk1 {
 
 .parlay-string-display {
     font-family: monospace;
+    white-space: pre-line;
 }
 
 /* male token */

@@ -61,7 +61,7 @@ partial class ParlayDisplay
             await editor.Focus();
     }
 
-    void HandleEditorKeyUp(BlazorMonaco.KeyboardEvent keyboardEvent)
+    async void HandleEditorKeyUp(BlazorMonaco.KeyboardEvent keyboardEvent)
     {
         var moveDown = keyboardEvent.KeyCode is BlazorMonaco.KeyCode.PageDown;
         var moveUp = keyboardEvent.KeyCode is BlazorMonaco.KeyCode.PageUp;
@@ -70,16 +70,15 @@ partial class ParlayDisplay
             || stringTable is null
             || stringTable.FilteredItems is not { } items)
             return;
-        editingEntry.Translation = editingEntryTranslation;
         var entries = items.ToImmutableArray();
         var entryIndex = entries.IndexOf(editingEntry);
         var nextEntryIndex = entryIndex + (moveDown ? 1 : -1);
         if (nextEntryIndex < 0 || nextEntryIndex >= entries.Length)
+        {
+            await JSRuntime.InvokeVoidAsync("mudTableCommitAndMove", "tr:has(div.parlay-editor)", 0);
             return;
-        var nextEntry = entries[nextEntryIndex];
-        editingEntry = nextEntry;
-        editingEntryTranslation = editingEntry.Translation;
-        stringTable.SetEditingItem(nextEntry);
+        }
+        await JSRuntime.InvokeVoidAsync("mudTableCommitAndMove", "tr:has(div.parlay-editor)", nextEntryIndex - entryIndex);
     }
 
     void HandleStringTableRowEditCancel(object? item) =>
