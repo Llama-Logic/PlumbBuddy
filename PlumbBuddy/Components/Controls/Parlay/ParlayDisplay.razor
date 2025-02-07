@@ -1,13 +1,26 @@
 @inherits ReactiveComponentBase
+@inject IDialogService DialogService
 @inject IJSRuntime JSRuntime
 @inject IParlay Parlay
+@inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 
 <MudGrid Justify="Justify.Center">
 	@if (Observed(() => Parlay.Packages) is { Count: > 0 } packages)
 	{
 		<MudItem xs="12">
-			<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="Package Containing String Tables" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+			<MudStack AlignItems="AlignItems.Center" Row>
+				<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Class="flex-grow-1" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="Package Containing String Tables" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+				<MudTooltip Color="Color.Secondary" Text="Show Original Mod Package File">
+					<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.OriginalPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TextBoxSearch" OnClick="ShowOriginalPackageFileAsync" />
+				</MudTooltip>
+				<MudTooltip Color="Color.Secondary" Text="Show Translation Override Mod Package File">
+					<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Outline.TextBoxSearch" OnClick="ShowTranslationPackageFileAsync" />
+				</MudTooltip>
+				<MudTooltip Color="Color.Secondary" Text="Merge Translation String Table">
+					<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TableArrowLeft" OnClick="MergeStringTableAsync" />
+				</MudTooltip>
+			</MudStack>
 		</MudItem>
 	}
 	@if (Observed(() => Parlay.SelectedPackage) is { } selectedPackage && selectedPackage.StringTables is { Count: > 0 } stringTables)

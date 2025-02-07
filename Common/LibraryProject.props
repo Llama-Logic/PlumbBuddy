@@ -5,6 +5,7 @@
     <PropertyGroup>
         <CodeAnalysisRuleSet>..\Common\library.ruleset</CodeAnalysisRuleSet>
         <IncludeSymbols>true</IncludeSymbols>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
 </Project>

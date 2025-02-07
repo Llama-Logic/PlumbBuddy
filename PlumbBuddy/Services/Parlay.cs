@@ -80,6 +80,18 @@ public sealed class Parlay :
         }
     }
 
+    public FileInfo? OriginalPackageFile
+    {
+        get => originalPackageFile;
+        set
+        {
+            if (originalPackageFile?.FullName == value?.FullName)
+                return;
+            originalPackageFile = value;
+            OnPropertyChanged();
+        }
+    }
+
     public IReadOnlyList<ParlayPackage> Packages
     {
         get => publicOrigins;
@@ -100,6 +112,9 @@ public sealed class Parlay :
             selectedOrigin = value;
             OnPropertyChanged();
             ShownStringTable = null;
+            OriginalPackageFile = SelectedPackage?.ModFilePath is { } selectedPackagePath
+                ? new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", selectedPackagePath))
+                : null;
         }
     }
 
@@ -158,6 +173,18 @@ public sealed class Parlay :
         }
     }
 
+    public FileInfo? TranslationPackageFile
+    {
+        get => translationPackageFile;
+        set
+        {
+            if (translationPackageFile?.FullName == value?.FullName)
+                return;
+            translationPackageFile = value;
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Dispose()
@@ -180,6 +207,29 @@ public sealed class Parlay :
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State)
             && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
             RefreshOrigins();
+    }
+
+    public async Task<int> MergeStringTableAsync(FileInfo fromPackageFile)
+    {
+        if (translationPackageFile is null
+            || stringTableEntries is null)
+            return 0;
+        ArgumentNullException.ThrowIfNull(fromPackageFile);
+        using var fromPackage = await DataBasePackedFile.FromPathAsync(fromPackageFile.FullName).ConfigureAwait(false);
+        if (!await fromPackage.ContainsKeyAsync(translationStringTableKey).ConfigureAwait(false))
+            return 0;
+        var importStbl = await fromPackage.GetModelAsync<StringTableModel>(translationStringTableKey).ConfigureAwait(false);
+        var importCount = 0;
+        foreach (var stringTableEntry in stringTableEntries)
+        {
+            var importString = importStbl.Get(stringTableEntry.Hash);
+            if (!string.IsNullOrWhiteSpace(importString))
+            {
+                stringTableEntry.Translation = importString;
+                ++importCount;
+            }
+        }
+        return importCount;
     }
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
@@ -331,8 +381,9 @@ public sealed class Parlay :
         }
         try
         {
-            originalPackageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", selectedPackagePath));
-            translationPackageFile =
+            if (this.originalPackageFile is not { } originalPackageFile)
+                return;
+            TranslationPackageFile =
                 maybeNullTranslationLocale is { } translationLocale
                 ? new FileInfo(Path.Combine(originalPackageFile.Directory!.FullName, $"!{originalPackageFile.Name[..^originalPackageFile.Extension.Length]}.{translationLocale.Name}.l10n.package"))
                 : null;
@@ -345,7 +396,7 @@ public sealed class Parlay :
                     translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(maybeNullTranslationLocale, originalStringTableKey.Group, originalStringTableKey.FullInstance);
                 else
                     translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(CultureInfo.GetCultureInfo("en-US"), originalStringTableKey.Group, originalStringTableKey.FullInstance);
-                if (translationPackageFile is not null
+                if (TranslationPackageFile is { } translationPackageFile
                     && translationPackageFile.Exists)
                 {
                     using var translationPackage = await DataBasePackedFile.FromPathAsync(translationPackageFile.FullName).ConfigureAwait(false);

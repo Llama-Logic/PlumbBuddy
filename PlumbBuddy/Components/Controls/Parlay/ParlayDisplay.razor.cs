@@ -116,9 +116,55 @@ partial class ParlayDisplay
         return false;
     }
 
+    async Task MergeStringTableAsync()
+    {
+        if (await ModFileSelector.SelectAModFileAsync() is not { } modFile)
+            return;
+        if (!modFile.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase))
+        {
+            await DialogService.ShowErrorDialogAsync("File Format Invalid", "The file selected should be a Sims 4 mod package file.");
+            return;
+        }
+        var stringsImported = await Parlay.MergeStringTableAsync(modFile);
+        if (stringsImported is 0)
+        {
+            await DialogService.ShowInfoDialogAsync("No Strings Were Merged", "Did you select the wrong file? It needs to have a string table with the same resource key which is being generated in your current translation in order to work.");
+            return;
+        }
+        await DialogService.ShowInfoDialogAsync("String Merge Complete", $"I successfully merged {"string".ToQuantity(stringsImported)} in the current translation from the file you selected.");
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await JSRuntime.InvokeVoidAsync("initializeMonacoStblSupport");
+    }
+
+    async Task ShowOriginalPackageFileAsync()
+    {
+        if (Parlay.OriginalPackageFile is { } originalPackageFile)
+        {
+            originalPackageFile.Refresh();
+            if (!originalPackageFile.Exists)
+            {
+                await DialogService.ShowErrorDialogAsync("Whoops", "The original mod package file has disappeared!");
+                return;
+            }
+            PlatformFunctions.ViewFile(originalPackageFile);
+        }
+    }
+
+    async Task ShowTranslationPackageFileAsync()
+    {
+        if (Parlay.TranslationPackageFile is { } translationPackageFile)
+        {
+            translationPackageFile.Refresh();
+            if (!translationPackageFile.Exists)
+            {
+                await DialogService.ShowErrorDialogAsync("Whoops", "I can't show you the translation override package file because it doesn't exist on disk. Have you clicked on any string table entries to enter and commit a translation yet? If not, then the file's not there because I haven't had a reason to save it.");
+                return;
+            }
+            PlatformFunctions.ViewFile(translationPackageFile);
+        }
     }
 }

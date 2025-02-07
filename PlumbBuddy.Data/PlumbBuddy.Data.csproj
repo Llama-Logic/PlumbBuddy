@@ -4,7 +4,6 @@
 
     <PropertyGroup>
         <AssemblyName>PlumbBuddy.Data</AssemblyName>
-        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
