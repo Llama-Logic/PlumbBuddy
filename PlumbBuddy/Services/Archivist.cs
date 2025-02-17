@@ -401,6 +401,8 @@ public partial class Archivist :
             var lastZone = saveGameData.Zones?.FirstOrDefault(z => z.ZoneId == zoneId);
             var neighborhoodId = lastZone?.NeighborhoodId ?? default;
             var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
+            await chronicleDbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", fileHashArray).ConfigureAwait(false);
+            var originalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false);
             newSnapshot = new SavePackageSnapshot
             {
                 ActiveHouseholdName = activeHousehold?.Name,
@@ -408,7 +410,7 @@ public partial class Archivist :
                 LastPlayedWorldName = lastNeighborhood?.Name,
                 LastWriteTime = fileInfo.LastWriteTime,
                 Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
-                OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) ?? new() { Sha256 = fileHashArray },
+                OriginalSavePackageHash = originalSavePackageHash,
                 Resources = []
             };
             var contextLock = new AsyncLock();
