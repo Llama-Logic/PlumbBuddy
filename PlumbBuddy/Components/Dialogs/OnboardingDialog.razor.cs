@@ -26,6 +26,12 @@ partial class OnboardingDialog
         set => Settings.DownloadsFolderPath = value;
     }
 
+    bool ForceGameProcessPerformanceProcessorAffinity
+    {
+        get => Settings.ForceGameProcessPerformanceProcessorAffinity;
+        set => Settings.ForceGameProcessPerformanceProcessorAffinity = value;
+    }
+
     bool GenerateGlobalManifestPackage
     {
         get => Settings.GenerateGlobalManifestPackage;

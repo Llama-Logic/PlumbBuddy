@@ -55,6 +55,8 @@ partial class PlatformFunctions :
     bool userNotificationsAllowed;
     readonly UNUserNotificationCenter userNotificationCenter;
 
+    public nint DefaultProcessorAffinity { get; } = default;
+
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
     [
         GetDotTemporaryItemsPattern(),
@@ -82,6 +84,15 @@ partial class PlatformFunctions :
         GetIconCacheDotDbPattern(),
         GetThumbsDotDbPattern()
     ];
+
+    public bool IsGameProcessOptimizationSupported =>
+        false;
+
+    public nint PerformanceProcessorAffinity =>
+        default;
+
+    public bool ProcessorsHavePerformanceVarianceAndConfigurableAffinity =>
+        false;
 
     public int ProgressMaximum
     {

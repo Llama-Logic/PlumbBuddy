@@ -117,6 +117,7 @@ public class ModsDirectoryCataloger :
                 hash => mfmh => mfmh.Sha256 == hash,
                 GetByteArrays(modFileManifestModel.SubsumedHashes)
             ).ToListAsync().ConfigureAwait(false),
+            TranslationSubmissionUrl = modFileManifestModel.TranslationSubmissionUrl,
             TuningFullInstance = modFileManifestModel.TuningFullInstance is not 0
                 ? unchecked((long)modFileManifestModel.TuningFullInstance)
                 : null,

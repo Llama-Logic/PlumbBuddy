@@ -1,0 +1,23 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject ISettings Settings
+@inject ISmartSimObserver SmartSimObserver
+
+@if (Observed(() => Settings.Type) is not UserType.Casual && Observed(() => SmartSimObserver.IsPerformanceProcessorAffinityInEffect))
+{
+	<MudTooltip Arrow Color="Color.Success">
+		<ChildContent>
+			<MudIcon Class="mr-2 mt-1" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.LightningBolt" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row="true">
+				<MudIcon Icon="@MaterialDesignIcons.Normal.LightningBolt" />
+				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Caption)]</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				@MarkupLocalizer[nameof(AppText.HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Description)]
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}

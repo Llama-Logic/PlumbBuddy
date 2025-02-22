@@ -252,6 +252,9 @@ partial class ManifestEditor
             null,
             null,
             string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.Exclusivities).Distinct()),
+            manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.MessageToTranslators))?.MessageToTranslators,
+            manifests.FirstOrDefault(manifest => manifest.TranslationSubmissionUrl is not null)?.TranslationSubmissionUrl?.ToString(),
+            string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.Translators.Where(translator => !string.IsNullOrWhiteSpace(translator.Name)).Select(translator => $"{translator.Name}{Environment.NewLine}{translator.Language}")).Distinct()),
             componentName == name ? null : componentName,
             string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.SubsumedHashes.Concat([manifest.Hash])).Select(hash => hash.ToHexString()).Distinct(StringComparer.OrdinalIgnoreCase))
         );
@@ -456,7 +459,9 @@ partial class ManifestEditor
                     {
                         ElectronicArtsPromoCode = string.IsNullOrWhiteSpace(electronicArtsPromoCode) ? null : electronicArtsPromoCode,
                         Hash = hash,
+                        MessageToTranslators = string.IsNullOrWhiteSpace(component.MessageToTranslators) ? null : component.MessageToTranslators,
                         Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
+                        TranslationSubmissionUrl = component.TranslationSubmissionUrl is { } translationSubmissionUrl && Uri.TryCreate(translationSubmissionUrl, UriKind.Absolute, out var translationSubmissionUri) ? translationSubmissionUri : null,
                         TuningFullInstance = tuningName is null ? 0 : Fnv64.SetHighBit(Fnv64.GetHash(tuningName)),
                         TuningName = tuningName,
                         Url = Uri.TryCreate(url, UriKind.Absolute, out var parsedUrl) ? parsedUrl : null,
@@ -493,6 +498,7 @@ partial class ManifestEditor
                     if (!component.SubsumedHashes.Contains(hexHash, StringComparer.OrdinalIgnoreCase))
                         filesWithAlteredManifests.Add(component.File);
                     addCollectionElements(model.SubsumedHashes, component.SubsumedHashes.Except([hexHash], StringComparer.OrdinalIgnoreCase).Select(hash => hash.TryToByteSequence(out var sequence) ? [.. sequence] : ImmutableArray<byte>.Empty));
+                    addTransformedCollectionElements(model.Translators, component.Translators, t => new ModFileManifestModelTranslator { Name = t.name, Culture = t.language });
                     componentManifests.Add(component, model);
                 }
             }
@@ -770,6 +776,8 @@ partial class ManifestEditor
                     componentToApplySettings.IgnoreIfPackAvailable = displayedComponent.IgnoreIfPackAvailable;
                     componentToApplySettings.IgnoreIfPackUnavailable = displayedComponent.IgnoreIfPackUnavailable;
                     componentToApplySettings.Exclusivities = [..displayedComponent.Exclusivities];
+                    componentToApplySettings.MessageToTranslators = displayedComponent.MessageToTranslators;
+                    componentToApplySettings.TranslationSubmissionUrl = displayedComponent.TranslationSubmissionUrl;
                 }
             }
             finally

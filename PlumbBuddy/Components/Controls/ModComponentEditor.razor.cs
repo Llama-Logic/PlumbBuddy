@@ -53,6 +53,9 @@ partial class ModComponentEditor
     public string? ManifestResourceName { get; set; }
 
     [Parameter]
+    public string? MessageToTranslators { get; set; }
+
+    [Parameter]
     public ModComponent? ModComponent { get; set; }
 
     [Parameter]
@@ -63,6 +66,13 @@ partial class ModComponentEditor
 
     [Parameter]
     public IReadOnlyList<string> SubsumedHashes { get; set; } = [];
+
+    [Parameter]
+    [SuppressMessage("Design", "CA1056: URI-like properties should not be strings")]
+    public string? TranslationSubmissionUrl { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<(string name, CultureInfo language)> Translators { get; set; } = [];
 
     public async Task CommitPendingEntriesIfEmptyAsync()
     {
@@ -168,6 +178,74 @@ partial class ModComponentEditor
             modComponent.IgnoreIfPackUnavailable = newValue;
     }
 
+    async Task HandleIntegrateTranslatorsOverridePackageOnClickAsync()
+    {
+        if (ModComponent?.FileObjectModel is not DataBasePackedFile componentDbpf
+            || await ModFileSelector.SelectAModFileAsync().ConfigureAwait(false) is not { } modFile
+            || !modFile.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase))
+            return;
+        DataBasePackedFile? overrideDbpf = null;
+        try
+        {
+            overrideDbpf = await DataBasePackedFile.FromPathAsync(modFile.FullName).ConfigureAwait(false);
+            var repurposedLanguages = (await ModFileManifestModel.GetModFileManifestsAsync(overrideDbpf).ConfigureAwait(false))
+                .SelectMany(kv => kv.Value.RepurposedLanguages)
+                .GroupBy(rl => rl.GameLocale)
+                .ToImmutableDictionary(g => g.Key, g => g.First());
+            foreach (var stblKey in (await overrideDbpf.GetKeysAsync().ConfigureAwait(false)).Where(k => k.Type is ResourceType.StringTable))
+            {
+                var stblNeutralLocale = SmartSimUtilities.GetStringTableLocale(stblKey);
+                if (repurposedLanguages.TryGetValue(SmartSimUtilities.GetStringTableLocale(stblKey).Name, out var repurposedLanguage)
+                    && !CultureInfo.GetCultureInfo(repurposedLanguage.ActualLocale).GetNeutralCultureInfo().Equals(stblNeutralLocale))
+                {
+                    await DialogService.ShowErrorDialogAsync("Maxis Non-Standard Languages Found", "I can't integrate this package's string tables into your original mod file because it contains Maxis non-standard languages, which should always be distributed independently as overrides. I'm sorry.");
+                    return;
+                }
+            }
+            foreach (var stblKey in (await overrideDbpf.GetKeysAsync().ConfigureAwait(false)).Where(k => k.Type is ResourceType.StringTable))
+            {
+                var stblNeutralLocale = SmartSimUtilities.GetStringTableLocale(stblKey);
+                var overrideStbl = await overrideDbpf.GetModelAsync<StringTableModel>(stblKey).ConfigureAwait(false);
+                if (await componentDbpf.ContainsKeyAsync(stblKey).ConfigureAwait(false))
+                {
+                    if (!await DialogService.ShowCautionDialogAsync($"I'm About to Overwrite {stblKey} in {ModComponent.File.Name}", $"The package you're integrating contains a string table with full instance `{stblKey.FullInstanceHex}` in the language \"{stblNeutralLocale.EnglishName}\", a resource of which your component already has a version. Overwriting this is *probably* what you intend to happen, but since I will be modifying a resource in your original mod file I just want to double-check with you to be sure."))
+                        return;
+                    var componentStbl = await componentDbpf.GetModelAsync<StringTableModel>(stblKey).ConfigureAwait(false);
+                    var missingKeyHashes = componentStbl.KeyHashes.Except(overrideStbl.KeyHashes).ToImmutableArray();
+                    if (missingKeyHashes.Any()
+                        && !await DialogService.ShowCautionDialogAsync($"This {stblNeutralLocale.EnglishName} Translation May Be Incomplete",
+                        $"""
+                        In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {"key hash".ToQuantity(missingKeyHashes.Length)}. If we proceed anyway, there may be blank UI elmeents for {stblNeutralLocale.EnglishName} players of your mod.
+
+                        The missing key hashes are:
+                        {string.Join(Environment.NewLine, missingKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`"))}
+                        """
+                        ))
+                        return;
+                }
+                await componentDbpf.SetAsync(stblKey, overrideStbl).ConfigureAwait(false);
+            }
+            HandleTranslatorsChanged(Translators
+                .Union
+                (
+                    (await ModFileManifestModel.GetModFileManifestsAsync(overrideDbpf).ConfigureAwait(false))
+                        .SelectMany(manifest => manifest.Value.Translators)
+                        .Select(translator => (translator.Name, new CultureInfo(translator.Language)))
+                        .Distinct()
+                )
+                .ToList()
+                .AsReadOnly());
+        }
+        catch (Exception ex)
+        {
+            await DialogService.ShowErrorDialogAsync(AppText.Archivist_Error_Caption, ex.ToString());
+        }
+        finally
+        {
+            overrideDbpf?.Dispose();
+        }
+    }
+
     void HandleIsRequiredChanged(bool newValue)
     {
         IsRequired = newValue;
@@ -180,6 +258,13 @@ partial class ModComponentEditor
         ManifestResourceName = newValue;
         if (ModComponent is { } modComponent)
             modComponent.ManifestResourceName = newValue;
+    }
+
+    void HandleMessageToTranslatorsChanged(string? newValue)
+    {
+        MessageToTranslators = newValue;
+        if (ModComponent is { } modComponent)
+            modComponent.MessageToTranslators = newValue;
     }
 
     void HandleNameChanged(string? newValue)
@@ -233,6 +318,36 @@ partial class ModComponentEditor
             modComponent.SubsumedHashes = newValue;
     }
 
+    void HandleTranslationSubmissionUrlChanged(string? newValue)
+    {
+        TranslationSubmissionUrl = newValue;
+        if (ModComponent is { } modComponent)
+            modComponent.TranslationSubmissionUrl = newValue;
+    }
+
+    async Task HandleTranslatorChipClosedAsync(MudChip<string> chip)
+    {
+        if (chip.Tag is not ValueTuple<string, CultureInfo> translator)
+            return;
+        var (name, language) = translator;
+        var languageName = language.EnglishName;
+        if (languageName != language.NativeName)
+            languageName = $"{languageName} [{language.NativeName}]";
+        if (!await DialogService.ShowCautionDialogAsync("Are you sure?", $"If this is here, it means that at some point, {name} contributed a translation of this component in {languageName}. If you continue now and then finish updating your mod manifest, this credit will no longer appear in Catalog for players."))
+            return;
+        HandleTranslatorsChanged(Translators
+            .Except(new (string name, CultureInfo language)[] { translator })
+            .ToList()
+            .AsReadOnly());
+    }
+
+    void HandleTranslatorsChanged(IReadOnlyList<(string name, CultureInfo language)> newValue)
+    {
+        Translators = newValue;
+        if (ModComponent is { } modComponent)
+            modComponent.Translators = newValue;
+    }
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -259,9 +374,12 @@ partial class ModComponentEditor
             { nameof(IgnoreIfHashUnavailable), lastModComponent?.IgnoreIfHashUnavailable },
             { nameof(IsRequired), lastModComponent?.IsRequired },
             { nameof(ManifestResourceName), lastModComponent?.ManifestResourceName },
+            { nameof(MessageToTranslators), lastModComponent?.MessageToTranslators },
             { nameof(Name), lastModComponent?.Name },
             { nameof(RequirementIdentifier), lastModComponent?.RequirementIdentifier },
-            { nameof(SubsumedHashes), (lastModComponent?.SubsumedHashes ?? []).ToList().AsReadOnly() }
+            { nameof(SubsumedHashes), (lastModComponent?.SubsumedHashes ?? []).ToList().AsReadOnly() },
+            { nameof(TranslationSubmissionUrl), lastModComponent?.TranslationSubmissionUrl },
+            { nameof(Translators), (lastModComponent?.Translators ?? []).ToList().AsReadOnly() }
         }));
     }
 }

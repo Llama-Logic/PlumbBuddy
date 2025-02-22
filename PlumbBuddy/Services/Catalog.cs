@@ -19,15 +19,15 @@ public class Catalog :
         Dispose(false);
 
     bool isDisposed;
-    IReadOnlyDictionary<CatalogModKey, IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>> mods =
-        new Dictionary<CatalogModKey, IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>>().ToImmutableDictionary();
+    IReadOnlyDictionary<CatalogModKey, IReadOnlyList<CatalogModValue>> mods =
+        new Dictionary<CatalogModKey, IReadOnlyList<CatalogModValue>>().ToImmutableDictionary();
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     string modsSearchText = string.Empty;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     CatalogModKey? selectedModKey;
     readonly ISettings settings;
 
-    public IReadOnlyDictionary<CatalogModKey, IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>> Mods
+    public IReadOnlyDictionary<CatalogModKey, IReadOnlyList<CatalogModValue>> Mods
     {
         get => mods;
         set
@@ -122,6 +122,7 @@ public class Catalog :
                 .ThenInclude(rm => rm.RequirementIdentifier)
             .Include(mfm => mfm.RequiredPacks)
             .Include(mfm => mfm.SubsumedHashes)
+            .Include(mfm => mfm.Translators)
             .ToListAsync()
             .ConfigureAwait(false))
         {
@@ -139,6 +140,6 @@ public class Catalog :
                 (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new CatalogModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList().AsReadOnly()
             ));
         }
-        Mods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>)kv.Value.Select(manifestAndFiles => (manifestAndFiles.Manifest, (IReadOnlyList<FileInfo>)[.. manifestAndFiles.Files], (IReadOnlyList<CatalogModKey>)[.. manifestAndFiles.Dependencies], (IReadOnlyList<CatalogModKey>)[.. manifestAndFiles.Dependents])).ToImmutableArray());
+        Mods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<CatalogModValue>)kv.Value.AsReadOnly());
     }
 }

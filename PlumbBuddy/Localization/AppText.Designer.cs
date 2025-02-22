@@ -1620,6 +1620,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Performance Cores Only.
+        /// </summary>
+        internal static string HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This optimization, currently in effect, ensures that only the performance processing cores your computer has are being used by The Sims 4, as opposed to any of its efficiency processing cores. It may be causing your computer to use additional energy and may be placing additional burden on its thermal solution by generating more heat. If you&apos;d like to disable this optimization, you may do so in &lt;em&gt;Settings&lt;/em&gt;..
+        /// </summary>
+        internal static string HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game Version.
         /// </summary>
         internal static string HUD_GameVersion_Tip_Caption {
@@ -4304,6 +4322,24 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_PlumbBuddy_DefaultCreators_Label {
             get {
                 return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_DefaultCreators_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ensure The Sims 4 only uses my computer&apos;s performance cores.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your computer has different kinds of processing cores: some optimized for performance which use more energy, and others optimized for power efficiency but which can cause The Sims 4 to underperform if they&apos;re handed any of its critical functions. I can make sure that doesn&apos;t happen, if you want me to..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip", resourceCulture);
             }
         }
         
@@ -7218,6 +7254,15 @@ namespace PlumbBuddy.Localization {
         internal static string UserTypeSelector_EnthusiastPlayer_Label {
             get {
                 return ResourceManager.GetString("UserTypeSelector_EnthusiastPlayer_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Type.
+        /// </summary>
+        internal static string UserTypeSelector_Label {
+            get {
+                return ResourceManager.GetString("UserTypeSelector_Label", resourceCulture);
             }
         }
         

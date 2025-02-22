@@ -14,6 +14,8 @@ partial class SettingsDialog
 
     string DownloadsFolderPath { get; set; } = string.Empty;
 
+    bool ForceGameProcessPerformanceProcessorAffinity { get; set; }
+
     bool GenerateGlobalManifestPackage { get; set; }
 
     string InstallationFolderPath { get; set; } = string.Empty;
@@ -89,6 +91,7 @@ partial class SettingsDialog
     {
         await base.OnParametersSetAsync();
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
+        ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
         OfferPatchDayModUpdatesHelp = Settings.OfferPatchDayModUpdatesHelp;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
@@ -137,6 +140,7 @@ partial class SettingsDialog
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;
+        Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.OfferPatchDayModUpdatesHelp = OfferPatchDayModUpdatesHelp;

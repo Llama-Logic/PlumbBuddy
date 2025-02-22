@@ -17,7 +17,7 @@ partial class CatalogDisplayModsList
             StaticDispatcher.Dispatch(() => modsFolderPath = Path.Combine(Settings.UserDataFolderPath));
     }
 
-    bool IncludeMod(KeyValuePair<CatalogModKey, IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>> kv)
+    bool IncludeMod(KeyValuePair<CatalogModKey, IReadOnlyList<CatalogModValue>> kv)
     {
         var modsSearchText = Catalog.ModsSearchText;
         var (key, value) = kv;

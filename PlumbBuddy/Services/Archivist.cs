@@ -402,7 +402,6 @@ public partial class Archivist :
             var neighborhoodId = lastZone?.NeighborhoodId ?? default;
             var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
             await chronicleDbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", fileHashArray).ConfigureAwait(false);
-            var originalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false);
             newSnapshot = new SavePackageSnapshot
             {
                 ActiveHouseholdName = activeHousehold?.Name,
@@ -410,7 +409,7 @@ public partial class Archivist :
                 LastPlayedWorldName = lastNeighborhood?.Name,
                 LastWriteTime = fileInfo.LastWriteTime,
                 Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
-                OriginalSavePackageHash = originalSavePackageHash,
+                OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false),
                 Resources = []
             };
             var contextLock = new AsyncLock();
@@ -574,12 +573,8 @@ public partial class Archivist :
                 enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
                 using var sha256 = SHA256.Create();
                 fileHashArray = await sha256.ComputeHashAsync(enhancedPackageMemoryStream).ConfigureAwait(false);
-                if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false) is not { } knownSavePackageHash)
-                {
-                    knownSavePackageHash = new KnownSavePackageHash { Sha256 = fileHashArray };
-                    await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
-                }
-                newSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
+                await chronicleDbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", fileHashArray).ConfigureAwait(false);
+                newSnapshot.EnhancedSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(esp => esp.Sha256 == fileHashArray).ConfigureAwait(false);
                 enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
             }
             await package.DisposeAsync().ConfigureAwait(false);
@@ -799,12 +794,8 @@ public partial class Archivist :
                 tempFileName = $"{saveFile.FullName}.tmp";
                 await package.SaveAsAsync(tempFileName).ConfigureAwait(false);
                 var newEnhancedHashBytes = (await ModFileManifestModel.GetFileSha256HashAsync(tempFileName).ConfigureAwait(false)).ToArray();
-                if (await chronicleDbContext.KnownSavePackageHashes.FirstOrDefaultAsync(ksph => ksph.Sha256 == newEnhancedHashBytes).ConfigureAwait(false) is not { } knownSavePackageHash)
-                {
-                    knownSavePackageHash = new KnownSavePackageHash { Sha256 = newEnhancedHashBytes };
-                    await chronicleDbContext.KnownSavePackageHashes.AddAsync(knownSavePackageHash).ConfigureAwait(false);
-                }
-                savePackageSnapshot.EnhancedSavePackageHash = knownSavePackageHash;
+                await chronicleDbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", newEnhancedHashBytes).ConfigureAwait(false);
+                savePackageSnapshot.EnhancedSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(ksph => ksph.Sha256 == newEnhancedHashBytes).ConfigureAwait(false);
                 await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
                 await snapshot.ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
             }

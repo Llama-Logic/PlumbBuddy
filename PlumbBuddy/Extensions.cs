@@ -1,5 +1,3 @@
-using ProtoBuf;
-
 namespace PlumbBuddy;
 
 static partial class Extensions
@@ -20,6 +18,16 @@ static partial class Extensions
         if (dictionary.TryGetValue(string.Empty, out var invariant))
             return invariant;
         return createEmptyValue();
+    }
+
+    public static CultureInfo GetNeutralCultureInfo(this CultureInfo cultureInfo)
+    {
+        ArgumentNullException.ThrowIfNull(cultureInfo);
+        if (cultureInfo.Equals(CultureInfo.InvariantCulture))
+            return cultureInfo;
+        while (!cultureInfo.IsNeutralCulture)
+            cultureInfo = cultureInfo.Parent;
+        return cultureInfo;
     }
 
     public static IEnumerable<byte> ToByteSequence(this string hex)

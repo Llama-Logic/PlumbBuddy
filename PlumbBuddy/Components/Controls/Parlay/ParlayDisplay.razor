@@ -6,11 +6,18 @@
 @inject ISettings Settings
 
 <MudGrid Justify="Justify.Center">
+
 	@if (Observed(() => Parlay.Packages) is { Count: > 0 } packages)
 	{
 		<MudItem xs="12">
 			<MudStack AlignItems="AlignItems.Center" Row>
 				<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Class="flex-grow-1" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="Package Containing String Tables" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+				@if (Observed(() => Parlay.MessageFromCreators) is not null || Observed(() => Parlay.TranslationSubmissionUrl) is not null)
+				{
+					<MudTooltip Color="Color.Info" Text="@($"View Message to Translators from {(Observed(() => Parlay.Creators) is { } creators ? creators : "the Mod Creator")}")">
+						<MudIconButton Color="Color.Info" Icon="@MaterialDesignIcons.Normal.HumanGreetingVariant" OnClick="ShowCreatorMessageAsync" Variant="Variant.Filled" />
+					</MudTooltip>
+				}
 				<MudTooltip Color="Color.Secondary" Text="Show Original Mod Package File">
 					<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.OriginalPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TextBoxSearch" OnClick="ShowOriginalPackageFileAsync" />
 				</MudTooltip>
@@ -32,7 +39,7 @@
 			<MudSelectExtended @bind-Value="@Binding(() => Parlay.TranslationLocale).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.TableColumnPlusAfter" Color="Color.Secondary" ItemCollection="@(Parlay.TranslationLocales)" Label="Translate to Language" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
 		</MudItem>
 		<MudItem xs="3">
-			<MudTextField @bind-Value="@Binding(() => Settings.ParlayName).Value" Adornment="Adornment.Start" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.Account" Immediate Label="Translator" Variant="Variant.Filled" />
+			<MudTextField @bind-Value="@Binding(() => Settings.ParlayName).Value" Adornment="Adornment.Start" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.Account" DebounceInterval="250" Immediate Label="Translator" Variant="Variant.Filled" />
 		</MudItem>
 	}
 	@if (Observed(() => Parlay.StringTableEntries) is { } stringTableEntries && ObservedCollection(() => stringTableEntries).Count > 0)

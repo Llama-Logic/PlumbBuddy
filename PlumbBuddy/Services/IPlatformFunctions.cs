@@ -10,6 +10,10 @@ public interface IPlatformFunctions :
     IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> ForeignFileNamePatterns { get; }
 
+    nint DefaultProcessorAffinity { get; }
+    bool IsGameProcessOptimizationSupported { get; }
+    nint PerformanceProcessorAffinity { get; }
+    bool ProcessorsHavePerformanceVarianceAndConfigurableAffinity { get; }
     int ProgressMaximum { get; set; }
     AppProgressState ProgressState { get; set; }
     int ProgressValue { get; set; }

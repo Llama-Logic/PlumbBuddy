@@ -1,4 +1,5 @@
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
 
@@ -30,17 +31,19 @@
     <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer KeepPanelsAlive PanelClass="pa-6" SliderAnimation="false">
         <MudTabPanel Text="@StringLocalizer[nameof(AppText.SettingsDialog_General_Label)]" Icon="@MaterialDesignIcons.Normal.Cog">
             <MudStack Class="ma-4">
-                <MudSelect T="UserType" @bind-Value="@Type" Class="text-field label-background-transparent" Label="User Type" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                    <MudSelectItem Value="@UserType.Casual">
-                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_CasualPlayer_Label)]
-                    </MudSelectItem>
-                    <MudSelectItem Value="@UserType.Enthusiast">
-                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_EnthusiastPlayer_Label)]
-                    </MudSelectItem>
-                    <MudSelectItem Value="@UserType.Creator">
-                        @MarkupLocalizer[nameof(AppText.UserTypeSelector_ModCreator_Label)]
-                    </MudSelectItem>
-                </MudSelect>
+				<MudField Label="@(AppText.UserTypeSelector_Label)" Variant="Variant.Filled">
+					<MudRadioGroup @bind-Value="@Type">
+						<MudRadio Value="@UserType.Casual" Color="Color.Primary">
+							@MarkupLocalizer[nameof(AppText.UserTypeSelector_CasualPlayer_Label)]
+						</MudRadio>
+						<MudRadio Value="@UserType.Enthusiast" Color="Color.Secondary">
+							@MarkupLocalizer[nameof(AppText.UserTypeSelector_EnthusiastPlayer_Label)]
+						</MudRadio>
+						<MudRadio Value="@UserType.Creator" Color="Color.Tertiary">
+							@MarkupLocalizer[nameof(AppText.UserTypeSelector_ModCreator_Label)]
+						</MudRadio>
+					</MudRadioGroup>
+				</MudField>
                 @if (Type is UserType.Creator)
                 {
                     <ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
@@ -65,6 +68,14 @@
                     <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip)]">
                         <MudSwitchM3 @bind-Value="@ShowSystemTrayIcon" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.ChevronUp">
                             @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label)]
+                        </MudSwitchM3>
+                    </MudTooltip>
+                }
+				@if (PlatformFunctions.ProcessorsHavePerformanceVarianceAndConfigurableAffinity && Type is not UserType.Casual)
+                {
+					<MudTooltip Arrow Color="Color.Secondary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip)]">
+						<MudSwitchM3 @bind-Value="@ForceGameProcessPerformanceProcessorAffinity" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.LightningBolt" ThumbOffIcon="@MaterialDesignIcons.Normal.Leaf">
+							@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label)]
                         </MudSwitchM3>
                     </MudTooltip>
                 }

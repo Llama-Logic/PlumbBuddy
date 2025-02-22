@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Components.Controls;
 
-public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? name, string subsumedHashes) :
+public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? messageToTranslators, string? translationSubmissionUrl, string translators, string? name, string subsumedHashes) :
     IDisposable,
     INotifyPropertyChanged
 {
@@ -12,9 +12,12 @@ public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? ma
     string? ignoreIfPackUnavailable = ignoreIfPackUnavailable;
     bool isRequired = isRequired;
     string? manifestResourceName = manifestResourceName;
+    string? messageToTranslators = messageToTranslators;
     string? name = name;
     string? requirementIdentifier = requirementIdentifier;
     string subsumedHashes = subsumedHashes;
+    string? translationSubmissionUrl = translationSubmissionUrl;
+    string translators = translators;
 
     public IReadOnlyList<string> Exclusivities
     {
@@ -112,6 +115,18 @@ public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? ma
         }
     }
 
+    public string? MessageToTranslators
+    {
+        get => messageToTranslators;
+        set
+        {
+            if (messageToTranslators == value)
+                return;
+            messageToTranslators = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string? Name
     {
         get => name;
@@ -142,6 +157,39 @@ public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? ma
         set
         {
             subsumedHashes = string.Join(Environment.NewLine, value);
+            OnPropertyChanged();
+        }
+    }
+
+    [SuppressMessage("Design", "CA1056: URI-like properties should not be strings")]
+    public string? TranslationSubmissionUrl
+    {
+        get => translationSubmissionUrl;
+        set
+        {
+            if (translationSubmissionUrl == value)
+                return;
+            translationSubmissionUrl = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public IReadOnlyList<(string name, CultureInfo language)> Translators
+    {
+        get
+        {
+            var split = translators.Split(Environment.NewLine);
+            if (split.Length % 2 != 0)
+                throw new Exception("ack");
+            return Enumerable
+                .Range(0, split.Length / 2)
+                .Select(i => (split[i * 2], CultureInfo.GetCultureInfo(split[i * 2 + 1])))
+                .ToList()
+                .AsReadOnly();
+        }
+        set
+        {
+            translators = string.Join(Environment.NewLine, value.Select(t => $"{t.name}{Environment.NewLine}{t.language.Name}"));
             OnPropertyChanged();
         }
     }

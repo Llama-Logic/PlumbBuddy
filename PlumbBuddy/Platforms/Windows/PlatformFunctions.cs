@@ -1,5 +1,8 @@
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Windows.UI.Notifications;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.SystemInformation;
 
 namespace PlumbBuddy.Platforms.Windows;
 
@@ -39,6 +42,34 @@ partial class PlatformFunctions :
     static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
     static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
 
+    static unsafe List<SYSTEM_CPU_SET_INFORMATION._Anonymous_e__Union._CpuSet_e__Struct> GetLogicalProcessors()
+    {
+        var logicalProcessors = new List<SYSTEM_CPU_SET_INFORMATION._Anonymous_e__Union._CpuSet_e__Struct>();
+        uint bufferLength = 0;
+        var hProcNull = new HANDLE(IntPtr.Zero);
+        PInvoke.GetSystemCpuSetInformation((SYSTEM_CPU_SET_INFORMATION*)IntPtr.Zero, 0, &bufferLength, hProcNull, 0);
+        var buffer = Marshal.AllocHGlobal((int)bufferLength);
+        try
+        {
+            if (PInvoke.GetSystemCpuSetInformation((SYSTEM_CPU_SET_INFORMATION*)buffer, bufferLength, &bufferLength, hProcNull, 0))
+            {
+                nint offset = 0;
+                while (offset < bufferLength)
+                {
+                    logicalProcessors.Add(Marshal.PtrToStructure<SYSTEM_CPU_SET_INFORMATION>(buffer + offset).Anonymous.CpuSet);
+                    offset += Marshal.SizeOf<SYSTEM_CPU_SET_INFORMATION>();
+                }
+            }
+            else
+                throw new Win32Exception("she's being completely unreasnable, you speak to her, Jeez...");
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+        return logicalProcessors;
+    }
+
     public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger, IAppLifecycleManager appLifecycleManager)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
@@ -59,6 +90,17 @@ partial class PlatformFunctions :
     AppProgressState progressState;
     int progressValue;
     readonly ToastNotifier toastNotifier;
+
+    public nint DefaultProcessorAffinity
+    {
+        get
+        {
+            nint result = 0;
+            foreach (var logicalProcessor in GetLogicalProcessors().OrderBy(lp => lp.LogicalProcessorIndex))
+                result |= (nint)(1UL << logicalProcessor.LogicalProcessorIndex);
+            return result;
+        }
+    }
 
     public IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; } =
     [
@@ -87,6 +129,28 @@ partial class PlatformFunctions :
         GetDotDsUnderscoreStorePattern(),
         GetDotLocalizedPattern()
     ];
+
+    public bool IsGameProcessOptimizationSupported =>
+        true;
+
+    /// <summary>
+    /// Gets a platform-specific <see cref="IntPtr"/> that when set to a <see cref="Process.ProcessorAffinity"/> will cause it to avoid any E-cores...
+    /// ⚡🔥⚡ UNLIMITED POWER! ⚡🔥⚡
+    /// </summary>
+    public nint PerformanceProcessorAffinity
+    {
+        get
+        {
+            nint result = 0;
+            foreach (var logicalProcessor in GetLogicalProcessors().OrderBy(lp => lp.LogicalProcessorIndex))
+                if (logicalProcessor.EfficiencyClass is not 0)
+                    result |= (nint)(1UL << logicalProcessor.LogicalProcessorIndex);
+            return result;
+        }
+    }
+
+    public bool ProcessorsHavePerformanceVarianceAndConfigurableAffinity =>
+        GetLogicalProcessors().GroupBy(lp => lp.EfficiencyClass).Count() is > 1;
 
     public int ProgressMaximum
     {

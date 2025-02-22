@@ -104,6 +104,18 @@ class Settings :
         }
     }
 
+    public bool ForceGameProcessPerformanceProcessorAffinity
+    {
+        get => preferences.Get(nameof(ForceGameProcessPerformanceProcessorAffinity), false);
+        set
+        {
+            if (ForceGameProcessPerformanceProcessorAffinity == value)
+                return;
+            preferences.Set(nameof(ForceGameProcessPerformanceProcessorAffinity), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool GenerateGlobalManifestPackage
     {
         get => preferences.Get(nameof(GenerateGlobalManifestPackage), true);

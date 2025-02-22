@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Services;
 
-public record ParlayPackage(string ModFilePath, string? ManifestedName, string? ManifestedCreators, string? ManifestedVersion, IReadOnlyList<ParlayStringTable> StringTables)
+public record ParlayPackage(string ModFilePath, string? ManifestedName, string? ManifestedCreators, string? ManifestedVersion, string? ManifestedMessageFromCreators, Uri? ManifestedTranslationSubmissionUrl, IReadOnlyList<ParlayStringTable> StringTables)
 {
     public override string ToString()
     {

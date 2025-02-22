@@ -4,7 +4,11 @@ public interface IParlay :
     IDisposable,
     INotifyPropertyChanged
 {
+    string? Creators { get; }
+
     string EntrySearchText { get; set; }
+
+    string? MessageFromCreators { get; }
 
     FileInfo? OriginalPackageFile { get; set; }
 
@@ -21,6 +25,8 @@ public interface IParlay :
     ImmutableArray<ParlayLocale> TranslationLocales { get; }
 
     FileInfo? TranslationPackageFile { get; set; }
+
+    Uri? TranslationSubmissionUrl { get; }
 
     Task<int> MergeStringTableAsync(FileInfo fromPackageFile);
 

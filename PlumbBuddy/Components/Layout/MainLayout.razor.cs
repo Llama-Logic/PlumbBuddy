@@ -77,12 +77,6 @@ public partial class MainLayout
         }
     }
 
-    Task CloseDrawerHandler()
-    {
-        isMainMenuDrawerOpen = false;
-        return Task.CompletedTask;
-    }
-
     void ApplySettingsSelectedTheme(MudTheme theme)
     {
         if (Settings.Theme is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme))
@@ -117,6 +111,12 @@ public partial class MainLayout
                     if (value is not null)
                         typeof(PaletteDark).GetProperty(key)?.SetValue(theme.PaletteDark, (MudBlazor.Utilities.MudColor)value);
         }
+    }
+
+    Task CloseDrawerHandler()
+    {
+        isMainMenuDrawerOpen = false;
+        return Task.CompletedTask;
     }
 
     protected override void Dispose(bool disposing)

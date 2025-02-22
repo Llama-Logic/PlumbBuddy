@@ -16,11 +16,7 @@ public class Snapshot :
         {
             packageStream.Seek(0, SeekOrigin.Begin);
             var packageSha256 = await sha256.ComputeHashAsync(packageStream).ConfigureAwait(false);
-            if (!await dbContext.KnownSavePackageHashes.AnyAsync(esp => esp.Sha256 == packageSha256).ConfigureAwait(false))
-            {
-                await dbContext.KnownSavePackageHashes.AddAsync(new() { Sha256 = packageSha256 }).ConfigureAwait(false);
-                await dbContext.SaveChangesAsync().ConfigureAwait(false);
-            }
+            await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", packageSha256).ConfigureAwait(false);
         }
         return packageStream;
     }

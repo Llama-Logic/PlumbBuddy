@@ -6,7 +6,7 @@ partial class CatalogDisplayModDetailsFiles
     string modsFolderPath = string.Empty;
 
     [Parameter]
-    public IEnumerable<FileInfo>? Files { get; set; }
+    public IEnumerable<CatalogModValue>? CatalogModValues { get; set; }
 
     protected override void Dispose(bool disposing)
     {
@@ -31,12 +31,21 @@ partial class CatalogDisplayModDetailsFiles
         return [.. breadcrumbs];
     }
 
-    bool IncludeFile(FileInfo fileInfo)
+    bool IncludeFile(ValueTuple<ModFileManifestModel, FileInfo> record)
     {
         if (string.IsNullOrWhiteSpace(filesSearchText))
             return true;
-        if (fileInfo.FullName[(modsFolderPath.Length + 1)..].Contains(filesSearchText, StringComparison.OrdinalIgnoreCase))
+        if (record.Item2.FullName[(modsFolderPath.Length + 1)..].Contains(filesSearchText, StringComparison.OrdinalIgnoreCase))
             return true;
+        foreach (var translator in record.Item1.Translators)
+        {
+            if (translator.Name.Contains(filesSearchText, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (translator.Language.Contains(filesSearchText, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (translator.Culture?.NativeName.Contains(filesSearchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                return true;
+        }
         return false;
     }
 

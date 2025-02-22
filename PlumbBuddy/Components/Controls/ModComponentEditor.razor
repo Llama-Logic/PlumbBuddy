@@ -97,7 +97,41 @@
             </MudAlert>
         }
     </MudItem>
-    <MudItem xs="12">
+	<MudItem xs="12">
+		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" AutoGrow HelperText="If translators use a manifest-aware tool like Parlay to translate string tables in this component, is there anything you'd like to say to them?" Label="Message to Translators" Value="@MessageToTranslators" ValueChanged="HandleMessageToTranslatorsChanged" Variant="Variant.Filled" />
+	</MudItem>
+	<MudItem xs="12">
+		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Upload" HelperText="If a translator would like to submit a translation to you to consider integrating into your mod, where should they go? (Hint: This could be a Discord join link.)" Label="Translation Submission URL" Value="@TranslationSubmissionUrl" ValueChanged="HandleTranslationSubmissionUrlChanged" Variant="Variant.Filled" />
+	</MudItem>
+	<MudItem xs="12">
+		<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="These are the translators currently credited for this component. I will add them for you as you integrate override packages with the button below." Label="Credited Translators" Variant="Variant.Filled">
+			@foreach (var translator in Translators)
+			{
+				var countryCode = translator.language.Name;
+				try
+				{
+					countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
+				}
+				catch
+				{
+				}
+				<MudChip T="string" Color="Color.Tertiary" OnClose="HandleTranslatorChipClosedAsync" Tag="@translator" Value="@(translator.name)">
+					<AvatarContent>
+						<MudAvatar>
+							<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
+						</MudAvatar>
+					</AvatarContent>
+				</MudChip>
+			}
+		</MudField>
+	</MudItem>
+	<MudItem>
+		<MudButton Color="Color.Tertiary" OnClick="HandleIntegrateTranslatorsOverridePackageOnClickAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
+			Integrate translator's override package...
+		</MudButton>
+	</MudItem>
+	<MudFlexBreak />
+	<MudItem xs="12">
         <MudTextField T="string" Value="@Name" ValueChanged="HandleNameChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_Placeholder)]" />
     </MudItem>
     @if (@ManifestResourceName is not null)

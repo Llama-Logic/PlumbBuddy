@@ -1,3 +1,5 @@
+using PlumbBuddy.Data;
+
 namespace PlumbBuddy.Services;
 
 public sealed class Parlay :
@@ -24,6 +26,9 @@ public sealed class Parlay :
         new ("es-ES"),
         new ("sv")
     ];
+    static readonly ImmutableDictionary<string, CultureInfo> maxisLocaleByNeutralLocaleName = maxisLocales
+        .GroupBy(ci => ci.GetNeutralCultureInfo().Name)
+        .ToImmutableDictionary(g => g.Key, g => g.First());
 
     public Parlay(ISettings settings, ILogger<Parlay> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
     {
@@ -41,6 +46,7 @@ public sealed class Parlay :
         publicOrigins = packages.ToList().AsReadOnly();
         refreshOriginsLock = new();
         stringTableEntriesLock = new();
+        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         RefreshOrigins();
     }
@@ -48,9 +54,11 @@ public sealed class Parlay :
     ~Parlay() =>
         Dispose(false);
 
+    string? creators;
     string entrySearchText = string.Empty;
     bool isDisposed;
     readonly ILogger<Parlay> logger;
+    string? messageFromCreators;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     FileInfo? originalPackageFile;
     readonly List<ParlayPackage> packages;
@@ -58,6 +66,7 @@ public sealed class Parlay :
     IReadOnlyList<ParlayPackage> publicOrigins;
     ReadOnlyObservableCollection<ParlayStringTableEntry>? publicStringTableEntries;
     readonly AsyncLock refreshOriginsLock;
+    CultureInfo? repurposingMaxisLocale;
     readonly AsyncLock stringTableEntriesLock;
     ParlayPackage? selectedOrigin;
     readonly ISettings settings;
@@ -67,6 +76,19 @@ public sealed class Parlay :
     ParlayLocale? translationLocale;
     FileInfo? translationPackageFile;
     ResourceKey translationStringTableKey;
+    Uri? translationSubmissionUrl;
+
+    public string? Creators
+    {
+        get => creators;
+        private set
+        {
+            if (creators == value)
+                return;
+            creators = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string EntrySearchText
     {
@@ -76,6 +98,18 @@ public sealed class Parlay :
             if (entrySearchText == value)
                 return;
             entrySearchText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string? MessageFromCreators
+    {
+        get => messageFromCreators;
+        private set
+        {
+            if (messageFromCreators == value)
+                return;
+            messageFromCreators = value;
             OnPropertyChanged();
         }
     }
@@ -115,6 +149,7 @@ public sealed class Parlay :
             OriginalPackageFile = SelectedPackage?.ModFilePath is { } selectedPackagePath
                 ? new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", selectedPackagePath))
                 : null;
+            RefreshCreatorProperties();
         }
     }
 
@@ -157,14 +192,14 @@ public sealed class Parlay :
         get
         {
             var coveredNeutralCultureNames = maxisLocales
-                .Select(ci => ci.TwoLetterISOLanguageName)
+                .Select(ci => ci.Name)
                 .Distinct()
                 .ToImmutableHashSet();
             return maxisLocales
                 .Concat
                 (
                     CultureInfo
-                        .GetCultures(CultureTypes.NeutralCultures)
+                        .GetCultures(CultureTypes.SpecificCultures)
                         .Where(ci => !coveredNeutralCultureNames.Contains(ci.Name))
                         .OrderBy(ci => ci.NativeName)
                 )
@@ -181,6 +216,18 @@ public sealed class Parlay :
             if (translationPackageFile?.FullName == value?.FullName)
                 return;
             translationPackageFile = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Uri? TranslationSubmissionUrl
+    {
+        get => translationSubmissionUrl;
+        private set
+        {
+            if (translationSubmissionUrl == value)
+                return;
+            translationSubmissionUrl = value;
             OnPropertyChanged();
         }
     }
@@ -207,6 +254,12 @@ public sealed class Parlay :
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State)
             && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
             RefreshOrigins();
+    }
+
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISettings.ParlayName))
+            SaveTranslation();
     }
 
     public async Task<int> MergeStringTableAsync(FileInfo fromPackageFile)
@@ -237,6 +290,29 @@ public sealed class Parlay :
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    void RefreshCreatorProperties()
+    {
+        var reset = true;
+        try
+        {
+            if (SelectedPackage is not { } selectedPackage)
+                return;
+            Creators = selectedPackage.ManifestedCreators;
+            MessageFromCreators = selectedPackage.ManifestedMessageFromCreators;
+            TranslationSubmissionUrl = selectedPackage.ManifestedTranslationSubmissionUrl;
+            reset = false;
+        }
+        finally
+        {
+            if (reset)
+            {
+                Creators = null;
+                MessageFromCreators = null;
+                TranslationSubmissionUrl = null;
+            }
+        }
+    }
 
     void RefreshOrigins() =>
         _ = Task.Run(RefreshOriginsAsync);
@@ -279,6 +355,8 @@ public sealed class Parlay :
                         mfm.Name,
                         Creators = mfm.Creators!.Select(mc => mc.Name).ToList(),
                         mfm.Version,
+                        mfm.MessageToTranslators,
+                        mfm.TranslationSubmissionUrl,
                         RepurposedLanguages = mfm.RepurposedLanguages!.Select(rl => new
                         {
                             rl.ActualLocale,
@@ -313,7 +391,17 @@ public sealed class Parlay :
                     .OrderByDescending(g => g.Count())
                     .FirstOrDefault()
                     ?.Key;
-                packages.Add(new(path, manifestedName, manifestedCreators, manifestedVersion, packageRecord.StringTableKeys
+                var messagesFromCreators = packageRecord.ModFileManifests
+                    .Where(mfm => !string.IsNullOrWhiteSpace(mfm.MessageToTranslators))
+                    .Select(mfm => mfm.MessageToTranslators)
+                    .ToImmutableArray();
+                var manifestedMessageFromCreators = messagesFromCreators.Length is 0
+                    ? null
+                    : string.Join($"{Environment.NewLine}{Environment.NewLine}", messagesFromCreators);
+                var manifestedTranslationSubmissionUrl = packageRecord.ModFileManifests
+                    .FirstOrDefault(mfm => mfm.TranslationSubmissionUrl is not null)
+                    ?.TranslationSubmissionUrl;
+                packages.Add(new(path, manifestedName, manifestedCreators, manifestedVersion, manifestedMessageFromCreators, manifestedTranslationSubmissionUrl, packageRecord.StringTableKeys
                     .Select(stk =>
                     {
                         var stringTableKey = new ResourceKey
@@ -384,18 +472,24 @@ public sealed class Parlay :
             if (this.originalPackageFile is not { } originalPackageFile)
                 return;
             TranslationPackageFile =
-                maybeNullTranslationLocale is { } translationLocale
-                ? new FileInfo(Path.Combine(originalPackageFile.Directory!.FullName, $"!{originalPackageFile.Name[..^originalPackageFile.Extension.Length]}.{translationLocale.Name}.l10n.package"))
+                maybeNullTranslationLocale is { } translationLocaleForFileName
+                ? new FileInfo(Path.Combine(originalPackageFile.Directory!.FullName, $"!{originalPackageFile.Name[..^originalPackageFile.Extension.Length]}.{translationLocaleForFileName.Name}.l10n.package"))
                 : null;
             using var originalPackage = await DataBasePackedFile.FromPathAsync(originalPackageFile.FullName).ConfigureAwait(false);
             var originalStbl = await originalPackage.GetModelAsync<StringTableModel>(originalStringTableKey).ConfigureAwait(false);
             StringTableModel? translationStbl = null;
-            if (maybeNullTranslationLocale is not null)
+            if (maybeNullTranslationLocale is { } translationLocale)
             {
-                if (maxisLocales.Any(ml => ml.Name.Equals(maybeNullTranslationLocale.Name, StringComparison.OrdinalIgnoreCase)))
-                    translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(maybeNullTranslationLocale, originalStringTableKey.Group, originalStringTableKey.FullInstance);
+                repurposingMaxisLocale = null;
+                if (maxisLocales.Any(ml => ml.Name.Equals(translationLocale.Name, StringComparison.OrdinalIgnoreCase)))
+                    translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(translationLocale, originalStringTableKey.Group, originalStringTableKey.FullInstance);
                 else
-                    translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(CultureInfo.GetCultureInfo("en-US"), originalStringTableKey.Group, originalStringTableKey.FullInstance);
+                {
+                    repurposingMaxisLocale = maxisLocaleByNeutralLocaleName.TryGetValue(translationLocale.GetNeutralCultureInfo().Name, out var ml)
+                        ? ml
+                        : CultureInfo.GetCultureInfo("en-US");
+                    translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(repurposingMaxisLocale, originalStringTableKey.Group, originalStringTableKey.FullInstance);
+                }
                 if (TranslationPackageFile is { } translationPackageFile
                     && translationPackageFile.Exists)
                 {
@@ -427,6 +521,9 @@ public sealed class Parlay :
             });
         }
     }
+
+    void SaveTranslation() =>
+        _ = Task.Run(SaveTranslationAsync);
 
     public async Task SaveTranslationAsync()
     {
@@ -473,9 +570,9 @@ public sealed class Parlay :
             if (translationPackageManifests is not null)
                 foreach (var repurposedLanguage in translationPackageManifests.RepurposedLanguages)
                     repurposedLanguages.TryAdd(repurposedLanguage.GameLocale, repurposedLanguage.ActualLocale);
-            if (!maxisLocales.Any(ml => ml.Name.Equals(translationLocale.Name, StringComparison.OrdinalIgnoreCase))
-                && !repurposedLanguages.TryAdd("en-US", translationLocale.Name))
-                repurposedLanguages["en-US"] = translationLocale.Name;
+            if (repurposingMaxisLocale is not null
+                && !repurposedLanguages.TryAdd(repurposingMaxisLocale.Name, translationLocale.Name))
+                repurposedLanguages[repurposingMaxisLocale.Name] = translationLocale.Name;
             var translationStbl = new StringTableModel();
             foreach (var (hash, originalAndTranslation) in stringTableEntries)
             {
@@ -488,6 +585,13 @@ public sealed class Parlay :
             foreach (var key in await translationPackage.GetKeysAsync().ConfigureAwait(false))
                 translationPackageManifest.HashResourceKeys.Add(key);
             translationPackageManifest.Hash = await ModFileManifestModel.GetModFileHashAsync(translationPackage, translationPackageManifest.HashResourceKeys).ConfigureAwait(false);
+            translationPackageManifest.RepurposedLanguages.Clear();
+            foreach (var (gameLocale, actualLocale) in repurposedLanguages)
+                translationPackageManifest.RepurposedLanguages.Add(new()
+                {
+                    ActualLocale = actualLocale,
+                    GameLocale = gameLocale
+                });
             translationPackageManifest.RequiredMods.Clear();
             foreach (var originalPackageManifest in originalPackageManifests.Values)
             {

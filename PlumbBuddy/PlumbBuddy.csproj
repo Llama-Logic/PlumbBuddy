@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <Import Project="..\Common\AppProject.props" />
 
@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.3.3</ApplicationDisplayVersion>
-        <ApplicationVersion>1.3.3</ApplicationVersion>
+        <ApplicationDisplayVersion>1.3.4</ApplicationDisplayVersion>
+        <ApplicationVersion>1.3.4</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -81,17 +81,18 @@
         <PackageReference Include="ini-parser" Version="2.5.2" />
         <PackageReference Include="LlamaLogic.Packages" Version="2.22.2" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.112.481" />
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.12" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.93" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.93" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.13" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.100" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
         <PackageReference Include="MudBlazor" Version="8.2.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="8.0.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
         <PackageReference Include="Octokit" Version="14.0.0" />
         <PackageReference Include="Phork.Blazor.Reactivity" Version="1.1.3" />
+        <PackageReference Include="PSC.Blazor.Components.Icons" Version="6.0.8" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="2.0.0" />
         <PackageReference Include="Serilog.Enrichers.Demystifier" Version="1.0.3" />
@@ -114,7 +115,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
-        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.162">
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

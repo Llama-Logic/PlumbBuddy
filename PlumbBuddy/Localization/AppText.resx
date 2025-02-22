@@ -2827,4 +2827,19 @@ I've had to disable myself until you can fix this, and it's important that you u
   <data name="Home_Parlay_Label" xml:space="preserve">
     <value>Parlay</value>
   </data>
+  <data name="OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label" xml:space="preserve">
+    <value>Ensure The Sims 4 only uses my computer's performance cores</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip" xml:space="preserve">
+    <value>Your computer has different kinds of processing cores: some optimized for performance which use more energy, and others optimized for power efficiency but which can cause The Sims 4 to underperform if they're handed any of its critical functions. I can make sure that doesn't happen, if you want me to.</value>
+  </data>
+  <data name="UserTypeSelector_Label" xml:space="preserve">
+    <value>User Type</value>
+  </data>
+  <data name="HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Caption" xml:space="preserve">
+    <value>Performance Cores Only</value>
+  </data>
+  <data name="HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Description" xml:space="preserve">
+    <value>This optimization, currently in effect, ensures that only the performance processing cores your computer has are being used by The Sims 4, as opposed to any of its efficiency processing cores. It may be causing your computer to use additional energy and may be placing additional burden on its thermal solution by generating more heat. If you'd like to disable this optimization, you may do so in &lt;em&gt;Settings&lt;/em&gt;.</value>
+  </data>
 </root>

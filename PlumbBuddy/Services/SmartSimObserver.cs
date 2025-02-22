@@ -60,11 +60,13 @@ public partial class SmartSimObserver :
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
         this.publicCatalogs = publicCatalogs;
+        this.platformFunctions.PerformanceProcessorAffinity.ToString();
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
         fileSystemWatcherConnectionLock = new();
         fresheningTaskLock = new();
+        gameProcessOptimizationLock = new();
         resampleGameVersionDebouncer = new(ResampleGameVersionAsync, TimeSpan.FromSeconds(3));
         resamplingPacksTaskLock = new();
         scanInstances = [];
@@ -90,11 +92,13 @@ public partial class SmartSimObserver :
     readonly StringComparison fileSystemStringComparison;
     readonly AsyncLock fileSystemWatcherConnectionLock;
     readonly AsyncLock fresheningTaskLock;
+    readonly AsyncLock gameProcessOptimizationLock;
     Version? gameVersion;
     ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? installationDirectoryWatcher;
     IReadOnlyList<string> installedPackCodes = [];
+    bool isPerformanceProcessorAffinityInEffect;
     bool isScanning;
     bool isModsDisabledGameSettingOn;
     bool isScriptModsEnabledGameSettingOn = true;
@@ -173,6 +177,18 @@ public partial class SmartSimObserver :
                 return;
             installedPackCodes = [..cleaned];
             FreshenGlobalManifest(force: true);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsPerformanceProcessorAffinityInEffect
+    {
+        get => isPerformanceProcessorAffinityInEffect;
+        private set
+        {
+            if (isPerformanceProcessorAffinityInEffect == value)
+                return;
+            isPerformanceProcessorAffinityInEffect = value;
             OnPropertyChanged();
         }
     }
@@ -256,11 +272,40 @@ public partial class SmartSimObserver :
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    void ApplyGameProcessEnhancements() =>
+        _ = Task.Run(() => ApplyGameProcessEnhancementsAsync(null));
+
+    async Task ApplyGameProcessEnhancementsAsync(Process? ts4Process)
+    {
+        if (!platformFunctions.IsGameProcessOptimizationSupported)
+            return;
+        if (ts4Process is null)
+        {
+            ts4Process = await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false);
+            if (ts4Process is null)
+                return;
+        }
+        using var gameProcessOptimizationLockHeld = await gameProcessOptimizationLock.LockAsync().ConfigureAwait(false);
+        if (platformFunctions.ProcessorsHavePerformanceVarianceAndConfigurableAffinity)
+        {
+            var arePCoresOnlyRequested = settings.Type is not UserType.Casual
+                && settings.ForceGameProcessPerformanceProcessorAffinity;
+            var requestedAffinity = arePCoresOnlyRequested
+                ? platformFunctions.PerformanceProcessorAffinity
+                : platformFunctions.DefaultProcessorAffinity;
+            if (requestedAffinity is not 0)
+            {
+                ts4Process.ProcessorAffinity = requestedAffinity;
+                IsPerformanceProcessorAffinityInEffect = arePCoresOnlyRequested;
+            }
+        }
+    }
+
     bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath, out bool wasGlobalManifestChange)
     {
         if (modsDirectoryRelativePathPattern.IsMatch(userDataDirectoryRelativePath))
         {
-            PutCatalogerToBedIfGameIsRunning();
+            NoticeIfGameIsRunning();
             var modsDirectoryRelativePath = userDataDirectoryRelativePath[5..];
             wasGlobalManifestChange = modsDirectoryRelativePath is GlobalModsManifestPackageName;
             if (!wasGlobalManifestChange)
@@ -275,7 +320,7 @@ public partial class SmartSimObserver :
     {
         if (userDataDirectoryRelativePath == "Mods")
         {
-            PutCatalogerToBedIfGameIsRunning();
+            NoticeIfGameIsRunning();
             modsDirectoryCataloger.Catalog(string.Empty);
             return true;
         }
@@ -456,11 +501,11 @@ public partial class SmartSimObserver :
                 cacheComponents =
                 [
                     new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
-                new FileInfo(Path.Combine(settings.UserDataFolderPath, "clientDB.package")),
-                new FileInfo(Path.Combine(settings.UserDataFolderPath, "houseDescription-client.package")),
-                new FileInfo(Path.Combine(settings.UserDataFolderPath, "localthumbcache.package")),
-                new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "cachestr")),
-                new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "onlinethumbnailcache"))
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "clientDB.package")),
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "houseDescription-client.package")),
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "localthumbcache.package")),
+                    new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "cachestr")),
+                    new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "onlinethumbnailcache"))
                 ];
                 ResampleCacheClarity();
                 using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
@@ -517,7 +562,7 @@ public partial class SmartSimObserver :
                 userDataDirectoryWatcher.Renamed += UserDataDirectoryFileSystemEntryRenamedHandler;
                 userDataDirectoryWatcher.EnableRaisingEvents = true;
                 UpdateScanInitializationStatus();
-                PutCatalogerToBedIfGameIsRunning();
+                NoticeIfGameIsRunning();
                 modsDirectoryCataloger.Catalog(string.Empty);
                 FreshenGlobalManifest(force: true);
             }
@@ -735,8 +780,15 @@ public partial class SmartSimObserver :
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ISettings.CacheStatus) or nameof(ISettings.Type))
+        if (e.PropertyName is nameof(ISettings.Type))
+        {
             Scan();
+            ApplyGameProcessEnhancements();
+        }
+        else if (e.PropertyName is nameof(ISettings.CacheStatus))
+            Scan();
+        else if (e.PropertyName is nameof(ISettings.ForceGameProcessPerformanceProcessorAffinity))
+            ApplyGameProcessEnhancements();
         else if (e.PropertyName is nameof(ISettings.GenerateGlobalManifestPackage))
         {
             var globalModsManifestPackageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", GlobalModsManifestPackageName));
@@ -745,19 +797,19 @@ public partial class SmartSimObserver :
             else if (settings.GenerateGlobalManifestPackage)
                 FreshenGlobalManifest(force: true);
         }
-        else if (e.PropertyName == nameof(ISettings.InstallationFolderPath))
+        else if (e.PropertyName is nameof(ISettings.InstallationFolderPath))
         {
             DisconnectFromInstallationDirectoryWatcher();
             ConnectToInstallationDirectory();
         }
-        else if (e.PropertyName == nameof(ISettings.Onboarded))
+        else if (e.PropertyName is nameof(ISettings.Onboarded))
         {
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToInstallationDirectory();
             ConnectToUserDataDirectory();
         }
-        else if (e.PropertyName == nameof(ISettings.UserDataFolderPath))
+        else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
         {
             DisconnectFromUserDataDirectoryWatcher();
             ConnectToUserDataDirectory();
@@ -819,6 +871,27 @@ public partial class SmartSimObserver :
         }
     }
 
+    void NoticeIfGameIsRunning()
+    {
+        if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping
+            && (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            || IsCacheLocked())
+            Task.Run(NoticeIfGameIsRunningAsync);
+    }
+
+    async Task NoticeIfGameIsRunningAsync()
+    {
+        if (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is { } ts4Process)
+        {
+            modsDirectoryCataloger.GoToSleep();
+            await ApplyGameProcessEnhancementsAsync(ts4Process).ConfigureAwait(false);
+            await ts4Process.WaitForExitAsync().ConfigureAwait(false);
+            IsPerformanceProcessorAffinityInEffect = false;
+            ts4Process.Dispose();
+            modsDirectoryCataloger.WakeUp();
+        }
+    }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 
@@ -864,25 +937,6 @@ public partial class SmartSimObserver :
         ConnectToInstallationDirectory();
     }
 
-    void PutCatalogerToBedIfGameIsRunning()
-    {
-        if (modsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Sleeping
-            && (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
-            || IsCacheLocked())
-            Task.Run(PutCatalogerToBedWhileGameIsRunningAsync);
-    }
-
-    async Task PutCatalogerToBedWhileGameIsRunningAsync()
-    {
-        if (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is { } ts4Process)
-        {
-            modsDirectoryCataloger.GoToSleep();
-            await ts4Process.WaitForExitAsync().ConfigureAwait(false);
-            ts4Process.Dispose();
-            modsDirectoryCataloger.WakeUp();
-        }
-    }
-
     void ResampleCacheClarity()
     {
         foreach (var cacheComponent in cacheComponents)
@@ -891,7 +945,7 @@ public partial class SmartSimObserver :
         if (settings.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
         {
             settings.CacheStatus = SmartSimCacheStatus.Normal;
-            PutCatalogerToBedIfGameIsRunning();
+            NoticeIfGameIsRunning();
         }
         else if (settings.CacheStatus is not SmartSimCacheStatus.Clear && !anyCacheComponentsExistOnDisk)
             settings.CacheStatus = SmartSimCacheStatus.Clear;

@@ -39,6 +39,9 @@ amethyst-lilac:
       light: archivist-light.png
       position: center
       size: contain
+    parlay:
+      dark: parlay.png
+      light: parlay.png
 
 codebleu:
   display_name: CodeBleu
@@ -78,6 +81,9 @@ codebleu:
       dark: archivist.jpg
       light: archivist.jpg
       position: center
+    parlay:
+      dark: parlay.jpg
+      light: parlay.jpg
 
 deaderpool:
   display_name: Deaderpool
@@ -117,6 +123,9 @@ deaderpool:
       dark: archivist.jpg
       light: archivist.jpg
       position: center
+    parlay:
+      dark: parlay.jpg
+      light: parlay.jpg
 
 helen-the-hunter:
   display_name: Helen the Hunter
@@ -152,6 +161,9 @@ helen-the-hunter:
     archivist:
       dark: archivist.jpg
       light: archivist.jpg
+    parlay:
+      dark: parlay.jpg
+      light: parlay.jpg
 
 littlbowbub:
   display_name: Littlbowbub
@@ -172,18 +184,21 @@ littlbowbub:
     TextSecondary: '#cd6f6fff'
   backgrounded_tabs:
     mod-health:
-      dark: mod-health.png
-      light: mod-health.png
+      dark: mod-health.jpg
+      light: mod-health.jpg
     catalog:
-      dark: catalog.png
-      light: catalog.png
+      dark: catalog.jpg
+      light: catalog.jpg
     manifest-editor:
-      dark: manifest-editor.png
-      light: manifest-editor.png
+      dark: manifest-editor.jpg
+      light: manifest-editor.jpg
     archivist:
-      dark: archivist.png
-      light: archivist.png
+      dark: archivist.jpg
+      light: archivist.jpg
       position: center
+    parlay:
+      dark: parlay.jpg
+      light: parlay.jpg
 
 little-ms-sam:
   display_name: LittleMsSam
@@ -240,6 +255,9 @@ little-ms-sam:
     archivist:
       dark: null
       light: null
+    parlay:
+      dark: null
+      light: null
 
 meg:
   display_name: Meg
@@ -276,6 +294,9 @@ meg:
     archivist:
       dark: null
       light: null
+    parlay:
+      dark: null
+      light: null
 
 sim-realist:
   display_name: Sim Realist
@@ -289,15 +310,18 @@ sim-realist:
     Tertiary: '#a0c45bff'
   backgrounded_tabs:
     mod-health:
-      dark: mod-health.png
-      light: mod-health.png
+      dark: mod-health.jpg
+      light: mod-health.jpg
     catalog:
-      dark: catalog.png
-      light: catalog.png
+      dark: catalog.jpg
+      light: catalog.jpg
     manifest-editor:
-      dark: manifest-editor.png
-      light: manifest-editor.png
+      dark: manifest-editor.jpg
+      light: manifest-editor.jpg
     archivist:
-      dark: archivist.png
-      light: archivist.png
+      dark: archivist.jpg
+      light: archivist.jpg
       position: center
+    parlay:
+      dark: parlay.jpg
+      light: parlay.jpg

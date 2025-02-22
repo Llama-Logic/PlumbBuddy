@@ -7,6 +7,7 @@ public interface ISmartSimObserver :
     Version? GameVersion { get; }
     IReadOnlyList<string> InstalledPackCodes { get; }
     bool IsModsDisabledGameSettingOn { get; }
+    bool IsPerformanceProcessorAffinityInEffect { get; }
     bool IsScanning { get; }
     bool IsScriptModsEnabledGameSettingOn { get; }
     bool IsShowModListStartupGameSettingOn { get; }

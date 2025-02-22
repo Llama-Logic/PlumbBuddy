@@ -62,7 +62,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimFirstName",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimFirstName}",
+                        insertText: "{${1:0}.SimFirstName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -71,7 +71,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimFirstNameList",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimFirstNameList}",
+                        insertText: "{${1:0}.SimFirstNameList}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -80,7 +80,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimLastName",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimLastName}",
+                        insertText: "{${1:0}.SimLastName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -89,7 +89,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimName",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimName}",
+                        insertText: "{${1:0}.SimName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -98,7 +98,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimNameAndPronouns",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimNameAndPronouns}",
+                        insertText: "{${1:0}.SimNameAndPronouns}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -107,7 +107,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronounObjective",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronounObjective}",
+                        insertText: "{${1:0}.SimPronounObjective}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -116,7 +116,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronounPossessiveDependent",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronounPossessiveDependent}",
+                        insertText: "{${1:0}.SimPronounPossessiveDependent}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -125,7 +125,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronounPossessiveIndependent",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronounPossessiveIndependent}",
+                        insertText: "{${1:0}.SimPronounPossessiveIndependent}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -134,7 +134,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronounReflexive",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronounReflexive}",
+                        insertText: "{${1:0}.SimPronounReflexive}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -143,7 +143,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronounSubjective",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronounSubjective}",
+                        insertText: "{${1:0}.SimPronounSubjective}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -152,7 +152,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "SimPronouns",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:SimPronouns}",
+                        insertText: "{${1:0}.SimPronouns}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -161,7 +161,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "ObjectCatalogDescription",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:ObjectCatalogDescription}",
+                        insertText: "{${1:0}.ObjectCatalogDescription}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -170,7 +170,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "ObjectCatalogName",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:ObjectCatalogName}",
+                        insertText: "{${1:0}.ObjectCatalogName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -179,7 +179,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "ObjectDescription",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:ObjectDescription}",
+                        insertText: "{${1:0}.ObjectDescription}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -188,7 +188,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "DateLong",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:DateLong}",
+                        insertText: "{${1:0}.DateLong}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -197,7 +197,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "DateShort",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:DateShort}",
+                        insertText: "{${1:0}.DateShort}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -206,7 +206,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "DayOfWeekLong",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:DayOfWeekLong}",
+                        insertText: "{${1:0}.DayOfWeekLong}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -215,7 +215,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "DayOfWeekShort",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:DayOfWeekShort}",
+                        insertText: "{${1:0}.DayOfWeekShort}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -224,7 +224,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "TimeLong",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:TimeLong}",
+                        insertText: "{${1:0}.TimeLong}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -233,7 +233,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "TimeShort",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:TimeShort}",
+                        insertText: "{${1:0}.TimeShort}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -242,7 +242,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Timespan",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Timespan}",
+                        insertText: "{${1:0}.Timespan}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -251,7 +251,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "TimespanShort",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:TimespanShort}",
+                        insertText: "{${1:0}.TimespanShort}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -260,7 +260,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "ClubPoints",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:ClubPoints}",
+                        insertText: "{${1:0}.ClubPoints}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -269,7 +269,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Currency",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Currency}",
+                        insertText: "{${1:0}.Currency}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -278,7 +278,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "FamePoints",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:FamePoints}",
+                        insertText: "{${1:0}.FamePoints}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -287,7 +287,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "GalacticCredits",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:GalacticCredits}",
+                        insertText: "{${1:0}.GalacticCredits}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -296,7 +296,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Influence",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Influence}",
+                        insertText: "{${1:0}.Influence}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -305,7 +305,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Money",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Money}",
+                        insertText: "{${1:0}.Money}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -314,7 +314,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Number",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Number}",
+                        insertText: "{${1:0}.Number}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -323,7 +323,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "OccultPoints",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:OccultPoints}",
+                        insertText: "{${1:0}.OccultPoints}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -332,7 +332,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "PerkPoints",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:PerkPoints}",
+                        insertText: "{${1:0}.PerkPoints}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -341,7 +341,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Points",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:Points}",
+                        insertText: "{${1:0}.Points}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -350,7 +350,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "RecyclingBits",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:RecyclingBits}",
+                        insertText: "{${1:0}.RecyclingBits}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -359,7 +359,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "RecyclingPieces",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:RecyclingPieces}",
+                        insertText: "{${1:0}.RecyclingPieces}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -368,7 +368,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "String",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{${1:0}:String}",
+                        insertText: "{${1:0}.String}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -377,7 +377,7 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                     {
                         label: "Male/Female Pair",
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: "{M${1:0}:${2:for him}}{F${1:0}:${3:for her}}",
+                        insertText: "{M${1:0}.${2:for him}}{F${1:0}.${3:for her}}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,

@@ -142,6 +142,9 @@ public partial class MainPage :
         }
     }
 
+    public Task DisplayJavaScriptErrorAsync(string errorJson) =>
+        DisplayAlert("Un Unexpected UI Framework Error Has Occurred", errorJson, AppText.Common_Ok);
+
 #if WINDOWS
     void UpdateTrayIconVisibility()
     {

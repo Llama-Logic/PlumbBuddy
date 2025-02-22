@@ -4,7 +4,7 @@ public interface ICatalog :
     IDisposable,
     INotifyPropertyChanged
 {
-    IReadOnlyDictionary<CatalogModKey, IReadOnlyList<(ModFileManifestModel manifest, IReadOnlyList<FileInfo> files, IReadOnlyList<CatalogModKey> dependencies, IReadOnlyList<CatalogModKey> dependents)>> Mods { get; set; }
+    IReadOnlyDictionary<CatalogModKey, IReadOnlyList<CatalogModValue>> Mods { get; set; }
 
     string ModsSearchText { get; set; }
 

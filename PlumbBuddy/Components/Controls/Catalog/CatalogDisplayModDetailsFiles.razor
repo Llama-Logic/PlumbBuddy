@@ -4,39 +4,75 @@
 @inject ISettings Settings;
 @inject IStringLocalizer<AppText> StringLocalizer
 
-<MudTable T="FileInfo" Items="@Files" Breakpoint="Breakpoint.Md" Dense Filter="IncludeFile" Class="mt-2">
-	<ToolBarContent>
-		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
-			@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files)]
+@if (CatalogModValues is { } catalogModValues)
+{
+	<MudTable T="ValueTuple<ModFileManifestModel, FileInfo>" Items="@(catalogModValues.SelectMany(cmv => cmv.Files.Select(f => (cmv.Manifest, File: f))).DistinctBy(t => t.File.FullName).OrderBy(t => t.File.FullName))" Breakpoint="Breakpoint.Md" Dense Filter="IncludeFile" Class="mt-2">
+		<ToolBarContent>
+			<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+				@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files)]
 			</MudTextM3>
-		<MudSpacer />
-		<MudTextField @bind-Value="@filesSearchText" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
-	</ToolBarContent>
-	<HeaderContent>
-		<MudTh>
-			@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]
-		</MudTh>
-		<MudTh></MudTh>
-	</HeaderContent>
-	<RowTemplate>
-		<MudTd DataLabel="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]">
-			<MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context))" Class="ma-0 pa-0">
-				<ItemTemplate Context="item">
-					<MudStack Row Spacing="1" AlignItems="AlignItems.Center">
-						<MudIcon Icon="@item.Icon" />
-						<MudTextM3>
-							<MudHighlighter Text="@item.Text" HighlightedText="@filesSearchText" />
-						</MudTextM3>
-					</MudStack>
-				</ItemTemplate>
-			</MudBreadcrumbs>
-		</MudTd>
-		<MudTd>
-			<MudStack Row Justify="Justify.FlexEnd">
-				<MudTooltip Text="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ViewThisFile_Tip)]" Arrow>
-					<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="(() => PlatformFunctions.ViewFile(context))" />
-				</MudTooltip>
-			</MudStack>
-		</MudTd>
-	</RowTemplate>
-</MudTable>
+			<MudSpacer />
+			<MudTextField @bind-Value="@filesSearchText" Placeholder="@StringLocalizer[nameof(AppText.Common_Search)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+		</ToolBarContent>
+		<HeaderContent>
+			<MudTh>
+				@MarkupLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]
+			</MudTh>
+			<MudTh></MudTh>
+		</HeaderContent>
+		<RowTemplate>
+			<MudTd DataLabel="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ModsFolderPath)]">
+				<MudBreadcrumbs Items="@(GetModFileBreadcrumbs(context.Item2))" Class="ma-0 pa-0">
+					<ItemTemplate Context="item">
+						<MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+							<MudIcon Icon="@item.Icon" />
+							<MudTextM3>
+								<MudHighlighter Text="@item.Text" HighlightedText="@filesSearchText" />
+							</MudTextM3>
+						</MudStack>
+					</ItemTemplate>
+				</MudBreadcrumbs>
+			</MudTd>
+			<MudTd>
+				<MudStack Row Justify="Justify.FlexEnd">
+					<MudTooltip Text="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ViewThisFile_Tip)]" Arrow>
+						<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="(() => PlatformFunctions.ViewFile(context.Item2))" />
+					</MudTooltip>
+				</MudStack>
+			</MudTd>
+		</RowTemplate>
+		<ChildRowContent>
+			@if (context.Item1.Translators.Count > 0)
+			{
+				<MudTr>
+					<MudTd>
+						<MudGrid Spacing="0">
+							@foreach (var translator in context.Item1.Translators)
+							{
+								var countryCode = translator.Language;
+								try
+								{
+									countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
+								}
+								catch
+								{
+								}
+								<MudItem>
+									<MudTooltip Arrow Text="@(translator.Culture?.NativeName)">
+										<MudChip Value="@translator.Name">
+											<AvatarContent>
+												<MudAvatar>
+													<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
+												</MudAvatar>
+											</AvatarContent>
+										</MudChip>
+									</MudTooltip>
+								</MudItem>
+							}
+						</MudGrid>
+					</MudTd>
+				</MudTr>
+			}
+		</ChildRowContent>
+	</MudTable>
+}

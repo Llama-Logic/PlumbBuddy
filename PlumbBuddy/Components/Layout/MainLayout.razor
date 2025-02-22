@@ -1,4 +1,5 @@
 @inherits ReactiveLayoutComponentBase
+@inject IAppLifecycleManager AppLifecycleManager
 @inject IBlazorFramework BlazorFramework
 @inject ICustomThemes CustomThemes
 @inject IDialogService DialogService
@@ -10,48 +11,116 @@
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
 
-<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@Theme" />
-@if (Observed(() => Settings.ShowThemeManager))
-{
-    <MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
-    <MudThemeManager Open="@themeManagerOpen" IsDarkMode="@isDarkMode" OpenChanged="OpenThemeManager" Theme="@themeManagerTheme" ThemeChanged="UpdateTheme" />
-}
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudScrollbar Color="info" HoverColor="primary" TrackColor="#27272f30" Width="12" />
-<MudSnackbarProvider />
-<MudTypographyProvider />
+<ErrorBoundary Context="exception">
+	<ChildContent>
+		<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@isDarkMode" Theme="@Theme" />
+		@if (Observed(() => Settings.ShowThemeManager))
+		{
+			<MudThemeManagerButton OnClick="@((e) => OpenThemeManager(true))" />
+			<MudThemeManager Open="@themeManagerOpen" IsDarkMode="@isDarkMode" OpenChanged="OpenThemeManager" Theme="@themeManagerTheme" ThemeChanged="UpdateTheme" />
+		}
+		<MudPopoverProvider />
+		<MudDialogProvider />
+		<MudScrollbar Color="info" HoverColor="primary" TrackColor="#27272f30" Width="12" />
+		<MudSnackbarProvider />
+		<MudTypographyProvider />
 
-<MudDrawer @bind-Open="@isMainMenuDrawerOpen" Anchor="Anchor.Left" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
-    <MainMenu CloseDrawer="CloseDrawerHandler" />
-</MudDrawer>
+		<MudDrawer @bind-Open="@isMainMenuDrawerOpen" Anchor="Anchor.Left" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+			<MainMenu CloseDrawer="CloseDrawerHandler" />
+		</MudDrawer>
 
-<MudAnimate Selector=".plumbbuddy-is-thinking" AnimationType="AnimationType.Fade" Value="1" ValueSecondary="0.5" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseOut" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
-<MudAnimate Selector=".plumbbuddy-is-thinking-2" AnimationType="AnimationType.Fade" Value="0.5" ValueSecondary="1" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseIn" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
+		<MudAnimate Selector=".plumbbuddy-is-thinking" AnimationType="AnimationType.Fade" Value="1" ValueSecondary="0.5" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseOut" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
+		<MudAnimate Selector=".plumbbuddy-is-thinking-2" AnimationType="AnimationType.Fade" Value="0.5" ValueSecondary="1" Duration="0.5" Infinite="true" AnimationTiming="AnimationTiming.EaseIn" AnimationDirection="AnimationDirection.AlternateReverse" AnimationFillMode="AnimationFillMode.Forwards" />
 
-<MudLayout>
-    <MudAppBar>
-        <MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-		<MudImage Src="@(Observed(() => Settings.Theme) is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme) && customTheme.CustomAppLogo ? $"/img/custom-themes/{customThemeName}/applogo.svg" : "/img/PlumbBuddyLogo.svg")" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
-        @if (Observed(() => Settings.ShowThemeManager))
-        {
-            if (@manualLightDarkModeToggleEnabled)
-            {
-                <MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)">
-                    <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
-                </MudTooltip>
-            }
-            <MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)">
-                <MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
-            </MudTooltip>
-        }
-        <MudPaper Elevation="0" Outlined Class="rounded-pill mx-4" Style="padding: 0 5px;">
-			<MainToolbar />
-            <HUD />
-			<MudSpacer />
-		</MudPaper>
-	</MudAppBar>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+		<MudLayout>
+			<MudAppBar>
+				<MudToggleIconButton @bind-Toggled="@isMainMenuDrawerOpen" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+				<MudImage Src="@(Observed(() => Settings.Theme) is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme) && customTheme.CustomAppLogo ? $"/img/custom-themes/{customThemeName}/applogo.svg" : "/img/PlumbBuddyLogo.svg")" Width="48" Height="48" ObjectFit="ObjectFit.Fill" ObjectPosition="ObjectPosition.Center" />
+				@if (Observed(() => Settings.ShowThemeManager))
+				{
+					if (@manualLightDarkModeToggleEnabled)
+					{
+						<MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)">
+							<MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
+						</MudTooltip>
+					}
+					<MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)">
+						<MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
+					</MudTooltip>
+				}
+				<MudPaper Elevation="0" Outlined Class="rounded-pill mx-4 px-1 d-flex align-center">
+					<MainToolbar />
+					<HUD />
+					<MudSpacer />
+				</MudPaper>
+			</MudAppBar>
+			<MudMainContent>
+				@Body
+			</MudMainContent>
+		</MudLayout>
+	</ChildContent>
+	<ErrorContent>
+		@{
+			Logger.LogError(exception, "error boundary exception");
+			AppLifecycleManager.PreventCasualClosing = false;
+			var fallbackDarkMode = false;
+			if (Application.Current is { } app)
+				fallbackDarkMode = app.RequestedTheme is AppTheme.Dark;
+			var fallbackFactoryTheme = new MudTheme()
+			{
+				PaletteLight = new PaletteLight()
+				{
+					AppbarBackground = "rgba(89,74,226,.65)",
+					DrawerBackground = "rgba(255,255,255,.65)",
+					Primary = "#00a2ffff",
+					Surface = "rgba(255,255,255,.65)",
+					Tertiary = "#74c044ff",
+					Warning = "#d98806ff"
+				},
+				PaletteDark = new PaletteDark()
+				{
+					AppbarBackground = "rgba(39,39,47,.65)",
+					DrawerBackground = "rgba(39,39,47,.65)",
+					Primary = "#00a2ffff",
+					Surface = "rgba(55,55,64,.65)",
+					Tertiary = "#74c044ff",
+					Warning = "#d98806ff"
+				}
+			};
+			var errorDetails = exception.Demystify().ToString();
+		}
+		<MudThemeProvider DefaultScrollbar="true" IsDarkMode="@fallbackDarkMode" Theme="@fallbackFactoryTheme" />
+		<MudPopoverProvider />
+		<MudDialogProvider />
+		<MudScrollbar Color="info" HoverColor="primary" TrackColor="#27272f30" Width="12" />
+		<MudSnackbarProvider />
+		<MudTypographyProvider />
+		<MudCard Class="ma-8" Elevation="20" Outlined>
+			<MudCardHeader>
+				<MudTextM3 Color="Color.Error" Typo="TypoM3.Display">
+					(ノÒ_Ó)ノ︵ ━━┻━┻
+				</MudTextM3>
+			</MudCardHeader>
+			<MudCardContent>
+				<MudStack>
+					<MudTextM3>
+						A UI framework error just occurred which took me totally by surprise and has really pissed me off.
+						It's probably Dad's fault.
+					</MudTextM3>
+					<MudTextField Adornment="Adornment.Start" AdornmentColor="Color.Error" AdornmentIcon="@MaterialDesignIcons.Normal.CodeNotEqual" AutoGrow HelperText="Boy, this might be really useful to some nerdy software engineer trying to fix a bug in my code..." Label="Demystified Exception Stack Trace" ReadOnly Value="@errorDetails" Variant="Variant.Filled" />
+				</MudStack>
+			</MudCardContent>
+			<MudCardActions>
+				<MudButton Color="Color.Info" Href="https://discord.gg/XKbMEEfRde" StartIcon="@MaterialDesignIcons.Normal.FaceAgent">
+					Go to the PlumbBuddy Discord Server
+				</MudButton>
+				<MudButton Color="Color.Primary" OnClick="@(() => Clipboard.SetTextAsync($"```\n{errorDetails}\n```"))" StartIcon="@MaterialDesignIcons.Normal.ContentCopy">
+					Copy the Error to Paste in Discord
+				</MudButton>
+				<MudButton OnClick="@(() => Application.Current?.Quit())" StartIcon="@MaterialDesignIcons.Normal.CloseBox">
+					Close PlumbBuddy
+				</MudButton>
+			</MudCardActions>
+		</MudCard>
+	</ErrorContent>
+</ErrorBoundary>

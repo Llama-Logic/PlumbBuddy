@@ -1,6 +1,7 @@
 @implements IDisposable
 @inject IDialogService DialogService
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
 
@@ -72,7 +73,7 @@
                                 @MarkupLocalizer[nameof(AppText.OnboardingDialog_Folders_Heading_2)]
                             </MudTextM3>
                             <div class="mt-8">
-                                <FoldersSelector @ref="@foldersSelector" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" IsOnboarding="true" />
+                                <FoldersSelector @ref="@foldersSelector" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" @bind-ArchiveFolderPath="@ArchiveFolderPath" IsOnboarding="true" />
                             </div>
                         </ChildContent>
                     </MudStepExtended>
@@ -229,6 +230,14 @@
 											<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip)]">
 												<MudSwitchM3 @bind-Value="@ShowSystemTrayIcon" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.ChevronUp">
 													@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label)]
+												</MudSwitchM3>
+											</MudTooltip>
+										}
+										@if (PlatformFunctions.ProcessorsHavePerformanceVarianceAndConfigurableAffinity && Type is not UserType.Casual)
+										{
+											<MudTooltip Arrow Color="Color.Secondary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip)]">
+												<MudSwitchM3 @bind-Value="@ForceGameProcessPerformanceProcessorAffinity" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.LightningBolt" ThumbOffIcon="@MaterialDesignIcons.Normal.Leaf">
+													@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label)]
 												</MudSwitchM3>
 											</MudTooltip>
 										}

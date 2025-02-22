@@ -140,6 +140,16 @@ partial class ParlayDisplay
         await JSRuntime.InvokeVoidAsync("initializeMonacoStblSupport");
     }
 
+    async Task ShowCreatorMessageAsync()
+    {
+        var text = new List<string>();
+        if (Parlay.MessageFromCreators is { } messageFromCreators)
+            text.Add(messageFromCreators);
+        if (Parlay.TranslationSubmissionUrl is { } transmissionSubmissionUrl)
+            text.Add($"Translation Submission URL:{Environment.NewLine}{transmissionSubmissionUrl}");
+        await DialogService.ShowInfoDialogAsync($"Message to Translators from {Parlay.Creators ?? "Mod Creator"}", string.Join($"{Environment.NewLine}{Environment.NewLine}", text));
+    }
+
     async Task ShowOriginalPackageFileAsync()
     {
         if (Parlay.OriginalPackageFile is { } originalPackageFile)
