@@ -178,6 +178,8 @@ public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? ma
     {
         get
         {
+            if (string.IsNullOrWhiteSpace(translators))
+                return [];
             var split = translators.Split(Environment.NewLine);
             if (split.Length % 2 != 0)
                 throw new Exception("ack");

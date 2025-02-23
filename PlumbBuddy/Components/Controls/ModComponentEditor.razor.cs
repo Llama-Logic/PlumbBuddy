@@ -222,6 +222,21 @@ partial class ModComponentEditor
                         """
                         ))
                         return;
+                    var extraKeyHashes = overrideStbl.KeyHashes.Except(componentStbl.KeyHashes).ToImmutableArray();
+                    if (extraKeyHashes.Any())
+                    {
+                        if (await DialogService.ShowQuestionDialogAsync($"Include Extra Key Hashes from {stblNeutralLocale.EnglishName} Translation?",
+                            $"""
+                            The plot thickens because this {stblNeutralLocale.EnglishName} translation you're integrating has {"extra key hash".ToQuantity(extraKeyHashes.Length)}... somehow. Maybe the translator was working with an older version of your mod file. Do you want to include the additional key hashes... or just cancel the process altogether?
+
+                            The extra key hashes are:
+                            {string.Join(Environment.NewLine, extraKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`"))}
+                            """, userCanCancel: true) is not { } includeExtraKeyHashes)
+                            return;
+                        if (!includeExtraKeyHashes)
+                            foreach (var extraKeyHash in extraKeyHashes)
+                                overrideStbl.Delete(extraKeyHash);
+                    }
                 }
                 await componentDbpf.SetAsync(stblKey, overrideStbl).ConfigureAwait(false);
             }
