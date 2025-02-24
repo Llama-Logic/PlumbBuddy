@@ -1,0 +1,19 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IParlay Parlay
+
+@if (Observed(() => Parlay.StringTableEntries) is { } stringTableEntries && ObservedCollection(() => stringTableEntries).Count > 0)
+{
+	<MudItem xs="12">
+		<MudPaper>
+			@if (Observed(() => Parlay.TranslationLocale) is null)
+			{
+				<ParlayReadStringTable StringTableEntries="@stringTableEntries" />
+			}
+			else
+			{
+				<ParlayTranslateStringTable StringTableEntries="@stringTableEntries" />
+			}
+		</MudPaper>
+	</MudItem>
+}

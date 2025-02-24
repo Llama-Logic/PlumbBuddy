@@ -1,0 +1,16 @@
+@inherits ReactiveComponentBase
+@inject IParlay Parlay
+@inject ISettings Settings
+
+@if (Observed(() => Parlay.SelectedPackage) is { } selectedPackage && selectedPackage.StringTables is { Count: > 0 } stringTables)
+{
+	<MudItem xs="6">
+		<MudSelectExtended @bind-Value="@Binding(() => Parlay.ShownStringTable).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.TableLarge" Color="Color.Secondary" ItemCollection="@(stringTables.OrderBy(st => st.Locale.NativeName).ThenBy(st => st.StringTableKey.Group).ThenBy(st => st.StringTableKey.FullInstance).ToImmutableArray())" Label="@(AppText.Parlay_StringTable_Label)" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+	</MudItem>
+	<MudItem xs="3">
+		<MudTextField @bind-Value="@Binding(() => Settings.ParlayName).Value" Adornment="Adornment.Start" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.Account" DebounceInterval="250" Immediate Label="@(AppText.Parlay_Translator_Label)" Variant="Variant.Filled" />
+	</MudItem>
+	<MudItem xs="3">
+		<MudSelectExtended @bind-Value="@Binding(() => Parlay.TranslationLocale).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.TableColumnPlusAfter" Color="Color.Secondary" ItemCollection="@(Parlay.TranslationLocales)" Label="@(AppText.Parlay_TranslationLanguage_Label)" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+	</MudItem>
+}

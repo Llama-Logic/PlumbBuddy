@@ -1,0 +1,37 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IParlay Parlay
+
+<MudTable Dense Hover Items="@StringTableEntries" Filter="@(ste => ParlayStringTable.IncludeEntry(Parlay, ste))" FixedHeader Height="calc(100vh - 384px)">
+	<ToolBarContent>
+		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+			@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Title)]
+		</MudTextM3>
+		<MudSpacer />
+		<MudTextField @bind-Value="@Binding(() => Parlay.EntrySearchText).Value" Placeholder="@(AppText.Common_Search)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+	</ToolBarContent>
+	<HeaderContent>
+		<MudTh>
+			<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Hash)">
+				@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Header_Hash)]
+			</MudTableSortLabel>
+		</MudTh>
+		<MudTh>
+			<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Original)">
+				@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Header_Original)]
+			</MudTableSortLabel>
+		</MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Hash)">
+			<code>
+				@(context.Hash.ToString("x8"))
+			</code>
+		</MudTd>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Original)">
+			<div class="parlay-string-display">
+				@(ParlayStringTable.HighlightForDisplay(context.Original))
+			</div>
+		</MudTd>
+	</RowTemplate>
+</MudTable>

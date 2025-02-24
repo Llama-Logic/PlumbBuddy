@@ -2842,4 +2842,180 @@ I've had to disable myself until you can fix this, and it's important that you u
   <data name="HUD_GameOptimizations_IsPerformanceProcessorAffinityInEffect_Tip_Description" xml:space="preserve">
     <value>This optimization, currently in effect, ensures that only the performance processing cores your computer has are being used by The Sims 4, as opposed to any of its efficiency processing cores. It may be causing your computer to use additional energy and may be placing additional burden on its thermal solution by generating more heat. If you'd like to disable this optimization, you may do so in &lt;em&gt;Settings&lt;/em&gt;.</value>
   </data>
+  <data name="Parlay_Package_Label" xml:space="preserve">
+    <value>Package Containing String Tables</value>
+  </data>
+  <data name="Parlay_MessageToTranslators_Tip" xml:space="preserve">
+    <value>View Message to Translators from {0}</value>
+    <comment>{0} = Mod Creators' Names</comment>
+  </data>
+  <data name="Parlay_MessageToTranslators_Tip_DefaultCreator" xml:space="preserve">
+    <value>the Mod Creator</value>
+  </data>
+  <data name="Parlay_ShowOriginalPackage_Tip" xml:space="preserve">
+    <value>Show Original Mod Package File</value>
+  </data>
+  <data name="Parlay_ShowTranslationPackage_Tip" xml:space="preserve">
+    <value>Show Translation Override Mod Package File</value>
+  </data>
+  <data name="Parlay_MergeTranslationStringTable_Tip" xml:space="preserve">
+    <value>Merge Translation String Table</value>
+  </data>
+  <data name="Parlay_StringTable_Label" xml:space="preserve">
+    <value>Show Existing String Table</value>
+  </data>
+  <data name="Parlay_TranslationLanguage_Label" xml:space="preserve">
+    <value>Translate to Language</value>
+  </data>
+  <data name="Parlay_Translator_Label" xml:space="preserve">
+    <value>Translator</value>
+  </data>
+  <data name="Parlay_StringTable_Title" xml:space="preserve">
+    <value>Strings</value>
+  </data>
+  <data name="Parlay_StringTable_Header_Hash" xml:space="preserve">
+    <value>Hash</value>
+  </data>
+  <data name="Parlay_StringTable_Header_Original" xml:space="preserve">
+    <value>Original</value>
+  </data>
+  <data name="Parlay_StringTable_Header_Translation" xml:space="preserve">
+    <value>Translation</value>
+  </data>
+  <data name="Parlay_StringTable_Footer_NextKeyHash" xml:space="preserve">
+    <value>Next Key Hash</value>
+  </data>
+  <data name="Parlay_StringTable_Footer_PreviousKeyHash" xml:space="preserve">
+    <value>Previous Key Hash</value>
+  </data>
+  <data name="Parlay_StringTable_Footer_NextAutofill" xml:space="preserve">
+    <value>Next Autofill</value>
+  </data>
+  <data name="Parlay_StringTable_Footer_PreviousAutofill" xml:space="preserve">
+    <value>Previous Autofill</value>
+  </data>
+  <data name="Key_PageDown" xml:space="preserve">
+    <value>Page Down</value>
+  </data>
+  <data name="Key_PageUp" xml:space="preserve">
+    <value>Page Up</value>
+  </data>
+  <data name="Key_Tab" xml:space="preserve">
+    <value>Tab</value>
+  </data>
+  <data name="Key_Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Parlay_MergeStringTable_InvalidFileFormat_Caption" xml:space="preserve">
+    <value>File Format Invalid</value>
+  </data>
+  <data name="Parlay_MergeStringTable_InvalidFileFormat_Text" xml:space="preserve">
+    <value>The file selected should be a Sims 4 mod package file.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Parlay_MergeStringTable_NoStringsImported_Caption" xml:space="preserve">
+    <value>No Strings Were Merged</value>
+  </data>
+  <data name="Parlay_MergeStringTable_NoStringsImported_Text" xml:space="preserve">
+    <value>Did you select the wrong file? It needs to have a string table with the same resource key which is being generated in your current translation in order to work.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Parlay_MergeStringTable_MergeComplete_Caption" xml:space="preserve">
+    <value>String Merge Complete</value>
+  </data>
+  <data name="Parlay_MergeStringTable_MergeComplete_Text_String" xml:space="preserve">
+    <value>string</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Parlay_MergeStringTable_MergeComplete_Text" xml:space="preserve">
+    <value>I successfully merged {0} in the current translation from the file you selected.</value>
+    <comment>This text is in Markdown. {0} = Number of strings</comment>
+  </data>
+  <data name="Parlay_ShowCreatorMessage_Caption_DefaultModCreators" xml:space="preserve">
+    <value>Mod Creator</value>
+  </data>
+  <data name="Parlay_ShowCreatorMessage_Caption" xml:space="preserve">
+    <value>Message to Translators from {0}</value>
+    <comment>{0} = The Mod Creators</comment>
+  </data>
+  <data name="Parlay_ShowCreatorMessage_Text_TranslationSubmissionUrlLabel" xml:space="preserve">
+    <value>Translation Submission URL:</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Parlay_ShowOriginalPackage_NotFound_Text" xml:space="preserve">
+    <value>The original mod package file has disappeared!</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="Parlay_ShowTranslationPackage_NotFound_Text" xml:space="preserve">
+    <value>I can't show you the translation override package file because it doesn't exist on disk. Have you clicked on any string table entries to enter and commit a translation yet? If not, then the file's not there because I haven't had a reason to save it.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestComponentEditor_MessageToTranslators_Label" xml:space="preserve">
+    <value>Message to Translators</value>
+  </data>
+  <data name="ManifestComponentEditor_MessageToTranslators_HelperText" xml:space="preserve">
+    <value>If translators use a manifest-aware tool like Parlay to translate string tables in this component, is there anything you'd like to say to them?</value>
+  </data>
+  <data name="ManifestComponentEditor_TranslationSubmissionUrl_Label" xml:space="preserve">
+    <value>Translation Submission URL</value>
+  </data>
+  <data name="ManifestComponentEditor_TranslationSubmissionUrl_HelperText" xml:space="preserve">
+    <value>If a translator would like to submit a translation to you to consider integrating into your mod, where should they go? (Hint: This could be a Discord join link.)</value>
+  </data>
+  <data name="ManifestComponentEditor_CreditedTranslators_Label" xml:space="preserve">
+    <value>Credited Translators</value>
+  </data>
+  <data name="ManifestComponentEditor_CreditedTranslators_HelperText" xml:space="preserve">
+    <value>These are the translators currently credited for this component. I will add them for you as you integrate override packages with the button below.</value>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label" xml:space="preserve">
+    <value>Integrate translator's override package...</value>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Caption" xml:space="preserve">
+    <value>Maxis Non-Standard Languages Found</value>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Text" xml:space="preserve">
+    <value>I can't integrate this package's string tables into your original mod file because it contains Maxis non-standard languages, which should always be distributed independently as overrides. I'm sorry.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Caption" xml:space="preserve">
+    <value>I'm About to Overwrite {0} in {1}</value>
+    <comment>{0} = The String Table's Resource Key; {1} = The Mod Component's File Name</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text" xml:space="preserve">
+    <value>The package you're integrating contains a string table with full instance `{0}` in the language \"{1}\", a resource of which your component already has a version. Overwriting this is *probably* what you intend to happen, but since I will be modifying a resource in your original mod file I just want to double-check with you to be sure.</value>
+    <comment>This text is in Markdown. {0} = String Table Full Instance Hex; {1} = Translation Language</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Caption" xml:space="preserve">
+    <value>This {0} Translation May Be Incomplete</value>
+    <comment>{0} = Translation Language</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text_KeyHash" xml:space="preserve">
+    <value>key hash</value>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text" xml:space="preserve">
+    <value>In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elmeents for {1} players of your mod.
+
+The missing key hashes are:
+{2}</value>
+    <comment>This text is in Markdown. {0} = The number of missing key hashes; {1} = Translation Language; {2} = The list of missing key hashes</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Caption" xml:space="preserve">
+    <value>Include Extra Key Hashes from {0} Translation?</value>
+    <comment>{0} = Translation Language</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text_ExtraKeyHash" xml:space="preserve">
+    <value>extra key hash</value>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text" xml:space="preserve">
+    <value>The plot thickens because this {0} translation you're integrating has {1}... somehow. Maybe the translator was working with an older version of your mod file. Do you want to include the additional key hashes... or just cancel the process altogether?</value>
+    <comment>This text is in Markdown. {0} = Translation Language; {1} = Number of Extra Key Hashes; {2} = List of Extra Key Hashes</comment>
+  </data>
+  <data name="ManifestComponentEditor_TranslatorChipClosed_Caution_Caption" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="ManifestComponentEditor_TranslatorChipClosed_Caution_Text" xml:space="preserve">
+    <value>If this is here, it means that at some point, {0} contributed a translation of this component in {1}. If you continue now and then finish updating your mod manifest, this credit will no longer appear in Catalog for players.</value>
+    <comment>This text is in Markdown. {0} = Translator Name; {1} = Language Name</comment>
+  </data>
 </root>

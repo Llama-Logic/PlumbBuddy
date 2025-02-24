@@ -1,0 +1,29 @@
+@inherits ReactiveComponentBase
+@inject IDialogService DialogService
+@inject IParlay Parlay
+@inject IPlatformFunctions PlatformFunctions
+@inject IStringLocalizer<AppText> StringLocalizer
+
+@if (Observed(() => Parlay.Packages) is { Count: > 0 } packages)
+{
+	<MudItem xs="12">
+		<MudStack AlignItems="AlignItems.Center" Row>
+			<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Class="flex-grow-1" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="@(AppText.Parlay_Package_Label)" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+			@if (Observed(() => Parlay.MessageFromCreators) is not null || Observed(() => Parlay.TranslationSubmissionUrl) is not null)
+			{
+				<MudTooltip Color="Color.Info" Text="@StringLocalizer[nameof(AppText.Parlay_MessageToTranslators_Tip), Observed(() => Parlay.Creators) is { } creators ? creators : AppText.Parlay_MessageToTranslators_Tip_DefaultCreator]">
+					<MudIconButton Color="Color.Info" Icon="@MaterialDesignIcons.Normal.HumanGreetingVariant" OnClick="ShowCreatorMessageAsync" Variant="Variant.Filled" />
+				</MudTooltip>
+			}
+			<MudTooltip Color="Color.Secondary" Text="@(AppText.Parlay_ShowOriginalPackage_Tip)">
+				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.OriginalPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TextBoxSearch" OnClick="ShowOriginalPackageFileAsync" />
+			</MudTooltip>
+			<MudTooltip Color="Color.Secondary" Text="@(AppText.Parlay_ShowTranslationPackage_Tip)">
+				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Outline.TextBoxSearch" OnClick="ShowTranslationPackageFileAsync" />
+			</MudTooltip>
+			<MudTooltip Color="Color.Secondary" Text="@(AppText.Parlay_MergeTranslationStringTable_Tip)">
+				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TableArrowLeft" OnClick="MergeStringTableAsync" />
+			</MudTooltip>
+		</MudStack>
+	</MudItem>
+}

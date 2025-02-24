@@ -98,13 +98,13 @@
         }
     </MudItem>
 	<MudItem xs="12">
-		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" AutoGrow HelperText="If translators use a manifest-aware tool like Parlay to translate string tables in this component, is there anything you'd like to say to them?" Label="Message to Translators" Value="@MessageToTranslators" ValueChanged="HandleMessageToTranslatorsChanged" Variant="Variant.Filled" />
+		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" AutoGrow HelperText="@(AppText.ManifestComponentEditor_MessageToTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_MessageToTranslators_Label)" Value="@MessageToTranslators" ValueChanged="HandleMessageToTranslatorsChanged" Variant="Variant.Filled" />
 	</MudItem>
 	<MudItem xs="12">
-		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Upload" HelperText="If a translator would like to submit a translation to you to consider integrating into your mod, where should they go? (Hint: This could be a Discord join link.)" Label="Translation Submission URL" Value="@TranslationSubmissionUrl" ValueChanged="HandleTranslationSubmissionUrlChanged" Variant="Variant.Filled" />
+		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Upload" HelperText="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_HelperText)" Label="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_Label)" Value="@TranslationSubmissionUrl" ValueChanged="HandleTranslationSubmissionUrlChanged" Variant="Variant.Filled" />
 	</MudItem>
 	<MudItem xs="12">
-		<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="These are the translators currently credited for this component. I will add them for you as you integrate override packages with the button below." Label="Credited Translators" Variant="Variant.Filled">
+		<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="@(AppText.ManifestComponentEditor_CreditedTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_CreditedTranslators_Label)" Variant="Variant.Filled">
 			@foreach (var translator in Translators)
 			{
 				var countryCode = translator.language.Name;
@@ -127,7 +127,7 @@
 	</MudItem>
 	<MudItem>
 		<MudButton Color="Color.Tertiary" OnClick="HandleIntegrateTranslatorsOverridePackageOnClickAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
-			Integrate translator's override package...
+			@MarkupLocalizer[nameof(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label)]
 		</MudButton>
 	</MudItem>
 	<MudFlexBreak />

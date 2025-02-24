@@ -397,7 +397,7 @@ public sealed class DependencyScan :
                                 Color = MudBlazor.Color.Secondary,
                                 Data = $"showfile-{filePath}"
                             })
-                        ),
+                        )!,
                     new()
                     {
                         Icon = MaterialDesignIcons.Normal.Cancel,

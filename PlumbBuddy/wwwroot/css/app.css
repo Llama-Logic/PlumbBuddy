@@ -112,7 +112,7 @@ div.mud-input-control.no-material-variant .mud-input > * {
     -webkit-backdrop-filter: blur(2px);
 }
 
-.mud-paper, .mud-dialog, .mud-drawer, .mud-appbar, .mud-input-filled, .mud-alert-filled-normal, .mud-alert-filled-info, .mud-alert-filled-success, .mud-alert-filled-warning, .mud-alert-filled-error, th.mud-table-cell {
+.mud-paper, .mud-dialog, .mud-drawer, .mud-appbar, .mud-input-filled, .mud-alert-filled-normal, .mud-alert-filled-info, .mud-alert-filled-success, .mud-alert-filled-warning, .mud-alert-filled-error, th.mud-table-cell, tfoot td {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }

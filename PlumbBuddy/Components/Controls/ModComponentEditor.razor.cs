@@ -198,7 +198,7 @@ partial class ModComponentEditor
                 if (repurposedLanguages.TryGetValue(SmartSimUtilities.GetStringTableLocale(stblKey).Name, out var repurposedLanguage)
                     && !CultureInfo.GetCultureInfo(repurposedLanguage.ActualLocale).GetNeutralCultureInfo().Equals(stblNeutralLocale))
                 {
-                    await DialogService.ShowErrorDialogAsync("Maxis Non-Standard Languages Found", "I can't integrate this package's string tables into your original mod file because it contains Maxis non-standard languages, which should always be distributed independently as overrides. I'm sorry.");
+                    await DialogService.ShowErrorDialogAsync(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Caption, AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Text);
                     return;
                 }
             }
@@ -208,30 +208,17 @@ partial class ModComponentEditor
                 var overrideStbl = await overrideDbpf.GetModelAsync<StringTableModel>(stblKey).ConfigureAwait(false);
                 if (await componentDbpf.ContainsKeyAsync(stblKey).ConfigureAwait(false))
                 {
-                    if (!await DialogService.ShowCautionDialogAsync($"I'm About to Overwrite {stblKey} in {ModComponent.File.Name}", $"The package you're integrating contains a string table with full instance `{stblKey.FullInstanceHex}` in the language \"{stblNeutralLocale.EnglishName}\", a resource of which your component already has a version. Overwriting this is *probably* what you intend to happen, but since I will be modifying a resource in your original mod file I just want to double-check with you to be sure."))
+                    if (!await DialogService.ShowCautionDialogAsync(string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Caption, stblKey, ModComponent.File.Name), string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text, stblKey.FullInstanceHex, stblNeutralLocale.EnglishName)))
                         return;
                     var componentStbl = await componentDbpf.GetModelAsync<StringTableModel>(stblKey).ConfigureAwait(false);
                     var missingKeyHashes = componentStbl.KeyHashes.Except(overrideStbl.KeyHashes).ToImmutableArray();
                     if (missingKeyHashes.Any()
-                        && !await DialogService.ShowCautionDialogAsync($"This {stblNeutralLocale.EnglishName} Translation May Be Incomplete",
-                        $"""
-                        In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {"key hash".ToQuantity(missingKeyHashes.Length)}. If we proceed anyway, there may be blank UI elmeents for {stblNeutralLocale.EnglishName} players of your mod.
-
-                        The missing key hashes are:
-                        {string.Join(Environment.NewLine, missingKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`"))}
-                        """
-                        ))
+                        && !await DialogService.ShowCautionDialogAsync(string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Caption, stblNeutralLocale.EnglishName), string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text, AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text_KeyHash.ToQuantity(missingKeyHashes.Length), stblNeutralLocale.EnglishName, string.Join(Environment.NewLine, missingKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`")))))
                         return;
                     var extraKeyHashes = overrideStbl.KeyHashes.Except(componentStbl.KeyHashes).ToImmutableArray();
                     if (extraKeyHashes.Any())
                     {
-                        if (await DialogService.ShowQuestionDialogAsync($"Include Extra Key Hashes from {stblNeutralLocale.EnglishName} Translation?",
-                            $"""
-                            The plot thickens because this {stblNeutralLocale.EnglishName} translation you're integrating has {"extra key hash".ToQuantity(extraKeyHashes.Length)}... somehow. Maybe the translator was working with an older version of your mod file. Do you want to include the additional key hashes... or just cancel the process altogether?
-
-                            The extra key hashes are:
-                            {string.Join(Environment.NewLine, extraKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`"))}
-                            """, userCanCancel: true) is not { } includeExtraKeyHashes)
+                        if (await DialogService.ShowQuestionDialogAsync(string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Caption, stblNeutralLocale.EnglishName), string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text, stblNeutralLocale.EnglishName, AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text_ExtraKeyHash.ToQuantity(extraKeyHashes.Length), string.Join(Environment.NewLine, extraKeyHashes.Select(missingKeyHash => $"* `{missingKeyHash:x8}`"))), userCanCancel: true) is not { } includeExtraKeyHashes)
                             return;
                         if (!includeExtraKeyHashes)
                             foreach (var extraKeyHash in extraKeyHashes)
@@ -348,7 +335,7 @@ partial class ModComponentEditor
         var languageName = language.EnglishName;
         if (languageName != language.NativeName)
             languageName = $"{languageName} [{language.NativeName}]";
-        if (!await DialogService.ShowCautionDialogAsync("Are you sure?", $"If this is here, it means that at some point, {name} contributed a translation of this component in {languageName}. If you continue now and then finish updating your mod manifest, this credit will no longer appear in Catalog for players."))
+        if (!await DialogService.ShowCautionDialogAsync(AppText.ManifestComponentEditor_TranslatorChipClosed_Caution_Caption, string.Format(AppText.ManifestComponentEditor_TranslatorChipClosed_Caution_Text, name, languageName)))
             return;
         HandleTranslatorsChanged(Translators
             .Except(new (string name, CultureInfo language)[] { translator })

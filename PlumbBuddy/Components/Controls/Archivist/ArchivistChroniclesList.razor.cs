@@ -2,6 +2,12 @@ namespace PlumbBuddy.Components.Controls.Archivist;
 
 partial class ArchivistChroniclesList
 {
+    protected override void ConfigureBindings()
+    {
+        base.ConfigureBindings();
+        Observed(() => Archivist.ChroniclesSearchText);
+    }
+
     bool IncludeChronicle(Chronicle chronicle)
     {
         var chroniclesSearchText = Archivist.ChroniclesSearchText;
@@ -29,11 +35,5 @@ partial class ArchivistChroniclesList
                 return true;
         }
         return false;
-    }
-
-    protected override void ConfigureBindings()
-    {
-        base.ConfigureBindings();
-        Observed(() => Archivist.ChroniclesSearchText);
     }
 }

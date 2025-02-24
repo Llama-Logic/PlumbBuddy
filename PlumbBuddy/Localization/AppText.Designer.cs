@@ -1809,6 +1809,42 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Page Down.
+        /// </summary>
+        internal static string Key_PageDown {
+            get {
+                return ResourceManager.GetString("Key_PageDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page Up.
+        /// </summary>
+        internal static string Key_PageUp {
+            get {
+                return ResourceManager.GetString("Key_PageUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shift.
+        /// </summary>
+        internal static string Key_Shift {
+            get {
+                return ResourceManager.GetString("Key_Shift", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tab.
+        /// </summary>
+        internal static string Key_Tab {
+            get {
+                return ResourceManager.GetString("Key_Tab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Click here to start the process of requesting help with your game from a Community Support Venue..
         /// </summary>
         internal static string MainLayout_AskForHelp_Tip {
@@ -2241,6 +2277,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to These are the translators currently credited for this component. I will add them for you as you integrate override packages with the button below..
+        /// </summary>
+        internal static string ManifestComponentEditor_CreditedTranslators_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_CreditedTranslators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credited Translators.
+        /// </summary>
+        internal static string ManifestComponentEditor_CreditedTranslators_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_CreditedTranslators_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to **Exclusivity** is globally scoped in the mod load order. Make sure to include elements uniquely identifying your mod if other mods should not be considered. For example:
         ///&gt; vyxated - Chalk&apos;d UI - Support - TMEX - Smarter Pie Menu.
         /// </summary>
@@ -2404,6 +2458,115 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Include Extra Key Hashes from {0} Translation?.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Captio" +
+                        "n", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The plot thickens because this {0} translation you&apos;re integrating has {1}... somehow. Maybe the translator was working with an older version of your mod file. Do you want to include the additional key hashes... or just cancel the process altogether?.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to extra key hash.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text_ExtraKeyHash {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_ExtraKeyHashes_Text_E" +
+                        "xtraKeyHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Integrate translator&apos;s override package....
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maxis Non-Standard Languages Found.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLangu" +
+                        "ages_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I can&apos;t integrate this package&apos;s string tables into your original mod file because it contains Maxis non-standard languages, which should always be distributed independently as overrides. I&apos;m sorry..
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLanguages_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MaxisNonStandardLangu" +
+                        "ages_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This {0} Translation May Be Incomplete.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Capt" +
+                        "ion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elmeents for {1} players of your mod.
+        ///
+        ///The missing key hashes are:
+        ///{2}.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text" +
+                        "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to key hash.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text_KeyHash {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text" +
+                        "_KeyHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m About to Overwrite {0} in {1}.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The package you&apos;re integrating contains a string table with full instance `{0}` in the language \&quot;{1}\&quot;, a resource of which your component already has a version. Overwriting this is *probably* what you intend to happen, but since I will be modifying a resource in your original mod file I just want to double-check with you to be sure..
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to My mod requires this file to work properly — it is not an optional add-on to suit the player&apos;s preferences..
         /// </summary>
         internal static string ManifestComponentEditor_IsRequired_Label {
@@ -2427,6 +2590,24 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestComponentEditor_ManifestSnippetTuningResourceName_Label {
             get {
                 return ResourceManager.GetString("ManifestComponentEditor_ManifestSnippetTuningResourceName_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If translators use a manifest-aware tool like Parlay to translate string tables in this component, is there anything you&apos;d like to say to them?.
+        /// </summary>
+        internal static string ManifestComponentEditor_MessageToTranslators_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_MessageToTranslators_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message to Translators.
+        /// </summary>
+        internal static string ManifestComponentEditor_MessageToTranslators_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_MessageToTranslators_Label", resourceCulture);
             }
         }
         
@@ -2481,6 +2662,42 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestComponentEditor_SubsumedHashes_Placeholder {
             get {
                 return ResourceManager.GetString("ManifestComponentEditor_SubsumedHashes_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If a translator would like to submit a translation to you to consider integrating into your mod, where should they go? (Hint: This could be a Discord join link.).
+        /// </summary>
+        internal static string ManifestComponentEditor_TranslationSubmissionUrl_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_TranslationSubmissionUrl_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translation Submission URL.
+        /// </summary>
+        internal static string ManifestComponentEditor_TranslationSubmissionUrl_Label {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_TranslationSubmissionUrl_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure?.
+        /// </summary>
+        internal static string ManifestComponentEditor_TranslatorChipClosed_Caution_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_TranslatorChipClosed_Caution_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If this is here, it means that at some point, {0} contributed a translation of this component in {1}. If you continue now and then finish updating your mod manifest, this credit will no longer appear in Catalog for players..
+        /// </summary>
+        internal static string ManifestComponentEditor_TranslatorChipClosed_Caution_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_TranslatorChipClosed_Caution_Text", resourceCulture);
             }
         }
         
@@ -4457,6 +4674,267 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_Theme_Label {
             get {
                 return ResourceManager.GetString("OnboardingDialog_Theme_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Format Invalid.
+        /// </summary>
+        internal static string Parlay_MergeStringTable_InvalidFileFormat_Caption {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_InvalidFileFormat_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file selected should be a Sims 4 mod package file..
+        /// </summary>
+        internal static string Parlay_MergeStringTable_InvalidFileFormat_Text {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_InvalidFileFormat_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to String Merge Complete.
+        /// </summary>
+        internal static string Parlay_MergeStringTable_MergeComplete_Caption {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_MergeComplete_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I successfully merged {0} in the current translation from the file you selected..
+        /// </summary>
+        internal static string Parlay_MergeStringTable_MergeComplete_Text {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_MergeComplete_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to string.
+        /// </summary>
+        internal static string Parlay_MergeStringTable_MergeComplete_Text_String {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_MergeComplete_Text_String", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Strings Were Merged.
+        /// </summary>
+        internal static string Parlay_MergeStringTable_NoStringsImported_Caption {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_NoStringsImported_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Did you select the wrong file? It needs to have a string table with the same resource key which is being generated in your current translation in order to work..
+        /// </summary>
+        internal static string Parlay_MergeStringTable_NoStringsImported_Text {
+            get {
+                return ResourceManager.GetString("Parlay_MergeStringTable_NoStringsImported_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Merge Translation String Table.
+        /// </summary>
+        internal static string Parlay_MergeTranslationStringTable_Tip {
+            get {
+                return ResourceManager.GetString("Parlay_MergeTranslationStringTable_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Message to Translators from {0}.
+        /// </summary>
+        internal static string Parlay_MessageToTranslators_Tip {
+            get {
+                return ResourceManager.GetString("Parlay_MessageToTranslators_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to the Mod Creator.
+        /// </summary>
+        internal static string Parlay_MessageToTranslators_Tip_DefaultCreator {
+            get {
+                return ResourceManager.GetString("Parlay_MessageToTranslators_Tip_DefaultCreator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package Containing String Tables.
+        /// </summary>
+        internal static string Parlay_Package_Label {
+            get {
+                return ResourceManager.GetString("Parlay_Package_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message to Translators from {0}.
+        /// </summary>
+        internal static string Parlay_ShowCreatorMessage_Caption {
+            get {
+                return ResourceManager.GetString("Parlay_ShowCreatorMessage_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Creator.
+        /// </summary>
+        internal static string Parlay_ShowCreatorMessage_Caption_DefaultModCreators {
+            get {
+                return ResourceManager.GetString("Parlay_ShowCreatorMessage_Caption_DefaultModCreators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translation Submission URL:.
+        /// </summary>
+        internal static string Parlay_ShowCreatorMessage_Text_TranslationSubmissionUrlLabel {
+            get {
+                return ResourceManager.GetString("Parlay_ShowCreatorMessage_Text_TranslationSubmissionUrlLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The original mod package file has disappeared!.
+        /// </summary>
+        internal static string Parlay_ShowOriginalPackage_NotFound_Text {
+            get {
+                return ResourceManager.GetString("Parlay_ShowOriginalPackage_NotFound_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Original Mod Package File.
+        /// </summary>
+        internal static string Parlay_ShowOriginalPackage_Tip {
+            get {
+                return ResourceManager.GetString("Parlay_ShowOriginalPackage_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I can&apos;t show you the translation override package file because it doesn&apos;t exist on disk. Have you clicked on any string table entries to enter and commit a translation yet? If not, then the file&apos;s not there because I haven&apos;t had a reason to save it..
+        /// </summary>
+        internal static string Parlay_ShowTranslationPackage_NotFound_Text {
+            get {
+                return ResourceManager.GetString("Parlay_ShowTranslationPackage_NotFound_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Translation Override Mod Package File.
+        /// </summary>
+        internal static string Parlay_ShowTranslationPackage_Tip {
+            get {
+                return ResourceManager.GetString("Parlay_ShowTranslationPackage_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Autofill.
+        /// </summary>
+        internal static string Parlay_StringTable_Footer_NextAutofill {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Footer_NextAutofill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Key Hash.
+        /// </summary>
+        internal static string Parlay_StringTable_Footer_NextKeyHash {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Footer_NextKeyHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Autofill.
+        /// </summary>
+        internal static string Parlay_StringTable_Footer_PreviousAutofill {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Footer_PreviousAutofill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Key Hash.
+        /// </summary>
+        internal static string Parlay_StringTable_Footer_PreviousKeyHash {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Footer_PreviousKeyHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash.
+        /// </summary>
+        internal static string Parlay_StringTable_Header_Hash {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Header_Hash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Original.
+        /// </summary>
+        internal static string Parlay_StringTable_Header_Original {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Header_Original", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translation.
+        /// </summary>
+        internal static string Parlay_StringTable_Header_Translation {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Header_Translation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Existing String Table.
+        /// </summary>
+        internal static string Parlay_StringTable_Label {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strings.
+        /// </summary>
+        internal static string Parlay_StringTable_Title {
+            get {
+                return ResourceManager.GetString("Parlay_StringTable_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate to Language.
+        /// </summary>
+        internal static string Parlay_TranslationLanguage_Label {
+            get {
+                return ResourceManager.GetString("Parlay_TranslationLanguage_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translator.
+        /// </summary>
+        internal static string Parlay_Translator_Label {
+            get {
+                return ResourceManager.GetString("Parlay_Translator_Label", resourceCulture);
             }
         }
         

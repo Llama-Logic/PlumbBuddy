@@ -1,0 +1,108 @@
+@inherits ReactiveComponentBase
+@inject IJSRuntime JSRuntime
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IParlay Parlay
+
+<MudTable @ref="@stringTable" CanCancelEdit Class="parlay-string-table" Dense EditButtonPosition="TableEditButtonPosition.End" Filter="@(ste => ParlayStringTable.IncludeEntry(Parlay, ste))" FixedFooter FixedHeader Height="calc(100vh - 384px)" Hover Items="@StringTableEntries" OnPreviewEditClick="HandleStringTableOnPreviewEditClick" RowEditCancel="HandleStringTableRowEditCancel" RowEditCommit="HandleStringTableRowEditCommit">
+	<ToolBarContent>
+		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
+			@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Title)]
+		</MudTextM3>
+		<MudSpacer />
+		<MudTextField @bind-Value="@Binding(() => Parlay.EntrySearchText).Value" Placeholder="@(AppText.Common_Search)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate Clearable DebounceInterval="250" Class="mt-0" />
+	</ToolBarContent>
+	<ColGroup>
+		<col width="10%" />
+		<col width="40%" />
+		<col width="40%" />
+		<col width="10%" />
+	</ColGroup>
+	<HeaderContent>
+		<MudTh>
+			<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Hash)">
+				@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Header_Hash)]
+			</MudTableSortLabel>
+		</MudTh>
+		<MudTh>
+			<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Original)">
+				@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Header_Original)]
+			</MudTableSortLabel>
+		</MudTh>
+		<MudTh>
+			<MudTableSortLabel SortBy="new Func<ParlayStringTableEntry, object>(pste => pste.Translation)">
+				@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Header_Translation)]
+			</MudTableSortLabel>
+		</MudTh>
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Hash)" Class="table-cell-align-top">
+			<code>
+				@(context.Hash.ToString("x8"))
+			</code>
+		</MudTd>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Original)" Class="table-cell-align-top">
+			<div class="parlay-string-display">
+				@ParlayStringTable.HighlightForDisplay(context.Original)
+			</div>
+		</MudTd>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Translation)" Class="table-cell-align-top">
+			<div class="parlay-string-display">
+				@ParlayStringTable.HighlightForDisplay(context.Translation)
+			</div>
+		</MudTd>
+	</RowTemplate>
+	<RowEditingTemplate>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Hash)" Class="table-cell-align-top">
+			<code>
+				@(context.Hash.ToString("x8"))
+			</code>
+		</MudTd>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Original)" Class="table-cell-align-top">
+			<div class="parlay-string-display">
+				@ParlayStringTable.HighlightForDisplay(context.Original)
+			</div>
+		</MudTd>
+		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Translation)" Class="table-cell-align-top">
+			<StandaloneCodeEditor @ref="@standaloneCodeEditor" ConstructionOptions="CreateEditorOptions" CssClass="parlay-editor" OnDidChangeModelContent="HandleEditorOnDidChangeModelContent" OnDidInit="HandleEditorOnDidInitAsync" OnKeyUp="HandleEditorKeyUp" />
+		</MudTd>
+	</RowEditingTemplate>
+	<FooterContent>
+		<MudTd colspan="3">
+			<MudGrid Justify="Justify.SpaceEvenly">
+				<MudItem>
+					<MudStack Row AlignItems="AlignItems.Center">
+						<MudChip Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.ArrowDownBold" Label="true" Value="@(AppText.Key_PageDown)" />
+						<MudTextM3>
+							@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Footer_NextKeyHash)]
+						</MudTextM3>
+					</MudStack>
+				</MudItem>
+				<MudItem>
+					<MudStack Row AlignItems="AlignItems.Center">
+						<MudChip Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.ArrowUpBold" Label="true" Value="@(AppText.Key_PageUp)" />
+						<MudTextM3>
+							@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Footer_PreviousKeyHash)]
+						</MudTextM3>
+					</MudStack>
+				</MudItem>
+				<MudItem>
+					<MudStack Row AlignItems="AlignItems.Center">
+						<MudChip Color="Color.Info" Icon="@MaterialDesignIcons.Normal.KeyboardTab" Label="true" Value="@(AppText.Key_Tab)" />
+						<MudTextM3>
+							@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Footer_NextAutofill)]
+						</MudTextM3>
+					</MudStack>
+				</MudItem>
+				<MudItem>
+					<MudStack Row AlignItems="AlignItems.Center">
+						<MudChip Color="Color.Info" Icon="@MaterialDesignIcons.Normal.AppleKeyboardShift" Label="true" Value="@(AppText.Key_Shift)" />
+						<MudChip Color="Color.Info" Icon="@MaterialDesignIcons.Normal.KeyboardTab" Label="true" Value="@(AppText.Key_Tab)" />
+						<MudTextM3>
+							@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Footer_PreviousAutofill)]
+						</MudTextM3>
+					</MudStack>
+				</MudItem>
+			</MudGrid>
+		</MudTd>
+	</FooterContent>
+</MudTable>

@@ -4,6 +4,12 @@ partial class CatalogDisplayModsList
 {
     string modsFolderPath = string.Empty;
 
+    protected override void ConfigureBindings()
+    {
+        base.ConfigureBindings();
+        Observed(() => Catalog.ModsSearchText);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
