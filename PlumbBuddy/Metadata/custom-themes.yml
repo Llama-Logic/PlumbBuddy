@@ -42,6 +42,8 @@ amethyst-lilac:
     parlay:
       dark: parlay.png
       light: parlay.png
+      repeat: no-repeat
+      size: contain
 
 codebleu:
   display_name: CodeBleu

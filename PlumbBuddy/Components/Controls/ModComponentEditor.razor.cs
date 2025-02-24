@@ -225,6 +225,8 @@ partial class ModComponentEditor
                                 overrideStbl.Delete(extraKeyHash);
                     }
                 }
+                else if (!await DialogService.ShowCautionDialogAsync(string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Caption, stblKey.FullInstanceHex, ModComponent.File.Name), string.Format(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Text, stblKey, stblNeutralLocale.EnglishName, modFile.Name, ModComponent.File.Name)))
+                    continue;
                 await componentDbpf.SetAsync(stblKey, overrideStbl).ConfigureAwait(false);
             }
             HandleTranslatorsChanged(Translators

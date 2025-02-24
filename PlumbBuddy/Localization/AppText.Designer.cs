@@ -2526,7 +2526,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elmeents for {1} players of your mod.
+        ///   Looks up a localized string similar to In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elements for {1} players of your mod.
         ///
         ///The missing key hashes are:
         ///{2}.
@@ -2563,6 +2563,26 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text {
             get {
                 return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Overwriting_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Integrate {0} Even Though It&apos;s Not In {1}?.
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Caption {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_C" +
+                        "aption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to `{0}`, a string table in {1} from the file you selected (`{2}`), is not also in your original mod file (`{3}`). I can integrate it anyway, but this may cause issues if its key hashes are defined in another string table resource..
+        /// </summary>
+        internal static string ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Text {
+            get {
+                return ResourceManager.GetString("ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_T" +
+                        "ext", resourceCulture);
             }
         }
         

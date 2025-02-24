@@ -2994,7 +2994,7 @@ I've had to disable myself until you can fix this, and it's important that you u
     <value>key hash</value>
   </data>
   <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_MissingKeyHashes_Text" xml:space="preserve">
-    <value>In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elmeents for {1} players of your mod.
+    <value>In trying to watch your back, I examined both your original string table and this new one. It turns out the new string table is actually missing {0}. If we proceed anyway, there may be blank UI elements for {1} players of your mod.
 
 The missing key hashes are:
 {2}</value>
@@ -3017,5 +3017,13 @@ The missing key hashes are:
   <data name="ManifestComponentEditor_TranslatorChipClosed_Caution_Text" xml:space="preserve">
     <value>If this is here, it means that at some point, {0} contributed a translation of this component in {1}. If you continue now and then finish updating your mod manifest, this credit will no longer appear in Catalog for players.</value>
     <comment>This text is in Markdown. {0} = Translator Name; {1} = Language Name</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Caption" xml:space="preserve">
+    <value>Integrate {0} Even Though It's Not In {1}?</value>
+    <comment>{0} = String Table Full Instance; {1} = Mod File Name</comment>
+  </data>
+  <data name="ManifestComponentEditor_IntegrateTranslatorsOverridePackage_StringTableNotFound_Text" xml:space="preserve">
+    <value>`{0}`, a string table in {1} from the file you selected (`{2}`), is not also in your original mod file (`{3}`). I can integrate it anyway, but this may cause issues if its key hashes are defined in another string table resource.</value>
+    <comment>This text is in Markdown. {0} = String Table Key; {1} = Translation Language; {2} = Integration Package Name; {3} = Mod File Name</comment>
   </data>
 </root>
