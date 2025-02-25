@@ -2,6 +2,8 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
+    const int manfiestEditorTabIndex = 4;
+
     int activePanelIndex;
     bool keepPanelsAlive;
 
@@ -12,9 +14,9 @@ partial class Home
         {
             if (activePanelIndex == value)
                 return;
-            if (value is 3)
+            if (value is manfiestEditorTabIndex)
                 keepPanelsAlive = true;
-            else if (activePanelIndex is 3 && !ManifestEditor.RequestToRemainAlive)
+            else if (activePanelIndex is manfiestEditorTabIndex && !ManifestEditor.RequestToRemainAlive)
                 keepPanelsAlive = false;
             activePanelIndex = value;
         }
@@ -40,7 +42,7 @@ partial class Home
     {
         if (Settings.Type is UserType.Creator)
         {
-            activePanelIndex = 2;
+            activePanelIndex = manfiestEditorTabIndex;
             StateHasChanged();
         }
     }
