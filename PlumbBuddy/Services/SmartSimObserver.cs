@@ -941,7 +941,7 @@ public partial class SmartSimObserver :
     {
         foreach (var cacheComponent in cacheComponents)
             cacheComponent.Refresh();
-        var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce is DirectoryInfo dce ? dce.GetFiles("*.*", SearchOption.AllDirectories).Length > 0 : ce.Exists);
+        var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce is DirectoryInfo dce && dce.Exists ? dce.GetFiles("*.*", SearchOption.AllDirectories).Length > 0 : ce.Exists);
         if (settings.CacheStatus is SmartSimCacheStatus.Clear && anyCacheComponentsExistOnDisk)
         {
             settings.CacheStatus = SmartSimCacheStatus.Normal;
