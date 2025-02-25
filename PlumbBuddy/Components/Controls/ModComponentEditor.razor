@@ -8,128 +8,131 @@
 @inject IUserInterfaceMessaging UserInterfaceMessaging
 
 <MudGrid Justify="Justify.Center" Spacing="4">
-    <MudItem xs="12">
-        <ModFileSelector Label="Local Path" File="@File" Disabled />
-    </MudItem>
-    <MudItem xs="12">
-        <MudSwitchM3 T="bool" Value="@IsRequired" ValueChanged="HandleIsRequiredChanged" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.Asterisk">
-            @MarkupLocalizer[nameof(AppText.ManifestComponentEditor_IsRequired_Label)]
-        </MudSwitchM3>
-    </MudItem>
-    @if (IsRequired)
-    {
-        <MudItem md="12">
-            <MudTextField T="string" Text="@RequirementIdentifier" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" AdornmentColor="Color.Tertiary" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_Placeholder)]" />
-        </MudItem>
-        <MudItem xs="12" lg="6">
-            @if (PublicCatalogs.PackCatalog is { } packCatalog)
-            {
-                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder)]" />
-            }
-            else
-            {
-                <MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder)]" />
-            }
-        </MudItem>
-        <MudItem xs="12" lg="6">
-            @if (PublicCatalogs.PackCatalog is { } packCatalog)
-            {
-                <MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder)]" />
-            }
-            else
-            {
-                <MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder)]" />
-            }
-        </MudItem>
-        <MudItem xs="12" xl="6">
-            <MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder)]">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudStack Row>
-                        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
-                            @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
-                        </MudButton>
-                        <MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
-                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync" />
-                        </MudTooltip>
-                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
-                        {
-                            <MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
-                                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
-                            </MudTooltip>
-                        }
-                    </MudStack>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
-        </MudItem>
-        <MudItem xs="12" xl="6">
-            <MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder)]">
-                <AdornmentStart>
-                    <MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
-                </AdornmentStart>
-                <AdornmentEnd>
-                    <MudStack Row>
-                        <MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
-                            @MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
-                        </MudButton>
-                        <MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
-                            <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync" />
-                        </MudTooltip>
-                        @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
-                        {
-                            <MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
-                                <MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
-                            </MudTooltip>
-                        }
-                    </MudStack>
-                </AdornmentEnd>
-            </MudTextFieldExtended>
-        </MudItem>
-    }
-    <MudItem xs="12">
-        <ChipSetField @ref="@exclusivitiesField" Values="@Exclusivities" ValuesChanged="HandleExclusivitiesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SetLeftRight" ChipIcon="@MaterialDesignIcons.Normal.SetCenter" Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Placeholder)]" />
-        @if (Exclusivities.Count is > 0)
-        {
-            <MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight">
-                <MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Guidance)]" />
-            </MudAlert>
-        }
-    </MudItem>
 	<MudItem xs="12">
-		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" AutoGrow HelperText="@(AppText.ManifestComponentEditor_MessageToTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_MessageToTranslators_Label)" Value="@MessageToTranslators" ValueChanged="HandleMessageToTranslatorsChanged" Variant="Variant.Filled" />
+		<ModFileSelector Label="Local Path" File="@File" Disabled />
 	</MudItem>
 	<MudItem xs="12">
-		<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Upload" HelperText="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_HelperText)" Label="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_Label)" Value="@TranslationSubmissionUrl" ValueChanged="HandleTranslationSubmissionUrlChanged" Variant="Variant.Filled" />
+		<MudSwitchM3 T="bool" Value="@IsRequired" ValueChanged="HandleIsRequiredChanged" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.Asterisk">
+			@MarkupLocalizer[nameof(AppText.ManifestComponentEditor_IsRequired_Label)]
+		</MudSwitchM3>
 	</MudItem>
-	<MudItem xs="12">
-		<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="@(AppText.ManifestComponentEditor_CreditedTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_CreditedTranslators_Label)" Variant="Variant.Filled">
-			@foreach (var translator in Translators)
+	@if (IsRequired)
+	{
+		<MudItem md="12">
+			<MudTextField T="string" Text="@RequirementIdentifier" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.OrderBoolDescendingVariant" AdornmentColor="Color.Tertiary" TextChanged="HandleRequirementIdentifierChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_RequirementIdentifier_Placeholder)]" />
+		</MudItem>
+		<MudItem xs="12" lg="6">
+			@if (PublicCatalogs.PackCatalog is { } packCatalog)
 			{
-				var countryCode = translator.language.Name;
-				try
-				{
-					countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
-				}
-				catch
-				{
-				}
-				<MudChip T="string" Color="Color.Tertiary" OnClose="HandleTranslatorChipClosedAsync" Tag="@translator" Value="@(translator.name)">
-					<AvatarContent>
-						<MudAvatar>
-							<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
-						</MudAvatar>
-					</AvatarContent>
-				</MudChip>
+				<MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackAvailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder)]" />
 			}
-		</MudField>
+			else
+			{
+				<MudTextField T="string" Text="@IgnoreIfPackAvailable" TextChanged="HandleIgnoreIfPackAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Freeform_Placeholder)]" />
+			}
+		</MudItem>
+		<MudItem xs="12" lg="6">
+			@if (PublicCatalogs.PackCatalog is { } packCatalog)
+			{
+				<MudSelectExtended T="KeyValuePair<string, PackDescription>?" @bind-Value="@IgnoreIfPackUnavailablePair" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Clearable SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Selector_Placeholder)]" />
+			}
+			else
+			{
+				<MudTextField T="string" Text="@IgnoreIfPackUnavailable" TextChanged="HandleIgnoreIfPackUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Label)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonalOff" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackUnavailable_Freeform_Placeholder)]" />
+			}
+		</MudItem>
+		<MudItem xs="12" xl="6">
+			<MudTextFieldExtended T="string" Text="@IgnoreIfHashAvailable" TextChanged="HandleIgnoreIfHashAvailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashAvailable_Placeholder)]">
+				<AdornmentStart>
+					<MudIcon Icon="@MaterialDesignIcons.Normal.Barcode" Color="Color.Tertiary" />
+				</AdornmentStart>
+				<AdornmentEnd>
+					<MudStack Row>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashAvailableModFileOnClickAsync">
+							@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
+						</MudButton>
+						<MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
+							<MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashAvailableModFileOnClickAsync" />
+						</MudTooltip>
+						@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+						{
+							<MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+								<MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashAvailableModFileOnClickAsync" />
+							</MudTooltip>
+						}
+					</MudStack>
+				</AdornmentEnd>
+			</MudTextFieldExtended>
+		</MudItem>
+		<MudItem xs="12" xl="6">
+			<MudTextFieldExtended T="string" Text="@IgnoreIfHashUnavailable" TextChanged="HandleIgnoreIfHashUnavailableChanged" Variant="Variant.Filled" Clearable Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfHashUnavailable_Placeholder)]">
+				<AdornmentStart>
+					<MudIcon Icon="@MaterialDesignIcons.Normal.BarcodeOff" Color="Color.Tertiary" />
+				</AdornmentStart>
+				<AdornmentEnd>
+					<MudStack Row>
+						<MudButton Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" OnClick="HandleBrowseForIgnoreIfHashUnavailableModFileOnClickAsync">
+							@MarkupLocalizer[nameof(AppText.Common_Browse_Ellipsis)]
+						</MudButton>
+						<MudTooltip Arrow Text="@(AppText.Common_SelectModFileFromCatalog)">
+							<MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleSelectCatalogedIgnoreIfHashUnavailableModFileOnClickAsync" />
+						</MudTooltip>
+						@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+						{
+							<MudTooltip Arrow Text="@(AppText.Common_AcceptADraggedAndDroppedModFile)">
+								<MudIconButton Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.Eyedropper" OnClick="HandleDropAnIgnoreIfHashUnavailableModFileOnClickAsync" />
+							</MudTooltip>
+						}
+					</MudStack>
+				</AdornmentEnd>
+			</MudTextFieldExtended>
+		</MudItem>
+	}
+	<MudItem xs="12">
+		<ChipSetField @ref="@exclusivitiesField" Values="@Exclusivities" ValuesChanged="HandleExclusivitiesChanged" Color="Color.Tertiary" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SetLeftRight" ChipIcon="@MaterialDesignIcons.Normal.SetCenter" Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Placeholder)]" />
+		@if (Exclusivities.Count is > 0)
+		{
+			<MudAlert Severity="Severity.Warning" Icon="@MaterialDesignIcons.Normal.SetLeftRight">
+				<MudMarkdown Value="@StringLocalizer[nameof(AppText.ManifestComponentEditor_Exclusivities_Guidance)]" />
+			</MudAlert>
+		}
 	</MudItem>
-	<MudItem>
-		<MudButton Color="Color.Tertiary" OnClick="HandleIntegrateTranslatorsOverridePackageOnClickAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
-			@MarkupLocalizer[nameof(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label)]
-		</MudButton>
-	</MudItem>
+	@if (@ManifestResourceName is not null /* i.e., it's a DBPF package and not a TS4SCRIPT file */)
+	{
+		<MudItem xs="12">
+			<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.HumanGreetingProximity" AutoGrow HelperText="@(AppText.ManifestComponentEditor_MessageToTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_MessageToTranslators_Label)" Value="@MessageToTranslators" ValueChanged="HandleMessageToTranslatorsChanged" Variant="Variant.Filled" />
+		</MudItem>
+		<MudItem xs="12">
+			<MudTextField T="string" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Upload" HelperText="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_HelperText)" Label="@(AppText.ManifestComponentEditor_TranslationSubmissionUrl_Label)" Value="@TranslationSubmissionUrl" ValueChanged="HandleTranslationSubmissionUrlChanged" Variant="Variant.Filled" />
+		</MudItem>
+		<MudItem xs="12">
+			<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="@(AppText.ManifestComponentEditor_CreditedTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_CreditedTranslators_Label)" Variant="Variant.Filled">
+				@foreach (var translator in Translators)
+				{
+					var countryCode = translator.language.Name;
+					try
+					{
+						countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
+					}
+					catch
+					{
+					}
+					<MudChip T="string" Color="Color.Tertiary" OnClose="HandleTranslatorChipClosedAsync" Tag="@translator" Value="@(translator.name)">
+						<AvatarContent>
+							<MudAvatar>
+								<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
+							</MudAvatar>
+						</AvatarContent>
+					</MudChip>
+				}
+			</MudField>
+		</MudItem>
+		<MudItem>
+			<MudButton Color="Color.Tertiary" OnClick="HandleIntegrateTranslatorsOverridePackageOnClickAsync" StartIcon="@MaterialDesignIcons.Normal.FolderOpen" Variant="Variant.Filled">
+				@MarkupLocalizer[nameof(AppText.ManifestComponentEditor_IntegrateTranslatorsOverridePackage_Label)]
+			</MudButton>
+		</MudItem>
+	}
 	<MudFlexBreak />
 	<MudItem xs="12">
         <MudTextField T="string" Value="@Name" ValueChanged="HandleNameChanged" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.SpotlightBeam" Label="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_HelperText)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_ComponentName_Placeholder)]" />
