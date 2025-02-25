@@ -8,7 +8,7 @@
 {
 	<MudItem xs="12">
 		<MudStack AlignItems="AlignItems.Center" Row>
-			<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Class="flex-grow-1" Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="@(AppText.Parlay_Package_Label)" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
+			<MudSelectExtended @bind-Value="@Binding(() => Parlay.SelectedPackage).Value" AdornmentColor="Color.Secondary" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosed" Class="flex-grow-1" Clearable Color="Color.Secondary" ItemCollection="@(packages.OrderBy(p => string.IsNullOrWhiteSpace(p.ManifestedName) ? 1 : 0).ThenBy(p => p.ManifestedName).ThenBy(p => p.ManifestedVersion).ThenBy(p => p.ManifestedCreators).ThenBy(p => p.ModFilePath).ToImmutableArray())" Label="@(AppText.Parlay_Package_Label)" SearchBox SearchBoxAutoFocus Variant="Variant.Filled" />
 			@if (Observed(() => Parlay.MessageFromCreators) is not null || Observed(() => Parlay.TranslationSubmissionUrl) is not null)
 			{
 				<MudTooltip Color="Color.Info" Text="@StringLocalizer[nameof(AppText.Parlay_MessageToTranslators_Tip), Observed(() => Parlay.Creators) is { } creators ? creators : AppText.Parlay_MessageToTranslators_Tip_DefaultCreator]">

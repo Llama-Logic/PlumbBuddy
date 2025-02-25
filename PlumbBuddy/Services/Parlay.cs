@@ -498,7 +498,7 @@ public sealed class Parlay :
                         translationStbl = await translationPackage.GetModelAsync<StringTableModel>(translationStringTableKey).ConfigureAwait(false);
                 }
             }
-            stringTableEntries = new(originalStbl.KeyHashes.Select(hash => new ParlayStringTableEntry(this, hash, originalStbl.Get(hash), translationStbl?.Get(hash) ?? string.Empty)));
+            stringTableEntries = [..originalStbl.KeyHashes.Select(hash => new ParlayStringTableEntry(this, hash, originalStbl.Get(hash), translationStbl?.Get(hash) ?? string.Empty))];
             StringTableEntries = new(stringTableEntries);
         }
         catch (Exception ex)
