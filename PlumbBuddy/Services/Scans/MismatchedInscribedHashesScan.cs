@@ -62,7 +62,7 @@ public sealed class MismatchedInscribedHashesScan :
                 Data = mod,
                 Resolutions =
                 [
-                    ..(settings.Type is UserType.Creator
+                    ..settings.Type is UserType.Creator
                         && await userInterfaceMessaging.IsModScaffoldedAsync(mod.FilePaths.First()).ConfigureAwait(false)
                         ? [new ScanIssueResolution()
                         {
@@ -79,7 +79,7 @@ public sealed class MismatchedInscribedHashesScan :
                             Color = MudBlazor.Color.Primary,
                             Data = $"download-{url}"
                         }]
-                        : Enumerable.Empty<ScanIssueResolution>()),
+                        : Enumerable.Empty<ScanIssueResolution>(),
                     ..mod.FilePaths.Select((filePath, index) => new ScanIssueResolution()
                     {
                         Label = string.Format(AppText.Scan_MismatchedInscribedHashes_ShowFile_Label, (index + 1).ToOrdinalWords()),

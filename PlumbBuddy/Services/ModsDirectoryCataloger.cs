@@ -47,6 +47,7 @@ public class ModsDirectoryCataloger :
                 creator => mc => mc.Name == creator,
                 modFileManifestModel.Creators
             ).ToListAsync().ConfigureAwait(false),
+            Description = modFileManifestModel.Description,
             Exclusivities = await TransformNormalizedEntitySequence
             (
                 pbDbContext,

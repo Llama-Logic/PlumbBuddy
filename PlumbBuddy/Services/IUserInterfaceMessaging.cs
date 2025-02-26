@@ -7,7 +7,6 @@ public interface IUserInterfaceMessaging :
 
     event EventHandler<BeginManifestingModRequestedEventArgs>? BeginManifestingModRequested;
     event EventHandler<FilesDroppedEventArgs>? FilesDropped;
-    event EventHandler<IsModScaffoldedInquiredEventArgs>? IsModScaffoldedInquired;
 
     void BeginManifestingMod(string modFilePath);
     void DropFiles(IReadOnlyList<string> paths);

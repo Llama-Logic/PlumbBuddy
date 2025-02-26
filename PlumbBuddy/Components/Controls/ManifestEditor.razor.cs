@@ -53,6 +53,7 @@ partial class ManifestEditor
     IReadOnlyList<(Severity severity, string? icon, string message)> confirmationStepMessages = [];
     IReadOnlyList<string> creators = [];
     ChipSetField? creatorsChipSetField;
+    string description = string.Empty;
     MudForm? detailsStepForm;
     string electronicArtsPromoCode = string.Empty;
     IReadOnlyList<string> features = [];
@@ -457,6 +458,7 @@ partial class ManifestEditor
                         : null;
                     var model = new ModFileManifestModel
                     {
+                        Description = description,
                         ElectronicArtsPromoCode = string.IsNullOrWhiteSpace(electronicArtsPromoCode) ? null : electronicArtsPromoCode,
                         Hash = hash,
                         MessageToTranslators = string.IsNullOrWhiteSpace(component.MessageToTranslators) ? null : component.MessageToTranslators,
@@ -681,7 +683,6 @@ partial class ManifestEditor
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
-        UserInterfaceMessaging.IsModScaffoldedInquired -= HandleUserInterfaceMessagingIsModScaffoldedInquired;
         RequestToRemainAlive = false;
     }
 
@@ -843,6 +844,7 @@ partial class ManifestEditor
                     else
                         throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
                     name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
+                    description = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Description))?.Description ?? string.Empty;
                     creators = manifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
                     creatorsChipSetField?.Refresh();
                     url = manifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
@@ -1188,14 +1190,6 @@ partial class ManifestEditor
         StateHasChanged();
     }
 
-    void HandleUserInterfaceMessagingIsModScaffoldedInquired(object? sender, IsModScaffoldedInquiredEventArgs e) =>
-        e.IsModScaffolded =
-            ManifestedModFileScaffolding.IsModFileScaffolded
-            (
-                new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", e.ModFilePath)),
-                Settings
-            );
-
     Task<bool> OfferToCancelAsync() =>
         DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_OfferToCancel_Caption, AppText.ManifestEditor_Caution_OfferToCancel_Text);
 
@@ -1205,7 +1199,6 @@ partial class ManifestEditor
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
-        UserInterfaceMessaging.IsModScaffoldedInquired += HandleUserInterfaceMessagingIsModScaffoldedInquired;
     }
 
     void RefreshCompositionStepMessages()
@@ -1315,6 +1308,7 @@ partial class ManifestEditor
         await (requirementsStepForm?.ResetAsync() ?? Task.CompletedTask);
         url = string.Empty;
         await (creatorsChipSetField?.ClearAsync() ?? Task.CompletedTask);
+        description = string.Empty;
         name = string.Empty;
         await (detailsStepForm?.ResetAsync() ?? Task.CompletedTask);
         componentsStepSelectedComponent = null;

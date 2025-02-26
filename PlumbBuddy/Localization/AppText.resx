@@ -3026,4 +3026,10 @@ The missing key hashes are:
     <value>`{0}`, a string table in {1} from the file you selected (`{2}`), is not also in your original mod file (`{3}`). I can integrate it anyway, but this may cause issues if its key hashes are defined in another string table resource.</value>
     <comment>This text is in Markdown. {0} = String Table Key; {1} = Translation Language; {2} = Integration Package Name; {3} = Mod File Name</comment>
   </data>
+  <data name="Common_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ManifestEditor_Details_ModDescription_HelperText" xml:space="preserve">
+    <value>What does your mod do? What's it for? Probably best to keep this short, but sweet.</value>
+  </data>
 </root>

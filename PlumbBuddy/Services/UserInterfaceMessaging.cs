@@ -3,6 +3,14 @@ namespace PlumbBuddy.Services;
 public sealed class UserInterfaceMessaging :
     IUserInterfaceMessaging
 {
+    public UserInterfaceMessaging(ISettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        this.settings = settings;
+    }
+
+    readonly ISettings settings;
+
     bool isFileDroppingEnabled;
 
     public bool IsFileDroppingEnabled
@@ -19,14 +27,21 @@ public sealed class UserInterfaceMessaging :
 
     public event EventHandler<BeginManifestingModRequestedEventArgs>? BeginManifestingModRequested;
     public event EventHandler<FilesDroppedEventArgs>? FilesDropped;
-    public event EventHandler<IsModScaffoldedInquiredEventArgs>? IsModScaffoldedInquired;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void BeginManifestingMod(string modFilePath) =>
-        StaticDispatcher.Dispatch(() => BeginManifestingModRequested?.Invoke(this, new BeginManifestingModRequestedEventArgs
+        _ = StaticDispatcher.DispatchAsync(async () =>
         {
-            ModFilePath = modFilePath
-        }));
+            BeginManifestingModRequested?.Invoke(this, new BeginManifestingModRequestedEventArgs
+            {
+                ModFilePath = modFilePath
+            });
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            BeginManifestingModRequested?.Invoke(this, new BeginManifestingModRequestedEventArgs
+            {
+                ModFilePath = modFilePath
+            });
+        });
 
     public void DropFiles(IReadOnlyList<string> paths) =>
         FilesDropped?.Invoke(this, new() { Paths = paths });
@@ -52,29 +67,15 @@ public sealed class UserInterfaceMessaging :
         return files;
     }
 
-    public async Task<bool> IsModScaffoldedAsync(string modFilePath)
+    public Task<bool> IsModScaffoldedAsync(string modFilePath)
     {
-        var eventArgs = new IsModScaffoldedInquiredEventArgs
-        {
-            ModFilePath = modFilePath
-        };
-        foreach (var @delegate in IsModScaffoldedInquired?.GetInvocationList() ?? Enumerable.Empty<Delegate>())
-        {
-            if (@delegate is EventHandler<IsModScaffoldedInquiredEventArgs> eventHandler)
-            {
-                var tcs = new TaskCompletionSource();
-                StaticDispatcher.Dispatch(() =>
-                {
-                    eventHandler(this, eventArgs);
-                    tcs.SetResult();
-                });
-                await tcs.Task.ConfigureAwait(false);
-                if (eventArgs.IsModScaffolded is { } result)
-                    return result;
-            }
-        }
-        return false;
+        return Task.FromResult<bool>(ManifestedModFileScaffolding.IsModFileScaffolded
+        (
+            new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath)),
+            settings
+        ));
     }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 

@@ -232,6 +232,7 @@ namespace PlumbBuddy.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ModFileHashId = table.Column<long>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     Version = table.Column<string>(type: "TEXT", nullable: true),
                     Url = table.Column<string>(type: "TEXT", nullable: true),
                     InscribedModFileManifestHashId = table.Column<long>(type: "INTEGER", nullable: false),

@@ -140,7 +140,7 @@ public static class MauiProgram
             var currentVersion = new Version(mauiVersion.Major, mauiVersion.Minor, mauiVersion.Build);
             if (currentVersion != versionAtLastStartup
                 && versionAtLastStartup is { } lastVersion
-                && lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 2 })
+                && lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 8 })
             {
                 var mdcDatabase = new FileInfo(Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite"));
                 if (mdcDatabase.Exists)

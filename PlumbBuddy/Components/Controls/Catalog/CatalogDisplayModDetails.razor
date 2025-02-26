@@ -11,7 +11,9 @@
 	<MudGrid Justify="Justify.Center" Spacing="1">
 		@if (Observed(() => Catalog.Mods) is { } mods && Observed(() => Catalog.SelectedModKey) is { } selectedModKey && mods.TryGetValue(selectedModKey, out var selectedMod))
 		{
+			var modSearchText = Observed(() => Catalog.ModsSearchText);
 			var version = selectedMod.Select(t => t.Manifest.Version).Where(v => !string.IsNullOrWhiteSpace(v)).Cast<string>().GroupBy(v => v).OrderByDescending(g => g.Key)?.FirstOrDefault()?.Key;
+			var description = selectedMod.Select(t => t.Manifest.Description).Where(d => !string.IsNullOrWhiteSpace(d)).Cast<string>().GroupBy(d => d).OrderByDescending(g => g.Count())?.FirstOrDefault()?.Key;
 			var hashHex = selectedMod.Select(t => t.Manifest.Hash).First().ToHexString();
 			var requiredPackCodes = selectedMod.SelectMany(t => t.Manifest.RequiredPacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
 			var incompatiblePackCodes = selectedMod.SelectMany(t => t.Manifest.IncompatiblePacks).Select(pc => pc.ToUpperInvariant()).Distinct().Order().ToImmutableArray();
@@ -21,18 +23,29 @@
 			var indexableDependents = selectedMod.SelectMany(t => t.Dependents).Distinct().Where(mods.ContainsKey).OrderBy(k => k.Name).ThenBy(k => k.Creators ?? k.Url?.ToString() ?? string.Empty).ToImmutableArray();
 			<MudItem Style="text-align: center;">
 				<MudTextM3 Typo="TypoM3.Headline">
-					@(selectedModKey.Name)
+					<MudHighlighter Text="@(selectedModKey.Name)" HighlightedText="@modSearchText" />
 					@if (!string.IsNullOrWhiteSpace(version))
 					{
-						<small>&#x20;@version</small>
+						<small>&#x20;<MudHighlighter Text="@version" HighlightedText="@modSearchText" /></small>
 					}
 				</MudTextM3>
 			</MudItem>
 			<MudFlexBreak />
+			@if (!string.IsNullOrWhiteSpace(description))
+			{
+				<MudItem>
+					<MudTextM3 Class="overflow-auto" Style="max-height: 72px;">
+						<MudHighlighter Text="@description" HighlightedText="@modSearchText" />
+					</MudTextM3>
+				</MudItem>
+				<MudFlexBreak />
+			}
 			@if (selectedModKey.Url is { } url)
 			{
 				<MudItem>
-					<MudLink Href="@url.ToString()">@url</MudLink>
+					<MudLink Href="@url.ToString()">
+						<MudHighlighter Text="@url.ToString()" HighlightedText="@modSearchText" />
+					</MudLink>
 				</MudItem>
 			}
 			<MudFlexBreak />

@@ -16,6 +16,8 @@ public class ModFileManifest
     [Required]
     public required string Name { get; set; }
 
+    public string? Description { get; set; }
+
     [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public ICollection<ModCreator>? Creators { get; set; }
 
@@ -132,6 +134,7 @@ public class ModFileManifest
         {
             ContactEmail = ContactEmail,
             ContactUrl = ContactUrl,
+            Description = Description,
             ElectronicArtsPromoCode = ElectronicArtsPromoCode?.Code,
             Hash = (InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
             MessageToTranslators = MessageToTranslators,

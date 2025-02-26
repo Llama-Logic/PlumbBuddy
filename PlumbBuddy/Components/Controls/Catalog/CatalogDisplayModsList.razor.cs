@@ -37,6 +37,9 @@ partial class CatalogDisplayModsList
             return true;
         foreach (var (manifest, files, dependencies, dependents) in value)
         {
+            if (!string.IsNullOrWhiteSpace(manifest.Description)
+                && manifest.Description.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase))
+                return true;
             if (manifest.RequiredPacks.Any(rp => rp.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase)))
                 return true;
             if (manifest.IncompatiblePacks.Any(ip => ip.Contains(modsSearchText, StringComparison.OrdinalIgnoreCase)))

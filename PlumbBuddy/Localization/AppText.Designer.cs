@@ -927,6 +927,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        internal static string Common_Description {
+            get {
+                return ResourceManager.GetString("Common_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disable All.
         /// </summary>
         internal static string Common_DisableAll {
@@ -3339,6 +3348,15 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Details_Label {
             get {
                 return ResourceManager.GetString("ManifestEditor_Details_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What does your mod do? What&apos;s it for? Probably best to keep this short, but sweet..
+        /// </summary>
+        internal static string ManifestEditor_Details_ModDescription_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_ModDescription_HelperText", resourceCulture);
             }
         }
         

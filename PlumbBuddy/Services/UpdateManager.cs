@@ -58,7 +58,7 @@ public sealed class UpdateManager :
                         options.RequireInteraction = true;
                     });
                 }
-                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 2 })
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 3 } or { Major: 1, Minor: 3, Build: < 8 })
                 {
                     this.logger.LogInformation("The existing Mods Directory Cataloger database has been deleted so that it will be rebuilt.");
                     superSnacks.OfferRefreshments(new MarkupString("Apologies for the inconvenience, but new features have been added which have invalidated my scan of your Mods folder, so I need to scan it again."), Severity.Info, options => options.Icon = MaterialDesignIcons.Normal.CogRefresh);

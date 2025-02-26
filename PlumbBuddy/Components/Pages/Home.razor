@@ -34,22 +34,16 @@
 			<ParlayDisplay />
 		</div>
 	</MudTabPanel>
-	@if (Observed(() => Settings.Type) is UserType.Creator)
-    {
-		<MudTabPanel Text="@(AppText.Home_ManifestEditor_Label)" Icon="@MaterialDesignIcons.Normal.TagEdit" IconColor="Color.Tertiary">
-            <div class="manifest-editor-tab-container">
-                <div class="background"></div>
-                <ManifestEditor />
-            </div>
-        </MudTabPanel>
-    }
-    @if (Observed(() => Settings.DevToolsUnlocked) && Observed(() => Settings.ShowThemeManager))
-    {
-        <MudTabPanel Text="@(AppText.Home_SampleUI_Label)" Icon="@MaterialDesignIcons.Normal.ApplicationEdit">
-            <div class="mod-health-tab-container">
-                <div class="background"></div>
-                <SampleUserInterface />
-            </div>
-        </MudTabPanel>
-    }
+	<MudTabPanel Text="@(AppText.Home_ManifestEditor_Label)" Icon="@MaterialDesignIcons.Normal.TagEdit" IconColor="Color.Tertiary" Visible="@(Observed(() => Settings.Type) is UserType.Creator)">
+        <div class="manifest-editor-tab-container">
+            <div class="background"></div>
+            <ManifestEditor />
+        </div>
+    </MudTabPanel>
+	<MudTabPanel Text="@(AppText.Home_SampleUI_Label)" Icon="@MaterialDesignIcons.Normal.ApplicationEdit" Visible="@(Observed(() => Settings.DevToolsUnlocked) && Observed(() => Settings.ShowThemeManager))">
+        <div class="mod-health-tab-container">
+            <div class="background"></div>
+            <SampleUserInterface />
+        </div>
+    </MudTabPanel>
 </MudTabs>
