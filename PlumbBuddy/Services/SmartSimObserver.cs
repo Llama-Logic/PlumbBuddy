@@ -503,6 +503,7 @@ public partial class SmartSimObserver :
                     new FileInfo(Path.Combine(settings.UserDataFolderPath, "avatarcache.package")),
                     new FileInfo(Path.Combine(settings.UserDataFolderPath, "clientDB.package")),
                     new FileInfo(Path.Combine(settings.UserDataFolderPath, "houseDescription-client.package")),
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "localsimtexturecache.package")),
                     new FileInfo(Path.Combine(settings.UserDataFolderPath, "localthumbcache.package")),
                     new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "cachestr")),
                     new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "onlinethumbnailcache"))
