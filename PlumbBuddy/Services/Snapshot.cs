@@ -23,7 +23,10 @@ public class Snapshot :
 
     static uint GetOpenSlot(ISettings settings)
     {
-        var savesDirectoryFiles = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"))
+        var savesFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
+        if (!savesFolder.Exists)
+            savesFolder.Create();
+        var savesDirectoryFiles = savesFolder
             .GetFiles("*.*", SearchOption.TopDirectoryOnly);
         uint slotId = 0x0002;
         var slotIdHex = slotId.ToString("x8");

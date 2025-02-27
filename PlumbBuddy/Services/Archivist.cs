@@ -149,10 +149,10 @@ public partial class Archivist :
     async Task ConnectToFoldersAsync()
     {
         using var connectionLockHeld = await connectionLock.LockAsync().ConfigureAwait(false);
-        if (!settings.ArchivistEnabled || fileSystemWatcher is not null)
-            return;
-        var savesFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
-        if (!savesFolder.Exists)
+        var userDataFolder = new DirectoryInfo(settings.UserDataFolderPath);
+        if (!settings.ArchivistEnabled
+            || fileSystemWatcher is not null
+            || !userDataFolder.Exists)
             return;
         DirectoryInfo archiveFolder;
         try
@@ -178,9 +178,9 @@ public partial class Archivist :
             return;
         }
         pathsProcessingQueue = new();
-        fileSystemWatcher = new FileSystemWatcher(Path.Combine(settings.UserDataFolderPath, "saves"))
+        fileSystemWatcher = new FileSystemWatcher(userDataFolder.FullName)
         {
-            IncludeSubdirectories = false,
+            IncludeSubdirectories = true,
             NotifyFilter =
                   NotifyFilters.CreationTime
                 | NotifyFilters.DirectoryName
@@ -215,7 +215,7 @@ public partial class Archivist :
             }
         }
         if (settings.ArchivistAutoIngestSaves)
-            await pathsProcessingQueue.EnqueueAsync(Path.Combine(settings.UserDataFolderPath, "saves")).ConfigureAwait(false);
+            await pathsProcessingQueue.EnqueueAsync(Path.Combine(userDataFolder.FullName, "saves")).ConfigureAwait(false);
     }
 
     void DisconnectFromFolders() =>
@@ -259,19 +259,43 @@ public partial class Archivist :
 
     void HandleFileSystemWatcherChanged(object sender, FileSystemEventArgs e)
     {
-        if (fileSystemWatcher is not null
+        if (fileSystemWatcher is null)
+            return;
+        if (File.Exists(e.FullPath)
             && new FileInfo(e.FullPath) is { } fileInfo
             && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists)
+            && fileInfo.Exists
+            && fileInfo.Directory is { } filedirectoryInfo
+            && filedirectoryInfo.Name == "saves"
+            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
+            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
+            pathsProcessingQueue?.Enqueue(e.FullPath);
+        if (Directory.Exists(e.FullPath)
+            && new DirectoryInfo(e.FullPath) is { } directoryInfo
+            && directoryInfo.Name == "saves"
+            && directoryInfo.Parent is { } nextDirectoryInfo
+            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
             pathsProcessingQueue?.Enqueue(e.FullPath);
     }
 
     void HandleFileSystemWatcherCreated(object sender, FileSystemEventArgs e)
     {
-        if (fileSystemWatcher is not null
+        if (fileSystemWatcher is null)
+            return;
+        if (File.Exists(e.FullPath)
             && new FileInfo(e.FullPath) is { } fileInfo
             && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists)
+            && fileInfo.Exists
+            && fileInfo.Directory is { } filedirectoryInfo
+            && filedirectoryInfo.Name == "saves"
+            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
+            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
+            pathsProcessingQueue?.Enqueue(e.FullPath);
+        if (Directory.Exists(e.FullPath)
+            && new DirectoryInfo(e.FullPath) is { } directoryInfo
+            && directoryInfo.Name == "saves"
+            && directoryInfo.Parent is { } nextDirectoryInfo
+            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
             pathsProcessingQueue?.Enqueue(e.FullPath);
     }
 
@@ -283,10 +307,22 @@ public partial class Archivist :
 
     void HandleFileSystemWatcherRenamed(object sender, RenamedEventArgs e)
     {
-        if (fileSystemWatcher is not null
+        if (fileSystemWatcher is null)
+            return;
+        if (File.Exists(e.FullPath)
             && new FileInfo(e.FullPath) is { } fileInfo
             && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists)
+            && fileInfo.Exists
+            && fileInfo.Directory is { } filedirectoryInfo
+            && filedirectoryInfo.Name == "saves"
+            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
+            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
+            pathsProcessingQueue?.Enqueue(e.FullPath);
+        if (Directory.Exists(e.FullPath)
+            && new DirectoryInfo(e.FullPath) is { } directoryInfo
+            && directoryInfo.Name == "saves"
+            && directoryInfo.Parent is { } nextDirectoryInfo
+            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
             pathsProcessingQueue?.Enqueue(e.FullPath);
     }
 
@@ -306,6 +342,11 @@ public partial class Archivist :
                 ConnectToFolders();
             else
                 DisconnectFromFolders();
+        }
+        else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
+        {
+            if (settings.ArchivistEnabled)
+                ReconnectFolders();
         }
     }
 
