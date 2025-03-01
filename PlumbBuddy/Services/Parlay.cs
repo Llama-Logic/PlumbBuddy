@@ -1,5 +1,3 @@
-using PlumbBuddy.Data;
-
 namespace PlumbBuddy.Services;
 
 public sealed class Parlay :
@@ -55,6 +53,8 @@ public sealed class Parlay :
         Dispose(false);
 
     string? creators;
+    ParlayStringTableEntry? editingEntry;
+    string editingEntryTranslation = string.Empty;
     string entrySearchText = string.Empty;
     bool isDisposed;
     readonly ILogger<Parlay> logger;
@@ -86,6 +86,30 @@ public sealed class Parlay :
             if (creators == value)
                 return;
             creators = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ParlayStringTableEntry? EditingEntry
+    {
+        get => editingEntry;
+        set
+        {
+            if (editingEntry?.Hash == value?.Hash)
+                return;
+            editingEntry = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string EditingEntryTranslation
+    {
+        get => editingEntryTranslation;
+        set
+        {
+            if (editingEntryTranslation == value)
+                return;
+            editingEntryTranslation = value;
             OnPropertyChanged();
         }
     }

@@ -6,6 +6,10 @@ public interface IParlay :
 {
     string? Creators { get; }
 
+    ParlayStringTableEntry? EditingEntry { get; set; }
+
+    string EditingEntryTranslation { get; set; }
+
     string EntrySearchText { get; set; }
 
     string? MessageFromCreators { get; }

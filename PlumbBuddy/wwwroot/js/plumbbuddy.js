@@ -410,6 +410,10 @@ window.mudTableCommitAndMove = (editingRowSelector, addend) => {
     }
 };
 
+window.mudTableClickRow = (tableSelector, rowIndex) => {
+    Array.from(document.querySelector(`${tableSelector} tbody`).children)[rowIndex].click();
+};
+
 window.registerExternalLinkHandler = handlerInstance =>
     document.body.addEventListener('click', e => {
         if (e.target.tagName === 'A' && e.target.href && !e.target.href.startsWith(window.location.origin)) {
