@@ -64,9 +64,11 @@ public partial class Archivist :
     bool isDisposed;
     readonly ILogger<Archivist> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
-    AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
+    AsyncProducerConsumerQueue<(string path, bool manuallyAdded)>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
+    bool savesFolderScanned;
+    string savesFolderPath = string.Empty;
     Chronicle? selectedChronicle;
     readonly ISettings settings;
     string snapshotsSearchText = string.Empty;
@@ -140,7 +142,7 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(fileSystemInfo);
         return pathsProcessingQueue is null
             ? Task.CompletedTask
-            : pathsProcessingQueue.EnqueueAsync(fileSystemInfo.FullName);
+            : pathsProcessingQueue.EnqueueAsync((fileSystemInfo.FullName, true));
     }
 
     void ConnectToFolders() =>
@@ -181,6 +183,7 @@ public partial class Archivist :
         fileSystemWatcher = new FileSystemWatcher(userDataFolder.FullName)
         {
             IncludeSubdirectories = true,
+            InternalBufferSize = 64 * 1024,
             NotifyFilter =
                   NotifyFilters.CreationTime
                 | NotifyFilters.DirectoryName
@@ -190,6 +193,7 @@ public partial class Archivist :
         };
         fileSystemWatcher.Changed += HandleFileSystemWatcherChanged;
         fileSystemWatcher.Created += HandleFileSystemWatcherCreated;
+        fileSystemWatcher.Deleted += HandleFileSystemWatcherDeleted;
         fileSystemWatcher.Error += HandleFileSystemWatcherError;
         fileSystemWatcher.Renamed += HandleFileSystemWatcherRenamed;
         fileSystemWatcher.EnableRaisingEvents = true;
@@ -215,7 +219,11 @@ public partial class Archivist :
             }
         }
         if (settings.ArchivistAutoIngestSaves)
-            await pathsProcessingQueue.EnqueueAsync(Path.Combine(userDataFolder.FullName, "saves")).ConfigureAwait(false);
+        {
+            savesFolderPath = Path.GetFullPath(Path.Combine(userDataFolder.FullName, "saves"));
+            if (Directory.Exists(savesFolderPath))
+                await pathsProcessingQueue.EnqueueAsync((savesFolderPath, false)).ConfigureAwait(false);
+        }
     }
 
     void DisconnectFromFolders() =>
@@ -228,6 +236,7 @@ public partial class Archivist :
         {
             fileSystemWatcher.Changed -= HandleFileSystemWatcherChanged;
             fileSystemWatcher.Created -= HandleFileSystemWatcherCreated;
+            fileSystemWatcher.Deleted -= HandleFileSystemWatcherDeleted;
             fileSystemWatcher.Error -= HandleFileSystemWatcherError;
             fileSystemWatcher.Renamed -= HandleFileSystemWatcherRenamed;
             fileSystemWatcher.Dispose();
@@ -257,46 +266,16 @@ public partial class Archivist :
         }
     }
 
-    void HandleFileSystemWatcherChanged(object sender, FileSystemEventArgs e)
-    {
-        if (fileSystemWatcher is null)
-            return;
-        if (File.Exists(e.FullPath)
-            && new FileInfo(e.FullPath) is { } fileInfo
-            && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists
-            && fileInfo.Directory is { } filedirectoryInfo
-            && filedirectoryInfo.Name == "saves"
-            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
-            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
-        if (Directory.Exists(e.FullPath)
-            && new DirectoryInfo(e.FullPath) is { } directoryInfo
-            && directoryInfo.Name == "saves"
-            && directoryInfo.Parent is { } nextDirectoryInfo
-            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
-    }
+    void HandleFileSystemWatcherChanged(object sender, FileSystemEventArgs e) =>
+        pathsProcessingQueue?.Enqueue((e.FullPath, false));
 
-    void HandleFileSystemWatcherCreated(object sender, FileSystemEventArgs e)
+    void HandleFileSystemWatcherCreated(object sender, FileSystemEventArgs e) =>
+        pathsProcessingQueue?.Enqueue((e.FullPath, false));
+
+    void HandleFileSystemWatcherDeleted(object sender, FileSystemEventArgs e)
     {
-        if (fileSystemWatcher is null)
-            return;
-        if (File.Exists(e.FullPath)
-            && new FileInfo(e.FullPath) is { } fileInfo
-            && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists
-            && fileInfo.Directory is { } filedirectoryInfo
-            && filedirectoryInfo.Name == "saves"
-            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
-            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
-        if (Directory.Exists(e.FullPath)
-            && new DirectoryInfo(e.FullPath) is { } directoryInfo
-            && directoryInfo.Name == "saves"
-            && directoryInfo.Parent is { } nextDirectoryInfo
-            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
+        if (Path.GetFullPath(e.FullPath) == savesFolderPath)
+            savesFolderScanned = false;
     }
 
     void HandleFileSystemWatcherError(object sender, ErrorEventArgs e)
@@ -307,23 +286,9 @@ public partial class Archivist :
 
     void HandleFileSystemWatcherRenamed(object sender, RenamedEventArgs e)
     {
-        if (fileSystemWatcher is null)
-            return;
-        if (File.Exists(e.FullPath)
-            && new FileInfo(e.FullPath) is { } fileInfo
-            && extensions.Contains(fileInfo.Extension)
-            && fileInfo.Exists
-            && fileInfo.Directory is { } filedirectoryInfo
-            && filedirectoryInfo.Name == "saves"
-            && filedirectoryInfo.Parent is { } fileNextDirectoryInfo
-            && Path.GetFullPath(fileNextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
-        if (Directory.Exists(e.FullPath)
-            && new DirectoryInfo(e.FullPath) is { } directoryInfo
-            && directoryInfo.Name == "saves"
-            && directoryInfo.Parent is { } nextDirectoryInfo
-            && Path.GetFullPath(nextDirectoryInfo.FullName) == Path.GetFullPath(settings.UserDataFolderPath))
-            pathsProcessingQueue?.Enqueue(e.FullPath);
+        if (Path.GetFullPath(e.OldFullPath) == savesFolderPath)
+            savesFolderScanned = false;
+        pathsProcessingQueue?.Enqueue((e.FullPath, false));
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -334,7 +299,7 @@ public partial class Archivist :
         else if (e.PropertyName is nameof(ISettings.ArchivistAutoIngestSaves))
         {
             if (settings.ArchivistAutoIngestSaves)
-                pathsProcessingQueue?.Enqueue(Path.Combine(settings.UserDataFolderPath, "saves"));
+                pathsProcessingQueue?.Enqueue((Path.Combine(settings.UserDataFolderPath, "saves"), false));
         }
         else if (e.PropertyName is nameof(ISettings.ArchivistEnabled))
         {
@@ -367,19 +332,16 @@ public partial class Archivist :
 
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
-    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, bool isSingleEnqueuedFile, bool gameWasRunningAtStart)
+    async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, DateTime? gameStarted)
     {
         DataBasePackedFile? package = null;
         try
         {
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Wait";
-            var wasLive =
-                   isInSavesDirectory
-                && isSingleEnqueuedFile
-                && gameWasRunningAtStart;
+            DiagnosticStatus = $"{fileInfo.Name} / Wait";
             fileInfo.Refresh();
             var length = fileInfo.Length;
-            while (gameWasRunningAtStart)
+            while (gameStarted is not null
+                && fileInfo.LastWriteTime > gameStarted)
             {
                 await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
                 fileInfo.Refresh();
@@ -388,7 +350,10 @@ public partial class Archivist :
                     break;
                 length = newLength;
             }
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / SHA256 Package";
+            var wasLive = isInSavesDirectory
+                && gameStarted is not null
+                && fileInfo.LastWriteTime > gameStarted;
+            DiagnosticStatus = $"{fileInfo.Name} / SHA256 Package";
             var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
             if (chronicles.Any(c => c.Snapshots.Any(s => s.OriginalPackageSha256.SequenceEqual(fileHash) || s.EnhancedPackageSha256.SequenceEqual(fileHash))))
                 return;
@@ -399,7 +364,7 @@ public partial class Archivist :
             if (saveGameDataKeys.Length is <= 0 or >= 2)
                 throw new FormatException("save package contains invalid number of save game data resources");
             var saveGameDataKey = saveGameDataKeys[0];
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Deserialize SGD";
+            DiagnosticStatus = $"{fileInfo.Name} / Deserialize SGD";
             var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
             if (saveGameData.SaveSlot is not { } saveSlot
                 || saveGameData.Account is not { } account)
@@ -432,7 +397,7 @@ public partial class Archivist :
                 };
                 await chronicleDbContext.ChroniclePropertySets.AddAsync(chroniclePropertySet).ConfigureAwait(false);
             }
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Last Snapshot";
+            DiagnosticStatus = $"{fileInfo.Name} / Last Snapshot";
             var lastSnapshot = await chronicleDbContext.SavePackageSnapshots
                 .OrderByDescending(s => s.Id)
                 .FirstOrDefaultAsync()
@@ -500,7 +465,7 @@ public partial class Archivist :
                         SavePackageResource? resource = null;
                         if (lastSnapshot is not null)
                         {
-                            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Load Prev {key}";
+                            DiagnosticStatus = $"{fileInfo.Name} / Load Prev {key}";
                             using var supplementaryChronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                             resource = await supplementaryChronicleDbContext.SavePackageResources.FirstOrDefaultAsync(spr => spr.Snapshots!.Any(sps => sps.Id == lastSnapshot.Id) && spr.Key == keyBytes).ConfigureAwait(false);
                             if (resource is not null)
@@ -512,7 +477,7 @@ public partial class Archivist :
                         }
                         if (resource is not null)
                         {
-                            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Delta Gen {key}";
+                            DiagnosticStatus = $"{fileInfo.Name} / Delta Gen {key}";
                             var previousContent = await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false);
                             var previousCompressionType = resource.CompressionType;
                             if (!previousContent.Span.SequenceEqual(content.Span))
@@ -523,7 +488,7 @@ public partial class Archivist :
                                 resource.ContentZLib = compressedContent;
                                 resource.ContentSize = content.Length;
                                 resource.CompressionType = compressionType;
-                                DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Comp Delta {key}";
+                                DiagnosticStatus = $"{fileInfo.Name} / Comp Delta {key}";
                                 var patchZlib = (await DataBasePackedFile.ZLibCompressAsync(patch).ConfigureAwait(false)).ToArray();
                                 using var heldContextLockForAddDelta = await contextLock.LockAsync().ConfigureAwait(false);
                                 await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
@@ -557,7 +522,7 @@ public partial class Archivist :
                 })).ConfigureAwait(false);
             if (wasLive)
             {
-                DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Live";
+                DiagnosticStatus = $"{fileInfo.Name} / Live";
                 newSnapshot.WasLive = true;
                 using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 await foreach (var modFile in pbDbContext.ModFiles
@@ -599,7 +564,7 @@ public partial class Archivist :
                 && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                 || !customThumbnail.IsEmpty))
             {
-                DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Customize";
+                DiagnosticStatus = $"{fileInfo.Name} / Customize";
                 if (chroniclePropertySet.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
                     && saveSlot.SlotName != gameNameOverride)
                 {
@@ -619,7 +584,7 @@ public partial class Archivist :
                 enhancedPackageMemoryStream.Seek(0, SeekOrigin.Begin);
             }
             await package.DisposeAsync().ConfigureAwait(false);
-            DiagnosticStatus = $"{(isSingleEnqueuedFile ? "Single" : "Batch")}: {fileInfo.Name} / Commit";
+            DiagnosticStatus = $"{fileInfo.Name} / Commit";
             await chronicleDbContext.SavePackageSnapshots.AddAsync(newSnapshot).ConfigureAwait(false);
             await chronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
             if (enhancedPackageMemoryStream is not null)
@@ -677,9 +642,9 @@ public partial class Archivist :
             return;
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
-            var nomNom = new Queue<string>();
-            var alreadyNom = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            nomNom.Enqueue(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
+            var list = new List<(string path, bool manuallyAdded)>();
+            var alreadyNomed = new Dictionary<string, bool>();
+            list.Add(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
             while (true)
             {
                 try
@@ -695,12 +660,14 @@ public partial class Archivist :
                 {
                     while (await pathsProcessingQueue.OutputAvailableAsync(new CancellationToken(true)).ConfigureAwait(false))
                     {
-                        var path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
-                        if (!alreadyNom.Contains(path))
+                        var (path, manuallyAdded) = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
+                        if (!alreadyNomed.TryGetValue(path, out var alreadyManuallyAdded))
                         {
-                            nomNom.Enqueue(path);
-                            alreadyNom.Add(path);
+                            list.Add((path, manuallyAdded));
+                            continue;
                         }
+                        if (manuallyAdded && !alreadyManuallyAdded)
+                            list[list.FindIndex(t => t.path == path)] = (path, true);
                     }
                 }
                 catch (OperationCanceledException)
@@ -708,17 +675,19 @@ public partial class Archivist :
                     continue;
                 }
             }
+            var nomNom = new Queue<(string path, bool manuallyAdded)>(list);
             try
             {
                 if (settings.ArchivistEnabled)
                 {
                     State = ArchivistState.Ingesting;
-                    var gameWasRunningAtStart = await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is not null;
+                    var gameStarted = (await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false))?.StartTime;
                     try
                     {
                         var savesDirectoryPath = Path.GetFullPath(Path.Combine(settings.UserDataFolderPath, "saves"));
-                        while (settings.ArchivistEnabled && nomNom.TryDequeue(out var path))
+                        while (settings.ArchivistEnabled && nomNom.TryDequeue(out var tuple))
                         {
+                            var (path, manuallyAdded) = tuple;
                             FileSystemInfo? fileSystemInfo = File.Exists(path)
                                 ? new FileInfo(path)
                                 : Directory.Exists(path)
@@ -731,16 +700,19 @@ public partial class Archivist :
                                 : fileSystemInfo is DirectoryInfo directoryInfo
                                 ? directoryInfo.FullName
                                 : string.Empty);
-                            if (isInSavesDirectory
-                                && !settings.ArchivistAutoIngestSaves)
-                                continue;
-                            if (isInSavesDirectory
-                                && modsDirectoryCataloger.State is not (ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping))
+                            if (isInSavesDirectory)
                             {
-                                State = ArchivistState.AwaitingModCataloging;
-                                await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
-                                State = ArchivistState.Ingesting;
+                                if (!settings.ArchivistAutoIngestSaves)
+                                    continue;
+                                if (modsDirectoryCataloger.State is not (ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping))
+                                {
+                                    State = ArchivistState.AwaitingModCataloging;
+                                    await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+                                    State = ArchivistState.Ingesting;
+                                }
                             }
+                            else if (!manuallyAdded)
+                                continue;
                             var savesDirectoryInfo = new DirectoryInfo(savesDirectoryPath);
                             var singleSaveFile = new FileInfo(path);
                             if (singleSaveFile.Exists
@@ -748,9 +720,16 @@ public partial class Archivist :
                                 && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(singleSaveFile.Name)))
                             {
                                 DiagnosticStatus = $"Single: {singleSaveFile.Name}";
-                                await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, true, gameWasRunningAtStart).ConfigureAwait(false);
+                                await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, gameStarted).ConfigureAwait(false);
                             }
                             else if (Directory.Exists(path))
+                            {
+                                if (isInSavesDirectory)
+                                {
+                                    if (savesFolderScanned)
+                                        continue;
+                                    savesFolderScanned = true;
+                                }
                                 foreach (var directoryFileInfo in new DirectoryInfo(path)
                                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
                                     .Where(file => extensions.Contains(file.Extension) && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name)))
@@ -758,12 +737,13 @@ public partial class Archivist :
                                     .ToImmutableArray())
                                 {
                                     DiagnosticStatus = $"Batch: {directoryFileInfo.Name}";
-                                    await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, false, gameWasRunningAtStart).ConfigureAwait(false);
+                                    await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, gameStarted).ConfigureAwait(false);
                                     if (!settings.ArchivistEnabled
                                         || isInSavesDirectory
                                         && !settings.ArchivistAutoIngestSaves)
                                         break;
                                 }
+                            }
                         }
                     }
                     finally

@@ -436,6 +436,7 @@ public partial class SmartSimObserver :
                     installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
                     {
                         IncludeSubdirectories = true,
+                        InternalBufferSize = 64 * 1024,
                         NotifyFilter =
                               NotifyFilters.CreationTime
                             | NotifyFilters.DirectoryName
@@ -549,6 +550,7 @@ public partial class SmartSimObserver :
                 userDataDirectoryWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
                 {
                     IncludeSubdirectories = true,
+                    InternalBufferSize = 64 * 1024,
                     NotifyFilter =
                           NotifyFilters.CreationTime
                         | NotifyFilters.DirectoryName
