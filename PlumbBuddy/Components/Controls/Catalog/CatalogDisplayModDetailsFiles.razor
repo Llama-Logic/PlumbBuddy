@@ -49,20 +49,13 @@
 						<MudGrid Spacing="0">
 							@foreach (var translator in context.Item1.Translators)
 							{
-								var countryCode = translator.Language;
-								try
-								{
-									countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
-								}
-								catch
-								{
-								}
+								(3 + 2).ToString();
 								<MudItem>
 									<MudTooltip Arrow Text="@(translator.Culture?.NativeName)">
 										<MudChip Value="@translator.Name">
 											<AvatarContent>
 												<MudAvatar>
-													<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
+													<SVGFlag CountryCode="@(Utilities.GetCountryCodeFromLanguageIdentifier(translator.Language))" FlagType="FlagType.Square" />
 												</MudAvatar>
 											</AvatarContent>
 										</MudChip>

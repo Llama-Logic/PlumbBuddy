@@ -109,18 +109,10 @@
 			<MudField Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.TranslateVariant" HelperText="@(AppText.ManifestComponentEditor_CreditedTranslators_HelperText)" Label="@(AppText.ManifestComponentEditor_CreditedTranslators_Label)" Variant="Variant.Filled">
 				@foreach (var translator in Translators)
 				{
-					var countryCode = translator.language.Name;
-					try
-					{
-						countryCode = new RegionInfo(countryCode).TwoLetterISORegionName;
-					}
-					catch
-					{
-					}
 					<MudChip T="string" Color="Color.Tertiary" OnClose="HandleTranslatorChipClosedAsync" Tag="@translator" Value="@(translator.name)">
 						<AvatarContent>
 							<MudAvatar>
-								<SVGFlag CountryCode="@countryCode" FlagType="FlagType.Square" />
+								<SVGFlag CountryCode="@(Utilities.GetCountryCodeFromLanguageIdentifier(translator.language.Name))" FlagType="FlagType.Square" />
 							</MudAvatar>
 						</AvatarContent>
 					</MudChip>
