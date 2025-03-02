@@ -22,7 +22,7 @@
 				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Outline.TextBoxSearch" OnClick="ShowTranslationPackageFileAsync" />
 			</MudTooltip>
 			<MudTooltip Color="Color.Secondary" Text="@(AppText.Parlay_MergeTranslationStringTable_Tip)">
-				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null)" Icon="@MaterialDesignIcons.Normal.TableArrowLeft" OnClick="MergeStringTableAsync" />
+				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null || Observed(() => Parlay.EditingEntry) is not null)" Icon="@MaterialDesignIcons.Normal.TableArrowLeft" OnClick="MergeStringTableAsync" />
 			</MudTooltip>
 		</MudStack>
 	</MudItem>

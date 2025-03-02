@@ -47,7 +47,7 @@
 		</MudTd>
 		<MudTd DataLabel="@(AppText.Parlay_StringTable_Header_Translation)" Class="table-cell-align-top">
 			<div class="parlay-string-display">
-				@ParlayStringTable.HighlightForDisplay(context.Translation)
+				@ParlayStringTable.HighlightForDisplay(Observed(() => context.Translation))
 			</div>
 		</MudTd>
 	</RowTemplate>
