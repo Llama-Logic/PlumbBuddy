@@ -22,6 +22,8 @@ static class Utilities
         return language switch
         {
             "DA" => "DK", // Danish => Denmark
+            "JA" => "JP", // Japanese => Japan
+            "KO" => "KR", // Korean => Korea
             "NB" => "NO", // Norwegian => Norway
             _ => language
         };
