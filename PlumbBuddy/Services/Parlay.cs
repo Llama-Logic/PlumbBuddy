@@ -359,6 +359,7 @@ public sealed class Parlay :
             var packagesToRemove = packages
                 .ToDictionary(p => p.ModFilePath);
             var signedStringTableResourceType = unchecked((int)(uint)ResourceType.StringTable);
+            await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
             var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             await foreach (var packageRecord in pbDbContext.ModFiles
                 .Where(mf => !mf.Path.EndsWith(".l10n.package")

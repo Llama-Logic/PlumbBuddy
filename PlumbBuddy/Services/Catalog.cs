@@ -97,6 +97,7 @@ public class Catalog :
     {
         var userDataFolderPath = settings.UserDataFolderPath;
         var mods = new Dictionary<CatalogModKey, List<CatalogModValue>>();
+        await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
