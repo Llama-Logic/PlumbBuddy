@@ -5,20 +5,16 @@ partial class ParlayStringTable
     [GeneratedRegex(@"\\.")]
     private static partial Regex GetEscapeSequencePattern();
 
-    [GeneratedRegex(@"\{F\d+\..*?\}")]
-    private static partial Regex GetFemaleTokenPattern();
+    [GeneratedRegex(@"&lt;.*?&gt;")]
+    private static partial Regex GetMarkupFormattingPattern();
 
-    [GeneratedRegex(@"\{M\d+\..*?\}")]
-    private static partial Regex GetMaleTokenPattern();
-
-    [GeneratedRegex(@"\{\d+\..*?\}")]
+    [GeneratedRegex(@"\{[A-Z]*?\d+\..*?\}")]
     private static partial Regex GetTokenPattern();
 
     public static MarkupString HighlightForDisplay(string text)
     {
         text = WebUtility.HtmlEncode(text);
-        text = GetMaleTokenPattern().Replace(text, $"<span class=\"male-token\">$0</span>");
-        text = GetFemaleTokenPattern().Replace(text, $"<span class=\"female-token\">$0</span>");
+        text = GetMarkupFormattingPattern().Replace(text, $"<span class=\"markup-formatting\">$0</span>");
         text = GetTokenPattern().Replace(text, $"<span class=\"token\">$0</span>");
         text = GetEscapeSequencePattern().Replace(text, $"<span class=\"escape-sequence\">$0</span>");
         return new(text);

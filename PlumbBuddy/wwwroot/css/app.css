@@ -382,24 +382,19 @@ div.monaco-editor span.mtk1 {
     white-space: pre-line;
 }
 
-/* male token */
-.parlay-string-display .male-token, div[data-mode-id='ts4-stbl'] span.mtk4 {
-    color: var(--mud-palette-info);
-}
-
-/* female token */
-.parlay-string-display .female-token, div[data-mode-id='ts4-stbl'] span.mtk3 {
-    color: var(--mud-palette-success);
-}
-
-/* ungendered token */
-.parlay-string-display .token, div[data-mode-id='ts4-stbl'] span.mtk5 {
-    color: var(--mud-palette-secondary);
-}
-
 /* escape sequences */
 .parlay-string-display .escape-sequence, div[data-mode-id='ts4-stbl'] span.mtk2 {
     color: var(--mud-palette-primary);
+}
+
+/* markup formatting */
+.parlay-string-display .markup-formatting, div[data-mode-id='ts4-stbl'] span.mtk3 {
+    color: var(--mud-palette-success);
+}
+
+/* token */
+.parlay-string-display .token, div[data-mode-id='ts4-stbl'] span.mtk4 {
+    color: var(--mud-palette-secondary);
 }
 
 .parlay-editor {

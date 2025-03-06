@@ -29,10 +29,9 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
         monaco.languages.setMonarchTokensProvider("ts4-stbl", {
             tokenizer: {
                 root: [
-                    [/\{M.*?\}/, "male-token"],
-                    [/\{F.*?\}/, "female-token"],
-                    [/\{.*?\}/, "token"],
-                    [/\\./, "escape-sequence"],
+                    [/\{[A-Z]*?\d+\..*?\}/gm, "token"],
+                    [/<.*?>/gm, "markup-formatting"],
+                    [/\\./gm, "escape-sequence"],
                 ],
             },
         });
@@ -40,9 +39,8 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
             base: "vs-dark",
             inherit: false,
             rules: [
-                { token: "male-token", foreground: "#66aaff" },
-                { token: "female-token", foreground: "#ffaa66" },
                 { token: "token", foreground: "#66cccc" },
+                { token: "markup-formatting", foreground: "#ffaa66" },
                 { token: "escape-sequence", foreground: "#44dd88" },
             ],
             colors: {
@@ -180,6 +178,15 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                         label: "ObjectDescription",
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         insertText: "{${1:0}.ObjectDescription}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
+                        label: "ObjectName",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{${1:0}.ObjectName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
@@ -378,6 +385,33 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                         label: "Male/Female Pair",
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         insertText: "{M${1:0}.${2:for him}}{F${1:0}.${3:for her}}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
+                        label: "Teen/Adults Pair",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{T${1:0}.${2:for teen}}{DAE${1:0}.${3:for adults}}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
+                        label: "Singular/Plural Pair",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{S${1:0}.${2:for him or her}}{P${1:0}.${3:for them}}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
+                        label: "Gender Trio",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{M${1:0}.${2:for him}}{F${1:0}.${3:for her}}{N${1:0}.${4:for them}}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
