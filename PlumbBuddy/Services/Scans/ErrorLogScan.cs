@@ -54,7 +54,16 @@ public sealed class ErrorLogScan :
                         if (foundErrorLogs.Length is 1)
                         {
                             if (await dialogService.ShowCautionDialogAsync(AppText.Scan_ErrorLog_Delete_Caution_Caption, AppText.Scan_ErrorLog_Delete_Caution_Text).ConfigureAwait(false))
-                                file.Delete();
+                            {
+                                file.Refresh();
+                                try
+                                {
+                                    file.Delete();
+                                }
+                                catch
+                                {
+                                }
+                            }
                             return;
                         }
                         if (await dialogService.ShowDeleteErrorLogsDialogAsync(foundErrorLogs, [userDataRelativePath]).ConfigureAwait(false) is { } deleteErrorLogsPaths)
