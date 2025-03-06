@@ -515,12 +515,15 @@ public sealed class Parlay :
                         : CultureInfo.GetCultureInfo("en-US");
                     translationStringTableKey = SmartSimUtilities.GetStringTableResourceKey(repurposingMaxisLocale, originalStringTableKey.Group, originalStringTableKey.FullInstance);
                 }
-                if (TranslationPackageFile is { } translationPackageFile
-                    && translationPackageFile.Exists)
+                if (TranslationPackageFile is { } translationPackageFile)
                 {
-                    using var translationPackage = await DataBasePackedFile.FromPathAsync(translationPackageFile.FullName).ConfigureAwait(false);
-                    if (await translationPackage.ContainsKeyAsync(translationStringTableKey))
-                        translationStbl = await translationPackage.GetModelAsync<StringTableModel>(translationStringTableKey).ConfigureAwait(false);
+                    translationPackageFile.Refresh();
+                    if (translationPackageFile.Exists)
+                    {
+                        using var translationPackage = await DataBasePackedFile.FromPathAsync(translationPackageFile.FullName).ConfigureAwait(false);
+                        if (await translationPackage.ContainsKeyAsync(translationStringTableKey))
+                            translationStbl = await translationPackage.GetModelAsync<StringTableModel>(translationStringTableKey).ConfigureAwait(false);
+                    }
                 }
             }
             stringTableEntries = [..originalStbl.KeyHashes.Select(hash => new ParlayStringTableEntry(this, hash, originalStbl.Get(hash), translationStbl?.Get(hash) ?? string.Empty))];
