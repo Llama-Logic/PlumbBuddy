@@ -19,6 +19,7 @@ static class Configuration
         services.AddSingleton<ICatalog, Catalog>();
         services.AddSingleton<IArchivist, Archivist>();
         services.AddSingleton<IParlay, Parlay>();
+        services.AddSingleton<IModHoundClient, ModHoundClient>();
         return services;
     }
 }

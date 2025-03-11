@@ -130,6 +130,9 @@ partial class PlatformFunctions :
         GetDotLocalizedPattern()
     ];
 
+    public string HostOperatingSystemUserAgentName =>
+        "Windows";
+
     public bool IsGameProcessOptimizationSupported =>
         true;
 

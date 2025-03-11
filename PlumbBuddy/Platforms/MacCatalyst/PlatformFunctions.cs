@@ -85,6 +85,9 @@ partial class PlatformFunctions :
         GetThumbsDotDbPattern()
     ];
 
+    public string HostOperatingSystemUserAgentName =>
+        "macOS";
+
     public bool IsGameProcessOptimizationSupported =>
         false;
 

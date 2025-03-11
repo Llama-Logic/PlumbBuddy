@@ -25,6 +25,14 @@ public class PbDbContext :
     public DbSet<ModFileManifestResourceKey> ModFileManifestResourceKeys { get; set; }
     public DbSet<ModFileManifest> ModFileManifests { get; set; }
     public DbSet<ModFileManifestRepurposedLanguage> ModFileManifestRepurposedLanguages { get; set; }
+    public DbSet<ModHoundReport> ModHoundReports { get; set; }
+    public DbSet<ModHoundReportIncompatibilityRecord> ModHoundReportIncompatibilityRecords { get; set; }
+    public DbSet<ModHoundReportIncompatibilityRecordPart> ModHoundReportIncompatibilityRecordParts { get; set; }
+    public DbSet<ModHoundReportMissingRequirementsRecord> ModHoundReportMissingRequirementsRecords { get; set; }
+    public DbSet<ModHoundReportMissingRequirementsRecordDependency> ModHoundReportMissingRequirementsRecordDependencies { get; set; }
+    public DbSet<ModHoundReportMissingRequirementsRecordDependent> ModHoundReportMissingRequirementsRecordDependents { get; set; }
+    public DbSet<ModHoundReportNotTrackedRecord> ModHoundReportNotTrackedRecords { get; set; }
+    public DbSet<ModHoundReportRecord> ModHoundReportRecords { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
     public DbSet<RequirementIdentifier> RequirementIdentifiers { get; set; }
@@ -45,6 +53,12 @@ public class PbDbContext :
     {
         base.OnModelCreating(modelBuilder);
         ArgumentNullException.ThrowIfNull(modelBuilder);
+
+        var dtoConverter = new ValueConverter<DateTimeOffset, long>
+        (
+            v => v.ToUnixTimeSeconds(),
+            v => DateTimeOffset.FromUnixTimeSeconds(v)
+        );
 
         var nullableUriValueConverter = new ValueConverter<Uri?, string?>
         (
@@ -74,6 +88,19 @@ public class PbDbContext :
             .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<ModFileManifest>()
             .Property(e => e.TranslationSubmissionUrl)
+            .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModHoundReport>()
+            .Property(e => e.RequestSha256)
+            .HasMaxLength(32)
+            .IsFixedLength(true);
+        modelBuilder.Entity<ModHoundReport>()
+            .Property(e => e.Retrieved)
+            .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModHoundReportMissingRequirementsRecordDependency>()
+            .Property(e => e.ModLinkOrIndexHref)
+            .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModHoundReportRecord>()
+            .Property(e => e.ModLinkOrIndexHref)
             .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<RequiredMod>()
             .Property(e => e.Url)

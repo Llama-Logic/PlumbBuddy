@@ -83,7 +83,7 @@ public sealed class UpdateManager :
     {
         try
         {
-            var releases = await new GitHubClient(new ProductHeaderValue("PlumbBuddy.app")).Repository.Release.GetAll("Llama-Logic", "PlumbBuddy");
+            var releases = await new GitHubClient(new Octokit.ProductHeaderValue("PlumbBuddy.app")).Repository.Release.GetAll("Llama-Logic", "PlumbBuddy");
             var latestMostStableRelease = releases
                 .OrderBy(release => release.TagName switch
                 {

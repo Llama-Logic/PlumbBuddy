@@ -9,6 +9,17 @@ public interface IPlatformFunctions :
     StringComparison FileSystemStringComparison { get; }
     IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> ForeignFileNamePatterns { get; }
+    string HostOperatingSystemUserAgentName { get; }
+
+    string UserAgent
+    {
+        get
+        {
+            var mauiVersion = AppInfo.Version;
+            var llpVersion = typeof(DataBasePackedFile).Assembly.GetName().Version;
+            return $"PlumbBuddy/{mauiVersion.Major}.{mauiVersion.Minor}.{mauiVersion.Build} ({HostOperatingSystemUserAgentName} {DeviceInfo.VersionString}; {RuntimeInformation.ProcessArchitecture}) NETCLR/{RuntimeInformation.FrameworkDescription.Split(' ')[1]} (.NET Core CLR; MAUI Blazor Hybrid){(llpVersion is null ? string.Empty : $" LLP/{llpVersion.Major}.{llpVersion.Minor}.{llpVersion.Build}")}";
+        }
+    }
 
     nint DefaultProcessorAffinity { get; }
     bool IsGameProcessOptimizationSupported { get; }
