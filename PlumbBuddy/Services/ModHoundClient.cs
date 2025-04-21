@@ -25,43 +25,274 @@ public class ModHoundClient :
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
         requestLock = new();
+        availableReports = [];
+        AvailableReports = new(availableReports);
+        searchText = string.Empty;
+        selectedReportIncompatibilityRecords = [];
+        SelectedReportIncompatibilityRecords = new(selectedReportIncompatibilityRecords);
+        selectedReportIncompatibilityRecordsLock = new();
+        selectedReportMissingRequirementsRecords = [];
+        SelectedReportMissingRequirementsRecords = new(selectedReportMissingRequirementsRecords);
+        selectedReportMissingRequirementsRecordsLock = new();
+        LoadAvailableReports();
     }
 
+    readonly ObservableCollection<ModHoundReportSelection> availableReports;
+    int? brokenObsoleteCount;
+    int? duplicatesCount;
+    int? incompatibleCount;
     readonly ILogger<ModHoundClient> logger;
+    int? missingRequirementsCount;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
+    int? notTrackedCount;
+    int? outdatedCount;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    int? processingCurrent;
-    int? processingTotal;
+    int? progressValue;
+    int? progressMax;
     readonly AsyncLock requestLock;
+    int? requestPhase;
+    string searchText;
+    ModHoundReportSelection? selectedReport;
+    readonly ObservableCollection<ModHoundReportIncompatibilityRecord> selectedReportIncompatibilityRecords;
+    readonly AsyncLock selectedReportIncompatibilityRecordsLock;
+    readonly ObservableCollection<ModHoundReportMissingRequirementsRecord> selectedReportMissingRequirementsRecords;
+    readonly AsyncLock selectedReportMissingRequirementsRecordsLock;
+    string? selectedReportSection;
     readonly ISettings settings;
+    string? status;
     readonly ISuperSnacks superSnacks;
+    int? unknownStatusCount;
+    int? upToDateCount;
 
-    public int? ProcessingCurrent
+    public ReadOnlyObservableCollection<ModHoundReportSelection> AvailableReports { get; }
+
+    public int? BrokenObsoleteCount
     {
-        get => processingCurrent;
+        get => brokenObsoleteCount;
         private set
         {
-            if (processingCurrent == value)
+            if (brokenObsoleteCount == value)
                 return;
-            processingCurrent = value;
+            brokenObsoleteCount = value;
             OnPropertyChanged();
         }
     }
 
-    public int? ProcessingTotal
+    public int? DuplicatesCount
     {
-        get => processingTotal;
+        get => duplicatesCount;
         private set
         {
-            if (processingTotal == value)
+            if (duplicatesCount == value)
                 return;
-            processingTotal = value;
+            duplicatesCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? IncompatibleCount
+    {
+        get => incompatibleCount;
+        private set
+        {
+            if (incompatibleCount == value)
+                return;
+            incompatibleCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? MissingRequirementsCount
+    {
+        get => missingRequirementsCount;
+        private set
+        {
+            if (missingRequirementsCount == value)
+                return;
+            missingRequirementsCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? NotTrackedCount
+    {
+        get => notTrackedCount;
+        private set
+        {
+            if (notTrackedCount == value)
+                return;
+            notTrackedCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? OutdatedCount
+    {
+        get => outdatedCount;
+        private set
+        {
+            if (outdatedCount == value)
+                return;
+            outdatedCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? ProgressMax
+    {
+        get => progressMax;
+        private set
+        {
+            if (progressMax == value)
+                return;
+            progressMax = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? ProgressValue
+    {
+        get => progressValue;
+        private set
+        {
+            if (progressValue == value)
+                return;
+            progressValue = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? RequestPhase
+    {
+        get => requestPhase;
+        private set
+        {
+            if (requestPhase == value)
+                return;
+            requestPhase = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SearchText
+    {
+        get => searchText;
+        set
+        {
+            if (searchText == value)
+                return;
+            searchText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ModHoundReportSelection? SelectedReport
+    {
+        get => selectedReport;
+        set
+        {
+            if (selectedReport == value)
+                return;
+            selectedReport = value;
+            OnPropertyChanged();
+            UpdateSectionCounts();
+            UpdateSelectedReportIncompatibilityRecords();
+            UpdateSelectedReportMissingRequirementsRecords();
+        }
+    }
+
+    public ReadOnlyObservableCollection<ModHoundReportIncompatibilityRecord> SelectedReportIncompatibilityRecords { get; }
+
+    public ReadOnlyObservableCollection<ModHoundReportMissingRequirementsRecord> SelectedReportMissingRequirementsRecords { get; }
+
+    public string? SelectedReportSection
+    {
+        get => selectedReportSection;
+        set
+        {
+            if (selectedReportSection == value)
+                return;
+            selectedReportSection = value;
+            OnPropertyChanged();
+            UpdateSelectedReportIncompatibilityRecords();
+            UpdateSelectedReportMissingRequirementsRecords();
+        }
+    }
+
+    public string? Status
+    {
+        get => status;
+        private set
+        {
+            if (status == value)
+                return;
+            status = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? UnknownStatusCount
+    {
+        get => unknownStatusCount;
+        private set
+        {
+            if (unknownStatusCount == value)
+                return;
+            unknownStatusCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int? UpToDateCount
+    {
+        get => upToDateCount;
+        private set
+        {
+            if (upToDateCount == value)
+                return;
+            upToDateCount = value;
             OnPropertyChanged();
         }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    void ClearCounts()
+    {
+        BrokenObsoleteCount = null;
+        DuplicatesCount = null;
+        IncompatibleCount = null;
+        MissingRequirementsCount = null;
+        OutdatedCount = null;
+        UnknownStatusCount = null;
+        UpToDateCount = null;
+    }
+
+    void LoadAvailableReports() =>
+        _ = Task.Run(LoadAvailableReportsAsync);
+
+    async Task LoadAvailableReportsAsync()
+    {
+        var existingReports = availableReports.ToDictionary(mhrs => mhrs.Id);
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await foreach (var report in pbDbContext.ModHoundReports.AsAsyncEnumerable().ConfigureAwait(false))
+        {
+            var wasSelected = false;
+            if (existingReports.TryGetValue(report.Id, out var existingReport))
+            {
+                wasSelected = selectedReport == existingReport;
+                existingReports.Remove(report.Id);
+                availableReports.Remove(existingReport);
+            }
+            var newReport = new ModHoundReportSelection(report.Id, report.Retrieved);
+            availableReports.Add(newReport);
+            if (wasSelected)
+                SelectedReport = newReport;
+        }
+        foreach (var remainingReport in existingReports.Values)
+            availableReports.Remove(remainingReport);
+    }
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
@@ -89,7 +320,10 @@ public class ModHoundClient :
         }
         try
         {
+            Status = "Waiting for Mods Directory Cataloger";
+            RequestPhase = 1;
             await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+            Status = "Preparing Mod Hound Request";
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var postDirectoryRequestBodyObject = new
             {
@@ -130,9 +364,12 @@ public class ModHoundClient :
             var stalenessTime = DateTimeOffset.UtcNow.Subtract(freshnessDuration);
             if (await pbDbContext.ModHoundReports.Where(mhr => mhr.RequestSha256 == postDirectoryRequestBodyJsonSha256 && mhr.Retrieved >= stalenessTime).OrderByDescending(mhr => mhr.Retrieved).FirstOrDefaultAsync().ConfigureAwait(false) is { } freshIdenticalReport)
             {
-                superSnacks.OfferRefreshments(new MarkupString($"Good news, I already asked Mod Hound about this exact configuration of your Mods folder in the past {freshnessDuration.Humanize()}. I can just show you that report right now!"), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
+                if (availableReports.FirstOrDefault(mhrs => mhrs.Id == freshIdenticalReport.Id) is { } availableReport)
+                    SelectedReport = availableReport;
+                superSnacks.OfferRefreshments(new MarkupString($"Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {freshIdenticalReport.Retrieved.Humanize()}, which is still pretty fresh. I've selected that report for you for your convenience."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
                 return;
             }
+            Status = "Submitting Request to Mod Hound";
             var cookieContainer = new CookieContainer();
             using var httpClientHandler = new HttpClientHandler
             {
@@ -159,7 +396,11 @@ public class ModHoundClient :
             if (checkModFilesPageDocument.QuerySelector("meta[name=\"csrf-token\"]") is not { } csrfTokenMetaTag
                 || csrfTokenMetaTag.GetAttribute("content") is not { } csrfToken
                 || string.IsNullOrWhiteSpace(csrfToken))
+            {
+                logger.LogWarning($"Mod Hound's response from GET {visitorLoad} returned markup without a discoverable CSRF token");
+                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
+            }
             httpClient.DefaultRequestHeaders.Referrer = referer;
             httpClient.DefaultRequestHeaders.Add("X-CSRFToken", csrfToken);
             using var postDirectoryRequestBody = new StringContent(postDirectoryRequestBodyJson, new MediaTypeHeaderValue("application/json"));
@@ -181,6 +422,8 @@ public class ModHoundClient :
                 superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
+            Status = "Waiting for Mod Hound's Response";
+            RequestPhase = 2;
             GetTaskStatusResponse? lastTaskStatusResponse = null;
             var visitorTaskStatusUrl = $"/visitor/task-status/{taskId}";
             while (true)
@@ -206,11 +449,14 @@ public class ModHoundClient :
                 }
                 if (lastTaskStatusResponse.State is not (TaskStatusState.PENDING or TaskStatusState.STARTED or TaskStatusState.PROCESSING))
                     break;
-                ProcessingTotal = lastTaskStatusResponse.Total;
-                ProcessingCurrent = lastTaskStatusResponse.Current;
+                Status = $"Your Request {lastTaskStatusResponse.State switch { TaskStatusState.PENDING => "is Pending", TaskStatusState.STARTED => "has Started", _ => "is Being Processed" }}";
+                ProgressMax = lastTaskStatusResponse.Total;
+                ProgressValue = lastTaskStatusResponse.Current;
             }
-            ProcessingTotal = null;
-            ProcessingCurrent = null;
+            Status = "Reading Mod Hound's Response";
+            RequestPhase = 3;
+            ProgressMax = 9;
+            ProgressValue = 0;
             if (lastTaskStatusResponse is null)
                 return;
             if (lastTaskStatusResponse.State is TaskStatusState.FAILURE)
@@ -259,6 +505,7 @@ public class ModHoundClient :
             var records = new List<ModHoundReportRecord>();
             for (var i = 0; i <= 4; ++i)
             {
+                ++ProgressValue;
                 if (reportPageDocument.GetElementById(statusedRecordTableIds[i]) is not { } table)
                     continue;
                 var status = (ModHoundReportRecordStatus)i;
@@ -269,27 +516,42 @@ public class ModHoundClient :
                     var record = new ModHoundReportRecord()
                     {
                         CreatorName = htmlRecord.QuerySelector("td:nth-child(3)")?.TextContent.Trim() ?? string.Empty,
-                        FilePath = htmlRecord.QuerySelector("td:nth-child(1) > div[title]")?.GetAttribute("title") ?? string.Empty,
+                        FileName = htmlRecord.QuerySelector("td:nth-child(1)")?.TextContent?.Trim() ?? string.Empty,
+                        FilePath = htmlRecord.QuerySelector("td:nth-child(1) > div[title]")?.GetAttribute("title")?.Trim() ?? string.Empty,
                         ModName = htmlRecord.QuerySelector("td:nth-child(2)")?.TextContent.Trim() ?? string.Empty,
                         Status = status
                     };
+                    if (record.FilePath.StartsWith("Location:"))
+                        record.FilePath = record.FilePath[9..].Trim();
                     if (htmlRecord.QuerySelector("td:nth-child(5) > div[data-utc-time-date-only]")?.GetAttribute("data-utc-time-date-only") is { } dateOfInstalledFileStr
                         && !string.IsNullOrWhiteSpace(dateOfInstalledFileStr)
                         && DateTimeOffset.TryParse(dateOfInstalledFileStr, out var dateOfInstalledFile))
+                    {
                         record.DateOfInstalledFile = dateOfInstalledFile;
-                    else if (htmlRecord.QuerySelector("td:nth-child(5)")?.TextContent is { } lessPrecisedateOfInstalledFileStr
-                        && !string.IsNullOrWhiteSpace(lessPrecisedateOfInstalledFileStr)
-                        && DateTimeOffset.TryParse(lessPrecisedateOfInstalledFileStr.Trim(), out var lessPrecisedateOfInstalledFile))
-                        record.DateOfInstalledFile = lessPrecisedateOfInstalledFile;
+                        record.DateOfInstalledFileString = dateOfInstalledFile.ToLocalTime().ToString("g");
+                    }
+                    else if (htmlRecord.QuerySelector("td:nth-child(5)")?.TextContent is { } lessPreciseDateOfInstalledFileStr
+                        && !string.IsNullOrWhiteSpace(lessPreciseDateOfInstalledFileStr)
+                        && DateTimeOffset.TryParse(lessPreciseDateOfInstalledFileStr.Trim(), out var lessPreciseDateOfInstalledFile))
+                    {
+                        record.DateOfInstalledFile = lessPreciseDateOfInstalledFile;
+                        record.DateOfInstalledFileString = lessPreciseDateOfInstalledFile.ToString("d");
+                    }
                     if (htmlRecord.QuerySelector("td:nth-child(4) > div[data-utc-time-date-only]")?.GetAttribute("data-utc-time-date-only") is { } lastUpdateDateStr
                         && !string.IsNullOrWhiteSpace(lastUpdateDateStr)
                         && DateTimeOffset.TryParse(lastUpdateDateStr, out var lastUpdateDate))
+                    {
                         record.LastUpdateDate = lastUpdateDate;
+                        record.LastUpdateDateString = lastUpdateDate.ToLocalTime().ToString("g");
+                    }
                     else if (htmlRecord.QuerySelector("td:nth-child(4)")?.TextContent is { } lessPreciseLastUpdateDateStr
                         && !string.IsNullOrWhiteSpace(lessPreciseLastUpdateDateStr)
                         && DateTimeOffset.TryParse(lessPreciseLastUpdateDateStr, out var lessPreciseLastUpdateDate))
+                    {
                         record.LastUpdateDate = lessPreciseLastUpdateDate;
-                    if (htmlRecord.QuerySelector("td:nth-child(7)") is { } modLinkOrIndexCell)
+                        record.LastUpdateDateString = lessPreciseLastUpdateDate.ToString("d");
+                    }
+                    if (htmlRecord.QuerySelector("td:nth-last-child(2)") is { } modLinkOrIndexCell)
                     {
                         if (modLinkOrIndexCell.QuerySelector("div > a[href]") is { } modLinkOrIndexAnchor
                             && modLinkOrIndexAnchor.GetAttribute("href") is { } modLinkOrIndexHrefStr
@@ -300,13 +562,14 @@ public class ModHoundClient :
                             && !string.IsNullOrWhiteSpace(modLinkOrIndexText))
                             record.ModLinkOrIndexText = modLinkOrIndexText.Trim();
                     }
-                    if (htmlRecord.QuerySelector("td:nth-child(8)")?.TextContent is { } updateNotes
+                    if (htmlRecord.QuerySelector("td:nth-last-child(1)")?.TextContent is { } updateNotes
                         && !string.IsNullOrWhiteSpace(updateNotes))
                         record.UpdateNotes = updateNotes.Trim();
                     records.Add(record);
                 }
             }
             modHoundReport.Records = records;
+            ++ProgressValue;
             var incompatibilityRecords = new List<ModHoundReportIncompatibilityRecord>();
             if (reportPageDocument.GetElementById("incompsDetailsPane") is { } incompatibilityDetailsPane)
                 foreach (var orderedList in incompatibilityDetailsPane.QuerySelectorAll("ol"))
@@ -322,6 +585,7 @@ public class ModHoundClient :
                         incompatibilityRecords.Add(record);
                 }
             modHoundReport.IncompatibilityRecords = incompatibilityRecords;
+            ++ProgressValue;
             var missingRequirementsRecords = new List<ModHoundReportMissingRequirementsRecord>();
             if (reportPageDocument.GetElementById("missingreqsDetailsPane") is { } missingRequirementsDetailsPane)
                 foreach (var htmlRecord in missingRequirementsDetailsPane.QuerySelectorAll("div"))
@@ -364,6 +628,7 @@ public class ModHoundClient :
                         missingRequirementsRecords.Add(record);
                 }
             modHoundReport.MissingRequirementsRecords = missingRequirementsRecords;
+            ++ProgressValue;
             var notTrackedRecords = new List<ModHoundReportNotTrackedRecord>();
             if (reportPageDocument.GetElementById("nottrackedsTable") is { } notTrackedTable)
                 foreach (var htmlRecord in notTrackedTable.QuerySelectorAll("tbody > tr"))
@@ -381,12 +646,22 @@ public class ModHoundClient :
                     if (htmlRecord.QuerySelector("td:nth-child(3)")?.TextContent is { } fileDateStr
                         && !string.IsNullOrWhiteSpace(fileDateStr)
                         && DateTimeOffset.TryParse(fileDateStr.Trim(), out var fileDate))
+                    {
                         record.FileDate = fileDate;
+                        record.FileDateString = fileDate.ToString("d");
+                    }
                     notTrackedRecords.Add(record);
                 }
             modHoundReport.NotTrackedRecords = notTrackedRecords;
+            Status = "Saving Mod Hound Report";
+            RequestPhase = 4;
+            ProgressMax = null;
+            ProgressValue = null;
             await pbDbContext.ModHoundReports.AddAsync(modHoundReport).ConfigureAwait(false);
             await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await LoadAvailableReportsAsync().ConfigureAwait(false);
+            if (availableReports.FirstOrDefault(mhrs => mhrs.Id == modHoundReport.Id) is { } newlyAvailableReport)
+                SelectedReport = newlyAvailableReport;
             superSnacks.OfferRefreshments(new MarkupString($"Good news, your Mod Hound report is finished and ready to view!"), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableCheck);
         }
         catch (Exception ex)
@@ -397,8 +672,103 @@ public class ModHoundClient :
         }
         finally
         {
+            Status = null;
+            RequestPhase = null;
+            ProgressMax = null;
+            ProgressValue = null;
             requestLockHeld.Dispose();
         }
+    }
+
+    void UpdateSectionCounts() =>
+        _ = Task.Run(UpdateSectionCountsAsync);
+
+    async Task UpdateSectionCountsAsync()
+    {
+        if (selectedReport is not { } report)
+        {
+            ClearCounts();
+            return;
+        }
+        try
+        {
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            var counts = await pbDbContext.ModHoundReports
+                .Where(mhr => mhr.Id == report.Id)
+                .Select(mhr => new
+                {
+                    BrokenObsoleteCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.BrokenObsoleteMatches).Count(),
+                    DuplicatesCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.DuplicateMatches).Count(),
+                    IncompatibleCount = mhr.IncompatibilityRecords!.Count(),
+                    MissingRequirementsCount = mhr.MissingRequirementsRecords!.Count(),
+                    NotTrackedCount = mhr.NotTrackedRecords!.Count(),
+                    OutdatedCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.OutdatedMatches).Count(),
+                    UnknownStatusCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UnknownStatusMatches).Count(),
+                    UpToDateCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UpToDateOkayMatches).Count()
+                })
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            if (counts is null)
+            {
+                ClearCounts();
+                return;
+            }
+            BrokenObsoleteCount = counts.BrokenObsoleteCount;
+            DuplicatesCount = counts.DuplicatesCount;
+            IncompatibleCount = counts.IncompatibleCount;
+            MissingRequirementsCount = counts.MissingRequirementsCount;
+            NotTrackedCount = counts.NotTrackedCount;
+            OutdatedCount = counts.OutdatedCount;
+            UnknownStatusCount = counts.UnknownStatusCount;
+            UpToDateCount = counts.UpToDateCount;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "failed to retrieve section counts for report {ReportId}", report.Id);
+        }
+    }
+
+    void UpdateSelectedReportIncompatibilityRecords() =>
+        _ = Task.Run(UpdateSelectedReportIncompatibilityRecordsAsync);
+
+    async Task UpdateSelectedReportIncompatibilityRecordsAsync()
+    {
+        using var selectedReportIncompatibilityRecordsLockHeld = await selectedReportIncompatibilityRecordsLock.LockAsync().ConfigureAwait(false);
+        if (selectedReportIncompatibilityRecords.Any())
+            selectedReportIncompatibilityRecords.Clear();
+        if (selectedReport?.Id is not { } reportId
+            || reportId is <= 0
+            || selectedReportSection != IModHoundClient.SectionIncompatible)
+            return;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await foreach (var incompatibilityRecord in pbDbContext.ModHoundReportIncompatibilityRecords
+            .Where(mhrir => mhrir.ModHoundReportId == reportId)
+            .Include(mhrir => mhrir.Parts)
+            .AsAsyncEnumerable()
+            .ConfigureAwait(false))
+            selectedReportIncompatibilityRecords.Add(incompatibilityRecord);
+    }
+
+    void UpdateSelectedReportMissingRequirementsRecords() =>
+        _ = Task.Run(UpdateSelectedReportMissingRequirementsRecordsAsync);
+
+    async Task UpdateSelectedReportMissingRequirementsRecordsAsync()
+    {
+        using var selectedReportMissingRequirementsRecordsLockHeld = await selectedReportMissingRequirementsRecordsLock.LockAsync().ConfigureAwait(false);
+        if (selectedReportMissingRequirementsRecords.Any())
+            selectedReportMissingRequirementsRecords.Clear();
+        if (selectedReport?.Id is not { } reportId
+            || reportId is <= 0
+            || selectedReportSection != IModHoundClient.SectionMissingRequirements)
+            return;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await foreach (var missingRequirementsRecord in pbDbContext.ModHoundReportMissingRequirementsRecords
+            .Where(mhrmr => mhrmr.ModHoundReportId == reportId)
+            .Include(mhrmr => mhrmr.Dependencies)
+            .Include(mhrmr => mhrmr.Dependents)
+            .AsAsyncEnumerable()
+            .ConfigureAwait(false))
+            selectedReportMissingRequirementsRecords.Add(missingRequirementsRecord);
     }
 }
 

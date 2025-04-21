@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20250311040052_ModelV4")]
+    [Migration("20250421180807_ModelV4")]
     partial class ModelV4
     {
         /// <inheritdoc />
@@ -655,6 +655,9 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<DateTimeOffset>("FileDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FileDateString")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -682,14 +685,24 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("DateOfInstalledFile")
+                    b.Property<long>("DateOfInstalledFile")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DateOfInstalledFileString")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("LastUpdateDate")
+                    b.Property<long>("LastUpdateDate")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastUpdateDateString")
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ModHoundReportId")

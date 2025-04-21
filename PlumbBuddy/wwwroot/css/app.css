@@ -10,6 +10,11 @@
     --plumbbuddy-tab-background-catalog-position: center;
     --plumbbuddy-tab-background-catalog-repeat: unset;
     --plumbbuddy-tab-background-catalog-size: cover;
+    --plumbbuddy-tab-background-mod-hound-dark: url('/img/ModHoundBackground.png');
+    --plumbbuddy-tab-background-mod-hound-light: url('/img/ModHoundBackground.png');
+    --plumbbuddy-tab-background-mod-hound-position: right;
+    --plumbbuddy-tab-background-mod-hound-repeat: no-repeat;
+    --plumbbuddy-tab-background-mod-hound-size: contain;
     --plumbbuddy-tab-background-archivist-dark: url('/img/ArchivistBackgroundDark.png');
     --plumbbuddy-tab-background-archivist-light: url('/img/ArchivistBackgroundLight.png');
     --plumbbuddy-tab-background-archivist-position: bottom;
@@ -336,6 +341,14 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
     -webkit-backdrop-filter: blur(10px);
 }
 
+.mod-hound-outline {
+    height: calc(100vh - 165px);
+}
+
+.mod-hound-report {
+    height: calc(100vh - 165px);
+}
+
 .chronicle-list {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
@@ -399,4 +412,9 @@ div.monaco-editor span.mtk1 {
 
 .parlay-editor {
     height: 100px;
+}
+
+div.break-words > div.mud-table-container > table.mud-table-root > tbody.mud-table-body > tr.mud-table-row > td.mud-table-cell {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }

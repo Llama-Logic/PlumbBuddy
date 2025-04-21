@@ -10,6 +10,8 @@ public class ModHoundReportRecord
     [ForeignKey(nameof(ModHoundReportId))]
     public ModHoundReport? ModHoundReport { get; set; }
 
+    public required string FileName { get; set; }
+
     public required string FilePath { get; set; }
 
     public required string ModName { get; set; }
@@ -18,7 +20,11 @@ public class ModHoundReportRecord
 
     public DateTimeOffset LastUpdateDate { get; set; }
 
+    public string? LastUpdateDateString { get; set; }
+
     public DateTimeOffset DateOfInstalledFile { get; set; }
+
+    public string? DateOfInstalledFileString { get; set; }
 
     public ModHoundReportRecordStatus Status { get; set; }
 

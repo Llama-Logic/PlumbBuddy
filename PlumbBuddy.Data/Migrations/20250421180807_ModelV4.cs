@@ -1,13 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable IDE0079
-#pragma warning disable CA1062
-#pragma warning disable CA1861
-#pragma warning disable IDE0053
-#pragma warning disable IDE0161
-#pragma warning disable IDE0300
 
 namespace PlumbBuddy.Data.Migrations
 {
@@ -80,6 +74,7 @@ namespace PlumbBuddy.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ModHoundReportId = table.Column<long>(type: "INTEGER", nullable: false),
                     FileDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    FileDateString = table.Column<string>(type: "TEXT", nullable: true),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FileType = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -101,11 +96,14 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ModHoundReportId = table.Column<long>(type: "INTEGER", nullable: false),
+                    FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FilePath = table.Column<string>(type: "TEXT", nullable: false),
                     ModName = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastUpdateDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    DateOfInstalledFile = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastUpdateDate = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastUpdateDateString = table.Column<string>(type: "TEXT", nullable: true),
+                    DateOfInstalledFile = table.Column<long>(type: "INTEGER", nullable: false),
+                    DateOfInstalledFileString = table.Column<string>(type: "TEXT", nullable: true),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     ModLinkOrIndexText = table.Column<string>(type: "TEXT", nullable: true),
                     ModLinkOrIndexHref = table.Column<string>(type: "TEXT", nullable: true),

@@ -48,6 +48,26 @@
         z-index: -10;
     }
 
+.mod-hound-tab-container {
+    height: calc(100vh - 112px);
+    overflow-y: hidden;
+    padding: 24px;
+}
+
+    .mod-hound-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-mod-hound-light);
+        background-position: var(--plumbbuddy-tab-background-mod-hound-position);
+        background-repeat: var(--plumbbuddy-tab-background-mod-hound-repeat);
+        background-size: var(--plumbbuddy-tab-background-mod-hound-size);
+        height: 100vh;
+        left: 0;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        width: 100vw;
+        z-index: -10;
+    }
+
 .archivist-tab-container {
     height: calc(100vh - 112px);
     overflow-y: auto;
@@ -114,6 +134,10 @@
 
     .catalog-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-catalog-dark);
+    }
+
+    .mod-hound-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-mod-hound-dark);
     }
 
     .archivist-tab-container .background {

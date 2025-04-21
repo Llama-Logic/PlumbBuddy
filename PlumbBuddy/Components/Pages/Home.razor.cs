@@ -2,7 +2,7 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
-    const int manfiestEditorTabIndex = 4;
+    const int manfiestEditorTabIndex = 5;
 
     int activePanelIndex;
     bool keepPanelsAlive;
@@ -74,6 +74,11 @@ partial class Home
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-position", "center");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", "unset");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", "cover");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-dark", "url('/img/ModHoundBackground.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-light", "url('/img/ModHoundBackground.png')");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-position", "right");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-repeat", "no-repeat");
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-size", "contain");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-dark", "url('/img/ArchivistBackgroundDark.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-light", "url('/img/ArchivistBackgroundLight.png')");
         await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-archivist-position", "bottom");
@@ -131,6 +136,25 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-repeat", repeat);
                 if ((catalog?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-catalog-size", size);
+            }
+            if (backgroundedTabs.TryGetValue("mod-hound", out var modHound))
+            {
+                if ((modHound?.TryGetValue("dark", out var dark) ?? false) && (catalog?.TryGetValue("light", out var light) ?? false))
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-dark", string.IsNullOrWhiteSpace(dark) ? "none" : $"url('/img/custom-themes/{customThemeName}/{dark}')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-light", string.IsNullOrWhiteSpace(light) ? "none" : $"url('/img/custom-themes/{customThemeName}/{light}')");
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-dark", $"url('/img/custom-themes/{customThemeName}/mod-hound-dark.png')");
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-light", $"url('/img/custom-themes/{customThemeName}/mod-hound-light.png')");
+                }
+                if ((modHound?.TryGetValue("position", out var position) ?? false) && !string.IsNullOrWhiteSpace(position))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-position", position);
+                if ((modHound?.TryGetValue("repeat", out var repeat) ?? false) && !string.IsNullOrWhiteSpace(repeat))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-repeat", repeat);
+                if ((modHound?.TryGetValue("size", out var size) ?? false) && !string.IsNullOrWhiteSpace(size))
+                    await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-mod-hound-size", size);
             }
             if (backgroundedTabs.TryGetValue("archivist", out var archivist))
             {

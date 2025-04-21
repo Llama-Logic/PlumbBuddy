@@ -12,6 +12,8 @@ public class ModHoundReportNotTrackedRecord
 
     public DateTimeOffset FileDate { get; set; }
 
+    public string? FileDateString { get; set; }
+
     public required string FileName { get; set; }
 
     public ModHoundReportNotTrackedRecordFileType FileType { get; set; }

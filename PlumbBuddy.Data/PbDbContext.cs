@@ -100,6 +100,12 @@ public class PbDbContext :
             .Property(e => e.ModLinkOrIndexHref)
             .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<ModHoundReportRecord>()
+            .Property(e => e.LastUpdateDate)
+            .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModHoundReportRecord>()
+            .Property(e => e.DateOfInstalledFile)
+            .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModHoundReportRecord>()
             .Property(e => e.ModLinkOrIndexHref)
             .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<RequiredMod>()
