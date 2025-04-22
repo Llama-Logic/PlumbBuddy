@@ -41,8 +41,10 @@ partial class PlatformFunctions :
     static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
     static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
 
-    public PlatformFunctions()
+    public PlatformFunctions(ISettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+        this.settings = settings;
         userNotificationCenter = UNUserNotificationCenter.Current;
         Task.Run(InitializeNotificationsAsync);
     }
@@ -52,6 +54,7 @@ partial class PlatformFunctions :
     int progressMaximum;
     AppProgressState progressState;
     int progressValue;
+    readonly ISettings settings;
     bool userNotificationsAllowed;
     readonly UNUserNotificationCenter userNotificationCenter;
 
@@ -173,6 +176,24 @@ partial class PlatformFunctions :
                 return lastGameProcess;
             }
         }
+        return null;
+    }
+
+    public async Task<Version?> GetTS4InstallationVersionAsync()
+    {
+        var appBundle = new DirectoryInfo(settings.InstallationFolderPath);
+        if (!appBundle.Exists)
+            return null;
+        var defaultIni = new FileInfo(Path.Combine(appBundle.FullName, "Contents", "Resources", "Default.ini"));
+        if (!defaultIni.Exists)
+            return null;
+        var parser = new IniDataParser();
+        var data = parser.Parse(await File.ReadAllTextAsync(defaultIni.FullName).ConfigureAwait(false));
+        var versionData = data["Version"];
+        if (versionData["gameversion"] is { } gameVersion
+            && !string.IsNullOrWhiteSpace(gameVersion)
+            && Version.TryParse(gameVersion, out var version))
+            return version;
         return null;
     }
 

@@ -81,17 +81,4 @@ class ElectronicArtsApp :
             return Task.FromResult<DirectoryInfo?>(executable.Directory!.Parent!.Parent!);
         return Task.FromResult<DirectoryInfo?>(null);
     }
-
-    public Task<Version?> GetTS4InstallationVersionAsync()
-    {
-        if (GetTS4InstallationExecutableBinary() is not { } executable ||
-            !executable.Exists)
-            return Task.FromResult<Version?>(null);
-        var versionInfo = FileVersionInfo.GetVersionInfo(executable.FullName);
-        if (versionInfo.FileVersion is { } fileVersion
-            && !string.IsNullOrWhiteSpace(fileVersion)
-            && Version.TryParse(fileVersion, out var version))
-            return Task.FromResult<Version?>(version);
-        return Task.FromResult<Version?>(null);
-    }
 }

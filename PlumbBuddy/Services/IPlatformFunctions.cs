@@ -30,6 +30,7 @@ public interface IPlatformFunctions :
     int ProgressValue { get; set; }
 
     Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory);
+    Task<Version?> GetTS4InstallationVersionAsync();
     Task<bool> SendLocalNotificationAsync(string caption, string text);
     Task<bool> SetBadgeNumberAsync(int number);
     void ViewDirectory(DirectoryInfo directoryInfo);

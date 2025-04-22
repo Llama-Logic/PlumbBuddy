@@ -34,7 +34,7 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -43,7 +43,6 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
-        ArgumentNullException.ThrowIfNull(electronicArtsApp);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
@@ -55,7 +54,6 @@ public partial class SmartSimObserver :
         this.appLifecycleManager = appLifecycleManager;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
-        this.electronicArtsApp = electronicArtsApp;
         this.steam = steam;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
@@ -85,7 +83,6 @@ public partial class SmartSimObserver :
     readonly IAppLifecycleManager appLifecycleManager;
     readonly IBlazorFramework blazorFramework;
     ImmutableArray<FileSystemInfo> cacheComponents;
-    readonly IElectronicArtsApp electronicArtsApp;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
     readonly AsyncLock enqueuedScanningTaskLock;
@@ -1003,25 +1000,8 @@ public partial class SmartSimObserver :
     void ResampleGameVersion() =>
         _ = Task.Run(ResampleGameVersionAsync);
 
-    async Task ResampleGameVersionAsync()
-    {
-        var normalizedInstallationDirectoryPath = Path.GetFullPath(settings.InstallationFolderPath);
-        if (!Directory.Exists(normalizedInstallationDirectoryPath))
-            return;
-        if (await electronicArtsApp.GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is { } eaInstallationDirectory
-            && normalizedInstallationDirectoryPath == Path.GetFullPath(eaInstallationDirectory.FullName))
-        {
-            GameVersion = await electronicArtsApp.GetTS4InstallationVersionAsync().ConfigureAwait(false);
-            return;
-        }
-        if (await steam.GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is { } steamInstallationDirectory
-            && normalizedInstallationDirectoryPath == Path.GetFullPath(steamInstallationDirectory.FullName))
-        {
-            GameVersion = await steam.GetTS4InstallationVersionAsync().ConfigureAwait(false);
-            return;
-        }
-        GameVersion = null;
-    }
+    async Task ResampleGameVersionAsync() =>
+        GameVersion = await platformFunctions.GetTS4InstallationVersionAsync().ConfigureAwait(false);
 
     bool ResampleGameOptionsIfTheyChanged(string relativePath)
     {

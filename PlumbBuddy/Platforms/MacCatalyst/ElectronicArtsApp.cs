@@ -51,22 +51,4 @@ class ElectronicArtsApp :
         }
         return null;
     }
-
-    public async Task<Version?> GetTS4InstallationVersionAsync()
-    {
-        if (await GetTS4InstallationDirectoryAsync().ConfigureAwait(false) is not { } appBundle ||
-            !appBundle.Exists)
-            return null;
-        var defaultIni = new FileInfo(Path.Combine(appBundle.FullName, "Contents", "Resources", "Default.ini"));
-        if (!defaultIni.Exists)
-            return null;
-        var parser = new IniDataParser();
-        var data = parser.Parse(await File.ReadAllTextAsync(defaultIni.FullName).ConfigureAwait(false));
-        var versionData = data["Version"];
-        if (versionData["gameversion"] is { } gameVersion
-            && !string.IsNullOrWhiteSpace(gameVersion)
-            && Version.TryParse(gameVersion, out var version))
-            return version;
-        return null;
-    }
 }

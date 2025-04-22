@@ -70,25 +70,25 @@ partial class PlatformFunctions :
         return logicalProcessors;
     }
 
-    public PlatformFunctions(ILifetimeScope lifetimeScope, ILogger<PlatformFunctions> logger, IAppLifecycleManager appLifecycleManager)
+    public PlatformFunctions(ILogger<PlatformFunctions> logger, IAppLifecycleManager appLifecycleManager, ISettings settings)
     {
-        ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
-        this.lifetimeScope = lifetimeScope;
+        ArgumentNullException.ThrowIfNull(settings);
         this.logger = logger;
         this.appLifecycleManager = appLifecycleManager;
+        this.settings = settings;
         badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
         toastNotifier = ToastNotificationManager.CreateToastNotifier();
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
     readonly BadgeUpdater badgeUpdater;
-    readonly ILifetimeScope lifetimeScope;
     readonly ILogger<PlatformFunctions> logger;
     int progressMaximum;
     AppProgressState progressState;
     int progressValue;
+    readonly ISettings settings;
     readonly ToastNotifier toastNotifier;
 
     public nint DefaultProcessorAffinity
@@ -227,8 +227,21 @@ partial class PlatformFunctions :
         }
     }
 
+    public Task<Version?> GetTS4InstallationVersionAsync()
+    {
+        var executable = new FileInfo(Path.Combine(settings.InstallationFolderPath, "Game", "Bin", "TS4_x64.exe"));
+        if (!executable.Exists)
+            return Task.FromResult<Version?>(null);
+        var versionInfo = FileVersionInfo.GetVersionInfo(executable.FullName);
+        if (versionInfo.FileVersion is { } fileVersion
+            && !string.IsNullOrWhiteSpace(fileVersion)
+            && Version.TryParse(fileVersion, out var version))
+            return Task.FromResult<Version?>(version);
+        return Task.FromResult<Version?>(null);
+    }
+
     void HandleToastActivated(ToastNotification toastNotification, object args) =>
-        lifetimeScope.Resolve<IAppLifecycleManager>().ShowWindow();
+        appLifecycleManager.ShowWindow();
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);

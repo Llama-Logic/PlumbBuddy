@@ -16,10 +16,4 @@ public interface ISteam
     /// </summary>
     /// <returns>A <see cref="DirectoryInfo"/> object encapsulating The Sims 4 installation directory as installed by Steam if it was installed by Steam; otherwise, <see langword="null"/></returns>
     Task<DirectoryInfo?> GetTS4InstallationDirectoryAsync();
-
-    /// <summary>
-    /// Gets the version of The Sims 4 if it was installed by Stream on this computer
-    /// </summary>
-    /// <returns>A <see cref="Version"/> object encapsulating the version of The Sims 4 installed by Steam if it was installed by the Steam; otherwise, <see langword="null"/></returns>
-    Task<Version?> GetTS4InstallationVersionAsync();
 }
