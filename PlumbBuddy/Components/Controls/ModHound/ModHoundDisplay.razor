@@ -264,8 +264,8 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionIncompatible)
 			{
-				var records = ObservedCollection(() => ModHoundClient.SelectedReportIncompatibilityRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>()).Any(part => part.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))).ToImmutableArray();
-				<MudPaper Class="px-4 py-2" Outlined>
+				var records = ObservedCollection(() => ModHoundClient.SelectedReportIncompatibilityRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>()).Any(part => part.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+				<MudPaper Class="stop-backdrop-blur px-4 py-2" Outlined>
 					<MudStack AlignItems="AlignItems.Center" Row>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
@@ -316,8 +316,8 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionMissingRequirements)
 			{
-				var records = ObservedCollection(() => ModHoundClient.SelectedReportMissingRequirementsRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>()).Any(dependency => dependency.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || (tuple.record.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>()).Any(dependent => dependent.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))).ToImmutableArray();
-				<MudPaper Class="px-4 py-2" Outlined>
+				var records = ObservedCollection(() => ModHoundClient.SelectedReportMissingRequirementsRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>()).Any(dependency => dependency.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || (tuple.record.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>()).Any(dependent => dependent.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+				<MudPaper Class="stop-backdrop-blur px-4 py-2" Outlined>
 					<MudStack AlignItems="AlignItems.Center" Row>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
