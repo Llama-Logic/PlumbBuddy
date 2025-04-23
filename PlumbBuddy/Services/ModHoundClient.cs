@@ -580,7 +580,11 @@ public class ModHoundClient :
                     foreach (var listItem in orderedList.QuerySelectorAll("li"))
                         if (listItem.TextContent is { } textContent
                             && !string.IsNullOrWhiteSpace(textContent))
-                            record.Parts.Add(new() { Label = textContent.Trim() });
+                            record.Parts.Add(new()
+                            {
+                                FilePath = listItem.GetAttribute("title")?.Trim() ?? string.Empty,
+                                Label = textContent.Trim()
+                            });
                     if (record.Parts.Count is > 0)
                         incompatibilityRecords.Add(record);
                 }

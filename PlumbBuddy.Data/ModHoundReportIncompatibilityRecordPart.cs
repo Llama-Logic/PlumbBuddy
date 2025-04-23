@@ -10,6 +10,7 @@ public class ModHoundReportIncompatibilityRecordPart
     [ForeignKey(nameof(ModHoundReportIncompatibilityRecordId))]
     public ModHoundReportIncompatibilityRecord? ModHoundReportIncompatibilityRecord { get; set; }
 
-    [Required]
     public required string Label { get; set; }
+
+    public required string FilePath { get; set; }
 }

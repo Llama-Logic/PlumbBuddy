@@ -136,9 +136,9 @@
 					</MudListItem>
 				</MudList>
 			}
-			<MudTextM3 Align="Align.Center">
+			<MudTextM3 Align="Align.Center" Size="Size.Small">
 				Like Mod Hound?
-				You can support its maintenance and continued development by letting others know about it, and considering supporting <MudLink Href="https://www.patreon.com/lumpinou">Lumpinou on Patreon!</MudLink>
+				You can support its maintenance and continued development by letting others know about it, and considering supporting <a href="https://www.patreon.com/lumpinou" style="color: var(--mud-palette-primary);" target="_blank">Lumpinou on Patreon!</a>
 			</MudTextM3>
 		</MudStack>
 	</MudItem>
@@ -150,19 +150,35 @@
 			{
 				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(100vh - 280px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
 					<ToolBarContent>
-						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
-							@(
-								displayedReportSection switch
-								{
-									IModHoundClient.SectionOutdated => "Outdated",
-									IModHoundClient.SectionDuplicates => "Duplicates",
-									IModHoundClient.SectionBrokenObsolete => "Broken/Obsolete",
-									IModHoundClient.SectionUnknownStatus => "Unknown Status",
-									IModHoundClient.SectionUpToDate => "Up to Date",
-									_ => throw new NotSupportedException()
-								}
-							)
-						</MudTextM3>
+						<MudStack Spacing="0" Style="width: 80%;">
+							<MudTextM3 Typo="TypoM3.Title">
+								@(
+									displayedReportSection switch
+									{
+										IModHoundClient.SectionOutdated => "Outdated",
+										IModHoundClient.SectionDuplicates => "Duplicates",
+										IModHoundClient.SectionBrokenObsolete => "Broken/Obsolete",
+										IModHoundClient.SectionUnknownStatus => "Unknown Status",
+										IModHoundClient.SectionUpToDate => "Up to Date",
+										_ => throw new NotSupportedException()
+									}
+								)
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Title" Size="Size.Small">
+								@(
+									displayedReportSection switch
+									{
+										IModHoundClient.SectionOutdated => "Files updated since you downloaded them",
+										IModHoundClient.SectionDuplicates => "Files for which only one version must be kept",
+										IModHoundClient.SectionBrokenObsolete => "Broken or obsolete (discontinued) files with no updates available (as far as Mod Hound is aware)",
+										IModHoundClient.SectionUnknownStatus => "Files with \"unknown status\", which may or may not be okay to use",
+										IModHoundClient.SectionUpToDate => "Files that SEEM up to date and are not known to be broken",
+										_ => throw new NotSupportedException()
+									}
+								)
+							</MudTextM3>
+
+						</MudStack>
 						<MudSpacer />
 						<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
 					</ToolBarContent>
@@ -248,88 +264,126 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionIncompatible)
 			{
-				<MudStack AlignItems="AlignItems.Center" Row>
-					<MudTextM3 Style="width: 80%;" Typo="TypoM3.Title">
-						Incompatible
-					</MudTextM3>
-					<MudSpacer />
-					<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
-				</MudStack>
-				<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 200px);">
-					@foreach (var (incompatibilityRecord, index) in ObservedCollection(() => ModHoundClient.SelectedReportIncompatibilityRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>()).Any(part => part.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))))
+				var records = ObservedCollection(() => ModHoundClient.SelectedReportIncompatibilityRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>()).Any(part => part.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))).ToImmutableArray();
+				<MudPaper Class="px-4 py-2" Outlined>
+					<MudStack AlignItems="AlignItems.Center" Row>
+						<MudStack Spacing="0" Style="width: 80%;">
+							<MudTextM3 Typo="TypoM3.Title">
+								Incompatible
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Title" Size="Size.Small">
+								Must keep only one mod — click on a mod listed to view it on your computer
+							</MudTextM3>
+						</MudStack>
+						<MudSpacer />
+						<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
+					</MudStack>
+					@if (records.Any())
 					{
-						<MudExpansionPanel>
-							<TitleContent>
-								<div class="d-flex">
-									<MudIcon Icon="@MaterialDesignIcons.Normal.NotEqualVariant" class="mr-3"></MudIcon>
-									<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Incompatibility")</MudTextM3>
-								</div>
-							</TitleContent>
-							<ChildContent>
-								<MudList T="ModHoundReportIncompatibilityRecordPart">
-									@foreach (var part in incompatibilityRecord?.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>())
-									{
-										<MudListItem Icon="@MaterialDesignIcons.Normal.Certificate" Value="@part">
-											<MudHighlighter HighlightedText="@searchText" Text="@(part.Label)" />
-										</MudListItem>
-									}
-								</MudList>
-							</ChildContent>
-						</MudExpansionPanel>
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 236px);">
+							@foreach (var (incompatibilityRecord, index) in records)
+							{
+								<MudExpansionPanel>
+									<TitleContent>
+										<div class="d-flex">
+											<MudIcon Icon="@MaterialDesignIcons.Normal.NotEqualVariant" class="mr-3"></MudIcon>
+											<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Incompatibility")</MudTextM3>
+										</div>
+									</TitleContent>
+									<ChildContent>
+										<MudList T="ModHoundReportIncompatibilityRecordPart">
+											@foreach (var part in incompatibilityRecord?.Parts ?? Enumerable.Empty<ModHoundReportIncompatibilityRecordPart>())
+											{
+												<MudListItem Icon="@MaterialDesignIcons.Normal.Certificate" OnClick="@(() => ViewModHoundReportIncompatibilityRecordPartFile(part))" Value="@part">
+													<MudHighlighter HighlightedText="@searchText" Text="@(part.Label)" />
+												</MudListItem>
+											}
+										</MudList>
+									</ChildContent>
+								</MudExpansionPanel>
+							}
+						</MudExpansionPanels>
 					}
-				</MudExpansionPanels>
+					else
+					{
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
+							<strong>
+								There are no incomptaible mods to display.
+							</strong>
+						</MudTextM3>
+					}
+				</MudPaper>
 			}
 			else if (displayedReportSection is IModHoundClient.SectionMissingRequirements)
 			{
-				<MudStack AlignItems="AlignItems.Center" Row>
-					<MudTextM3 Style="width: 80%;" Typo="TypoM3.Title">
-						Missing Requirements
-					</MudTextM3>
-					<MudSpacer />
-					<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
-				</MudStack>
-				<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 200px);">
-					@foreach (var (missingRequirementsRecord, index) in ObservedCollection(() => ModHoundClient.SelectedReportMissingRequirementsRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>()).Any(dependency => dependency.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || (tuple.record.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>()).Any(dependent => dependent.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))))
+				var records = ObservedCollection(() => ModHoundClient.SelectedReportMissingRequirementsRecords).Select((record, index) => (record, index)).Where(tuple => string.IsNullOrWhiteSpace(searchText) || (tuple.record.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>()).Any(dependency => dependency.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || (tuple.record.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>()).Any(dependent => dependent.Label.Contains(searchText, StringComparison.OrdinalIgnoreCase))).ToImmutableArray();
+				<MudPaper Class="px-4 py-2" Outlined>
+					<MudStack AlignItems="AlignItems.Center" Row>
+						<MudStack Spacing="0" Style="width: 80%;">
+							<MudTextM3 Typo="TypoM3.Title">
+								Missing Requirements
+							</MudTextM3>
+							<MudTextM3 Typo="TypoM3.Title" Size="Size.Small">
+								Mods missing their Requirements
+							</MudTextM3>
+						</MudStack>
+						<MudSpacer />
+						<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
+					</MudStack>
+					@if (records.Any())
 					{
-						<MudExpansionPanel>
-							<TitleContent>
-								<div class="d-flex">
-									<MudIcon Icon="@MaterialDesignIcons.Normal.ImageBroken" class="mr-3"></MudIcon>
-									<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Missing Requirement")</MudTextM3>
-								</div>
-							</TitleContent>
-							<ChildContent>
-								<MudNavMenu>
-									<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Alert" IconColor="Color.Warning" Title="Mods Missing the Requirement">
-										@foreach (var dependent in missingRequirementsRecord?.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>())
-										{
-											<MudNavLink Href="javascript:void(0)" Icon="@MaterialDesignIcons.Normal.Certificate">
-												<MudTextM3>
-													<MudHighlighter HighlightedText="@searchText" Text="@(dependent.Label)" />
-												</MudTextM3>
-											</MudNavLink>
-										}
-									</MudNavGroup>
-									<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Asterisk" IconColor="Color.Error" Title="Mods that Make Up the Requirement">
-										@foreach (var dependency in missingRequirementsRecord?.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>())
-										{
-											<MudNavLink Href="@(dependency.ModLinkOrIndexHref is { } href ? href.ToString() : "javascript:void(0)")" Icon="@MaterialDesignIcons.Normal.Certificate" Target="@(dependency.ModLinkOrIndexHref is null ? string.Empty : "_blank")">
-												<MudStack Spacing="0">
-													<MudTextM3>
-														<MudHighlighter HighlightedText="@searchText" Text="@(dependency.Label)" />
-													</MudTextM3>
-													<MudTextM3 Typo="TypoM3.Label" Size="Size.Small">
-														@(dependency.ModLinkOrIndexHref)
-													</MudTextM3>
-												</MudStack>
-											</MudNavLink>
-										}
-									</MudNavGroup>
-								</MudNavMenu>
-							</ChildContent>
-						</MudExpansionPanel>
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 236px);">
+							@foreach (var (missingRequirementsRecord, index) in records)
+							{
+								<MudExpansionPanel>
+									<TitleContent>
+										<div class="d-flex">
+											<MudIcon Icon="@MaterialDesignIcons.Normal.ImageBroken" class="mr-3"></MudIcon>
+											<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Missing Requirement")</MudTextM3>
+										</div>
+									</TitleContent>
+									<ChildContent>
+										<MudNavMenu>
+											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Alert" IconColor="Color.Warning" Title="Mods Missing the Requirement">
+												@foreach (var dependent in missingRequirementsRecord?.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>())
+												{
+													<MudNavLink Href="javascript:void(0)" Icon="@MaterialDesignIcons.Normal.Certificate">
+														<MudTextM3>
+															<MudHighlighter HighlightedText="@searchText" Text="@(dependent.Label)" />
+														</MudTextM3>
+													</MudNavLink>
+												}
+											</MudNavGroup>
+											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Asterisk" IconColor="Color.Error" Title="Mods that Make Up the Requirement">
+												@foreach (var dependency in missingRequirementsRecord?.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>())
+												{
+													<MudNavLink Href="@(dependency.ModLinkOrIndexHref is { } href ? href.ToString() : "javascript:void(0)")" Icon="@MaterialDesignIcons.Normal.Certificate" Target="@(dependency.ModLinkOrIndexHref is null ? string.Empty : "_blank")">
+														<MudStack Spacing="0">
+															<MudTextM3>
+																<MudHighlighter HighlightedText="@searchText" Text="@(dependency.Label)" />
+															</MudTextM3>
+															<MudTextM3 Typo="TypoM3.Label" Size="Size.Small">
+																@(dependency.ModLinkOrIndexHref)
+															</MudTextM3>
+														</MudStack>
+													</MudNavLink>
+												}
+											</MudNavGroup>
+										</MudNavMenu>
+									</ChildContent>
+								</MudExpansionPanel>
+							}
+						</MudExpansionPanels>
 					}
-				</MudExpansionPanels>
+					else
+					{
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
+							<strong>
+								There are no mods missing requirements to display.
+							</strong>
+						</MudTextM3>
+					}
+				</MudPaper>
 			}
 			else if (displayedReportSection is IModHoundClient.SectionNotTracked)
 			{

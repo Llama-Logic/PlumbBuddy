@@ -129,9 +129,8 @@ partial class ModHoundDisplay
         ModHoundClient.PropertyChanged += HandleModHoundClientPropertyChanged;
     }
 
-    void ViewModHoundReportRecordFile(ModHoundReportRecord record)
+    void ViewFile(FileInfo file)
     {
-        var file = new FileInfo(Path.Combine(Settings.UserDataFolderPath, record.FilePath));
         if (!file.Exists)
         {
             SuperSnacks.OfferRefreshments(new MarkupString("The file no longer exists, so I can't show it to you."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
@@ -139,4 +138,10 @@ partial class ModHoundDisplay
         }
         PlatformFunctions.ViewFile(file);
     }
+
+    void ViewModHoundReportIncompatibilityRecordPartFile(ModHoundReportIncompatibilityRecordPart part) =>
+        ViewFile(new FileInfo(Path.Combine(Settings.UserDataFolderPath, part.FilePath)));
+
+    void ViewModHoundReportRecordFile(ModHoundReportRecord record) =>
+        ViewFile(new FileInfo(Path.Combine(Settings.UserDataFolderPath, record.FilePath)));
 }
