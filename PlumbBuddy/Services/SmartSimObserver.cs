@@ -706,16 +706,16 @@ public partial class SmartSimObserver :
         var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var modFileHashElements in await pbDbContext.ModFileHashes
-            .Where(mfh => mfh.ModFiles!.Any() && mfh.ModFileManifests!.Any())
+            .Where(mfh => mfh.ModFiles.Any() && mfh.ModFileManifests.Any())
             .Select(mfh => new
             {
-                Paths = mfh.ModFiles!.Select(mf => mf.Path!).ToList(),
-                Manifests = mfh.ModFileManifests!.Select(mfm => new
+                Paths = mfh.ModFiles.Select(mf => mf.Path!).ToList(),
+                Manifests = mfh.ModFileManifests.Select(mfm => new
                 {
                     mfm.Key,
                     mfm.TuningName,
-                    CalculatedSha256 = mfm.CalculatedModFileManifestHash!.Sha256,
-                    SubsumedSha256 = mfm.SubsumedHashes!.Select(mfmh => mfmh.Sha256).ToList()
+                    CalculatedSha256 = mfm.CalculatedModFileManifestHash.Sha256,
+                    SubsumedSha256 = mfm.SubsumedHashes.Select(mfmh => mfmh.Sha256).ToList()
                 }).ToList()
             })
             .ToListAsync()

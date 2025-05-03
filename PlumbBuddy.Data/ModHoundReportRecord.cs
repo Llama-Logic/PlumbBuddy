@@ -1,14 +1,19 @@
 namespace PlumbBuddy.Data;
 
-public class ModHoundReportRecord
+public class ModHoundReportRecord(ModHoundReport modHoundReport)
 {
+    ModHoundReportRecord() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModHoundReportId { get; set; }
 
     [ForeignKey(nameof(ModHoundReportId))]
-    public ModHoundReport? ModHoundReport { get; set; }
+    public ModHoundReport ModHoundReport { get; set; } = modHoundReport;
 
     public required string FileName { get; set; }
 

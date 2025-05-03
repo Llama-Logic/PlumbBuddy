@@ -18,14 +18,11 @@ public class SavePackageSnapshot
     [Required]
     public DateTimeOffset LastWriteTime { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<SavePackageResource>? Resources { get; set; }
+    public ICollection<SavePackageResource> Resources { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ResourceSnapshotDelta>? Deltas { get; set; }
+    public ICollection<ResourceSnapshotDelta> Deltas { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<SnapshotModFile>? ModFiles { get; set; }
+    public ICollection<SnapshotModFile> ModFiles { get; } = [];
 
     [Required]
     public string Label { get; set; } = string.Empty;

@@ -19,15 +19,11 @@ public class ModHoundReport
 
     public DateTimeOffset Retrieved { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportRecord>? Records { get; set; }
+    public ICollection<ModHoundReportRecord> Records { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportIncompatibilityRecord>? IncompatibilityRecords { get; set; }
+    public ICollection<ModHoundReportIncompatibilityRecord> IncompatibilityRecords { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportMissingRequirementsRecord>? MissingRequirementsRecords { get; set; }
+    public ICollection<ModHoundReportMissingRequirementsRecord> MissingRequirementsRecords { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportNotTrackedRecord>? NotTrackedRecords { get; set; }
+    public ICollection<ModHoundReportNotTrackedRecord> NotTrackedRecords { get; } = [];
 }

@@ -1,14 +1,19 @@
 namespace PlumbBuddy.Data;
 
-public class ModHoundReportIncompatibilityRecordPart
+public class ModHoundReportIncompatibilityRecordPart(ModHoundReportIncompatibilityRecord modHoundReportIncompatibilityRecord)
 {
+    ModHoundReportIncompatibilityRecordPart() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModHoundReportIncompatibilityRecordId { get; set; }
 
     [ForeignKey(nameof(ModHoundReportIncompatibilityRecordId))]
-    public ModHoundReportIncompatibilityRecord? ModHoundReportIncompatibilityRecord { get; set; }
+    public ModHoundReportIncompatibilityRecord ModHoundReportIncompatibilityRecord { get; set; } = modHoundReportIncompatibilityRecord;
 
     public required string Label { get; set; }
 

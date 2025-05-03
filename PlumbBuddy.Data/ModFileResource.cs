@@ -1,14 +1,19 @@
 namespace PlumbBuddy.Data;
 
-public class ModFileResource
+public class ModFileResource(ModFileHash modFileHash)
 {
+    ModFileResource() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModFileHashId { get; set; }
 
     [ForeignKey(nameof(ModFileHashId))]
-    public ModFileHash? ModFileHash { get; set; }
+    public ModFileHash ModFileHash { get; set; } = modFileHash;
 
     [NotMapped]
     public ResourceKey Key
@@ -43,6 +48,5 @@ public class ModFileResource
     [Required]
     public long KeyFullInstance { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<TopologySnapshot>? TopologySnapshots { get; set; }
+    public ICollection<TopologySnapshot> TopologySnapshots { get; } = [];
 }

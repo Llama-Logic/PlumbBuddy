@@ -1,30 +1,32 @@
 namespace PlumbBuddy.Data;
 
-public class RequiredMod
+public class RequiredMod(ModFileManifest modFileManifest)
 {
+    RequiredMod() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModFileManfiestId { get; set; }
 
     [ForeignKey(nameof(ModFileManfiestId))]
-    public ModFileManifest? ModFileManifest { get; set; }
+    public ModFileManifest ModFileManifest { get; set; } = modFileManifest;
 
     [Required]
     public required string Name { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModCreator>? Creators { get; set; }
+    public ICollection<ModCreator> Creators { get; } = [];
 
     public string? Version { get; set; }
 
     public Uri? Url { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifestHash>? Hashes { get; set; }
+    public ICollection<ModFileManifestHash> Hashes { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFeature>? RequiredFeatures { get; set; }
+    public ICollection<ModFeature> RequiredFeatures { get; } = [];
 
     public long? RequirementIdentifierId { get; set; }
 

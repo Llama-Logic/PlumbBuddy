@@ -8,6 +8,5 @@ public class TopologySnapshot
     [Required]
     public DateTimeOffset Taken { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileResource>? Resources { get; set; }
+    public ICollection<ModFileResource> Resources { get; } = [];
 }

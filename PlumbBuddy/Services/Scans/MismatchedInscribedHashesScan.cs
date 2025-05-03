@@ -41,13 +41,13 @@ public sealed class MismatchedInscribedHashesScan :
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var mod in pbDbContext.ModFileManifests
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any() && mfm.CalculatedModFileManifestHashId != mfm.InscribedModFileManifestHashId)
+            .Where(mfm => mfm.ModFileHash.ModFiles.Any() && mfm.CalculatedModFileManifestHashId != mfm.InscribedModFileManifestHashId)
             .Select(mfm => new
             {
                 mfm.Name,
-                Creators = mfm.Creators!.Select(c => c.Name).ToList(),
+                Creators = mfm.Creators.Select(c => c.Name).ToList(),
                 mfm.Url,
-                FilePaths = mfm.ModFileHash!.ModFiles!
+                FilePaths = mfm.ModFileHash.ModFiles
                     .Select(mf => mf.Path!)
                     .ToList()
             })

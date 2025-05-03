@@ -1,14 +1,19 @@
 namespace PlumbBuddy.Data;
 
-public class ModFileManifestResourceKey
+public class ModFileManifestResourceKey(ModFileManifest modFileManifest)
 {
+    ModFileManifestResourceKey() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModFileManifestId { get; set; }
 
     [ForeignKey(nameof(ModFileManifestId))]
-    public ModFileManifest? ModFileManifest { get; set; }
+    public ModFileManifest ModFileManifest { get; set; } = modFileManifest;
 
     [NotMapped]
     public ResourceKey Key

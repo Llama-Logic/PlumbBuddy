@@ -33,29 +33,20 @@ public class ModsDirectoryCataloger :
         };
     }
 
-    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileManifestModel modFileManifestModel, ResourceKey? key)
+    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileHash modFileHash, ModFileManifestHash calculatedModFileManifestHash, ModFileManifestModel modFileManifestModel, ResourceKey? key)
     {
-        var modManifest = new ModFileManifest
+        var modFileManifest = new ModFileManifest(modFileHash, await TransformNormalizedEntity
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModFileManifestHashes,
+            nameof(ModFileManifestHash.Sha256),
+            hash => mfmh => mfmh.Sha256 == hash,
+            GetByteArray(modFileManifestModel.Hash)
+        ).ConfigureAwait(false), calculatedModFileManifestHash)
         {
             ContactEmail = modFileManifestModel.ContactEmail,
             ContactUrl = modFileManifestModel.ContactUrl,
-            Creators = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.ModCreators,
-                nameof(ModCreator.Name),
-                creator => mc => mc.Name == creator,
-                modFileManifestModel.Creators
-            ).ToListAsync().ConfigureAwait(false),
             Description = modFileManifestModel.Description,
-            Exclusivities = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.ModExclusivities,
-                nameof(ModExclusivity.Name),
-                exclusivity => me => me.Name == exclusivity,
-                modFileManifestModel.Exclusivities
-            ).ToListAsync().ConfigureAwait(false),
             ElectronicArtsPromoCode =
                 !string.IsNullOrWhiteSpace(modFileManifestModel.ElectronicArtsPromoCode)
                 ? await TransformNormalizedEntity
@@ -67,57 +58,9 @@ public class ModsDirectoryCataloger :
                     modFileManifestModel.ElectronicArtsPromoCode
                 ).ConfigureAwait(false)
                 : null,
-            Features = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.ModFeatures,
-                nameof(ModFeature.Name),
-                feature => mf => mf.Name == feature,
-                modFileManifestModel.Features
-            ).ToListAsync().ConfigureAwait(false),
-            HashResourceKeys = modFileManifestModel.HashResourceKeys
-                .Select(key => new ModFileManifestResourceKey
-                {
-                    KeyType = unchecked((int)(uint)key.Type),
-                    KeyGroup = unchecked((int)key.Group),
-                    KeyFullInstance = unchecked((long)key.FullInstance)
-                })
-                .ToList(),
-            InscribedModFileManifestHash = await TransformNormalizedEntity
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.ModFileManifestHashes,
-                nameof(ModFileManifestHash.Sha256),
-                hash => mfmh => mfmh.Sha256 == hash,
-                GetByteArray(modFileManifestModel.Hash)
-            ).ConfigureAwait(false),
-            IncompatiblePacks = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.PackCodes,
-                nameof(PackCode.Code),
-                code => pc => pc.Code == code,
-                modFileManifestModel.IncompatiblePacks
-            ).ToListAsync().ConfigureAwait(false),
             Key = key,
             MessageToTranslators = modFileManifestModel.MessageToTranslators,
             Name = modFileManifestModel.Name,
-            RequiredPacks = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.PackCodes,
-                nameof(PackCode.Code),
-                code => pc => pc.Code == code,
-                modFileManifestModel.RequiredPacks
-            ).ToListAsync().ConfigureAwait(false),
-            SubsumedHashes = await TransformNormalizedEntitySequence
-            (
-                pbDbContext,
-                pbDbContext => pbDbContext.ModFileManifestHashes,
-                nameof(ModFileManifestHash.Sha256),
-                hash => mfmh => mfmh.Sha256 == hash,
-                GetByteArrays(modFileManifestModel.SubsumedHashes)
-            ).ToListAsync().ConfigureAwait(false),
             TranslationSubmissionUrl = modFileManifestModel.TranslationSubmissionUrl,
             TuningFullInstance = modFileManifestModel.TuningFullInstance is not 0
                 ? unchecked((long)modFileManifestModel.TuningFullInstance)
@@ -126,119 +69,166 @@ public class ModsDirectoryCataloger :
             Url = modFileManifestModel.Url,
             Version = modFileManifestModel.Version
         };
-        if (modFileManifestModel.RepurposedLanguages.Count > 0)
+        await foreach (var creator in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModCreators,
+            nameof(ModCreator.Name),
+            creator => mc => mc.Name == creator,
+            modFileManifestModel.Creators
+        ).ConfigureAwait(false))
+            modFileManifest.Creators.Add(creator);
+        await foreach (var exclusivity in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModExclusivities,
+            nameof(ModExclusivity.Name),
+            exclusivity => me => me.Name == exclusivity,
+            modFileManifestModel.Exclusivities
+        ).ConfigureAwait(false))
+            modFileManifest.Exclusivities.Add(exclusivity);
+        await foreach (var feature in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModFeatures,
+            nameof(ModFeature.Name),
+            feature => mf => mf.Name == feature,
+            modFileManifestModel.Features
+        ).ConfigureAwait(false))
+            modFileManifest.Features.Add(feature);
+        foreach (var hashResourceKey in modFileManifestModel.HashResourceKeys)
+            modFileManifest.HashResourceKeys.Add(new ModFileManifestResourceKey(modFileManifest) { Key = hashResourceKey });
+        await foreach (var incompatiblePack in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.PackCodes,
+            nameof(PackCode.Code),
+            code => pc => pc.Code == code,
+            modFileManifestModel.IncompatiblePacks
+        ).ConfigureAwait(false))
+            modFileManifest.IncompatiblePacks.Add(incompatiblePack);
+        foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages)
+            modFileManifest.RepurposedLanguages.Add(new ModFileManifestRepurposedLanguage(modFileManifest)
+            {
+                ActualLocale = repurposedLanguage.ActualLocale,
+                GameLocale = repurposedLanguage.GameLocale
+            });
+        foreach (var requiredMod in modFileManifestModel.RequiredMods)
         {
-            var repurposedLanguages = new List<ModFileManifestRepurposedLanguage>();
-            foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages)
-                repurposedLanguages.Add(new ModFileManifestRepurposedLanguage
-                {
-                    ActualLocale = repurposedLanguage.ActualLocale,
-                    GameLocale = repurposedLanguage.GameLocale
-                });
-            modManifest.RepurposedLanguages = repurposedLanguages;
-        }
-        if (modFileManifestModel.RequiredMods.Count > 0)
-        {
-            var requiredMods = new List<RequiredMod>();
-            foreach (var requiredMod in modFileManifestModel.RequiredMods)
-                requiredMods.Add(new RequiredMod
-                {
-                    Creators = await TransformNormalizedEntitySequence
-                    (
-                        pbDbContext,
-                        pbDbContext => pbDbContext.ModCreators,
-                        nameof(ModCreator.Name),
-                        creator => mc => mc.Name == creator,
-                        requiredMod.Creators
-                    ).ToListAsync().ConfigureAwait(false),
-                    Hashes = await TransformNormalizedEntitySequence
+            var modFileManifestRequiredMod = new RequiredMod(modFileManifest)
+            {
+                IgnoreIfHashAvailable =
+                    !requiredMod.IgnoreIfHashAvailable.IsDefaultOrEmpty
+                    ? await TransformNormalizedEntity
                     (
                         pbDbContext,
                         pbDbContext => pbDbContext.ModFileManifestHashes,
-                    nameof(ModFileManifestHash.Sha256),
+                        nameof(ModFileManifestHash.Sha256),
                         hash => mfmh => mfmh.Sha256 == hash,
-                        GetByteArrays(requiredMod.Hashes)
-                    ).ToListAsync().ConfigureAwait(false),
-                    IgnoreIfHashAvailable =
-                        !requiredMod.IgnoreIfHashAvailable.IsDefaultOrEmpty
-                        ? await TransformNormalizedEntity
-                        (
-                            pbDbContext,
-                            pbDbContext => pbDbContext.ModFileManifestHashes,
-                            nameof(ModFileManifestHash.Sha256),
-                            hash => mfmh => mfmh.Sha256 == hash,
-                            GetByteArray(requiredMod.IgnoreIfHashAvailable)
-                        ).ConfigureAwait(false)
-                        : null,
-                    IgnoreIfHashUnavailable =
-                        !requiredMod.IgnoreIfHashUnavailable.IsDefaultOrEmpty
-                        ? await TransformNormalizedEntity
-                        (
-                            pbDbContext,
-                            pbDbContext => pbDbContext.ModFileManifestHashes,
-                            nameof(ModFileManifestHash.Sha256),
-                            hash => mfmh => mfmh.Sha256 == hash,
-                            GetByteArray(requiredMod.IgnoreIfHashUnavailable)
-                        ).ConfigureAwait(false)
-                        : null,
-                    IgnoreIfPackAvailable =
-                        !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackAvailable)
-                        ? await TransformNormalizedEntity
-                        (
-                            pbDbContext,
-                            pbDbContext => pbDbContext.PackCodes,
-                            nameof(PackCode.Code),
-                            packCode => pc => pc.Code == packCode,
-                            requiredMod.IgnoreIfPackAvailable
-                        ).ConfigureAwait(false)
-                        : null,
-                    IgnoreIfPackUnavailable =
-                        !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable)
-                        ? await TransformNormalizedEntity
-                        (
-                            pbDbContext,
-                            pbDbContext => pbDbContext.PackCodes,
-                            nameof(PackCode.Code),
-                            packCode => pc => pc.Code == packCode,
-                            requiredMod.IgnoreIfPackUnavailable
-                        ).ConfigureAwait(false)
-                        : null,
-                    Name = requiredMod.Name,
-                    RequiredFeatures = await TransformNormalizedEntitySequence
+                        GetByteArray(requiredMod.IgnoreIfHashAvailable)
+                    ).ConfigureAwait(false)
+                    : null,
+                IgnoreIfHashUnavailable =
+                    !requiredMod.IgnoreIfHashUnavailable.IsDefaultOrEmpty
+                    ? await TransformNormalizedEntity
                     (
                         pbDbContext,
-                        pbDbContext => pbDbContext.ModFeatures,
-                        nameof(ModFeature.Name),
-                        requiredFeature => mf => mf.Name == requiredFeature,
-                        requiredMod.RequiredFeatures
-                    ).ToListAsync().ConfigureAwait(false),
-                    RequirementIdentifier = requiredMod.RequirementIdentifier is { } identifier
-                        ? await TransformNormalizedEntity
-                        (
-                            pbDbContext,
-                            pbDbContext => pbDbContext.RequirementIdentifiers,
-                            nameof(RequirementIdentifier.Identifier),
-                            requirementIdentifier => ri => ri.Identifier == requirementIdentifier,
-                            requiredMod.RequirementIdentifier
-                        ).ConfigureAwait(false)
-                        : null,
-                    Url = requiredMod.Url,
-                    Version = requiredMod.Version
-                });
-            modManifest.RequiredMods = requiredMods;
+                        pbDbContext => pbDbContext.ModFileManifestHashes,
+                        nameof(ModFileManifestHash.Sha256),
+                        hash => mfmh => mfmh.Sha256 == hash,
+                        GetByteArray(requiredMod.IgnoreIfHashUnavailable)
+                    ).ConfigureAwait(false)
+                    : null,
+                IgnoreIfPackAvailable =
+                    !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackAvailable)
+                    ? await TransformNormalizedEntity
+                    (
+                        pbDbContext,
+                        pbDbContext => pbDbContext.PackCodes,
+                        nameof(PackCode.Code),
+                        packCode => pc => pc.Code == packCode,
+                        requiredMod.IgnoreIfPackAvailable
+                    ).ConfigureAwait(false)
+                    : null,
+                IgnoreIfPackUnavailable =
+                    !string.IsNullOrWhiteSpace(requiredMod.IgnoreIfPackUnavailable)
+                    ? await TransformNormalizedEntity
+                    (
+                        pbDbContext,
+                        pbDbContext => pbDbContext.PackCodes,
+                        nameof(PackCode.Code),
+                        packCode => pc => pc.Code == packCode,
+                        requiredMod.IgnoreIfPackUnavailable
+                    ).ConfigureAwait(false)
+                    : null,
+                Name = requiredMod.Name,
+                RequirementIdentifier = requiredMod.RequirementIdentifier is { } identifier
+                    ? await TransformNormalizedEntity
+                    (
+                        pbDbContext,
+                        pbDbContext => pbDbContext.RequirementIdentifiers,
+                        nameof(RequirementIdentifier.Identifier),
+                        requirementIdentifier => ri => ri.Identifier == requirementIdentifier,
+                        requiredMod.RequirementIdentifier
+                    ).ConfigureAwait(false)
+                    : null,
+                Url = requiredMod.Url,
+                Version = requiredMod.Version
+            };
+            await foreach (var creator in TransformNormalizedEntitySequence
+            (
+                pbDbContext,
+                pbDbContext => pbDbContext.ModCreators,
+                nameof(ModCreator.Name),
+                creator => mc => mc.Name == creator,
+                requiredMod.Creators
+            ).ConfigureAwait(false))
+                modFileManifestRequiredMod.Creators.Add(creator);
+            await foreach (var hash in TransformNormalizedEntitySequence
+            (
+                pbDbContext,
+                pbDbContext => pbDbContext.ModFileManifestHashes,
+                nameof(ModFileManifestHash.Sha256),
+                hash => mfmh => mfmh.Sha256 == hash,
+                GetByteArrays(requiredMod.Hashes)
+            ).ConfigureAwait(false))
+                modFileManifestRequiredMod.Hashes.Add(hash);
+            await foreach (var requiredFeature in TransformNormalizedEntitySequence
+            (
+                pbDbContext,
+                pbDbContext => pbDbContext.ModFeatures,
+                nameof(ModFeature.Name),
+                requiredFeature => mf => mf.Name == requiredFeature,
+                requiredMod.RequiredFeatures
+            ).ConfigureAwait(false))
+                modFileManifestRequiredMod.RequiredFeatures.Add(requiredFeature);
+            modFileManifest.RequiredMods.Add(modFileManifestRequiredMod);
         }
-        if (modFileManifestModel.Translators.Count > 0)
-        {
-            var modFileManifestTranslators = new List<ModFileManifestTranslator>();
-            foreach (var translator in modFileManifestModel.Translators)
-                modFileManifestTranslators.Add(new ModFileManifestTranslator
-                {
-                    Language = translator.Language,
-                    Name = translator.Name
-                });
-            modManifest.Translators = modFileManifestTranslators;
-        }
-        return modManifest;
+        await foreach (var requiredPack in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.PackCodes,
+            nameof(PackCode.Code),
+            code => pc => pc.Code == code,
+            modFileManifestModel.RequiredPacks
+        ).ConfigureAwait(false))
+            modFileManifest.RequiredPacks.Add(requiredPack);
+        await foreach (var subsumedHash in TransformNormalizedEntitySequence
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModFileManifestHashes,
+            nameof(ModFileManifestHash.Sha256),
+            hash => mfmh => mfmh.Sha256 == hash,
+            GetByteArrays(modFileManifestModel.SubsumedHashes)
+        ).ConfigureAwait(false))
+            modFileManifest.SubsumedHashes.Add(subsumedHash);
+        foreach (var translator in modFileManifestModel.Translators)
+            modFileManifest.Translators.Add(new ModFileManifestTranslator(modFileManifest)
+            {
+                Language = translator.Language,
+                Name = translator.Name
+            });
+        return modFileManifest;
     }
 
     static ValueTask<TNormalizedEntity> TransformNormalizedEntity<TNormalizedValue, TNormalizedEntity>(PbDbContext pbDbContext, Func<PbDbContext, DbSet<TNormalizedEntity>> setSelector, string uniqueColumnName, Func<TNormalizedValue, Expression<Func<TNormalizedEntity, bool>>> selectionPredicateFactory, TNormalizedValue value)
@@ -656,25 +646,26 @@ public class ModsDirectoryCataloger :
                     modFileHash = modFile.ModFileHash;
                     fileType = modFile.FileType;
                 }
+                static async ValueTask<ModFileHash> getModFileHashAsync(PbDbContext pbDbContext, ModsDirectoryFileType fileType, ImmutableArray<byte> hash)
+                {
+                    var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
+                    await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged, IsCorrupt) VALUES ({0}, 0, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
+                    var modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
+                    if (modFileHash.IsCorrupt)
+                    {
+                        if (fileType is ModsDirectoryFileType.Package)
+                            fileType = ModsDirectoryFileType.CorruptPackage;
+                        else if (fileType is ModsDirectoryFileType.ScriptArchive)
+                            fileType = ModsDirectoryFileType.CorruptScriptArchive;
+                    }
+                    return modFileHash;
+                }
                 if (modFile is null)
                 {
                     var hash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
-                    if (modFileHash is null)
-                    {
-                        var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
-                        await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged, IsCorrupt) VALUES ({0}, 0, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
-                        modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
-                        if (modFileHash.IsCorrupt)
-                        {
-                            if (fileType is ModsDirectoryFileType.Package)
-                                fileType = ModsDirectoryFileType.CorruptPackage;
-                            else if (fileType is ModsDirectoryFileType.ScriptArchive)
-                                fileType = ModsDirectoryFileType.CorruptScriptArchive;
-                        }
-                    }
+                    modFileHash ??= await getModFileHashAsync(pbDbContext, fileType, hash);
                     if (!modFileHash.ResourcesAndManifestsCataloged)
                     {
-                        var dbManifests = new List<ModFileManifest>();
                         if (fileType is ModsDirectoryFileType.Package)
                         {
                             DataBasePackedFile? dbpf = null;
@@ -712,22 +703,22 @@ public class ModsDirectoryCataloger :
                                         // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
                                         return;
                                     }
-                                    modFileHash.Resources = keys.Select(key => new ModFileResource() { Key = key, ModFileHash = modFileHash }).ToList();
+                                    modFileHash.Resources.Clear();
+                                    foreach (var key in keys.Select(key => new ModFileResource(modFileHash) { Key = key, ModFileHash = modFileHash }))
+                                        modFileHash.Resources.Add(key);
                                     foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                                     {
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, manifest, manifestKey).ConfigureAwait(false);
-                                        dbManifest.ModFileHash = modFileHash;
-                                        dbManifest.Key = manifestKey;
                                         var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
-                                        dbManifest.CalculatedModFileManifestHash = await TransformNormalizedEntity
+                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await TransformNormalizedEntity
                                         (
                                             pbDbContext,
                                             pbDbContext => pbDbContext.ModFileManifestHashes,
                                             nameof(ModFileManifestHash.Sha256),
                                             hash => mfmh => mfmh.Sha256 == hash,
                                             GetByteArray(calculatedHash)
-                                        ).ConfigureAwait(false);
-                                        dbManifests.Add(dbManifest);
+                                        ).ConfigureAwait(false), manifest, manifestKey).ConfigureAwait(false);
+                                        dbManifest.Key = manifestKey;
+                                        modFileHash.ModFileManifests.Add(dbManifest);
                                     }
                                 }
                             }
@@ -762,10 +753,8 @@ public class ModsDirectoryCataloger :
                             {
                                 if (zipArchive is not null)
                                 {
-                                    var scriptModArchiveEntries = new List<ScriptModArchiveEntry>();
                                     foreach (var entry in zipArchive.Entries)
-                                    {
-                                        scriptModArchiveEntries.Add(new()
+                                        modFileHash.ScriptModArchiveEntries.Add(new(modFileHash)
                                         {
                                             Comment = entry.Comment,
                                             CompressedLength = entry.CompressedLength,
@@ -778,22 +767,18 @@ public class ModsDirectoryCataloger :
                                             ModFileHash = modFileHash,
                                             Name = entry.Name
                                         });
-                                    }
-                                    modFileHash.ScriptModArchiveEntries = scriptModArchiveEntries;
                                     if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
                                     {
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, manifest, null).ConfigureAwait(false);
-                                        dbManifest.ModFileHash = modFileHash;
                                         var calculatedHash = ModFileManifestModel.GetModFileHash(zipArchive);
-                                        dbManifest.CalculatedModFileManifestHash = await TransformNormalizedEntity
+                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await TransformNormalizedEntity
                                         (
                                             pbDbContext,
                                             pbDbContext => pbDbContext.ModFileManifestHashes,
                                             nameof(ModFileManifestHash.Sha256),
                                             hash => mfmh => mfmh.Sha256 == hash,
                                             GetByteArray(calculatedHash)
-                                        ).ConfigureAwait(false);
-                                        dbManifests.Add(dbManifest);
+                                        ).ConfigureAwait(false), manifest, null).ConfigureAwait(false);
+                                        modFileHash.ModFileManifests.Add(dbManifest);
                                     }
                                 }
                             }
@@ -802,19 +787,18 @@ public class ModsDirectoryCataloger :
                                 zipArchive?.Dispose();
                             }
                         }
-                        modFileHash.ModFileManifests = dbManifests;
                         modFileHash.ResourcesAndManifestsCataloged = fileType is not (ModsDirectoryFileType.CorruptPackage or ModsDirectoryFileType.CorruptScriptArchive);
                     }
                     modFile = modFileHash.ModFiles?.Where(mf => mf.Path?.Equals(path, platformFunctions.FileSystemStringComparison) ?? false).FirstOrDefault();
                 }
                 if (modFile is null)
                 {
-                    modFile = new()
+                    modFileHash ??= await getModFileHashAsync(pbDbContext, fileType, await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false));
+                    modFile = new(modFileHash)
                     {
-                        ModFileHash = modFileHash,
                         Path = path
                     };
-                    (modFileHash!.ModFiles ??= []).Add(modFile);
+                    modFileHash.ModFiles!.Add(modFile);
                     await pbDbContext.AddAsync(modFile).ConfigureAwait(false);
                     if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.CorruptPackage)
                     {
@@ -825,9 +809,9 @@ public class ModsDirectoryCataloger :
                     else if (fileType is ModsDirectoryFileType.ScriptArchive or ModsDirectoryFileType.CorruptScriptArchive)
                     {
                         ++ScriptArchiveCount;
-                        PythonByteCodeFileCount += modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
+                        PythonByteCodeFileCount += modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
                             ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc"));
-                        PythonScriptCount += modFileHash!.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
+                        PythonScriptCount += modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
                             ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py"));
                     }
                 }
@@ -883,15 +867,15 @@ public class ModsDirectoryCataloger :
             .ConfigureAwait(false);
         PythonByteCodeFileCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)
-            .SumAsync(mf => mf.ModFileHash!.ScriptModArchiveEntries!.Count(smae => smae.Name.EndsWith(".pyc")))
+            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.Name.EndsWith(".pyc")))
             .ConfigureAwait(false);
         PythonScriptCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)
-            .SumAsync(mf => mf.ModFileHash!.ScriptModArchiveEntries!.Count(smae => smae.Name.EndsWith(".py")))
+            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.Name.EndsWith(".py")))
             .ConfigureAwait(false);
         ResourceCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)
-            .SumAsync(mf => mf.ModFileHash!.Resources!.Count)
+            .SumAsync(mf => mf.ModFileHash.Resources.Count)
             .ConfigureAwait(false);
         ScriptArchiveCount = await pbDbContext.ModFiles
             .CountAsync(mf => mf.Path != null && (mf.FileType == ModsDirectoryFileType.ScriptArchive || mf.FileType == ModsDirectoryFileType.CorruptScriptArchive))

@@ -347,7 +347,7 @@ public class ModHoundClient :
                     .Select(mf => new
                     {
                         name = mf.Path[(mf.Path.LastIndexOf('/') + 1)..mf.Path.LastIndexOf('.')],
-                        date = mf.LastWrite!.Value.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
+                        date = mf.LastWrite.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
                         extension = mf.Path[(mf.Path.LastIndexOf('.') + 1)..],
                         fullPath = $"Mods/{mf.Path}"
                     })
@@ -502,7 +502,6 @@ public class ModHoundClient :
                 "unknownstatusesTable",
                 "uptodatesTable"
             ];
-            var records = new List<ModHoundReportRecord>();
             for (var i = 0; i <= 4; ++i)
             {
                 ++ProgressValue;
@@ -513,7 +512,7 @@ public class ModHoundClient :
                 {
                     if (htmlRecord is null)
                         continue;
-                    var record = new ModHoundReportRecord()
+                    var record = new ModHoundReportRecord(modHoundReport)
                     {
                         CreatorName = htmlRecord.QuerySelector("td:nth-child(3)")?.TextContent.Trim() ?? string.Empty,
                         FileName = htmlRecord.QuerySelector("td:nth-child(1)")?.TextContent?.Trim() ?? string.Empty,
@@ -565,32 +564,27 @@ public class ModHoundClient :
                     if (htmlRecord.QuerySelector("td:nth-last-child(1)")?.TextContent is { } updateNotes
                         && !string.IsNullOrWhiteSpace(updateNotes))
                         record.UpdateNotes = updateNotes.Trim();
-                    records.Add(record);
+                    modHoundReport.Records.Add(record);
                 }
             }
-            modHoundReport.Records = records;
             ++ProgressValue;
-            var incompatibilityRecords = new List<ModHoundReportIncompatibilityRecord>();
             if (reportPageDocument.GetElementById("incompsDetailsPane") is { } incompatibilityDetailsPane)
                 foreach (var orderedList in incompatibilityDetailsPane.QuerySelectorAll("ol"))
                 {
                     if (orderedList is null)
                         continue;
-                    var record = new ModHoundReportIncompatibilityRecord { Parts = [] };
+                    var record = new ModHoundReportIncompatibilityRecord(modHoundReport);
                     foreach (var listItem in orderedList.QuerySelectorAll("li"))
                         if (listItem.TextContent is { } textContent
                             && !string.IsNullOrWhiteSpace(textContent))
-                            record.Parts.Add(new()
+                            record.Parts.Add(new(record)
                             {
                                 FilePath = listItem.GetAttribute("title")?.Trim() ?? string.Empty,
                                 Label = textContent.Trim()
                             });
-                    if (record.Parts.Count is > 0)
-                        incompatibilityRecords.Add(record);
+                    modHoundReport.IncompatibilityRecords.Add(record);
                 }
-            modHoundReport.IncompatibilityRecords = incompatibilityRecords;
             ++ProgressValue;
-            var missingRequirementsRecords = new List<ModHoundReportMissingRequirementsRecord>();
             if (reportPageDocument.GetElementById("missingreqsDetailsPane") is { } missingRequirementsDetailsPane)
                 foreach (var htmlRecord in missingRequirementsDetailsPane.QuerySelectorAll("div"))
                 {
@@ -599,22 +593,18 @@ public class ModHoundClient :
                     var unorderedLists = htmlRecord.QuerySelectorAll("ul").ToImmutableArray();
                     if (unorderedLists.Length is not 2)
                         continue;
-                    var record = new ModHoundReportMissingRequirementsRecord
-                    {
-                        Dependencies = [],
-                        Dependents = []
-                    };
+                    var record = new ModHoundReportMissingRequirementsRecord(modHoundReport);
                     foreach (var listItem in unorderedLists[0].QuerySelectorAll("li"))
                         if (listItem.TextContent is { } textContent
                             && !string.IsNullOrWhiteSpace(textContent))
-                            record.Dependents.Add(new() { Label = textContent.Trim() });
+                            record.Dependents.Add(new(record) { Label = textContent.Trim() });
                     foreach (var listItem in unorderedLists[1].QuerySelectorAll("li"))
                     {
                         if (listItem.QuerySelector("b") is not { } boldTag
                             || boldTag.TextContent is not { } label
                             || string.IsNullOrWhiteSpace(label))
                             continue;
-                        var dependency = new ModHoundReportMissingRequirementsRecordDependency { Label = label };
+                        var dependency = new ModHoundReportMissingRequirementsRecordDependency(record) { Label = label };
                         if (listItem.QuerySelector("span.basic-hint a[href]") is { } anchorTag
                             && anchorTag.TextContent is { } anchorTextContent
                             && !string.IsNullOrWhiteSpace(anchorTextContent)
@@ -627,19 +617,15 @@ public class ModHoundClient :
                         }
                         record.Dependencies.Add(dependency);
                     }
-                    if (record.Dependencies.Count is > 0
-                        && record.Dependents.Count is > 0)
-                        missingRequirementsRecords.Add(record);
+                    modHoundReport.MissingRequirementsRecords.Add(record);
                 }
-            modHoundReport.MissingRequirementsRecords = missingRequirementsRecords;
             ++ProgressValue;
-            var notTrackedRecords = new List<ModHoundReportNotTrackedRecord>();
             if (reportPageDocument.GetElementById("nottrackedsTable") is { } notTrackedTable)
                 foreach (var htmlRecord in notTrackedTable.QuerySelectorAll("tbody > tr"))
                 {
                     if (htmlRecord is null)
                         continue;
-                    var record = new ModHoundReportNotTrackedRecord()
+                    var record = new ModHoundReportNotTrackedRecord(modHoundReport)
                     {
                         FileName = htmlRecord.QuerySelector("td:nth-child(1)")?.TextContent.Trim() ?? string.Empty
                     };
@@ -654,9 +640,8 @@ public class ModHoundClient :
                         record.FileDate = fileDate;
                         record.FileDateString = fileDate.ToString("d");
                     }
-                    notTrackedRecords.Add(record);
+                    modHoundReport.NotTrackedRecords.Add(record);
                 }
-            modHoundReport.NotTrackedRecords = notTrackedRecords;
             Status = "Saving Mod Hound Report";
             RequestPhase = 4;
             ProgressMax = null;
@@ -701,14 +686,14 @@ public class ModHoundClient :
                 .Where(mhr => mhr.Id == report.Id)
                 .Select(mhr => new
                 {
-                    BrokenObsoleteCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.BrokenObsoleteMatches).Count(),
-                    DuplicatesCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.DuplicateMatches).Count(),
-                    IncompatibleCount = mhr.IncompatibilityRecords!.Count(),
-                    MissingRequirementsCount = mhr.MissingRequirementsRecords!.Count(),
-                    NotTrackedCount = mhr.NotTrackedRecords!.Count(),
-                    OutdatedCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.OutdatedMatches).Count(),
-                    UnknownStatusCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UnknownStatusMatches).Count(),
-                    UpToDateCount = mhr.Records!.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UpToDateOkayMatches).Count()
+                    BrokenObsoleteCount = mhr.Records.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.BrokenObsoleteMatches).Count(),
+                    DuplicatesCount = mhr.Records.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.DuplicateMatches).Count(),
+                    IncompatibleCount = mhr.IncompatibilityRecords.Count(),
+                    MissingRequirementsCount = mhr.MissingRequirementsRecords.Count(),
+                    NotTrackedCount = mhr.NotTrackedRecords.Count(),
+                    OutdatedCount = mhr.Records.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.OutdatedMatches).Count(),
+                    UnknownStatusCount = mhr.Records.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UnknownStatusMatches).Count(),
+                    UpToDateCount = mhr.Records.Where(mhrr => mhrr.Status == ModHoundReportRecordStatus.UpToDateOkayMatches).Count()
                 })
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);

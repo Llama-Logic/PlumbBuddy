@@ -415,8 +415,7 @@ public partial class Archivist :
                 LastPlayedWorldName = lastNeighborhood?.Name,
                 LastWriteTime = fileInfo.LastWriteTime,
                 Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
-                OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false),
-                Resources = []
+                OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false)
             };
             var contextLock = new AsyncLock();
             using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
@@ -493,13 +492,11 @@ public partial class Archivist :
                                 using var heldContextLockForAddDelta = await contextLock.LockAsync().ConfigureAwait(false);
                                 await chronicleDbContext.ResourceSnapshotDeltas.AddAsync
                                 (
-                                    new ResourceSnapshotDelta
+                                    new ResourceSnapshotDelta(newSnapshot, resource)
                                     {
                                         PatchZLib = patchZlib,
                                         PatchSize = patch.Length,
-                                        CompressionType = previousCompressionType,
-                                        SavePackageResource = resource,
-                                        SavePackageSnapshot = newSnapshot
+                                        CompressionType = previousCompressionType
                                     }
                                 );
                             }
@@ -513,7 +510,7 @@ public partial class Archivist :
                                 ContentSize = content.Length,
                             };
                         using var heldContextLockForAddResource = await contextLock.LockAsync().ConfigureAwait(false);
-                        newSnapshot.Resources!.Add(resource);
+                        newSnapshot.Resources.Add(resource);
                     }
                     finally
                     {
@@ -530,10 +527,10 @@ public partial class Archivist :
                     .Include(mf => mf.ModFileHash)
                     .AsAsyncEnumerable())
                 {
-                    var modFileLastWrite = modFile.LastWrite ?? default;
+                    var modFileLastWrite = modFile.LastWrite;
                     var modFilePath = modFile.Path;
-                    var modFileSha256 = modFile.ModFileHash!.Sha256;
-                    var modFileSize = modFile.Size ?? default;
+                    var modFileSha256 = modFile.ModFileHash.Sha256;
+                    var modFileSize = modFile.Size;
                     var snapshotModFile = await chronicleDbContext.SnapshotModFiles
                         .FirstOrDefaultAsync
                         (
@@ -555,7 +552,7 @@ public partial class Archivist :
                         };
                         await chronicleDbContext.SnapshotModFiles.AddAsync(snapshotModFile).ConfigureAwait(false);
                     }
-                    (snapshotModFile.Snapshots ??= []).Add(newSnapshot);
+                    snapshotModFile.Snapshots.Add(newSnapshot);
                 }
             }
             MemoryStream? enhancedPackageMemoryStream = null;

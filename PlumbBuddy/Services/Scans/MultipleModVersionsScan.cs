@@ -35,19 +35,19 @@ public sealed class MultipleModVersionsScan :
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var uniqueConflictedFilesSignatures = new HashSet<string>();
         foreach (var modFileManfiestHashId in await pbDbContext.ModFileManifestHashes
-            .Where(mfmh => mfmh.ManifestsByCalculation!.Concat(mfmh.ManifestsBySubsumption!).Any(mfm => mfm.ModFileHash!.ModFiles!.Select(mf => mf.Path).Distinct().Count() > 1))
+            .Where(mfmh => mfmh.ManifestsByCalculation.Concat(mfmh.ManifestsBySubsumption).Any(mfm => mfm.ModFileHash.ModFiles.Select(mf => mf.Path).Distinct().Count() > 1))
             .Select(mfmh => mfmh.Id)
             .ToListAsync().ConfigureAwait(false))
         {
             var duplicates = await pbDbContext.ModFileManifests
-                .Where(mfm => mfm.ModFileHash!.ModFiles!.Any() && (mfm.CalculatedModFileManifestHashId == modFileManfiestHashId || mfm.SubsumedHashes!.Any(sh => sh.Id == modFileManfiestHashId)))
+                .Where(mfm => mfm.ModFileHash.ModFiles.Any() && (mfm.CalculatedModFileManifestHashId == modFileManfiestHashId || mfm.SubsumedHashes.Any(sh => sh.Id == modFileManfiestHashId)))
                 .Select(mfm => new
                 {
                     mfm.Name,
-                    Creators = mfm.Creators!.Select(c => c.Name).ToList(),
+                    Creators = mfm.Creators.Select(c => c.Name).ToList(),
                     mfm.Url,
                     mfm.Version,
-                    FilePaths = mfm.ModFileHash!.ModFiles!.Select(mf => mf.Path!).ToList()
+                    FilePaths = mfm.ModFileHash.ModFiles.Select(mf => mf.Path).ToList()
                 })
                 .ToListAsync().ConfigureAwait(false);
             if (!uniqueConflictedFilesSignatures.Add(string.Join("|", duplicates.SelectMany(d => d.FilePaths).Distinct().Order())))

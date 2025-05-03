@@ -20,9 +20,7 @@ public class SavePackageResource
     [Required]
     public required int ContentSize { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<SavePackageSnapshot>? Snapshots { get; set; }
+    public ICollection<SavePackageSnapshot> Snapshots { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ResourceSnapshotDelta>? Deltas { get; set; }
+    public ICollection<ResourceSnapshotDelta> Deltas { get; } = [];
 }

@@ -1344,7 +1344,7 @@ partial class ManifestEditor
             : string.Empty;
         var componentPathsSplitBySegment = components
             .Select(component => component.File.FullName)
-            .Select(path => path!.Split(Path.DirectorySeparatorChar))
+            .Select(path => path.Split(Path.DirectorySeparatorChar))
             .ToImmutableArray();
         if (componentPathsSplitBySegment.Length == 0)
             commonComponentDirectory = null;

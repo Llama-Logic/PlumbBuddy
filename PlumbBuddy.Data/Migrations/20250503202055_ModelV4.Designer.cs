@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20250423032854_ModelV4")]
+    [Migration("20250503202055_ModelV4")]
     partial class ModelV4
     {
         /// <inheritdoc />
@@ -269,13 +269,13 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("Creation")
+                    b.Property<DateTimeOffset>("Creation")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("FileType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("LastWrite")
+                    b.Property<DateTimeOffset>("LastWrite")
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ModFileHashId")
@@ -285,7 +285,7 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("Size")
+                    b.Property<long>("Size")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

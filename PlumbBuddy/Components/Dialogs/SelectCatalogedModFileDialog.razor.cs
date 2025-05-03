@@ -79,11 +79,11 @@ partial class SelectCatalogedModFileDialog
         var modFilesForDisplay = new List<ModFileForDisplay>();
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var manifestedModFile in await pbDbContext.ModFileManifests
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any())
+            .Where(mfm => mfm.ModFileHash.ModFiles.Any())
             .OrderBy(mfm => mfm.Name)
             .Include(mfm => mfm.Creators)
             .Include(mfm => mfm.ModFileHash)
-                .ThenInclude(mfh => mfh!.ModFiles)
+                .ThenInclude(mfh => mfh.ModFiles)
             .ToListAsync()
             .ConfigureAwait(false))
         {

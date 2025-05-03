@@ -363,11 +363,11 @@ public sealed class Parlay :
             var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             await foreach (var packageRecord in pbDbContext.ModFiles
                 .Where(mf => !mf.Path.EndsWith(".l10n.package")
-                    && mf.ModFileHash!.Resources!.Any(r => r.KeyType == signedStringTableResourceType))
+                    && mf.ModFileHash.Resources.Any(r => r.KeyType == signedStringTableResourceType))
                 .Select(mf => new
                 {
                     mf.Path,
-                    StringTableKeys = mf.ModFileHash!.Resources!
+                    StringTableKeys = mf.ModFileHash.Resources
                         .Where(r => r.KeyType == signedStringTableResourceType)
                         .Select(r => new
                         {
@@ -375,14 +375,14 @@ public sealed class Parlay :
                             r.KeyFullInstance
                         })
                         .ToList(),
-                    ModFileManifests = mf.ModFileHash!.ModFileManifests!.Select(mfm => new
+                    ModFileManifests = mf.ModFileHash.ModFileManifests.Select(mfm => new
                     {
                         mfm.Name,
-                        Creators = mfm.Creators!.Select(mc => mc.Name).ToList(),
+                        Creators = mfm.Creators.Select(mc => mc.Name).ToList(),
                         mfm.Version,
                         mfm.MessageToTranslators,
                         mfm.TranslationSubmissionUrl,
-                        RepurposedLanguages = mfm.RepurposedLanguages!.Select(rl => new
+                        RepurposedLanguages = mfm.RepurposedLanguages.Select(rl => new
                         {
                             rl.ActualLocale,
                             rl.GameLocale

@@ -3,23 +3,27 @@ namespace PlumbBuddy.Data;
 #pragma warning disable IDE0079
 
 [SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
-public class ModFileManifest
+public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscribedModFileManifestHash, ModFileManifestHash calculatedModFileManifestHash)
 {
+    ModFileManifest() :
+        this(null!, null!, null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModFileHashId { get; set; }
 
     [ForeignKey(nameof(ModFileHashId))]
-    public ModFileHash? ModFileHash { get; set; }
+    public ModFileHash ModFileHash { get; set; } = modFileHash;
 
     [Required]
     public required string Name { get; set; }
 
     public string? Description { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModCreator>? Creators { get; set; }
+    public ICollection<ModCreator> Creators { get; } = [];
 
     public string? Version { get; set; }
 
@@ -28,38 +32,31 @@ public class ModFileManifest
     public long InscribedModFileManifestHashId { get; set; }
 
     [ForeignKey(nameof(InscribedModFileManifestHashId))]
-    public ModFileManifestHash? InscribedModFileManifestHash { get; set; }
+    public ModFileManifestHash InscribedModFileManifestHash { get; set; } = inscribedModFileManifestHash;
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifestResourceKey>? HashResourceKeys { get; set; }
+    public ICollection<ModFileManifestResourceKey> HashResourceKeys { get; } = [];
 
     public long CalculatedModFileManifestHashId { get; set; }
 
     [ForeignKey(nameof(CalculatedModFileManifestHashId))]
-    public ModFileManifestHash? CalculatedModFileManifestHash { get; set; }
+    public ModFileManifestHash CalculatedModFileManifestHash { get; set; } = calculatedModFileManifestHash;
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifestHash>? SubsumedHashes { get; set; }
+    public ICollection<ModFileManifestHash> SubsumedHashes { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFeature>? Features { get; set; }
+    public ICollection<ModFeature> Features { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModExclusivity>? Exclusivities { get; set; }
+    public ICollection<ModExclusivity> Exclusivities { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<PackCode>? RequiredPacks { get; set; }
+    public ICollection<PackCode> RequiredPacks { get; } = [];
 
     public long? ElectronicArtsPromoCodeId { get; set; }
 
     [ForeignKey(nameof(ElectronicArtsPromoCodeId))]
     public ElectronicArtsPromoCode? ElectronicArtsPromoCode { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<PackCode>? IncompatiblePacks { get; set; }
+    public ICollection<PackCode> IncompatiblePacks { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? RequiredMods { get; set; }
+    public ICollection<RequiredMod> RequiredMods { get; } = [];
 
     public string? TuningName { get; set; }
 
@@ -119,11 +116,9 @@ public class ModFileManifest
 
     public Uri? TranslationSubmissionUrl { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifestRepurposedLanguage>? RepurposedLanguages { get; set; }
+    public ICollection<ModFileManifestRepurposedLanguage> RepurposedLanguages { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifestTranslator>? Translators { get; set; }
+    public ICollection<ModFileManifestTranslator> Translators { get; } = [];
 
     /// <summary>
     /// Convert this entity to its LLP model equivalent

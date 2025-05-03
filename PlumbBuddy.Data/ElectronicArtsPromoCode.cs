@@ -9,6 +9,5 @@ public class ElectronicArtsPromoCode
     [Required]
     public required string Code { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? ReferencingModFileManifests { get; set; }
+    public ICollection<ModFileManifest> ReferencingModFileManifests { get; } = [];
 }

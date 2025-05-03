@@ -12,26 +12,20 @@ public class ModFileManifestHash
     public required byte[] Sha256 { get; set; }
 
     [InverseProperty(nameof(ModFileManifest.CalculatedModFileManifestHash))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? ManifestsByCalculation { get; set; }
+    public ICollection<ModFileManifest> ManifestsByCalculation { get; } = [];
 
     [InverseProperty(nameof(ModFileManifest.InscribedModFileManifestHash))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? ManifestsByInscription { get; set; }
+    public ICollection<ModFileManifest> ManifestsByInscription { get; } = [];
 
     [InverseProperty(nameof(ModFileManifest.SubsumedHashes))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? ManifestsBySubsumption { get; set; }
+    public ICollection<ModFileManifest> ManifestsBySubsumption { get; } = [];
 
     [InverseProperty(nameof(RequiredMod.Hashes))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? Dependents { get; set; }
+    public ICollection<RequiredMod> Dependents { get; } = [];
 
     [InverseProperty(nameof(RequiredMod.IgnoreIfHashAvailable))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? DisqualifyingByPresence { get; set; }
+    public ICollection<RequiredMod> DisqualifyingByPresence { get; } = [];
 
     [InverseProperty(nameof(RequiredMod.IgnoreIfHashUnavailable))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? DisqualifyingByAbsence { get; set; }
+    public ICollection<RequiredMod> DisqualifyingByAbsence { get; } = [];
 }

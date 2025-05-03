@@ -10,18 +10,14 @@ public class PackCode
     public required string Code { get; set; }
 
     [InverseProperty(nameof(ModFileManifest.RequiredPacks))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? RequiredByMods { get; set; }
+    public ICollection<ModFileManifest> RequiredByMods { get; } = [];
 
     [InverseProperty(nameof(ModFileManifest.IncompatiblePacks))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? IncompatibleWithMods { get; set; }
+    public ICollection<ModFileManifest> IncompatibleWithMods { get; } = [];
 
     [InverseProperty(nameof(RequiredMod.IgnoreIfPackAvailable))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? DisqualifyingByPresence { get; set; }
+    public ICollection<RequiredMod> DisqualifyingByPresence { get; } = [];
 
     [InverseProperty(nameof(RequiredMod.IgnoreIfPackUnavailable))]
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? DisqualifyingByAbsence { get; set; }
+    public ICollection<RequiredMod> DisqualifyingByAbsence { get; } = [];
 }

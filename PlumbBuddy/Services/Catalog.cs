@@ -101,7 +101,7 @@ public class Catalog :
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
-            .Where(mfm => mfm.ModFileHash!.ModFiles!.Any())
+            .Where(mfm => mfm.ModFileHash.ModFiles.Any())
             .Include(mfm => mfm.ModFileHash!)
                 .ThenInclude(mfh => mfh.ModFiles)
             .Include(mfm => mfm.Creators!)
@@ -136,7 +136,7 @@ public class Catalog :
             values.Add(new
             (
                 activeManifest.ToModel(),
-                activeManifest.ModFileHash!.ModFiles!.Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path!))).ToList().AsReadOnly(),
+                activeManifest.ModFileHash.ModFiles.Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path))).ToList().AsReadOnly(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new CatalogModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList().AsReadOnly(),
                 (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new CatalogModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList().AsReadOnly()
             ));

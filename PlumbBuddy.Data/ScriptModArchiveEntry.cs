@@ -1,8 +1,13 @@
 namespace PlumbBuddy.Data;
 
 [Index(nameof(ModFileHashId), nameof(FullName), IsUnique = true)]
-public class ScriptModArchiveEntry
+public class ScriptModArchiveEntry(ModFileHash modFileHash)
 {
+    ScriptModArchiveEntry() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
@@ -10,7 +15,7 @@ public class ScriptModArchiveEntry
     public long ModFileHashId { get; set; }
 
     [ForeignKey(nameof(ModFileHashId))]
-    public ModFileHash? ModFileHash { get; set; }
+    public ModFileHash ModFileHash { get; set; } = modFileHash;
 
     public string? Comment { get; set; }
 

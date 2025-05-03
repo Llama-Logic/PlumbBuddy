@@ -9,6 +9,5 @@ public class RequirementIdentifier
     [Required]
     public required string Identifier { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? RequirementGroupMembers { get; set; }
+    public ICollection<RequiredMod> RequirementGroupMembers { get; } = [];
 }

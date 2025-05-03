@@ -1,18 +1,21 @@
 namespace PlumbBuddy.Data;
 
-public class ModHoundReportMissingRequirementsRecord
+public class ModHoundReportMissingRequirementsRecord(ModHoundReport modHoundReport)
 {
+    ModHoundReportMissingRequirementsRecord() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModHoundReportId { get; set; }
 
     [ForeignKey(nameof(ModHoundReportId))]
-    public ModHoundReport? ModHoundReport { get; set; }
+    public ModHoundReport ModHoundReport { get; set; } = modHoundReport;
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportMissingRequirementsRecordDependency>? Dependencies { get; set; }
+    public ICollection<ModHoundReportMissingRequirementsRecordDependency> Dependencies { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportMissingRequirementsRecordDependent>? Dependents { get; set; }
+    public ICollection<ModHoundReportMissingRequirementsRecordDependent> Dependents { get; } = [];
 }

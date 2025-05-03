@@ -17,6 +17,36 @@ namespace PlumbBuddy.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterColumn<long>(
+                name: "Size",
+                table: "ModFiles",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0L,
+                oldClrType: typeof(long),
+                oldType: "INTEGER",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "LastWrite",
+                table: "ModFiles",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "TEXT",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "Creation",
+                table: "ModFiles",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "TEXT",
+                oldNullable: true);
+
             migrationBuilder.CreateTable(
                 name: "ModHoundReports",
                 columns: table => new
@@ -256,6 +286,30 @@ namespace PlumbBuddy.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ModHoundReports");
+
+            migrationBuilder.AlterColumn<long>(
+                name: "Size",
+                table: "ModFiles",
+                type: "INTEGER",
+                nullable: true,
+                oldClrType: typeof(long),
+                oldType: "INTEGER");
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "LastWrite",
+                table: "ModFiles",
+                type: "TEXT",
+                nullable: true,
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "TEXT");
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "Creation",
+                table: "ModFiles",
+                type: "TEXT",
+                nullable: true,
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "TEXT");
         }
     }
 }

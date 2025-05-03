@@ -9,9 +9,7 @@ public class ModCreator
     [Required]
     public required string Name { get; set; }
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModFileManifest>? AttributedMods { get; set; }
+    public ICollection<ModFileManifest> AttributedMods { get; } = [];
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<RequiredMod>? AttributedRequiredMods { get; set; }
+    public ICollection<RequiredMod> AttributedRequiredMods { get; } = [];
 }

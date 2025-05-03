@@ -1,15 +1,19 @@
 namespace PlumbBuddy.Data;
 
-public class ModHoundReportIncompatibilityRecord
+public class ModHoundReportIncompatibilityRecord(ModHoundReport modHoundReport)
 {
+    ModHoundReportIncompatibilityRecord() :
+        this(null!)
+    {
+    }
+
     [Key]
     public long Id { get; set; }
 
     public long ModHoundReportId { get; set; }
 
     [ForeignKey(nameof(ModHoundReportId))]
-    public ModHoundReport? ModHoundReport { get; set; }
+    public ModHoundReport ModHoundReport { get; set; } = modHoundReport;
 
-    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
-    public ICollection<ModHoundReportIncompatibilityRecordPart>? Parts { get; set; }
+    public ICollection<ModHoundReportIncompatibilityRecordPart> Parts { get; } = [];
 }

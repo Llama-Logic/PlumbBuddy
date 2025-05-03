@@ -174,7 +174,7 @@ public abstract class MissingScan :
                     var signedType = unchecked((int)(uint)key.Type);
                     var signedGroup = unchecked((int)key.Group);
                     var signedFullInstance = unchecked((long)key.FullInstance);
-                    if (!await pbDbContext.ModFileResources.AnyAsync(mfr => mfr.KeyType == signedType && mfr.KeyGroup == signedGroup && mfr.KeyFullInstance == signedFullInstance && mfr.ModFileHash!.ModFiles!.Any(mf => mf.Path != null)).ConfigureAwait(false))
+                    if (!await pbDbContext.ModFileResources.AnyAsync(mfr => mfr.KeyType == signedType && mfr.KeyGroup == signedGroup && mfr.KeyFullInstance == signedFullInstance && mfr.ModFileHash.ModFiles!.Any(mf => mf.Path != null)).ConfigureAwait(false))
                     {
                         requiredElementMissing = true;
                         break;
@@ -183,7 +183,7 @@ public abstract class MissingScan :
             if (!requiredElementMissing && RequiredScriptArchiveFullNames is { } fullNames)
                 foreach (var fullName in fullNames)
                 {
-                    if (!await pbDbContext.ScriptModArchiveEntries.AnyAsync(smae => smae.FullName == fullName && smae.ModFileHash!.ModFiles!.Any(mf => mf.Path != null)).ConfigureAwait(false))
+                    if (!await pbDbContext.ScriptModArchiveEntries.AnyAsync(smae => smae.FullName == fullName && smae.ModFileHash.ModFiles.Any(mf => mf.Path != null)).ConfigureAwait(false))
                     {
                         requiredElementMissing = true;
                         break;

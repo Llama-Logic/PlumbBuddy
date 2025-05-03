@@ -266,13 +266,13 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("Creation")
+                    b.Property<DateTimeOffset>("Creation")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("FileType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("LastWrite")
+                    b.Property<DateTimeOffset>("LastWrite")
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ModFileHashId")
@@ -282,7 +282,7 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("Size")
+                    b.Property<long>("Size")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
