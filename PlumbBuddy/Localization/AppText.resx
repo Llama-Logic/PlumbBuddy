@@ -1581,7 +1581,10 @@ Move available features on the left over to the required list on the right. What
 * help players with installation problems involving it.
 
 ##### Manifest Hashes Need to be Maintained
-*Please remember to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.</value>
+*Please remember to come back here and have me update your mod's manifests if you change anything*. I promise it won't take long and you can even use the **UPDATE ALL THE MANIFESTS IN MODS IN A FOLDER** button on my first step to update manifests for multiple mods at once.
+
+##### Help Players Keep Your Mods Up To Date
+As an additional service to mod users (and to yourself), you may wish to consider listing your mods on [ModHound](https://app.ts4modhound.com/). That will allow mod users to check if they have the current version of your mods quickly and easily, either on the website or in PlumbBuddy, and gives more ways for them to check that it's installed properly — a win for everyone.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestEditor_Composing_Success_Caption" xml:space="preserve">

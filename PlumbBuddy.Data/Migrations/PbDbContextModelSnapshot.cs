@@ -653,8 +653,8 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("FileDate")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("FileDate")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FileDateString")
                         .HasColumnType("TEXT");

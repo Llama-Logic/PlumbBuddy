@@ -79,7 +79,7 @@ namespace PlumbBuddy.Data.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ModHoundReportId = table.Column<long>(type: "INTEGER", nullable: false),
-                    FileDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    FileDate = table.Column<long>(type: "INTEGER", nullable: false),
                     FileDateString = table.Column<string>(type: "TEXT", nullable: true),
                     FileName = table.Column<string>(type: "TEXT", nullable: false),
                     FileType = table.Column<int>(type: "INTEGER", nullable: false)

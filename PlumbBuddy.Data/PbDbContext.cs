@@ -99,6 +99,9 @@ public class PbDbContext :
         modelBuilder.Entity<ModHoundReportMissingRequirementsRecordDependency>()
             .Property(e => e.ModLinkOrIndexHref)
             .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModHoundReportNotTrackedRecord>()
+            .Property(e => e.FileDate)
+            .HasConversion(dtoConverter);
         modelBuilder.Entity<ModHoundReportRecord>()
             .Property(e => e.LastUpdateDate)
             .HasConversion(dtoConverter);

@@ -11,7 +11,7 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20250423004612_ModelV4")]
+    [Migration("20250423032854_ModelV4")]
     partial class ModelV4
     {
         /// <inheritdoc />
@@ -656,8 +656,8 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("FileDate")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("FileDate")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FileDateString")
                         .HasColumnType("TEXT");

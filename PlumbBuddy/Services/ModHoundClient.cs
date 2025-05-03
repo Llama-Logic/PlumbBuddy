@@ -54,9 +54,9 @@ public class ModHoundClient :
     int? requestPhase;
     string searchText;
     ModHoundReportSelection? selectedReport;
-    readonly ObservableCollection<ModHoundReportIncompatibilityRecord> selectedReportIncompatibilityRecords;
+    readonly ObservableRangeCollection<ModHoundReportIncompatibilityRecord> selectedReportIncompatibilityRecords;
     readonly AsyncLock selectedReportIncompatibilityRecordsLock;
-    readonly ObservableCollection<ModHoundReportMissingRequirementsRecord> selectedReportMissingRequirementsRecords;
+    readonly ObservableRangeCollection<ModHoundReportMissingRequirementsRecord> selectedReportMissingRequirementsRecords;
     readonly AsyncLock selectedReportMissingRequirementsRecordsLock;
     string? selectedReportSection;
     readonly ISettings settings;
@@ -360,7 +360,7 @@ public class ModHoundClient :
             byte[] postDirectoryRequestBodyJsonSha256;
             using (var postDirectoryRequestBodyJsonStream = new MemoryStream(Encoding.UTF8.GetBytes(postDirectoryRequestBodyJson)))
                 postDirectoryRequestBodyJsonSha256 = await SHA256.HashDataAsync(postDirectoryRequestBodyJsonStream).ConfigureAwait(false);
-            var freshnessDuration = TimeSpan.FromDays(1);
+            var freshnessDuration = TimeSpan.FromDays(2);
             var stalenessTime = DateTimeOffset.UtcNow.Subtract(freshnessDuration);
             if (await pbDbContext.ModHoundReports.Where(mhr => mhr.RequestSha256 == postDirectoryRequestBodyJsonSha256 && mhr.Retrieved >= stalenessTime).OrderByDescending(mhr => mhr.Retrieved).FirstOrDefaultAsync().ConfigureAwait(false) is { } freshIdenticalReport)
             {
@@ -738,19 +738,20 @@ public class ModHoundClient :
     async Task UpdateSelectedReportIncompatibilityRecordsAsync()
     {
         using var selectedReportIncompatibilityRecordsLockHeld = await selectedReportIncompatibilityRecordsLock.LockAsync().ConfigureAwait(false);
-        if (selectedReportIncompatibilityRecords.Any())
-            selectedReportIncompatibilityRecords.Clear();
         if (selectedReport?.Id is not { } reportId
             || reportId is <= 0
             || selectedReportSection != IModHoundClient.SectionIncompatible)
+        {
+            if (selectedReportIncompatibilityRecords.Any())
+                selectedReportIncompatibilityRecords.Clear();
             return;
+        }
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var incompatibilityRecord in pbDbContext.ModHoundReportIncompatibilityRecords
+        selectedReportIncompatibilityRecords.Reset(await pbDbContext.ModHoundReportIncompatibilityRecords
             .Where(mhrir => mhrir.ModHoundReportId == reportId)
             .Include(mhrir => mhrir.Parts)
-            .AsAsyncEnumerable()
-            .ConfigureAwait(false))
-            selectedReportIncompatibilityRecords.Add(incompatibilityRecord);
+            .ToListAsync()
+            .ConfigureAwait(false));
     }
 
     void UpdateSelectedReportMissingRequirementsRecords() =>
@@ -759,20 +760,21 @@ public class ModHoundClient :
     async Task UpdateSelectedReportMissingRequirementsRecordsAsync()
     {
         using var selectedReportMissingRequirementsRecordsLockHeld = await selectedReportMissingRequirementsRecordsLock.LockAsync().ConfigureAwait(false);
-        if (selectedReportMissingRequirementsRecords.Any())
-            selectedReportMissingRequirementsRecords.Clear();
         if (selectedReport?.Id is not { } reportId
             || reportId is <= 0
             || selectedReportSection != IModHoundClient.SectionMissingRequirements)
+        {
+            if (selectedReportMissingRequirementsRecords.Any())
+                selectedReportMissingRequirementsRecords.Clear();
             return;
+        }
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var missingRequirementsRecord in pbDbContext.ModHoundReportMissingRequirementsRecords
+        selectedReportMissingRequirementsRecords.Reset(await pbDbContext.ModHoundReportMissingRequirementsRecords
             .Where(mhrmr => mhrmr.ModHoundReportId == reportId)
             .Include(mhrmr => mhrmr.Dependencies)
             .Include(mhrmr => mhrmr.Dependents)
-            .AsAsyncEnumerable()
-            .ConfigureAwait(false))
-            selectedReportMissingRequirementsRecords.Add(missingRequirementsRecord);
+            .ToListAsync()
+            .ConfigureAwait(false));
     }
 }
 
