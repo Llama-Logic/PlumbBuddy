@@ -11,14 +11,14 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    [Migration("20250503202055_ModelV4")]
+    [Migration("20250504011908_ModelV4")]
     partial class ModelV4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
 
             modelBuilder.Entity("ModCreatorModFileManifest", b =>
                 {
@@ -519,6 +519,9 @@ namespace PlumbBuddy.Data.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("LastEditedAtAny")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReportHtml")

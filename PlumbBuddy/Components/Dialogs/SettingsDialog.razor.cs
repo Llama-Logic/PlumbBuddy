@@ -5,8 +5,14 @@ partial class SettingsDialog
     IReadOnlyList<string> defaultCreators = [];
     ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
+    IReadOnlyList<string> modHoundPackagesExclusions = [];
+    ChipSetField? modHoundPackagesExclusionsChipSetField;
     MudTabs? tabs;
     ThemeSelector? themeSelector;
+    UserType type;
+
+    [Parameter]
+    public int ActivePanelIndex { get; set; }
 
     string ArchiveFolderPath { get; set; } = string.Empty;
 
@@ -21,6 +27,10 @@ partial class SettingsDialog
     string InstallationFolderPath { get; set; } = string.Empty;
 
     bool OfferPatchDayModUpdatesHelp { get; set; }
+
+    ModHoundExcludePackagesMode ModHoundExcludePackagesMode { get; set; }
+
+    long? ModHoundReportRetentionPeriodTicks { get; set; }
 
     [CascadingParameter]
     IMudDialogInstance? MudDialog { get; set; }
@@ -65,9 +75,26 @@ partial class SettingsDialog
 
     bool ShowSystemTrayIcon { get; set; }
 
-    UserType Type { get; set; }
+    UserType Type
+    {
+        get => type;
+        set
+        {
+            type = value;
+            if (type is UserType.Casual && ModHoundExcludePackagesMode is ModHoundExcludePackagesMode.Patterns)
+            {
+                ModHoundExcludePackagesMode = ModHoundExcludePackagesMode.StartsWith;
+            }
+        }
+    }
 
     string UserDataFolderPath { get; set; } = string.Empty;
+
+    void HandleSetModHoundReportRetentionPeriodDefault() =>
+        ModHoundReportRetentionPeriodTicks = 4L * 7 * 24 * 60 * 60 * 10_000_000;
+
+    void HandleSetModHoundReportRetentionPeriodIndefinite() =>
+        ModHoundReportRetentionPeriodTicks = null;
 
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -75,6 +102,7 @@ partial class SettingsDialog
         if (firstRender)
         {
             defaultCreators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            modHoundPackagesExclusions = Settings.ModHoundPackagesExclusions;
             if (foldersSelector is not null)
             {
                 await foldersSelector.ScanForFoldersAsync();
@@ -93,6 +121,8 @@ partial class SettingsDialog
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
+        ModHoundExcludePackagesMode = Settings.ModHoundExcludePackagesMode;
+        ModHoundReportRetentionPeriodTicks = Settings.ModHoundReportRetentionPeriod?.Ticks;
         OfferPatchDayModUpdatesHelp = Settings.OfferPatchDayModUpdatesHelp;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
         ScanForCorruptMods = Settings.ScanForCorruptMods;
@@ -143,6 +173,9 @@ partial class SettingsDialog
         Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
+        Settings.ModHoundExcludePackagesMode = ModHoundExcludePackagesMode;
+        Settings.ModHoundPackagesExclusions = modHoundPackagesExclusions.ToArray();
+        Settings.ModHoundReportRetentionPeriod = ModHoundReportRetentionPeriodTicks is { } ticks ? new(ticks) : null;
         Settings.OfferPatchDayModUpdatesHelp = OfferPatchDayModUpdatesHelp;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
         Settings.ScanForCorruptMods = ScanForCorruptMods;

@@ -230,8 +230,11 @@ static class DialogExtensions
             return default;
         });
 
-    public static async Task ShowSettingsDialogAsync(this IDialogService dialogService) =>
-        await (await dialogService.ShowAsync<SettingsDialog>(string.Empty, new DialogOptions
+    public static async Task ShowSettingsDialogAsync(this IDialogService dialogService, int activePanelIndex = 0) =>
+        await (await dialogService.ShowAsync<SettingsDialog>(string.Empty, new DialogParameters<SettingsDialog>()
+        {
+            { x => x.ActivePanelIndex, activePanelIndex }
+        }, new DialogOptions
         {
             FullWidth = true,
             MaxWidth = MaxWidth.Medium,

@@ -109,7 +109,14 @@ public partial class App :
             if (Debugger.IsAttached)
                 Debugger.Break();
         }
+
 #endif
+        if (settings.ModHoundReportRetentionPeriod is { } modHoundReportRetentionPeriod)
+        {
+            var timeToDie = DateTimeOffset.UtcNow - modHoundReportRetentionPeriod;
+            using var mhPbDbContext = pbDbContextFactory.CreateDbContext();
+            mhPbDbContext.ModHoundReports.Where(mhr => mhr.Retrieved < timeToDie).ExecuteDelete();
+        }
         // I didn't inject you directly so that I could make sure I migrated before I woke you up
         // but guess what, it's time for school
         lifetimeScope.Resolve<ISmartSimObserver>();

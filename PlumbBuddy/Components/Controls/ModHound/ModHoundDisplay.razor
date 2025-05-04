@@ -20,9 +20,14 @@
 			}
 			else
 			{
-				<MudButton Color="Color.Primary" OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh" Variant="Variant.Filled">
-					Request New Report
-				</MudButton>
+				<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
+					<MudButton OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
+						Request New Report
+					</MudButton>
+					<MudTooltip Arrow Text="Manage Settings for Mod Hound">
+						<MudIconButton Icon="@MaterialDesignIcons.Normal.Cog" OnClick="HandleShowSettingsAsync" />
+					</MudTooltip>
+				</MudButtonGroup>
 			}
 			@if (Observed(() => ModHoundClient.RequestPhase) is { } requestPhase)
 			{

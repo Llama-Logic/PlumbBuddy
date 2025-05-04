@@ -1,13 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable IDE0079
-#pragma warning disable CA1062
-#pragma warning disable CA1861
-#pragma warning disable IDE0053
-#pragma warning disable IDE0161
-#pragma warning disable IDE0300
 
 namespace PlumbBuddy.Data.Migrations
 {
@@ -57,7 +51,8 @@ namespace PlumbBuddy.Data.Migrations
                     TaskId = table.Column<Guid>(type: "TEXT", nullable: false),
                     ResultId = table.Column<string>(type: "TEXT", nullable: false),
                     ReportHtml = table.Column<string>(type: "TEXT", nullable: false),
-                    Retrieved = table.Column<long>(type: "INTEGER", nullable: false)
+                    Retrieved = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastEditedAtAny = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

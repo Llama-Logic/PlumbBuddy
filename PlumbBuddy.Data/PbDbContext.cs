@@ -96,6 +96,9 @@ public class PbDbContext :
         modelBuilder.Entity<ModHoundReport>()
             .Property(e => e.Retrieved)
             .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModHoundReport>()
+            .Property(e => e.LastEditedAtAny)
+            .HasConversion(dtoConverter);
         modelBuilder.Entity<ModHoundReportMissingRequirementsRecordDependency>()
             .Property(e => e.ModLinkOrIndexHref)
             .HasConversion(nullableUriValueConverter);

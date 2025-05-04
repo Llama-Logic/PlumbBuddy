@@ -28,6 +28,9 @@ partial class ModHoundDisplay
         }
     }
 
+    async Task HandleShowSettingsAsync() =>
+        await DialogService.ShowSettingsDialogAsync(4);
+
     async Task<TableData<ModHoundReportNotTrackedRecord>> LoadNotTrackedRecordsAsync(TableState state, CancellationToken token)
     {
         if (ModHoundClient.SelectedReport is not { } selectedReport)

@@ -4,13 +4,14 @@ public class ModHoundClient :
     IModHoundClient
 {
     static readonly Uri baseAddress = new($"{schemeAndAuthority}/", UriKind.Absolute);
+    const string latestEditedAtAny = "/integrations/latest_edited_at_any";
     static readonly Uri referer = new($"{schemeAndAuthority}{visitorLoad}", UriKind.Absolute);
     const string schemeAndAuthority = "https://app.ts4modhound.com";
     const string visitorLoad = "/visitor/load";
     const string visitorLoadDirectory = "/visitor/load/directory";
     static readonly JsonSerializerOptions visitorLoadDirectoryRequestBodyJsonSerializerOptions = new() { WriteIndented = false };
 
-    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
+    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -18,12 +19,14 @@ public class ModHoundClient :
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        ArgumentNullException.ThrowIfNull(blazorFramework);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
+        this.blazorFramework = blazorFramework;
         requestLock = new();
         availableReports = [];
         AvailableReports = new(availableReports);
@@ -38,6 +41,7 @@ public class ModHoundClient :
     }
 
     readonly ObservableCollection<ModHoundReportSelection> availableReports;
+    readonly IBlazorFramework blazorFramework;
     int? brokenObsoleteCount;
     int? duplicatesCount;
     int? incompatibleCount;
@@ -325,33 +329,38 @@ public class ModHoundClient :
             await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
             Status = "Preparing Mod Hound Request";
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            var files = (await pbDbContext.ModFiles // get me dem mod files MDC
+                .Where
+                (
+                    mf =>
+                    mf.FileType == ModsDirectoryFileType.Package // if it's a package
+                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
+                    || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
+                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1 // and 1 folder deep or less
+                )
+                .OrderBy(mf => mf.Path) // put them in order like a gentleman
+                .Select(mf => new
+                {
+                    Path = mf.Path.Replace("\\", "/"), // MH thinks in POSIX
+                    mf.LastWrite
+                })
+                .ToListAsync()
+                .ConfigureAwait(false))
+                .Select(mf => new
+                {
+                    name = mf.Path[(mf.Path.LastIndexOf('/') + 1)..mf.Path.LastIndexOf('.')],
+                    date = mf.LastWrite.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
+                    extension = mf.Path[(mf.Path.LastIndexOf('.') + 1)..],
+                    fullPath = $"Mods/{mf.Path}"
+                })
+                .ToImmutableArray();
             var postDirectoryRequestBodyObject = new
             {
-                files = (await pbDbContext.ModFiles // get me dem mod files MDC
-                    .Where
-                    (
-                        mf =>
-                        mf.FileType == ModsDirectoryFileType.Package // if it's a package
-                        && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
-                        || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
-                        && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1 // and 1 folder deep or less
-                    )
-                    .OrderBy(mf => mf.Path) // put them in order like a gentleman
-                    .Select(mf => new
-                    {
-                        Path = mf.Path.Replace("\\", "/"), // MH thinks in POSIX
-                        mf.LastWrite
-                    })
-                    .ToListAsync()
-                    .ConfigureAwait(false))
-                    .Select(mf => new
-                    {
-                        name = mf.Path[(mf.Path.LastIndexOf('/') + 1)..mf.Path.LastIndexOf('.')],
-                        date = mf.LastWrite.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
-                        extension = mf.Path[(mf.Path.LastIndexOf('.') + 1)..],
-                        fullPath = $"Mods/{mf.Path}"
-                    })
-                    .ToImmutableArray(),
+                files = files.Where(settings.ModHoundExcludePackagesMode switch
+                {
+                    ModHoundExcludePackagesMode.Patterns => file => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !settings.ModHoundPackagesExclusions.Any(exclusion => Regex.IsMatch(file.fullPath[5..], exclusion, RegexOptions.IgnoreCase)),
+                    _ => (file) => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !settings.ModHoundPackagesExclusions.Any(exclusion => file.fullPath[5..].StartsWith(exclusion, StringComparison.OrdinalIgnoreCase))
+                }).ToImmutableArray(),
                 ignoreFolder = false,
                 ignoreFolderName = "CC",
                 timeZone = TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName)
@@ -360,15 +369,6 @@ public class ModHoundClient :
             byte[] postDirectoryRequestBodyJsonSha256;
             using (var postDirectoryRequestBodyJsonStream = new MemoryStream(Encoding.UTF8.GetBytes(postDirectoryRequestBodyJson)))
                 postDirectoryRequestBodyJsonSha256 = await SHA256.HashDataAsync(postDirectoryRequestBodyJsonStream).ConfigureAwait(false);
-            var freshnessDuration = TimeSpan.FromDays(2);
-            var stalenessTime = DateTimeOffset.UtcNow.Subtract(freshnessDuration);
-            if (await pbDbContext.ModHoundReports.Where(mhr => mhr.RequestSha256 == postDirectoryRequestBodyJsonSha256 && mhr.Retrieved >= stalenessTime).OrderByDescending(mhr => mhr.Retrieved).FirstOrDefaultAsync().ConfigureAwait(false) is { } freshIdenticalReport)
-            {
-                if (availableReports.FirstOrDefault(mhrs => mhrs.Id == freshIdenticalReport.Id) is { } availableReport)
-                    SelectedReport = availableReport;
-                superSnacks.OfferRefreshments(new MarkupString($"Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {freshIdenticalReport.Retrieved.Humanize()}, which is still pretty fresh. I've selected that report for you for your convenience."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
-                return;
-            }
             Status = "Submitting Request to Mod Hound";
             var cookieContainer = new CookieContainer();
             using var httpClientHandler = new HttpClientHandler
@@ -379,6 +379,40 @@ public class ModHoundClient :
             using var httpClient = new HttpClient(httpClientHandler) { BaseAddress = baseAddress };
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(platformFunctions.UserAgent);
             httpClient.DefaultRequestHeaders.Add("Origin", schemeAndAuthority);
+            var latestEditedAtAnyRequest = await httpClient.GetAsync(latestEditedAtAny).ConfigureAwait(false);
+            try
+            {
+                latestEditedAtAnyRequest.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, $"Mod Hound's response from GET {latestEditedAtAny} returned non-successful status code: {{StatusCode}}", latestEditedAtAnyRequest.StatusCode);
+                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                return;
+            }
+            var latestEditedAtAnyResponse = await latestEditedAtAnyRequest.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (!DateTimeOffset.TryParse(latestEditedAtAnyResponse, null, DateTimeStyles.AssumeUniversal, out var latestEditedAtAnyDateTimeOffset))
+            {
+                logger.LogWarning($"Mod Hound's response from GET {latestEditedAtAny} returned text not intelligible as a UTC date: {{Text}}", latestEditedAtAnyResponse);
+                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                return;
+            }
+            if (await pbDbContext.ModHoundReports.Where(mhr => mhr.RequestSha256 == postDirectoryRequestBodyJsonSha256 && mhr.LastEditedAtAny >= latestEditedAtAnyDateTimeOffset).OrderByDescending(mhr => mhr.Retrieved).FirstOrDefaultAsync().ConfigureAwait(false) is { } freshIdenticalReport)
+            {
+                if (availableReports.FirstOrDefault(mhrs => mhrs.Id == freshIdenticalReport.Id) is { } availableReport)
+                    SelectedReport = availableReport;
+                superSnacks.OfferRefreshments(new MarkupString($"Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {freshIdenticalReport.Retrieved.Humanize()}, and according to Mod Hound, nothing has changed since then. I've selected that report for you for your convenience."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
+                return;
+            }
+            var packageFilesBeingSent = postDirectoryRequestBodyObject.files.Count(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
+            if (packageFilesBeingSent > 2500)
+                superSnacks.OfferRefreshments(new MarkupString($"Uhh, you're sending a somewhat large batch of {packageFilesBeingSent:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn't analyze CC anyway."), Severity.Warning, options =>
+                {
+                    options.Action = "Show Me";
+                    options.Icon = MaterialDesignIcons.Normal.TableClock;
+                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
+                    options.RequireInteraction = true;
+                });
             using var checkModFilesPageRequest = await httpClient.GetAsync(visitorLoad).ConfigureAwait(false);
             try
             {
@@ -486,6 +520,7 @@ public class ModHoundClient :
             var getReportResponse = await getReportRequest.Content.ReadAsStringAsync().ConfigureAwait(false);
             var modHoundReport = new ModHoundReport
             {
+                LastEditedAtAny = latestEditedAtAnyDateTimeOffset,
                 ReportHtml = getReportResponse,
                 RequestSha256 = postDirectoryRequestBodyJsonSha256,
                 ResultId = lastTaskStatusResponse.ResultId,

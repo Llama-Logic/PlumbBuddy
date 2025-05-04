@@ -19,6 +19,8 @@ public class ModHoundReport
 
     public DateTimeOffset Retrieved { get; set; }
 
+    public DateTimeOffset LastEditedAtAny { get; set; }
+
     public ICollection<ModHoundReportRecord> Records { get; } = [];
 
     public ICollection<ModHoundReportIncompatibilityRecord> IncompatibilityRecords { get; } = [];

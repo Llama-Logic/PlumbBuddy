@@ -4,33 +4,33 @@
 @inject IStringLocalizer<AppText> StringLocalizer
 
 <style>
-    .mud-dialog {
-        border-top-left-radius: var(--mud-default-borderradius);
-        border-top-right-radius: var(--mud-default-borderradius);
-    }
+	.mud-dialog {
+	border-top-left-radius: var(--mud-default-borderradius);
+	border-top-right-radius: var(--mud-default-borderradius);
+	}
 
-    .mud-dialog-title {
-        display: none !important;
-    }
+	.mud-dialog-title {
+	display: none !important;
+	}
 
-    .mud-tab-slider {
-        display: none !important;
-    }
+	.mud-tab-slider {
+	display: none !important;
+	}
 
-    .custom-active-tab {
-        background-color: var(--mud-palette-surface);
-        color: var(--mud-palette-primary) !important;
-    }
+	.custom-active-tab {
+	background-color: var(--mud-palette-surface);
+	color: var(--mud-palette-primary) !important;
+	}
 
-        .custom-active-tab:hover {
-            color: var(--mud--palette-primary-text) !important;
-        }
+	.custom-active-tab:hover {
+	color: var(--mud--palette-primary-text) !important;
+	}
 </style>
 
 <MudStack>
-    <MudTabs @ref="@tabs" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer KeepPanelsAlive PanelClass="pa-6" SliderAnimation="false">
-        <MudTabPanel Text="@StringLocalizer[nameof(AppText.SettingsDialog_General_Label)]" Icon="@MaterialDesignIcons.Normal.Cog">
-            <MudStack Class="ma-4">
+	<MudTabs @ref="@tabs" @bind-ActivePanelIndex="ActivePanelIndex" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer KeepPanelsAlive PanelClass="pa-6" SliderAnimation="false">
+		<MudTabPanel Text="@StringLocalizer[nameof(AppText.SettingsDialog_General_Label)]" Icon="@MaterialDesignIcons.Normal.Cog">
+			<MudStack Class="ma-4">
 				<MudField Label="@(AppText.UserTypeSelector_Label)" Variant="Variant.Filled">
 					<MudRadioGroup @bind-Value="@Type">
 						<MudRadio Value="@UserType.Casual" Color="Color.Primary">
@@ -44,60 +44,108 @@
 						</MudRadio>
 					</MudRadioGroup>
 				</MudField>
-                @if (Type is UserType.Creator)
-                {
-                    <ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
-                }
-                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip)]">
-                    <MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">
-                        @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label)]
-                    </MudSwitchM3>
-                </MudTooltip>
-                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip)]">
-                    <MudSwitchM3 @bind-Value="@OfferPatchDayModUpdatesHelp" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Newspaper">
-                        @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label)]
-                    </MudSwitchM3>
-                </MudTooltip>
-                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
-                    <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">
-                        @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
-                    </MudSwitchM3>
-                </MudTooltip>
-                @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
-                {
-                    <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip)]">
-                        <MudSwitchM3 @bind-Value="@ShowSystemTrayIcon" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.ChevronUp">
-                            @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label)]
-                        </MudSwitchM3>
-                    </MudTooltip>
-                }
+				@if (Type is UserType.Creator)
+				{
+					<ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
+				}
+				<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip)]">
+					<MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">
+						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label)]
+					</MudSwitchM3>
+				</MudTooltip>
+				<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Tip)]">
+					<MudSwitchM3 @bind-Value="@OfferPatchDayModUpdatesHelp" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Newspaper">
+						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label)]
+					</MudSwitchM3>
+				</MudTooltip>
+				<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
+					<MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.InvoiceList">
+						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
+					</MudSwitchM3>
+				</MudTooltip>
+				@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+				{
+					<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip)]">
+						<MudSwitchM3 @bind-Value="@ShowSystemTrayIcon" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.ChevronUp">
+							@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label)]
+						</MudSwitchM3>
+					</MudTooltip>
+				}
 				@if (PlatformFunctions.ProcessorsHavePerformanceVarianceAndConfigurableAffinity && Type is not UserType.Casual)
-                {
+				{
 					<MudTooltip Arrow Color="Color.Secondary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip)]">
 						<MudSwitchM3 @bind-Value="@ForceGameProcessPerformanceProcessorAffinity" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.LightningBolt" ThumbOffIcon="@MaterialDesignIcons.Normal.Leaf">
 							@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label)]
-                        </MudSwitchM3>
-                    </MudTooltip>
-                }
-            </MudStack>
-        </MudTabPanel>
-        <MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
-            <div class="mx-n6 my-n2 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 210px);">
-                <ThemeSelector @ref="@themeSelector" />
-            </div>
-        </MudTabPanel>
-        <MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Label)]" Icon="@MaterialDesignIcons.Normal.Folder">
-            <div class="mt-8">
+						</MudSwitchM3>
+					</MudTooltip>
+				}
+			</MudStack>
+		</MudTabPanel>
+		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
+			<div class="mx-n6 my-n2 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 210px);">
+				<ThemeSelector @ref="@themeSelector" />
+			</div>
+		</MudTabPanel>
+		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Label)]" Icon="@MaterialDesignIcons.Normal.Folder">
+			<div class="mt-8">
 				<FoldersSelector @ref="@foldersSelector" @bind-ArchiveFolderPath="@ArchiveFolderPath" @bind-DownloadsFolderPath="@DownloadsFolderPath" @bind-InstallationFolderPath="@InstallationFolderPath" @bind-UserDataFolderPath="@UserDataFolderPath" />
-            </div>
-        </MudTabPanel>
-        <MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus">
-            <MudGrid Justify="Justify.Center">
-                <MudItem xs="10">
-                    <ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForCorruptMods="@ScanForCorruptMods" @bind-ScanForCorruptScriptMods="@ScanForCorruptScriptMods" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMismatchedInscribedHashes="@ScanForMismatchedInscribedHashes" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
-                </MudItem>
-            </MudGrid>
-        </MudTabPanel>
+			</div>
+		</MudTabPanel>
+		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_ModHealth_Label)]" Icon="@MaterialDesignIcons.Normal.BottleTonicPlus">
+			<MudGrid Justify="Justify.Center">
+				<MudItem xs="10">
+					<ScansToggler @bind-ScanForCacheStaleness="@ScanForCacheStaleness" @bind-ScanForCorruptMods="@ScanForCorruptMods" @bind-ScanForCorruptScriptMods="@ScanForCorruptScriptMods" @bind-ScanForErrorLogs="@ScanForErrorLogs" @bind-ScanForInvalidModSubdirectoryDepth="@ScanForInvalidModSubdirectoryDepth" @bind-ScanForInvalidScriptModSubdirectoryDepth="@ScanForInvalidScriptModSubdirectoryDepth" @bind-ScanForLoose7ZipArchives="@ScanForLoose7ZipArchives" @bind-ScanForLooseRarArchives="@ScanForLooseRarArchives" @bind-ScanForLooseZipArchives="@ScanForLooseZipArchives" @bind-ScanForMismatchedInscribedHashes="@ScanForMismatchedInscribedHashes" @bind-ScanForMissingBe="@ScanForMissingBe" @bind-ScanForMissingDependency="@ScanForMissingDependency" @bind-ScanForMissingMccc="@ScanForMissingMccc" @bind-ScanForMissingModGuard="@ScanForMissingModGuard" @bind-ScanForModsDisabled="@ScanForModsDisabled" @bind-ScanForMultipleModVersions="@ScanForMultipleModVersions" @bind-ScanForMutuallyExclusiveMods="@ScanForMutuallyExclusiveMods" @bind-ScanForScriptModsDisabled="@ScanForScriptModsDisabled" @bind-ScanForShowModsListAtStartupEnabled="@ScanForShowModsListAtStartupEnabled" />
+				</MudItem>
+			</MudGrid>
+		</MudTabPanel>
+		<MudTabPanel Text="Mod Hound" Icon="@MaterialDesignIcons.Normal.Dog">
+			<MudStack Class="ma-4">
+				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ContentSaveSettings" HelperText="I will hold on to reports Mod Hound has created for you for up to this period of time." Label="Report Retention Period" Variant="Variant.Filled">
+					<MudStack AlignItems="AlignItems.Center" Row Spacing="0">
+						<MudSlider T="long" @bind-NullableValue="ModHoundReportRetentionPeriodTicks" Min="1728000000000" Max="72576000000000" Size="Size.Medium" Variant="Variant.Filled">
+							@if (ModHoundReportRetentionPeriodTicks is { } modHoundReportRetentionPeriodTicks)
+							{
+								<MudTextM3>
+									@(new TimeSpan(modHoundReportRetentionPeriodTicks).Humanize(3))
+								</MudTextM3>
+							}
+							else
+							{
+								<MudTextM3>
+									Indefinite
+								</MudTextM3>
+							}
+						</MudSlider>
+						<MudTooltip Arrow Text="Keep my Mod Hound Reports Forever">
+							<MudIconButton Class="ml-2" Icon="@MaterialDesignIcons.Normal.Infinity" OnClick="HandleSetModHoundReportRetentionPeriodIndefinite" />
+						</MudTooltip>
+						<MudTooltip Arrow Text="Use the Default Setting">
+							<MudIconButton Icon="@MaterialDesignIcons.Normal.TimerRefresh" OnClick="HandleSetModHoundReportRetentionPeriodDefault" />
+						</MudTooltip>
+					</MudStack>
+				</MudField>
+				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HelperText="Mod Hound has limits of how many mod files it will analyze and it is not designed to analyze custom content package files (CAS clothing, hairstyles, Build &amp; Buy objects, etc. as opposed to mod package files). How should I determine which package files in your Mods folder are custom content?" Label="Packages Exclusion Mode" Variant="Variant.Filled">
+					<MudRadioGroup @bind-Value="@ModHoundExcludePackagesMode">
+						<MudRadio Value="@ModHoundExcludePackagesMode.StartsWith" Color="Color.Primary">
+							Look for Leading Text in Package File Paths
+						</MudRadio>
+						@if (Type is not UserType.Casual)
+						{
+							<MudRadio Value="@ModHoundExcludePackagesMode.Patterns" Color="Color.Secondary">
+								Test Package File Paths with Regular Expressions
+							</MudRadio>
+						}
+					</MudRadioGroup>
+				</MudField>
+				<ChipSetField @ref="@modHoundPackagesExclusionsChipSetField" @bind-Values="@modHoundPackagesExclusions" Color="Color.Primary" Label="Packages Exclusions" AdornmentIcon="@MaterialDesignIcons.Normal.TestTube" ChipIcon="@MaterialDesignIcons.Normal.EyeOff" Placeholder="Type a new exclusion and press enter" HelperText="If any of these exclusions match a package file, I will consider it a custom content package file and won't bother Mod Hound with it." />
+				<MudAlert Severity="Severity.Info">
+					<MudTextM3>
+						When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows.
+						The path will always be relative to the root of your Mods folder, without a leading forward slash.
+					</MudTextM3>
+				</MudAlert>
+			</MudStack>
+		</MudTabPanel>
     </MudTabs>
     <MudGrid Justify="Justify.FlexEnd" Class="pa-2">
         <MudButton OnClick="CancelOnClickHandler">

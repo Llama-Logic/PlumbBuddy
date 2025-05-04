@@ -16,6 +16,9 @@ public interface ISettings :
     string InstallationFolderPath { get; set; }
     DateTimeOffset? LastCheckForUpdate { get; set; }
     Version? LastGameVersion { get; set; }
+    ModHoundExcludePackagesMode ModHoundExcludePackagesMode { get; set; }
+    string[] ModHoundPackagesExclusions { get; set; }
+    TimeSpan? ModHoundReportRetentionPeriod { get; set; }
     bool OfferPatchDayModUpdatesHelp { get; set; }
     bool Onboarded { get; set; }
     string ParlayName { get; set; }

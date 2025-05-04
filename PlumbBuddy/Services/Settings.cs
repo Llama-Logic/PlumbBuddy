@@ -3,6 +3,9 @@ namespace PlumbBuddy.Services;
 class Settings :
     ISettings
 {
+    static readonly TimeSpan DefaultModHoundReportRetentionPeriod = TimeSpan.FromDays(28);
+    static readonly TimeSpan MinimumModHoundReportRetentionPeriod = TimeSpan.FromDays(2);
+
     public Settings(IPreferences preferences) =>
         this.preferences = preferences;
 
@@ -163,6 +166,49 @@ class Settings :
             if (LastGameVersion == value)
                 return;
             preferences.Set(nameof(LastGameVersion), value?.ToString());
+            OnPropertyChanged();
+        }
+    }
+
+    public ModHoundExcludePackagesMode ModHoundExcludePackagesMode
+    {
+        get => Get(nameof(ModHoundExcludePackagesMode), ModHoundExcludePackagesMode.StartsWith);
+        set
+        {
+            if (ModHoundExcludePackagesMode == value)
+                return;
+            Set(nameof(ModHoundExcludePackagesMode), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string[] ModHoundPackagesExclusions
+    {
+        get => preferences.Get(nameof(ModHoundPackagesExclusions), (string?)null) is string modHoundPackagesExclusions
+            ? modHoundPackagesExclusions.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            : [];
+        set
+        {
+            var currentSet = ModHoundPackagesExclusions.ToHashSet();
+            var valueSet = value.ToHashSet();
+            if (currentSet.IsSubsetOf(valueSet) && !currentSet.IsProperSubsetOf(valueSet))
+                return;
+            preferences.Set(nameof(ModHoundPackagesExclusions), string.Join("\n", valueSet));
+            OnPropertyChanged();
+        }
+    }
+
+    public TimeSpan? ModHoundReportRetentionPeriod
+    {
+        get => preferences.Get(nameof(ModHoundReportRetentionPeriod), (string?)null) is string timeSpanStr
+            && TimeSpan.TryParse(timeSpanStr, out var timeSpan)
+            ? (timeSpan < TimeSpan.Zero ? null : timeSpan < MinimumModHoundReportRetentionPeriod ? MinimumModHoundReportRetentionPeriod : timeSpan)
+            : DefaultModHoundReportRetentionPeriod;
+        set
+        {
+            if (ModHoundReportRetentionPeriod == value)
+                return;
+            preferences.Set(nameof(ModHoundReportRetentionPeriod), (value == null ? TimeSpan.FromSeconds(-1) : value < MinimumModHoundReportRetentionPeriod ? MinimumModHoundReportRetentionPeriod : value).ToString());
             OnPropertyChanged();
         }
     }
