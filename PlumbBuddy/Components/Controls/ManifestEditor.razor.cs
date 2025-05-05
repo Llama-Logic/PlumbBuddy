@@ -243,6 +243,7 @@ partial class ManifestEditor
         var componentName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name;
         var component = new ModComponent
         (
+            manifests.Any(),
             modFile,
             fileObjectModel,
             manifestResourceName,
@@ -503,6 +504,30 @@ partial class ManifestEditor
                     addTransformedCollectionElements(model.Translators, component.Translators, t => new ModFileManifestModelTranslator { Name = t.name, Culture = t.language });
                     componentManifests.Add(component, model);
                 }
+                if (components.Count is 1
+                    && components[0] is { } singleComponent
+                    && !singleComponent.IsManifestPreExisting
+                    && componentManifests[singleComponent] is { } manifest
+                    && Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest)
+                {
+                    var subsumedHashes = new HashSet<ImmutableArray<byte>>(manifest.SubsumedHashes, ImmutableArrayEqualityComparer<byte>.Default);
+                    var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                    await foreach (var dbManifest in pbDbContext.ModFileManifests
+                        .Where(mfm => mfm.Name == manifest.Name)
+                        .Include(mfm => mfm.Creators)
+                        .Include(mfm => mfm.CalculatedModFileManifestHash)
+                        .Include(mfm => mfm.SubsumedHashes)
+                        .AsAsyncEnumerable()
+                        .ConfigureAwait(false))
+                    {
+                        if (dbManifest.Creators.Any(c => !manifest.Creators.Contains(c.Name)))
+                            continue;
+                        subsumedHashes.Add([..dbManifest.CalculatedModFileManifestHash.Sha256]);
+                        subsumedHashes.UnionWith(dbManifest.SubsumedHashes.Select(sh => sh.Sha256.ToImmutableArray()));
+                    }
+                    manifest.SubsumedHashes.Clear();
+                    manifest.SubsumedHashes.UnionWith(subsumedHashes);
+                }
             }
             catch (Exception ex)
             {
@@ -570,6 +595,7 @@ partial class ManifestEditor
                     if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
                         await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", getComponentRelativePath(component)]).ConfigureAwait(false);
+                        var fileType = component.FileObjectModel is ZipArchive ? ModsDirectoryFileType.ScriptArchive : ModsDirectoryFileType.Package;
                         if (component.FileObjectModel is DataBasePackedFile dbpf)
                         {
                             await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
@@ -580,6 +606,14 @@ partial class ManifestEditor
                         else
                             throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                         component.FileObjectModel.Dispose();
+                        if (Settings.AutomaticallyCatalogOnComposition)
+                        {
+                            using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                            var (modFileHash, _) = await ModsDirectoryCataloger.GetModFileHashAsync(pbDbContext, fileType, await ModFileManifestModel.GetFileSha256HashAsync(component.File.FullName).ConfigureAwait(false)).ConfigureAwait(false);
+                            modFileHash.ModFileManifests.Clear();
+                            modFileHash.ModFileManifests.Add(await ModsDirectoryCataloger.TransformModFileManifestModelAsync(pbDbContext, modFileHash, manifest.Hash, manifest, fileType is ModsDirectoryFileType.ScriptArchive ? (ResourceKey?)null : new ResourceKey(ResourceType.SnippetTuning, 0x80000000, manifest.TuningFullInstance)).ConfigureAwait(false));
+                            await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+                        }
                     }
                 if (versionEnabled && !string.IsNullOrWhiteSpace(version) && !string.IsNullOrEmpty(originalVersion))
                     foreach (var component in components)
@@ -1460,5 +1494,22 @@ partial class ManifestEditor
         }
         foreach (var componentToDetach in incorporatedComponents.Except(components, ModComponentFullPathEqualityComparer.Default))
             detachComponent(componentTreeItemData, componentToDetach);
+    }
+}
+
+file class ImmutableArrayEqualityComparer<T> :
+    IEqualityComparer<ImmutableArray<T>>
+{
+    public static ImmutableArrayEqualityComparer<T> Default { get; } = new();
+
+    public bool Equals(ImmutableArray<T> x, ImmutableArray<T> y) =>
+        x.SequenceEqual(y);
+
+    public int GetHashCode([DisallowNull] ImmutableArray<T> obj)
+    {
+        var hashCode = new HashCode();
+        foreach (var element in obj)
+            hashCode.Add(element);
+        return hashCode.ToHashCode();
     }
 }

@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Components.Controls;
 
-public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? messageToTranslators, string? translationSubmissionUrl, string translators, string? name, string subsumedHashes) :
+public class ModComponent(bool isManifestPreExisting, FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? messageToTranslators, string? translationSubmissionUrl, string translators, string? name, string subsumedHashes) :
     IDisposable,
     INotifyPropertyChanged
 {
@@ -90,6 +90,8 @@ public class ModComponent(FileInfo file, IDisposable fileObjectModel, string? ma
             OnPropertyChanged();
         }
     }
+
+    public bool IsManifestPreExisting { get; } = isManifestPreExisting;
 
     public bool IsRequired
     {

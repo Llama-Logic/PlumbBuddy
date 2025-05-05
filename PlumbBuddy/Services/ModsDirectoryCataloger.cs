@@ -6,7 +6,7 @@ public class ModsDirectoryCataloger :
 {
     const int estimateBackwardSample = 64;
 
-    static byte[] GetByteArray(ImmutableArray<byte> immutableByteArray) =>
+    public static byte[] GetByteArray(ImmutableArray<byte> immutableByteArray) =>
         GetByteArrays([immutableByteArray]).Single();
 
     static IEnumerable<byte[]> GetByteArrays(IEnumerable<ImmutableArray<byte>> immutableByteArrays)
@@ -16,6 +16,22 @@ public class ModsDirectoryCataloger :
             var immutableByteArrayOnStack = immutableByteArray;
             yield return Unsafe.As<ImmutableArray<byte>, byte[]>(ref immutableByteArrayOnStack);
         }
+    }
+
+    public static async ValueTask<(ModFileHash modFileHash, ModsDirectoryFileType fileType)> GetModFileHashAsync(PbDbContext pbDbContext, ModsDirectoryFileType fileType, ImmutableArray<byte> hash)
+    {
+        ArgumentNullException.ThrowIfNull(pbDbContext);
+        var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
+        await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged, IsCorrupt) VALUES ({0}, 0, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
+        var modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
+        if (modFileHash.IsCorrupt)
+        {
+            if (fileType is ModsDirectoryFileType.Package)
+                fileType = ModsDirectoryFileType.CorruptPackage;
+            else if (fileType is ModsDirectoryFileType.ScriptArchive)
+                fileType = ModsDirectoryFileType.CorruptScriptArchive;
+        }
+        return (modFileHash, fileType);
     }
 
     static ModsDirectoryFileType GetFileType(FileInfo fileInfo)
@@ -33,8 +49,10 @@ public class ModsDirectoryCataloger :
         };
     }
 
-    static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileHash modFileHash, ModFileManifestHash calculatedModFileManifestHash, ModFileManifestModel modFileManifestModel, ResourceKey? key)
+    public static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileHash modFileHash, ImmutableArray<byte> calculatedModFileManifestHash, ModFileManifestModel modFileManifestModel, ResourceKey? key)
     {
+        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(modFileManifestModel);
         var modFileManifest = new ModFileManifest(modFileHash, await TransformNormalizedEntity
         (
             pbDbContext,
@@ -42,7 +60,14 @@ public class ModsDirectoryCataloger :
             nameof(ModFileManifestHash.Sha256),
             hash => mfmh => mfmh.Sha256 == hash,
             GetByteArray(modFileManifestModel.Hash)
-        ).ConfigureAwait(false), calculatedModFileManifestHash)
+        ).ConfigureAwait(false), await TransformNormalizedEntity
+        (
+            pbDbContext,
+            pbDbContext => pbDbContext.ModFileManifestHashes,
+            nameof(ModFileManifestHash.Sha256),
+            hash => mfmh => mfmh.Sha256 == hash,
+            GetByteArray(calculatedModFileManifestHash)
+        ).ConfigureAwait(false))
         {
             ContactEmail = modFileManifestModel.ContactEmail,
             ContactUrl = modFileManifestModel.ContactUrl,
@@ -646,24 +671,11 @@ public class ModsDirectoryCataloger :
                     modFileHash = modFile.ModFileHash;
                     fileType = modFile.FileType;
                 }
-                static async ValueTask<ModFileHash> getModFileHashAsync(PbDbContext pbDbContext, ModsDirectoryFileType fileType, ImmutableArray<byte> hash)
-                {
-                    var hashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref hash);
-                    await pbDbContext.Database.ExecuteSqlRawAsync("INSERT INTO ModFileHashes (Sha256, ResourcesAndManifestsCataloged, IsCorrupt) VALUES ({0}, 0, 0) ON CONFLICT DO NOTHING", hashArray).ConfigureAwait(false);
-                    var modFileHash = await pbDbContext.ModFileHashes.Include(mfh => mfh.ModFiles).FirstAsync(mfh => mfh.Sha256 == hashArray).ConfigureAwait(false);
-                    if (modFileHash.IsCorrupt)
-                    {
-                        if (fileType is ModsDirectoryFileType.Package)
-                            fileType = ModsDirectoryFileType.CorruptPackage;
-                        else if (fileType is ModsDirectoryFileType.ScriptArchive)
-                            fileType = ModsDirectoryFileType.CorruptScriptArchive;
-                    }
-                    return modFileHash;
-                }
                 if (modFile is null)
                 {
                     var hash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
-                    modFileHash ??= await getModFileHashAsync(pbDbContext, fileType, hash);
+                    if (modFileHash is null)
+                        (modFileHash, fileType) = await GetModFileHashAsync(pbDbContext, fileType, hash).ConfigureAwait(false);
                     if (!modFileHash.ResourcesAndManifestsCataloged)
                     {
                         if (fileType is ModsDirectoryFileType.Package)
@@ -708,15 +720,7 @@ public class ModsDirectoryCataloger :
                                         modFileHash.Resources.Add(key);
                                     foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                                     {
-                                        var calculatedHash = await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false);
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await TransformNormalizedEntity
-                                        (
-                                            pbDbContext,
-                                            pbDbContext => pbDbContext.ModFileManifestHashes,
-                                            nameof(ModFileManifestHash.Sha256),
-                                            hash => mfmh => mfmh.Sha256 == hash,
-                                            GetByteArray(calculatedHash)
-                                        ).ConfigureAwait(false), manifest, manifestKey).ConfigureAwait(false);
+                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false), manifest, manifestKey).ConfigureAwait(false);
                                         dbManifest.Key = manifestKey;
                                         modFileHash.ModFileManifests.Add(dbManifest);
                                     }
@@ -769,15 +773,7 @@ public class ModsDirectoryCataloger :
                                         });
                                     if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
                                     {
-                                        var calculatedHash = ModFileManifestModel.GetModFileHash(zipArchive);
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await TransformNormalizedEntity
-                                        (
-                                            pbDbContext,
-                                            pbDbContext => pbDbContext.ModFileManifestHashes,
-                                            nameof(ModFileManifestHash.Sha256),
-                                            hash => mfmh => mfmh.Sha256 == hash,
-                                            GetByteArray(calculatedHash)
-                                        ).ConfigureAwait(false), manifest, null).ConfigureAwait(false);
+                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipArchive), manifest, null).ConfigureAwait(false);
                                         modFileHash.ModFileManifests.Add(dbManifest);
                                     }
                                 }
@@ -793,7 +789,8 @@ public class ModsDirectoryCataloger :
                 }
                 if (modFile is null)
                 {
-                    modFileHash ??= await getModFileHashAsync(pbDbContext, fileType, await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false));
+                    if (modFileHash is null)
+                        (modFileHash, fileType) = await GetModFileHashAsync(pbDbContext, fileType, await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false));
                     modFile = new(modFileHash)
                     {
                         Path = path

@@ -354,13 +354,38 @@ public class ModHoundClient :
                     fullPath = $"Mods/{mf.Path}"
                 })
                 .ToImmutableArray();
+            var exclusionTests = settings.ModHoundExcludePackagesMode switch
+            {
+                ModHoundExcludePackagesMode.Patterns => settings.ModHoundPackagesExclusions.Select(exclusion =>
+                {
+                    try
+                    {
+                        var pattern = new Regex(exclusion, RegexOptions.IgnoreCase);
+                        return (Func<string, bool>)(path => pattern.IsMatch(path));
+                    }
+                    catch (RegexParseException ex)
+                    {
+                        logger.LogWarning(ex, "failed to parse Mod Hound packages exclusion regular expression: {Pattern}", exclusion);
+                        superSnacks.OfferRefreshments(new MarkupString($"Whoops, this regular expression isn't valid:<br /><br /><code>{exclusion}</code><br /><br />Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?"), Severity.Error, options =>
+                        {
+                            options.Icon = MaterialDesignIcons.Normal.Regex;
+                            options.Action = "Load Sandbox";
+                            options.OnClick = async _ =>
+                            {
+                                if (await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowQuestionDialogAsync("Put your mod package files in the clipboard?", "I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?") ?? false)
+                                    await Clipboard.SetTextAsync(string.Join(Environment.NewLine, files.Select(file => file.fullPath[5..])));
+                                await Browser.OpenAsync($"https://regex101.com/?regex={Uri.EscapeDataString(exclusion)}&flags=gim&flavor=dotnet", BrowserLaunchMode.External);
+                            };
+                            options.RequireInteraction = true;
+                        });
+                        throw;
+                    }
+                }),
+                _ => settings.ModHoundPackagesExclusions.Select(exclusion => (Func<string, bool>)(path => path.StartsWith(exclusion, StringComparison.OrdinalIgnoreCase)))
+            };
             var postDirectoryRequestBodyObject = new
             {
-                files = files.Where(settings.ModHoundExcludePackagesMode switch
-                {
-                    ModHoundExcludePackagesMode.Patterns => file => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !settings.ModHoundPackagesExclusions.Any(exclusion => Regex.IsMatch(file.fullPath[5..], exclusion, RegexOptions.IgnoreCase)),
-                    _ => (file) => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !settings.ModHoundPackagesExclusions.Any(exclusion => file.fullPath[5..].StartsWith(exclusion, StringComparison.OrdinalIgnoreCase))
-                }).ToImmutableArray(),
+                files = files.Where(file => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !exclusionTests.Any(exclusionTest => exclusionTest(file.fullPath[5..]))).ToImmutableArray(),
                 ignoreFolder = false,
                 ignoreFolderName = "CC",
                 timeZone = TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName)
@@ -405,10 +430,21 @@ public class ModHoundClient :
                 return;
             }
             var packageFilesBeingSent = postDirectoryRequestBodyObject.files.Count(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
-            if (packageFilesBeingSent > 2500)
+            if (packageFilesBeingSent > IModHoundClient.PackagesBatchHardLimit)
+            {
+                superSnacks.OfferRefreshments(new MarkupString($"I have cancelled your Mod Hound report request, which was to include a whopping {packageFilesBeingSent:n0} packages. Homes, that is just <strong>too much</strong>. Most of that <em>just has to be CC anyway, right?</em> You should know Mod Hound doesn't analyze CC, so excluding it would enable me to actually request reports."), Severity.Error, options =>
+                {
+                    options.Action = "Exclude CC";
+                    options.Icon = MaterialDesignIcons.Normal.TableOff;
+                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
+                    options.RequireInteraction = true;
+                });
+                return;
+            }
+            if (packageFilesBeingSent > IModHoundClient.PackagesBatchWarningThreshold)
                 superSnacks.OfferRefreshments(new MarkupString($"Uhh, you're sending a somewhat large batch of {packageFilesBeingSent:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn't analyze CC anyway."), Severity.Warning, options =>
                 {
-                    options.Action = "Show Me";
+                    options.Action = "Exclude CC";
                     options.Icon = MaterialDesignIcons.Normal.TableClock;
                     options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
                     options.RequireInteraction = true;
@@ -688,6 +724,10 @@ public class ModHoundClient :
                 SelectedReport = newlyAvailableReport;
             superSnacks.OfferRefreshments(new MarkupString($"Good news, your Mod Hound report is finished and ready to view!"), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableCheck);
         }
+        catch (RegexParseException)
+        {
+            return;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, $"unhandled exception while attempting to request, parse, and commit Mod Hound report");
@@ -839,4 +879,19 @@ file class GetTaskStatusResponse
 
     [JsonPropertyName("type")]
     public string? Type { get; set; }
+}
+
+file class Regex101CreateEntryResponse
+{
+    [JsonPropertyName("deleteCode")]
+    public string? DeleteCode { get; set; }
+
+    [JsonPropertyName("permalinkFragment")]
+    public string? PermalinkFragment { get; set; }
+
+    [JsonPropertyName("version")]
+    public int Version { get; set; }
+
+    [JsonPropertyName("isLibraryEntry")]
+    public bool IsLibraryEntry { get; set; }
 }

@@ -1,4 +1,8 @@
+@implements IDisposable
+@inject IDialogService DialogService
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
@@ -79,6 +83,19 @@
 						</MudSwitchM3>
 					</MudTooltip>
 				}
+				@if (Type is UserType.Creator)
+				{
+					<MudTooltip Arrow Color="Color.Tertiary" Text="This ensures there's a record of mods you manifest in my database even if you're not manifesting them from within your own Mods folder.">
+						<MudSwitchM3 @bind-Value="@AutomaticallyCatalogOnComposition" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FileSign">
+							Automatically catalog mod manifests when composition succeeds
+						</MudSwitchM3>
+					</MudTooltip>
+					<MudTooltip Arrow Color="Color.Tertiary" Text="If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I'll assume it's a new version of the same mod and incoporate the previous versions' hashes to preserve referential backward compatibility.">
+						<MudSwitchM3 @bind-Value="@AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.AutoMode">
+							Automatically subsume identically credited single-file mods when initializing a manifest
+						</MudSwitchM3>
+					</MudTooltip>
+				}
 			</MudStack>
 		</MudTabPanel>
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
@@ -137,13 +154,18 @@
 						}
 					</MudRadioGroup>
 				</MudField>
-				<ChipSetField @ref="@modHoundPackagesExclusionsChipSetField" @bind-Values="@modHoundPackagesExclusions" Color="Color.Primary" Label="Packages Exclusions" AdornmentIcon="@MaterialDesignIcons.Normal.TestTube" ChipIcon="@MaterialDesignIcons.Normal.EyeOff" Placeholder="Type a new exclusion and press enter" HelperText="If any of these exclusions match a package file, I will consider it a custom content package file and won't bother Mod Hound with it." />
+				<ChipSetField @ref="@modHoundPackagesExclusionsChipSetField" @bind-Values="@ModHoundPackagesExclusions" Color="Color.Primary" Label="Packages Exclusions" AdornmentIcon="@MaterialDesignIcons.Normal.TestTube" ChipIcon="@MaterialDesignIcons.Normal.EyeOff" Placeholder="Type a new exclusion and press enter" HelperText="If any of these exclusions match a package file, I will consider it a custom content package file and won't bother Mod Hound with it." />
 				<MudAlert Severity="Severity.Info">
-					<MudTextM3>
-						When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows.
-						The path will always be relative to the root of your Mods folder, without a leading forward slash.
-					</MudTextM3>
+					When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows.
+					The path will always be relative to the root of your Mods folder, without a leading forward slash.
 				</MudAlert>
+				@if (ModHoundPackagesBatchYieldIncluded is { } batchYieldIncluded && ModHoundPackagesBatchYieldExcluded is { } batchYieldExcluded)
+				{
+					<MudStack Row>
+						<MudNumericField Adornment="Adornment.Start" AdornmentColor="@(batchYieldIncluded > IModHoundClient.PackagesBatchHardLimit ? Color.Error : batchYieldIncluded > IModHoundClient.PackagesBatchWarningThreshold ? Color.Warning : Color.Success)" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" HideSpinButtons ReadOnly Label="Packages Included" Value="@batchYieldIncluded" />
+						<MudNumericField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HideSpinButtons ReadOnly Label="Packages Excluded" Value="@batchYieldExcluded" />
+					</MudStack>
+				}
 			</MudStack>
 		</MudTabPanel>
     </MudTabs>

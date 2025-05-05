@@ -3,8 +3,8 @@ namespace PlumbBuddy.Services;
 class Settings :
     ISettings
 {
-    static readonly TimeSpan DefaultModHoundReportRetentionPeriod = TimeSpan.FromDays(28);
-    static readonly TimeSpan MinimumModHoundReportRetentionPeriod = TimeSpan.FromDays(2);
+    static readonly TimeSpan defaultModHoundReportRetentionPeriod = TimeSpan.FromDays(28);
+    static readonly TimeSpan minimumModHoundReportRetentionPeriod = TimeSpan.FromDays(2);
 
     public Settings(IPreferences preferences) =>
         this.preferences = preferences;
@@ -47,6 +47,18 @@ class Settings :
         }
     }
 
+    public bool AutomaticallyCatalogOnComposition
+    {
+        get => preferences.Get(nameof(AutomaticallyCatalogOnComposition), true);
+        set
+        {
+            if (AutomaticallyCatalogOnComposition == value)
+                return;
+            preferences.Set(nameof(AutomaticallyCatalogOnComposition), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool AutomaticallyCheckForUpdates
     {
         get => preferences.Get(nameof(AutomaticallyCheckForUpdates), false);
@@ -55,6 +67,18 @@ class Settings :
             if (AutomaticallyCheckForUpdates == value)
                 return;
             preferences.Set(nameof(AutomaticallyCheckForUpdates), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest
+    {
+        get => preferences.Get(nameof(AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest), true);
+        set
+        {
+            if (AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest == value)
+                return;
+            preferences.Set(nameof(AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest), value);
             OnPropertyChanged();
         }
     }
@@ -182,10 +206,10 @@ class Settings :
         }
     }
 
-    public string[] ModHoundPackagesExclusions
+    public ImmutableArray<string> ModHoundPackagesExclusions
     {
         get => preferences.Get(nameof(ModHoundPackagesExclusions), (string?)null) is string modHoundPackagesExclusions
-            ? modHoundPackagesExclusions.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ? modHoundPackagesExclusions.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToImmutableArray()
             : [];
         set
         {
@@ -202,13 +226,13 @@ class Settings :
     {
         get => preferences.Get(nameof(ModHoundReportRetentionPeriod), (string?)null) is string timeSpanStr
             && TimeSpan.TryParse(timeSpanStr, out var timeSpan)
-            ? (timeSpan < TimeSpan.Zero ? null : timeSpan < MinimumModHoundReportRetentionPeriod ? MinimumModHoundReportRetentionPeriod : timeSpan)
-            : DefaultModHoundReportRetentionPeriod;
+            ? (timeSpan < TimeSpan.Zero ? null : timeSpan < minimumModHoundReportRetentionPeriod ? minimumModHoundReportRetentionPeriod : timeSpan)
+            : defaultModHoundReportRetentionPeriod;
         set
         {
             if (ModHoundReportRetentionPeriod == value)
                 return;
-            preferences.Set(nameof(ModHoundReportRetentionPeriod), (value == null ? TimeSpan.FromSeconds(-1) : value < MinimumModHoundReportRetentionPeriod ? MinimumModHoundReportRetentionPeriod : value).ToString());
+            preferences.Set(nameof(ModHoundReportRetentionPeriod), (value == null ? TimeSpan.FromSeconds(-1) : value < minimumModHoundReportRetentionPeriod ? minimumModHoundReportRetentionPeriod : value).ToString());
             OnPropertyChanged();
         }
     }

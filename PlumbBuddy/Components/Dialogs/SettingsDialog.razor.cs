@@ -5,6 +5,7 @@ partial class SettingsDialog
     IReadOnlyList<string> defaultCreators = [];
     ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
+    ModHoundExcludePackagesMode modHoundExcludePackagesMode;
     IReadOnlyList<string> modHoundPackagesExclusions = [];
     ChipSetField? modHoundPackagesExclusionsChipSetField;
     MudTabs? tabs;
@@ -16,7 +17,11 @@ partial class SettingsDialog
 
     string ArchiveFolderPath { get; set; } = string.Empty;
 
+    bool AutomaticallyCatalogOnComposition { get; set; }
+
     bool AutomaticallyCheckForUpdates { get; set; }
+
+    bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest { get; set; }
 
     string DownloadsFolderPath { get; set; } = string.Empty;
 
@@ -26,14 +31,36 @@ partial class SettingsDialog
 
     string InstallationFolderPath { get; set; } = string.Empty;
 
-    bool OfferPatchDayModUpdatesHelp { get; set; }
+    ModHoundExcludePackagesMode ModHoundExcludePackagesMode
+    {
+        get => modHoundExcludePackagesMode;
+        set
+        {
+            modHoundExcludePackagesMode = value;
+            SampleModHoundPackagesBatchYield();
+        }
+    }
 
-    ModHoundExcludePackagesMode ModHoundExcludePackagesMode { get; set; }
+    int? ModHoundPackagesBatchYieldExcluded { get; set; }
+
+    int? ModHoundPackagesBatchYieldIncluded { get; set; }
+
+    IReadOnlyList<string> ModHoundPackagesExclusions
+    {
+        get => modHoundPackagesExclusions;
+        set
+        {
+            modHoundPackagesExclusions = value;
+            SampleModHoundPackagesBatchYield();
+        }
+    }
 
     long? ModHoundReportRetentionPeriodTicks { get; set; }
 
     [CascadingParameter]
     IMudDialogInstance? MudDialog { get; set; }
+
+    bool OfferPatchDayModUpdatesHelp { get; set; }
 
     bool ScanForCacheStaleness { get; set; }
 
@@ -75,6 +102,9 @@ partial class SettingsDialog
 
     bool ShowSystemTrayIcon { get; set; }
 
+    [Inject]
+    public ISuperSnacks SuperSnacks { get; set; } = null!;
+
     UserType Type
     {
         get => type;
@@ -90,6 +120,15 @@ partial class SettingsDialog
 
     string UserDataFolderPath { get; set; } = string.Empty;
 
+    public void Dispose() =>
+        ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+
+    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.State) && ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+            SampleModHoundPackagesBatchYield();
+    }
+
     void HandleSetModHoundReportRetentionPeriodDefault() =>
         ModHoundReportRetentionPeriodTicks = 4L * 7 * 24 * 60 * 60 * 10_000_000;
 
@@ -103,6 +142,7 @@ partial class SettingsDialog
         {
             defaultCreators = [..Settings.DefaultCreatorsList.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
             modHoundPackagesExclusions = Settings.ModHoundPackagesExclusions;
+            SampleModHoundPackagesBatchYield();
             if (foldersSelector is not null)
             {
                 await foldersSelector.ScanForFoldersAsync();
@@ -114,14 +154,19 @@ partial class SettingsDialog
         }
     }
 
+    protected override void OnInitialized() =>
+        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+
     /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        AutomaticallyCatalogOnComposition = Settings.AutomaticallyCatalogOnComposition;
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
+        AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
         ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
-        ModHoundExcludePackagesMode = Settings.ModHoundExcludePackagesMode;
+        modHoundExcludePackagesMode = Settings.ModHoundExcludePackagesMode;
         ModHoundReportRetentionPeriodTicks = Settings.ModHoundReportRetentionPeriod?.Ticks;
         OfferPatchDayModUpdatesHelp = Settings.OfferPatchDayModUpdatesHelp;
         ScanForCacheStaleness = Settings.ScanForCacheStaleness;
@@ -166,15 +211,19 @@ partial class SettingsDialog
         }
         if (defaultCreatorsChipSetField is not null)
             await defaultCreatorsChipSetField.CommitPendingEntryIfEmptyAsync();
+        if (modHoundPackagesExclusionsChipSetField is not null)
+            await modHoundPackagesExclusionsChipSetField.CommitPendingEntryIfEmptyAsync();
         Settings.ArchiveFolderPath = ArchiveFolderPath;
+        Settings.AutomaticallyCatalogOnComposition = AutomaticallyCatalogOnComposition;
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
+        Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ModHoundExcludePackagesMode = ModHoundExcludePackagesMode;
-        Settings.ModHoundPackagesExclusions = modHoundPackagesExclusions.ToArray();
+        Settings.ModHoundPackagesExclusions = ModHoundPackagesExclusions.ToImmutableArray();
         Settings.ModHoundReportRetentionPeriod = ModHoundReportRetentionPeriodTicks is { } ticks ? new(ticks) : null;
         Settings.OfferPatchDayModUpdatesHelp = OfferPatchDayModUpdatesHelp;
         Settings.ScanForCacheStaleness = ScanForCacheStaleness;
@@ -200,5 +249,76 @@ partial class SettingsDialog
         Settings.Type = Type;
         Settings.UserDataFolderPath = UserDataFolderPath;
         MudDialog?.Close(DialogResult.Ok(true));
+    }
+
+    void SampleModHoundPackagesBatchYield() =>
+        _ = Task.Run(SampleModHoundPackagesBatchYieldAsync);
+
+    async Task SampleModHoundPackagesBatchYieldAsync()
+    {
+        try
+        {
+            using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            var files = (await pbDbContext.ModFiles // get me dem mod files MDC
+                .Where
+                (
+                    mf =>
+                    mf.FileType == ModsDirectoryFileType.Package // if it's a package
+                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
+                    || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
+                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1 // and 1 folder deep or less
+                )
+                .OrderBy(mf => mf.Path) // put them in order like a gentleman
+                .Select(mf => mf.Path.Replace("\\", "/")) // MH thinks in POSIX
+                .ToListAsync()
+                .ConfigureAwait(false))
+                .Select(p => new
+                {
+                    extension = p[(p.LastIndexOf('.') + 1)..],
+                    fullPath = p
+                })
+                .ToImmutableArray();
+            var exclusionTests = modHoundExcludePackagesMode switch
+            {
+                ModHoundExcludePackagesMode.Patterns => modHoundPackagesExclusions.Select(exclusion =>
+                {
+                    try
+                    {
+                        var pattern = new Regex(exclusion, RegexOptions.IgnoreCase);
+                        return (Func<string, bool>)(path => pattern.IsMatch(path));
+                    }
+                    catch (RegexParseException)
+                    {
+                        SuperSnacks.OfferRefreshments(new MarkupString($"Whoops, this regular expression isn't valid:<br /><br /><code>{exclusion}</code><br /><br />Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?"), Severity.Error, options =>
+                        {
+                            options.Icon = MaterialDesignIcons.Normal.Regex;
+                            options.Action = "Load Sandbox";
+                            options.OnClick = async _ =>
+                            {
+                                if (await DialogService.ShowQuestionDialogAsync("Put your mod package files in the clipboard?", "I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?") ?? false)
+                                    await Clipboard.SetTextAsync(string.Join(Environment.NewLine, files.Select(file => file.fullPath)));
+                                await Browser.OpenAsync($"https://regex101.com/?regex={Uri.EscapeDataString(exclusion)}&flags=gim&flavor=dotnet", BrowserLaunchMode.External);
+                            };
+                            options.RequireInteraction = true;
+                        });
+                        throw;
+                    }
+                }),
+                _ => modHoundPackagesExclusions.Select(exclusion => (Func<string, bool>)(path => path.StartsWith(exclusion, StringComparison.OrdinalIgnoreCase)))
+            };
+            var packages = files.Where(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
+            var batchYield = packages.ToLookup(file => !exclusionTests.Any(exclusionTest => exclusionTest(file.fullPath)));
+            ModHoundPackagesBatchYieldIncluded = batchYield[true].Count();
+            ModHoundPackagesBatchYieldExcluded = batchYield[false].Count();
+        }
+        catch
+        {
+            ModHoundPackagesBatchYieldIncluded = null;
+            ModHoundPackagesBatchYieldExcluded = null;
+        }
+        finally
+        {
+            StaticDispatcher.Dispatch(StateHasChanged);
+        }
     }
 }

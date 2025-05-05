@@ -6,7 +6,9 @@ public interface ISettings :
     string ArchiveFolderPath { get; set; }
     bool ArchivistEnabled { get; set; }
     bool ArchivistAutoIngestSaves { get; set; }
+    bool AutomaticallyCatalogOnComposition { get; set; }
     bool AutomaticallyCheckForUpdates { get; set; }
+    bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
     string DefaultCreatorsList { get; set; }
     bool DevToolsUnlocked { get; set; }
@@ -17,7 +19,7 @@ public interface ISettings :
     DateTimeOffset? LastCheckForUpdate { get; set; }
     Version? LastGameVersion { get; set; }
     ModHoundExcludePackagesMode ModHoundExcludePackagesMode { get; set; }
-    string[] ModHoundPackagesExclusions { get; set; }
+    ImmutableArray<string> ModHoundPackagesExclusions { get; set; }
     TimeSpan? ModHoundReportRetentionPeriod { get; set; }
     bool OfferPatchDayModUpdatesHelp { get; set; }
     bool Onboarded { get; set; }

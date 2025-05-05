@@ -49,7 +49,6 @@
 						<MudGrid Spacing="0">
 							@foreach (var translator in context.Item1.Translators)
 							{
-								(3 + 2).ToString();
 								<MudItem>
 									<MudTooltip Arrow Text="@(translator.Culture?.NativeName)">
 										<MudChip Value="@translator.Name">
