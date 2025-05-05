@@ -30,7 +30,7 @@ partial class ManifestEditor
     [GeneratedRegex(@"^https?://.*")]
     private static partial Regex GetUrlPattern();
 
-    public static Task WaitForCompositionClearance(CancellationToken cancellationToken = default) =>
+    public static Task WaitForCompositionClearanceAsync(CancellationToken cancellationToken = default) =>
         compositionResetEvent.WaitAsync(cancellationToken);
 
     bool addRequiredModGuidanceOpen;
@@ -608,10 +608,10 @@ partial class ManifestEditor
                         component.FileObjectModel.Dispose();
                         if (Settings.AutomaticallyCatalogOnComposition)
                         {
+                            var hash = await ModFileManifestModel.GetFileSha256HashAsync(component.File.FullName).ConfigureAwait(false);
                             using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                            var (modFileHash, _) = await ModsDirectoryCataloger.GetModFileHashAsync(pbDbContext, fileType, await ModFileManifestModel.GetFileSha256HashAsync(component.File.FullName).ConfigureAwait(false)).ConfigureAwait(false);
-                            modFileHash.ModFileManifests.Clear();
-                            modFileHash.ModFileManifests.Add(await ModsDirectoryCataloger.TransformModFileManifestModelAsync(pbDbContext, modFileHash, manifest.Hash, manifest, fileType is ModsDirectoryFileType.ScriptArchive ? (ResourceKey?)null : new ResourceKey(ResourceType.SnippetTuning, 0x80000000, manifest.TuningFullInstance)).ConfigureAwait(false));
+                            var (modFileHash, _) = await ModsDirectoryCataloger.GetModFileHashAsync(pbDbContext, fileType, hash).ConfigureAwait(false);
+                            await ModsDirectoryCataloger.CatalogResourcesAndManifestsAsync(pbDbContext, component.File, modFileHash, fileType).ConfigureAwait(false);
                             await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
                         }
                     }

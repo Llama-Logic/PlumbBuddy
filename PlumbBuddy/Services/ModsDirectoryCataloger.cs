@@ -1,3 +1,6 @@
+using PlumbBuddy.Data;
+using System.IO;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -6,7 +9,125 @@ public class ModsDirectoryCataloger :
 {
     const int estimateBackwardSample = 64;
 
-    public static byte[] GetByteArray(ImmutableArray<byte> immutableByteArray) =>
+    public static async ValueTask<(bool success, ModsDirectoryFileType fileType)> CatalogResourcesAndManifestsAsync(PbDbContext pbDbContext, FileInfo fileInfo, ModFileHash modFileHash, ModsDirectoryFileType fileType)
+    {
+        ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(fileInfo);
+        ArgumentNullException.ThrowIfNull(modFileHash);
+        if (!modFileHash.ResourcesAndManifestsCataloged)
+        {
+            if (fileType is ModsDirectoryFileType.Package)
+            {
+                DataBasePackedFile? dbpf = null;
+                var ioExceptionGraceAttempts = 10;
+                while (true)
+                {
+                    try
+                    {
+                        dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
+                        break;
+                    }
+                    catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        fileType = ModsDirectoryFileType.CorruptPackage;
+                        modFileHash.IsCorrupt = true;
+                        break;
+                    }
+                }
+                try
+                {
+                    if (dbpf is not null)
+                    {
+                        var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
+                        if (keys.Contains(GlobalModsManifestModel.ResourceKey))
+                        {
+                            // BAD PLAYER (or frick'n hacker)
+                            dbpf.Dispose();
+                            dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: false).ConfigureAwait(false);
+                            dbpf.Delete(GlobalModsManifestModel.ResourceKey);
+                            await dbpf.SaveAsync().ConfigureAwait(false);
+                            // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
+                            return (false, fileType);
+                        }
+                        modFileHash.Resources.Clear();
+                        foreach (var key in keys.Select(key => new ModFileResource(modFileHash) { Key = key, ModFileHash = modFileHash }))
+                            modFileHash.Resources.Add(key);
+                        foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
+                        {
+                            var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false), manifest, manifestKey).ConfigureAwait(false);
+                            dbManifest.Key = manifestKey;
+                            modFileHash.ModFileManifests.Add(dbManifest);
+                        }
+                    }
+                }
+                finally
+                {
+                    dbpf?.Dispose();
+                }
+            }
+            else if (fileType is ModsDirectoryFileType.ScriptArchive)
+            {
+                ZipArchive? zipArchive = null;
+                var ioExceptionGraceAttempts = 10;
+                while (true)
+                {
+                    try
+                    {
+                        zipArchive = ZipFile.OpenRead(fileInfo.FullName);
+                        break;
+                    }
+                    catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        fileType = ModsDirectoryFileType.CorruptScriptArchive;
+                        modFileHash.IsCorrupt = true;
+                        break;
+                    }
+                }
+                try
+                {
+                    if (zipArchive is not null)
+                    {
+                        foreach (var entry in zipArchive.Entries)
+                            modFileHash.ScriptModArchiveEntries.Add(new(modFileHash)
+                            {
+                                Comment = entry.Comment,
+                                CompressedLength = entry.CompressedLength,
+                                Crc32 = entry.Crc32,
+                                ExternalAttributes = entry.ExternalAttributes,
+                                FullName = entry.FullName,
+                                IsEncrypted = entry.IsEncrypted,
+                                LastWriteTime = entry.LastWriteTime,
+                                Length = entry.Length,
+                                ModFileHash = modFileHash,
+                                Name = entry.Name
+                            });
+                        if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
+                        {
+                            var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipArchive), manifest, null).ConfigureAwait(false);
+                            modFileHash.ModFileManifests.Add(dbManifest);
+                        }
+                    }
+                }
+                finally
+                {
+                    zipArchive?.Dispose();
+                }
+            }
+            modFileHash.ResourcesAndManifestsCataloged = fileType is not (ModsDirectoryFileType.CorruptPackage or ModsDirectoryFileType.CorruptScriptArchive);
+        }
+        return (true, fileType);
+    }
+
+
+    static byte[] GetByteArray(ImmutableArray<byte> immutableByteArray) =>
         GetByteArrays([immutableByteArray]).Single();
 
     static IEnumerable<byte[]> GetByteArrays(IEnumerable<ImmutableArray<byte>> immutableByteArrays)
@@ -52,6 +173,7 @@ public class ModsDirectoryCataloger :
     public static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileHash modFileHash, ImmutableArray<byte> calculatedModFileManifestHash, ModFileManifestModel modFileManifestModel, ResourceKey? key)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
+        ArgumentNullException.ThrowIfNull(modFileHash);
         ArgumentNullException.ThrowIfNull(modFileManifestModel);
         var modFileManifest = new ModFileManifest(modFileHash, await TransformNormalizedEntity
         (
@@ -461,7 +583,7 @@ public class ModsDirectoryCataloger :
                 State = ModsDirectoryCatalogerState.Sleeping;
                 await awakeManualResetEvent.WaitAsync().ConfigureAwait(false);
                 State = ModsDirectoryCatalogerState.Composing;
-                await ManifestEditor.WaitForCompositionClearance().ConfigureAwait(false);
+                await ManifestEditor.WaitForCompositionClearanceAsync().ConfigureAwait(false);
                 State = ModsDirectoryCatalogerState.Debouncing;
                 try
                 {
@@ -676,115 +798,10 @@ public class ModsDirectoryCataloger :
                     var hash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
                     if (modFileHash is null)
                         (modFileHash, fileType) = await GetModFileHashAsync(pbDbContext, fileType, hash).ConfigureAwait(false);
-                    if (!modFileHash.ResourcesAndManifestsCataloged)
-                    {
-                        if (fileType is ModsDirectoryFileType.Package)
-                        {
-                            DataBasePackedFile? dbpf = null;
-                            var ioExceptionGraceAttempts = 10;
-                            while (true)
-                            {
-                                try
-                                {
-                                    dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: true).ConfigureAwait(false);
-                                    break;
-                                }
-                                catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
-                                {
-                                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-                                }
-                                catch
-                                {
-                                    fileType = ModsDirectoryFileType.CorruptPackage;
-                                    modFileHash.IsCorrupt = true;
-                                    break;
-                                }
-                            }
-                            try
-                            {
-                                if (dbpf is not null)
-                                {
-                                    var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
-                                    if (keys.Contains(GlobalModsManifestModel.ResourceKey))
-                                    {
-                                        // BAD PLAYER (or frick'n hacker)
-                                        dbpf.Dispose();
-                                        dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: false).ConfigureAwait(false);
-                                        dbpf.Delete(GlobalModsManifestModel.ResourceKey);
-                                        await dbpf.SaveAsync().ConfigureAwait(false);
-                                        // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
-                                        return;
-                                    }
-                                    modFileHash.Resources.Clear();
-                                    foreach (var key in keys.Select(key => new ModFileResource(modFileHash) { Key = key, ModFileHash = modFileHash }))
-                                        modFileHash.Resources.Add(key);
-                                    foreach (var (manifestKey, manifest) in await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
-                                    {
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, await ModFileManifestModel.GetModFileHashAsync(dbpf, manifest.HashResourceKeys).ConfigureAwait(false), manifest, manifestKey).ConfigureAwait(false);
-                                        dbManifest.Key = manifestKey;
-                                        modFileHash.ModFileManifests.Add(dbManifest);
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                dbpf?.Dispose();
-                            }
-                        }
-                        else if (fileType is ModsDirectoryFileType.ScriptArchive)
-                        {
-                            ZipArchive? zipArchive = null;
-                            var ioExceptionGraceAttempts = 10;
-                            while (true)
-                            {
-                                try
-                                {
-                                    zipArchive = ZipFile.OpenRead(fileInfo.FullName);
-                                    break;
-                                }
-                                catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
-                                {
-                                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-                                }
-                                catch
-                                {
-                                    fileType = ModsDirectoryFileType.CorruptScriptArchive;
-                                    modFileHash.IsCorrupt = true;
-                                    break;
-                                }
-                            }
-                            try
-                            {
-                                if (zipArchive is not null)
-                                {
-                                    foreach (var entry in zipArchive.Entries)
-                                        modFileHash.ScriptModArchiveEntries.Add(new(modFileHash)
-                                        {
-                                            Comment = entry.Comment,
-                                            CompressedLength = entry.CompressedLength,
-                                            Crc32 = entry.Crc32,
-                                            ExternalAttributes = entry.ExternalAttributes,
-                                            FullName = entry.FullName,
-                                            IsEncrypted = entry.IsEncrypted,
-                                            LastWriteTime = entry.LastWriteTime,
-                                            Length = entry.Length,
-                                            ModFileHash = modFileHash,
-                                            Name = entry.Name
-                                        });
-                                    if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
-                                    {
-                                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipArchive), manifest, null).ConfigureAwait(false);
-                                        modFileHash.ModFileManifests.Add(dbManifest);
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                zipArchive?.Dispose();
-                            }
-                        }
-                        modFileHash.ResourcesAndManifestsCataloged = fileType is not (ModsDirectoryFileType.CorruptPackage or ModsDirectoryFileType.CorruptScriptArchive);
-                    }
+                    var success = false;
+                    (success, fileType) = await CatalogResourcesAndManifestsAsync(pbDbContext, fileInfo, modFileHash, fileType).ConfigureAwait(false);
+                    if (!success)
+                        return;
                     modFile = modFileHash.ModFiles?.Where(mf => mf.Path?.Equals(path, platformFunctions.FileSystemStringComparison) ?? false).FirstOrDefault();
                 }
                 if (modFile is null)
