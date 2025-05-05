@@ -208,7 +208,7 @@
 									<MudStack>
 										@if (Type is UserType.Creator)
 										{
-											<ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
+											<ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
 										}
 										<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip)]">
 											<MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">
@@ -238,6 +238,19 @@
 											<MudTooltip Arrow Color="Color.Secondary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Tip)]">
 												<MudSwitchM3 @bind-Value="@ForceGameProcessPerformanceProcessorAffinity" Color="Color.Secondary" ThumbIcon="@MaterialDesignIcons.Normal.LightningBolt" ThumbOffIcon="@MaterialDesignIcons.Normal.Leaf">
 													@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ForceGameProcessPerformanceProcessorAffinity_Label)]
+												</MudSwitchM3>
+											</MudTooltip>
+										}
+										@if (Type is UserType.Creator)
+										{
+											<MudTooltip Arrow Color="Color.Tertiary" Text="This ensures there's a record of mods you manifest in my database even if you're not manifesting them from within your own Mods folder.">
+												<MudSwitchM3 @bind-Value="@AutomaticallyCatalogOnComposition" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FileSign">
+													Automatically catalog mod manifests when composition succeeds
+												</MudSwitchM3>
+											</MudTooltip>
+											<MudTooltip Arrow Color="Color.Tertiary" Text="If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I'll assume it's a new version of the same mod and incoporate the previous versions' hashes to preserve referential backward compatibility.">
+												<MudSwitchM3 @bind-Value="@AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.AutoMode">
+													Automatically subsume identically credited single-file mods when initializing a manifest
 												</MudSwitchM3>
 											</MudTooltip>
 										}

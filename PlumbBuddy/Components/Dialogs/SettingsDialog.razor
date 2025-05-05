@@ -50,7 +50,7 @@
 				</MudField>
 				@if (Type is UserType.Creator)
 				{
-					<ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Primary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Primary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
+					<ChipSetField @ref="@defaultCreatorsChipSetField" @bind-Values="@defaultCreators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_Label)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_DefaultCreators_HelperText)]" />
 				}
 				<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip)]">
 					<MudSwitchM3 @bind-Value="@AutomaticallyCheckForUpdates" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.Update">
