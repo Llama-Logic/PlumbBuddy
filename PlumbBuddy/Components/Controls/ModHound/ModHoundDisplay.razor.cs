@@ -37,35 +37,33 @@ partial class ModHoundDisplay
             return new TableData<ModHoundReportNotTrackedRecord> { TotalItems = 0, Items = [] };
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync(token);
         var recordsInScope = pbDbContext.ModHoundReportNotTrackedRecords.Where(mhrr => mhrr.ModHoundReportId == selectedReport.Id);
-        var recordsToShow = recordsInScope;
         if (state.SortLabel is { } sortLabel
             && !string.IsNullOrWhiteSpace(sortLabel)
             && state.SortDirection is { } sortDirection
             && sortDirection is SortDirection.Ascending or SortDirection.Descending)
-            recordsToShow = sortLabel switch
+            recordsInScope = sortLabel switch
             {
-                "FileName" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.FileName),
-                "FileName" => recordsToShow.OrderBy(mhrr => mhrr.FileName),
-                "FileDate" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.FileDate),
-                "FileDate" => recordsToShow.OrderBy(mhrr => mhrr.FileDate),
-                "FileType" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.FileType),
-                "FileType" => recordsToShow.OrderBy(mhrr => mhrr.FileType),
+                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName),
+                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName),
+                "FileDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileDate),
+                "FileDate" => recordsInScope.OrderBy(mhrr => mhrr.FileDate),
+                "FileType" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileType),
+                "FileType" => recordsInScope.OrderBy(mhrr => mhrr.FileType),
                 _ => throw new Exception("Unsupported sort configuration")
             };
         if (ModHoundClient.SearchText is { } searchText
             && !string.IsNullOrWhiteSpace(searchText))
         {
             searchText = searchText.ToUpperInvariant();
-            recordsToShow = recordsToShow.Where(mhrr =>
+            recordsInScope = recordsInScope.Where(mhrr =>
                    mhrr.FileName.ToUpper().Contains(searchText)
                 || mhrr.FileDateString != null
                 && mhrr.FileDateString.ToUpper().Contains(searchText));
         }
-        recordsToShow = recordsToShow.Skip(state.Page * state.PageSize).Take(state.PageSize);
         return new TableData<ModHoundReportNotTrackedRecord>
         {
             TotalItems = await recordsInScope.CountAsync(token),
-            Items = await recordsToShow.ToListAsync(token)
+            Items = await recordsInScope.Skip(state.Page * state.PageSize).Take(state.PageSize).ToListAsync(token)
         };
     }
 
@@ -84,30 +82,29 @@ partial class ModHoundDisplay
             return new TableData<ModHoundReportRecord> { TotalItems = 0, Items = [] };
         using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync(token);
         var recordsInScope = pbDbContext.ModHoundReportRecords.Where(mhrr => mhrr.ModHoundReportId == selectedReport.Id && mhrr.Status == recordStatus);
-        var recordsToShow = recordsInScope;
         if (state.SortLabel is { } sortLabel
             && !string.IsNullOrWhiteSpace(sortLabel)
             && state.SortDirection is { } sortDirection
             && sortDirection is SortDirection.Ascending or SortDirection.Descending)
-            recordsToShow = sortLabel switch
+            recordsInScope = sortLabel switch
             {
-                "FileName" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.FileName),
-                "FileName" => recordsToShow.OrderBy(mhrr => mhrr.FileName),
-                "ModName" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.ModName),
-                "ModName" => recordsToShow.OrderBy(mhrr => mhrr.ModName),
-                "CreatorName" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.CreatorName),
-                "CreatorName" => recordsToShow.OrderBy(mhrr => mhrr.CreatorName),
-                "LastUpdateDate" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.LastUpdateDate),
-                "LastUpdateDate" => recordsToShow.OrderBy(mhrr => mhrr.LastUpdateDate),
-                "DateOfInstalledFile" when sortDirection is SortDirection.Descending => recordsToShow.OrderByDescending(mhrr => mhrr.DateOfInstalledFile),
-                "DateOfInstalledFile" => recordsToShow.OrderBy(mhrr => mhrr.DateOfInstalledFile),
+                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName),
+                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName),
+                "ModName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.ModName),
+                "ModName" => recordsInScope.OrderBy(mhrr => mhrr.ModName),
+                "CreatorName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.CreatorName),
+                "CreatorName" => recordsInScope.OrderBy(mhrr => mhrr.CreatorName),
+                "LastUpdateDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.LastUpdateDate),
+                "LastUpdateDate" => recordsInScope.OrderBy(mhrr => mhrr.LastUpdateDate),
+                "DateOfInstalledFile" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.DateOfInstalledFile),
+                "DateOfInstalledFile" => recordsInScope.OrderBy(mhrr => mhrr.DateOfInstalledFile),
                 _ => throw new Exception("Unsupported sort configuration")
             };
         if (ModHoundClient.SearchText is { } searchText
             && !string.IsNullOrWhiteSpace(searchText))
         {
             searchText = searchText.ToUpperInvariant();
-            recordsToShow = recordsToShow.Where(mhrr =>
+            recordsInScope = recordsInScope.Where(mhrr =>
                    mhrr.CreatorName.ToUpper().Contains(searchText)
                 || mhrr.DateOfInstalledFileString != null
                 && mhrr.DateOfInstalledFileString.ToUpper().Contains(searchText)
@@ -118,11 +115,10 @@ partial class ModHoundDisplay
                 || mhrr.UpdateNotes != null
                 && mhrr.UpdateNotes.Contains(searchText));
         }
-        recordsToShow = recordsToShow.Skip(state.Page * state.PageSize).Take(state.PageSize);
         return new TableData<ModHoundReportRecord>
         {
             TotalItems = await recordsInScope.CountAsync(token),
-            Items = await recordsToShow.ToListAsync(token)
+            Items = await recordsInScope.Skip(state.Page * state.PageSize).Take(state.PageSize).ToListAsync(token)
         };
     }
 
@@ -136,7 +132,7 @@ partial class ModHoundDisplay
     {
         if (!file.Exists)
         {
-            SuperSnacks.OfferRefreshments(new MarkupString("The file no longer exists, so I can't show it to you."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+            SuperSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundDisplay_Snack_Error_CannotViewRemovedFile), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
             return;
         }
         PlatformFunctions.ViewFile(file);

@@ -289,13 +289,13 @@ partial class SettingsDialog
                     }
                     catch (RegexParseException)
                     {
-                        SuperSnacks.OfferRefreshments(new MarkupString($"Whoops, this regular expression isn't valid:<br /><br /><code>{exclusion}</code><br /><br />Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?"), Severity.Error, options =>
+                        SuperSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_InvalidPackageExclusionRegex, exclusion)), Severity.Error, options =>
                         {
                             options.Icon = MaterialDesignIcons.Normal.Regex;
-                            options.Action = "Load Sandbox";
+                            options.Action = AppText.ModHoundClient_SnackAction_LoadSandbox;
                             options.OnClick = async _ =>
                             {
-                                if (await DialogService.ShowQuestionDialogAsync("Put your mod package files in the clipboard?", "I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?") ?? false)
+                                if (await DialogService.ShowQuestionDialogAsync(AppText.ModHoundClient_Question_PackageFilesInClipboard_Caption, AppText.ModHoundClient_Question_PackageFilesInClipboard_Text) ?? false)
                                     await Clipboard.SetTextAsync(string.Join(Environment.NewLine, files.Select(file => file.fullPath)));
                                 await Browser.OpenAsync($"https://regex101.com/?regex={Uri.EscapeDataString(exclusion)}&flags=gim&flavor=dotnet", BrowserLaunchMode.External);
                             };

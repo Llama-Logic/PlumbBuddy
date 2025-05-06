@@ -85,14 +85,14 @@
 				}
 				@if (Type is UserType.Creator)
 				{
-					<MudTooltip Arrow Color="Color.Tertiary" Text="This ensures there's a record of mods you manifest in my database even if you're not manifesting them from within your own Mods folder.">
+					<MudTooltip Arrow Color="Color.Tertiary" Text="@AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip">
 						<MudSwitchM3 @bind-Value="@AutomaticallyCatalogOnComposition" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FileSign">
-							Automatically catalog mod manifests when composition succeeds
+							@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label)]
 						</MudSwitchM3>
 					</MudTooltip>
-					<MudTooltip Arrow Color="Color.Tertiary" Text="If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I'll assume it's a new version of the same mod and incoporate the previous versions' hashes to preserve referential backward compatibility.">
+					<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip)">
 						<MudSwitchM3 @bind-Value="@AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.AutoMode">
-							Automatically subsume identically credited single-file mods when initializing a manifest
+							@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label)]
 						</MudSwitchM3>
 					</MudTooltip>
 				}
@@ -115,9 +115,9 @@
 				</MudItem>
 			</MudGrid>
 		</MudTabPanel>
-		<MudTabPanel Text="Mod Hound" Icon="@MaterialDesignIcons.Normal.Dog">
+		<MudTabPanel Text="@AppText.Home_ModHound_Label" Icon="@MaterialDesignIcons.Normal.Dog">
 			<MudStack Class="ma-4">
-				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ContentSaveSettings" HelperText="I will hold on to reports Mod Hound has created for you for up to this period of time." Label="Report Retention Period" Variant="Variant.Filled">
+				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ContentSaveSettings" HelperText="@AppText.SettingsDialog_ModHound_Retention_HelperText" Label="@AppText.SettingsDialog_ModHound_Retention_Label" Variant="Variant.Filled">
 					<MudStack AlignItems="AlignItems.Center" Row Spacing="0">
 						<MudSlider T="long" @bind-NullableValue="ModHoundReportRetentionPeriodTicks" Min="1728000000000" Max="72576000000000" Size="Size.Medium" Variant="Variant.Filled">
 							@if (ModHoundReportRetentionPeriodTicks is { } modHoundReportRetentionPeriodTicks)
@@ -129,41 +129,40 @@
 							else
 							{
 								<MudTextM3>
-									Indefinite
+									@StringLocalizer[nameof(AppText.Common_Indefinite)]
 								</MudTextM3>
 							}
 						</MudSlider>
-						<MudTooltip Arrow Text="Keep my Mod Hound Reports Forever">
+						<MudTooltip Arrow Text="@AppText.SettingsDialog_ModHound_Retention_Indefinite_Tip">
 							<MudIconButton Class="ml-2" Icon="@MaterialDesignIcons.Normal.Infinity" OnClick="HandleSetModHoundReportRetentionPeriodIndefinite" />
 						</MudTooltip>
-						<MudTooltip Arrow Text="Use the Default Setting">
+						<MudTooltip Arrow Text="@AppText.SettingsDialog_ModHound_Retention_Default_Tip">
 							<MudIconButton Icon="@MaterialDesignIcons.Normal.TimerRefresh" OnClick="HandleSetModHoundReportRetentionPeriodDefault" />
 						</MudTooltip>
 					</MudStack>
 				</MudField>
-				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HelperText="Mod Hound has limits of how many mod files it will analyze and it is not designed to analyze custom content package files (CAS clothing, hairstyles, Build &amp; Buy objects, etc. as opposed to mod package files). How should I determine which package files in your Mods folder are custom content?" Label="Packages Exclusion Mode" Variant="Variant.Filled">
+				<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HelperText="@AppText.SettingsDialog_ModHound_PackagesExclusionMode_HelperText" Label="@AppText.SettingsDialog_ModHound_PackagesExclusionMode_Label" Variant="Variant.Filled">
 					<MudRadioGroup @bind-Value="@ModHoundExcludePackagesMode">
 						<MudRadio Value="@ModHoundExcludePackagesMode.StartsWith" Color="Color.Primary">
-							Look for Leading Text in Package File Paths
+							@StringLocalizer[nameof(AppText.SettingsDialog_ModHound_PackagesExclusionMode_StartsWith_Label)]
 						</MudRadio>
 						@if (Type is not UserType.Casual)
 						{
 							<MudRadio Value="@ModHoundExcludePackagesMode.Patterns" Color="Color.Secondary">
-								Test Package File Paths with Regular Expressions
+								@StringLocalizer[nameof(AppText.SettingsDialog_ModHound_PackagesExclusionMode_Patterns_Label)]
 							</MudRadio>
 						}
 					</MudRadioGroup>
 				</MudField>
-				<ChipSetField @ref="@modHoundPackagesExclusionsChipSetField" @bind-Values="@ModHoundPackagesExclusions" Color="Color.Primary" Label="Packages Exclusions" AdornmentIcon="@MaterialDesignIcons.Normal.TestTube" ChipIcon="@MaterialDesignIcons.Normal.EyeOff" Placeholder="Type a new exclusion and press enter" HelperText="If any of these exclusions match a package file, I will consider it a custom content package file and won't bother Mod Hound with it." />
+				<ChipSetField @ref="@modHoundPackagesExclusionsChipSetField" @bind-Values="@ModHoundPackagesExclusions" Color="Color.Primary" Label="@AppText.SettingsDialog_ModHound_PackagesExclusions_Label" AdornmentIcon="@MaterialDesignIcons.Normal.TestTube" ChipIcon="@MaterialDesignIcons.Normal.EyeOff" Placeholder="@AppText.SettingsDialog_ModHound_PackagesExclusions_Placeholder" HelperText="@AppText.SettingsDialog_ModHound_PackagesExclusions_HelperText" />
 				<MudAlert Severity="Severity.Info">
-					When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows.
-					The path will always be relative to the root of your Mods folder, without a leading forward slash.
+					@StringLocalizer[nameof(AppText.SettingsDialog_ModHound_PackagesExclusions_EUA)]
 				</MudAlert>
 				@if (ModHoundPackagesBatchYieldIncluded is { } batchYieldIncluded && ModHoundPackagesBatchYieldExcluded is { } batchYieldExcluded)
 				{
 					<MudStack Row>
-						<MudNumericField Adornment="Adornment.Start" AdornmentColor="@(batchYieldIncluded > IModHoundClient.PackagesBatchHardLimit ? Color.Error : batchYieldIncluded > IModHoundClient.PackagesBatchWarningThreshold ? Color.Warning : Color.Success)" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" HideSpinButtons ReadOnly Label="Packages Included" Value="@batchYieldIncluded" />
-						<MudNumericField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HideSpinButtons ReadOnly Label="Packages Excluded" Value="@batchYieldExcluded" />
+						<MudNumericField Adornment="Adornment.Start" AdornmentColor="@(batchYieldIncluded > IModHoundClient.PackagesBatchHardLimit ? Color.Error : batchYieldIncluded > IModHoundClient.PackagesBatchWarningThreshold ? Color.Warning : Color.Success)" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" HideSpinButtons ReadOnly Label="@AppText.SettingsDialog_ModHound_PackagesIncluded_Label" Value="@batchYieldIncluded" />
+						<MudNumericField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HideSpinButtons ReadOnly Label="@AppText.SettingsDialog_ModHound_PackagesExcluded_Label" Value="@batchYieldExcluded" />
 					</MudStack>
 				}
 			</MudStack>

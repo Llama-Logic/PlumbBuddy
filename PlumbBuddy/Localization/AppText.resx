@@ -3035,4 +3035,262 @@ The missing key hashes are:
   <data name="ManifestEditor_Details_ModDescription_HelperText" xml:space="preserve">
     <value>What does your mod do? What's it for? Probably best to keep this short, but sweet.</value>
   </data>
+  <data name="ModHoundDisplay_RequestNewReport_Label" xml:space="preserve">
+    <value>Request New Report</value>
+  </data>
+  <data name="ModHoundDisplay_ManageSettings_Tip" xml:space="preserve">
+    <value>Manage Settings for Mod Hound</value>
+  </data>
+  <data name="ModHoundDisplay_DisplayReport_Label" xml:space="preserve">
+    <value>Display Report</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_Outdated_Label" xml:space="preserve">
+    <value>Outdated</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_Duplicates_Label" xml:space="preserve">
+    <value>Duplicates</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_BrokenObsolete_Label" xml:space="preserve">
+    <value>Broken/Obsolete</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_Incompatible_Label" xml:space="preserve">
+    <value>Incompatible</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_MissingRequirements_Label" xml:space="preserve">
+    <value>Missing Requirements</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_UnknownStatus_Label" xml:space="preserve">
+    <value>Unknown Status</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_UpToDate_Label" xml:space="preserve">
+    <value>Up to Date</value>
+  </data>
+  <data name="ModHoundDisplay_SectionMenu_NotTracked_Label" xml:space="preserve">
+    <value>Not Tracked</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Outdated_Subtitle" xml:space="preserve">
+    <value>Files updated since you downloaded them</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Duplicates_Subtitle" xml:space="preserve">
+    <value>Files for which only one version must be kept</value>
+  </data>
+  <data name="ModHoundDisplay_Section_BrokenObsolete_Subtitle" xml:space="preserve">
+    <value>Broken or obsolete (discontinued) files with no updates available (as far as Mod Hound is aware)</value>
+  </data>
+  <data name="ModHoundDisplay_Section_UnknownStatus_Subtitle" xml:space="preserve">
+    <value>Files with "unknown status", which may or may not be okay to use</value>
+  </data>
+  <data name="ModHoundDisplay_Section_UpToDate_Subtitle" xml:space="preserve">
+    <value>Files that SEEM up to date and are not known to be broken</value>
+  </data>
+  <data name="ModHoundDisplay_Section_MissingRequirements_Subtitle" xml:space="preserve">
+    <value>Mods missing their Requirements</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Incompatible_Subtitle" xml:space="preserve">
+    <value>Must keep only one mod — click on a mod listed to view it on your computer</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Outdated_NoResults_Label" xml:space="preserve">
+    <value>There are no outdated mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Duplicates_NoResults_Label" xml:space="preserve">
+    <value>There are no duplicate mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_BrokenObsolete_NoResults_Label" xml:space="preserve">
+    <value>There are no broken/obsolete mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_UnknownStatus_NoResults_Label" xml:space="preserve">
+    <value>There are no unknown status mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_UpToDate_NoResults_Label" xml:space="preserve">
+    <value>There are no up-to-date mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Incompatible_NoResults_Label" xml:space="preserve">
+    <value>There are no incomptaible mods to display.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_MissingRequirements_NoResults_Label" xml:space="preserve">
+    <value>There are no mods missing requirements to display.</value>
+  </data>
+  <data name="ModHoundDisplay_Section_NotTracked_NoResults_Label" xml:space="preserve">
+    <value>There are no not tracked mods to display for this page.</value>
+  </data>
+  <data name="ModHoundDisplay_SupportLumpinou_Label" xml:space="preserve">
+    <value>Like Mod Hound? You can support its maintenance and continued development by letting others know about it, and considering supporting [Lumpinou on Patreon](https://www.patreon.com/lumpinou)!</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_FileName" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_ModName" xml:space="preserve">
+    <value>Mod Name</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_CreatorName" xml:space="preserve">
+    <value>Creator Name</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_LastUpdateDate" xml:space="preserve">
+    <value>Last Update Date</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_DateOfInstalledFile" xml:space="preserve">
+    <value>Date of Installed File</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_UpdateNotes" xml:space="preserve">
+    <value>Update Notes</value>
+  </data>
+  <data name="ModHoundDisplay_DownloadThisMod_Tip" xml:space="preserve">
+    <value>Download this Mod</value>
+  </data>
+  <data name="ModHoundDisplay_Section_Incompatibility_RecordHeader_Format" xml:space="preserve">
+    <value>{0} Incompatibility</value>
+    <comment>{0} = Ordinal Number of the Incompatibility</comment>
+  </data>
+  <data name="ModHoundDisplay_Section_MissingRequirements_Dependencies_Label" xml:space="preserve">
+    <value>Mods that Make Up the Requirement</value>
+  </data>
+  <data name="ModHoundDisplay_Section_MissingRequirements_Dependents_Label" xml:space="preserve">
+    <value>Mods Missing the Requirement</value>
+  </data>
+  <data name="ModHoundDisplay_Section_MissingRequirements_RecordHeader_Format" xml:space="preserve">
+    <value>{0} Missing Requirement</value>
+    <comment>{0} = Ordinal Number of the Missing Requirement</comment>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_FileDate" xml:space="preserve">
+    <value>File Date</value>
+  </data>
+  <data name="ModHoundDisplay_ColumnHeader_FileType" xml:space="preserve">
+    <value>File Type</value>
+  </data>
+  <data name="ModHoundClient_Snack_Normal_RequestAlreadyInProgress" xml:space="preserve">
+    <value>I'm already communicating with Mod Hound on your behalf. I'll let you know when I'm done.</value>
+  </data>
+  <data name="ModHoundClient_Status_WaitingForModsDirectoryCataloger" xml:space="preserve">
+    <value>Waiting for Mods Directory Cataloger</value>
+  </data>
+  <data name="ModHoundClient_Status_PreparingRequest" xml:space="preserve">
+    <value>Preparing Mod Hound Request</value>
+  </data>
+  <data name="ModHoundClient_Status_SubmittingRequest" xml:space="preserve">
+    <value>Submitting Request to Mod Hound</value>
+  </data>
+  <data name="ModHoundClient_Snack_Error_ScrapWithTheDog" xml:space="preserve">
+    <value>Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later.</value>
+  </data>
+  <data name="ModHoundClient_Snack_Success_MatchingCachedReport" xml:space="preserve">
+    <value>Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {0}, and according to Mod Hound, nothing has changed since then. I've selected that report for you for your convenience.</value>
+    <comment>{0} = How long ago the previously retrieved report was retrieved</comment>
+  </data>
+  <data name="ModHoundClient_Snack_Error_InvalidPackageExclusionRegex" xml:space="preserve">
+    <value>Whoops, this regular expression isn't valid:&lt;br /&gt;&lt;br /&gt;&lt;code&gt;{0}&lt;/code&gt;&lt;br /&gt;&lt;br /&gt;Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?</value>
+    <comment>{0} = The offending regular expression</comment>
+  </data>
+  <data name="ModHoundClient_Question_PackageFilesInClipboard_Caption" xml:space="preserve">
+    <value>Put your mod package files in the clipboard?</value>
+  </data>
+  <data name="ModHoundClient_Question_PackageFilesInClipboard_Text" xml:space="preserve">
+    <value>I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?</value>
+  </data>
+  <data name="ModHoundClient_Snack_Error_PackageHardLimitExceeded" xml:space="preserve">
+    <value>I have cancelled your Mod Hound report request, which was to include a whopping {0:n0} packages. Homes, that is just &lt;strong&gt;too much&lt;/strong&gt;. Most of that &lt;em&gt;just has to be CC anyway, right?&lt;/em&gt; You should know Mod Hound doesn't analyze CC, so excluding it would enable me to actually request reports.</value>
+    <comment>{0:n0} = The number of packages the user is trying to send to Mod Hound</comment>
+  </data>
+  <data name="ModHoundClient_SnackAction_ExcludeCC" xml:space="preserve">
+    <value>Exclude CC</value>
+  </data>
+  <data name="ModHoundClient_SnackAction_LoadSandbox" xml:space="preserve">
+    <value>Load Sandbox</value>
+  </data>
+  <data name="ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages" xml:space="preserve">
+    <value>Uhh, you're sending a somewhat large batch of {0:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn't analyze CC anyway.</value>
+    <comment>{0:n0} = The number of packages the user is sending to Mod Hound</comment>
+  </data>
+  <data name="ModHoundClient_Status_AwaitingResponse" xml:space="preserve">
+    <value>Waiting for Mod Hound's Response</value>
+  </data>
+  <data name="ModHoundClient_Status_RequestQueueState" xml:space="preserve">
+    <value>Your Request {0}</value>
+    <comment>{0} = The description of the state of the request in the queue</comment>
+  </data>
+  <data name="ModHoundClient_Status_RequestQueueState_Pending" xml:space="preserve">
+    <value>is Pending</value>
+  </data>
+  <data name="ModHoundClient_Status_RequestQueueState_Started" xml:space="preserve">
+    <value>has Started</value>
+  </data>
+  <data name="ModHoundClient_Status_RequestQueueState_Default" xml:space="preserve">
+    <value>is Being Processed</value>
+  </data>
+  <data name="ModHoundClient_Status_ReadingResponse" xml:space="preserve">
+    <value>Reading Mod Hound's Response</value>
+  </data>
+  <data name="ModHoundClient_Snack_Error_DetailedScrapWithTheDog" xml:space="preserve">
+    <value>Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later.&lt;br /&gt;&lt;br /&gt;Specifically, Mod Hound said:&lt;br /&gt;&lt;pre&gt;{0}&lt;/pre&gt;</value>
+    <comment>{0} = Error from Mod Hound</comment>
+  </data>
+  <data name="ModHoundClient_Status_SavingReport" xml:space="preserve">
+    <value>Saving Mod Hound Report</value>
+  </data>
+  <data name="ModHoundClient_Snack_Success_ReportReady" xml:space="preserve">
+    <value>Good news, your Mod Hound report is finished and ready to view!</value>
+  </data>
+  <data name="Home_ModHound_Label" xml:space="preserve">
+    <value>Mod Hound</value>
+  </data>
+  <data name="ModHoundDisplay_Snack_Error_CannotViewRemovedFile" xml:space="preserve">
+    <value>The file no longer exists, so I can't show it to you.</value>
+  </data>
+  <data name="SettingsDialog_ModHound_Retention_HelperText" xml:space="preserve">
+    <value>I will hold on to reports Mod Hound has created for you for up to this period of time.</value>
+  </data>
+  <data name="SettingsDialog_ModHound_Retention_Label" xml:space="preserve">
+    <value>Report Retention Period</value>
+  </data>
+  <data name="Common_Indefinite" xml:space="preserve">
+    <value>Indefinite</value>
+  </data>
+  <data name="SettingsDialog_ModHound_Retention_Indefinite_Tip" xml:space="preserve">
+    <value>Keep my Mod Hound Reports Forever</value>
+  </data>
+  <data name="SettingsDialog_ModHound_Retention_Default_Tip" xml:space="preserve">
+    <value>Use the Default Setting</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusionMode_HelperText" xml:space="preserve">
+    <value>Mod Hound has limits of how many mod files it will analyze and it is not designed to analyze custom content package files (CAS clothing, hairstyles, Build &amp; Buy objects, etc. as opposed to mod package files). How should I determine which package files in your Mods folder are custom content?</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusionMode_Label" xml:space="preserve">
+    <value>Packages Exclusion Mode</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusionMode_StartsWith_Label" xml:space="preserve">
+    <value>Look for Leading Text in Package File Paths</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusionMode_Patterns_Label" xml:space="preserve">
+    <value>Test Package File Paths with Regular Expressions</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusions_Label" xml:space="preserve">
+    <value>Packages Exclusions</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusions_Placeholder" xml:space="preserve">
+    <value>Type a new exclusion and press enter</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusions_HelperText" xml:space="preserve">
+    <value>If any of these exclusions match a package file, I will consider it a custom content package file and won't bother Mod Hound with it.</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExclusions_EUA" xml:space="preserve">
+    <value>When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows. The path will always be relative to the root of your Mods folder, without a leading forward slash.</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesIncluded_Label" xml:space="preserve">
+    <value>Packages Included</value>
+  </data>
+  <data name="SettingsDialog_ModHound_PackagesExcluded_Label" xml:space="preserve">
+    <value>Packages Excluded</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip" xml:space="preserve">
+    <value>This ensures there's a record of mods you manifest in my database even if you're not manifesting them from within your own Mods folder.</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label" xml:space="preserve">
+    <value>Automatically catalog mod manifests when composition succeeds</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip" xml:space="preserve">
+    <value>If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I'll assume it's a new version of the same mod and incoporate the previous versions' hashes to preserve referential backward compatibility.</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label" xml:space="preserve">
+    <value>Automatically subsume identically credited single-file mods when initializing a manifest</value>
+  </data>
 </root>

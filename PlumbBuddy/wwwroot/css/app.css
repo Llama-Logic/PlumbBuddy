@@ -40,6 +40,15 @@ article.mud-markdown-body > *:last-child {
     margin-bottom: 0 !important;
 }
 
+.markdown-caption .mud-typography-body1 {
+    font-size: var(--mud-typography-caption-size);
+    font-family: var(--mud-typography-caption-family);
+    font-weight: var(--mud-typography-caption-weight);
+    line-height: var(--mud-typography-caption-lineheight);
+    letter-spacing: var(--mud-typography-caption-letterspacing);
+    text-transform: var(--mud-typography-caption-text-transform);
+}
+
 .fade-container {
     transition: opacity 0.5s ease-in-out;
 }

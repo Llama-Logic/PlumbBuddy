@@ -4,11 +4,13 @@ public class ModHoundClient :
     IModHoundClient
 {
     static readonly Uri baseAddress = new($"{schemeAndAuthority}/", UriKind.Absolute);
+    const string getReportUrlFormat = "/visitor/track/{0}/{1}";
     const string latestEditedAtAny = "/integrations/latest_edited_at_any";
     static readonly Uri referer = new($"{schemeAndAuthority}{visitorLoad}", UriKind.Absolute);
     const string schemeAndAuthority = "https://app.ts4modhound.com";
     const string visitorLoad = "/visitor/load";
     const string visitorLoadDirectory = "/visitor/load/directory";
+    const string visitorTaskStatusUrlFormat = "/visitor/task-status/{0}";
     static readonly JsonSerializerOptions visitorLoadDirectoryRequestBodyJsonSerializerOptions = new() { WriteIndented = false };
 
     public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
@@ -319,15 +321,15 @@ public class ModHoundClient :
         }
         if (requestLockHeld is null)
         {
-            superSnacks.OfferRefreshments(new MarkupString("I'm already communicating with Mod Hound on your behalf. I'll let you know when I'm done."), Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HandBackLeft);
+            superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Normal_RequestAlreadyInProgress), Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HandBackLeft);
             return;
         }
         try
         {
-            Status = "Waiting for Mods Directory Cataloger";
+            Status = AppText.ModHoundClient_Status_WaitingForModsDirectoryCataloger;
             RequestPhase = 1;
             await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
-            Status = "Preparing Mod Hound Request";
+            Status = AppText.ModHoundClient_Status_PreparingRequest;
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var files = (await pbDbContext.ModFiles // get me dem mod files MDC
                 .Where
@@ -366,13 +368,13 @@ public class ModHoundClient :
                     catch (RegexParseException ex)
                     {
                         logger.LogWarning(ex, "failed to parse Mod Hound packages exclusion regular expression: {Pattern}", exclusion);
-                        superSnacks.OfferRefreshments(new MarkupString($"Whoops, this regular expression isn't valid:<br /><br /><code>{exclusion}</code><br /><br />Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?"), Severity.Error, options =>
+                        superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_InvalidPackageExclusionRegex, exclusion)), Severity.Error, options =>
                         {
                             options.Icon = MaterialDesignIcons.Normal.Regex;
-                            options.Action = "Load Sandbox";
+                            options.Action = AppText.ModHoundClient_SnackAction_LoadSandbox;
                             options.OnClick = async _ =>
                             {
-                                if (await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowQuestionDialogAsync("Put your mod package files in the clipboard?", "I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?") ?? false)
+                                if (await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowQuestionDialogAsync(AppText.ModHoundClient_Question_PackageFilesInClipboard_Caption, AppText.ModHoundClient_Question_PackageFilesInClipboard_Text) ?? false)
                                     await Clipboard.SetTextAsync(string.Join(Environment.NewLine, files.Select(file => file.fullPath[5..])));
                                 await Browser.OpenAsync($"https://regex101.com/?regex={Uri.EscapeDataString(exclusion)}&flags=gim&flavor=dotnet", BrowserLaunchMode.External);
                             };
@@ -394,7 +396,7 @@ public class ModHoundClient :
             byte[] postDirectoryRequestBodyJsonSha256;
             using (var postDirectoryRequestBodyJsonStream = new MemoryStream(Encoding.UTF8.GetBytes(postDirectoryRequestBodyJson)))
                 postDirectoryRequestBodyJsonSha256 = await SHA256.HashDataAsync(postDirectoryRequestBodyJsonStream).ConfigureAwait(false);
-            Status = "Submitting Request to Mod Hound";
+            Status = AppText.ModHoundClient_Status_SubmittingRequest;
             var cookieContainer = new CookieContainer();
             using var httpClientHandler = new HttpClientHandler
             {
@@ -412,29 +414,29 @@ public class ModHoundClient :
             catch (Exception ex)
             {
                 logger.LogWarning(ex, $"Mod Hound's response from GET {latestEditedAtAny} returned non-successful status code: {{StatusCode}}", latestEditedAtAnyRequest.StatusCode);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             var latestEditedAtAnyResponse = await latestEditedAtAnyRequest.Content.ReadAsStringAsync().ConfigureAwait(false);
             if (!DateTimeOffset.TryParse(latestEditedAtAnyResponse, null, DateTimeStyles.AssumeUniversal, out var latestEditedAtAnyDateTimeOffset))
             {
                 logger.LogWarning($"Mod Hound's response from GET {latestEditedAtAny} returned text not intelligible as a UTC date: {{Text}}", latestEditedAtAnyResponse);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             if (await pbDbContext.ModHoundReports.Where(mhr => mhr.RequestSha256 == postDirectoryRequestBodyJsonSha256 && mhr.LastEditedAtAny >= latestEditedAtAnyDateTimeOffset).OrderByDescending(mhr => mhr.Retrieved).FirstOrDefaultAsync().ConfigureAwait(false) is { } freshIdenticalReport)
             {
                 if (availableReports.FirstOrDefault(mhrs => mhrs.Id == freshIdenticalReport.Id) is { } availableReport)
                     SelectedReport = availableReport;
-                superSnacks.OfferRefreshments(new MarkupString($"Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {freshIdenticalReport.Retrieved.Humanize()}, and according to Mod Hound, nothing has changed since then. I've selected that report for you for your convenience."), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Success_MatchingCachedReport, freshIdenticalReport.Retrieved.Humanize())), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
                 return;
             }
             var packageFilesBeingSent = postDirectoryRequestBodyObject.files.Count(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
             if (packageFilesBeingSent > IModHoundClient.PackagesBatchHardLimit)
             {
-                superSnacks.OfferRefreshments(new MarkupString($"I have cancelled your Mod Hound report request, which was to include a whopping {packageFilesBeingSent:n0} packages. Homes, that is just <strong>too much</strong>. Most of that <em>just has to be CC anyway, right?</em> You should know Mod Hound doesn't analyze CC, so excluding it would enable me to actually request reports."), Severity.Error, options =>
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_PackageHardLimitExceeded, packageFilesBeingSent)), Severity.Error, options =>
                 {
-                    options.Action = "Exclude CC";
+                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
                     options.Icon = MaterialDesignIcons.Normal.TableOff;
                     options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
                     options.RequireInteraction = true;
@@ -442,9 +444,9 @@ public class ModHoundClient :
                 return;
             }
             if (packageFilesBeingSent > IModHoundClient.PackagesBatchWarningThreshold)
-                superSnacks.OfferRefreshments(new MarkupString($"Uhh, you're sending a somewhat large batch of {packageFilesBeingSent:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn't analyze CC anyway."), Severity.Warning, options =>
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages, packageFilesBeingSent)), Severity.Warning, options =>
                 {
-                    options.Action = "Exclude CC";
+                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
                     options.Icon = MaterialDesignIcons.Normal.TableClock;
                     options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
                     options.RequireInteraction = true;
@@ -457,7 +459,7 @@ public class ModHoundClient :
             catch (Exception ex)
             {
                 logger.LogWarning(ex, $"Mod Hound's response from GET {visitorLoad} returned non-successful status code: {{StatusCode}}", checkModFilesPageRequest.StatusCode);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             var checkModFilesPageResponse = await checkModFilesPageRequest.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -468,7 +470,7 @@ public class ModHoundClient :
                 || string.IsNullOrWhiteSpace(csrfToken))
             {
                 logger.LogWarning($"Mod Hound's response from GET {visitorLoad} returned markup without a discoverable CSRF token");
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             httpClient.DefaultRequestHeaders.Referrer = referer;
@@ -482,20 +484,20 @@ public class ModHoundClient :
             catch (Exception ex)
             {
                 logger.LogWarning(ex, $"Mod Hound's response from POST {visitorLoadDirectory} returned non-successful status code: {{StatusCode}}", postDirectoryRequest.StatusCode);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             var postDirectoryResponse = await postDirectoryRequest.Content.ReadFromJsonAsync<PostDirectoryResponse>().ConfigureAwait(false);
             if (postDirectoryResponse?.TaskId is not { } taskId)
             {
                 logger.LogWarning($"Mod Hound's response from POST {visitorLoadDirectory} did not contain a task ID: {{Response}}", await postDirectoryRequest.Content.ReadAsStringAsync().ConfigureAwait(false));
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
-            Status = "Waiting for Mod Hound's Response";
+            Status = AppText.ModHoundClient_Status_AwaitingResponse;
             RequestPhase = 2;
             GetTaskStatusResponse? lastTaskStatusResponse = null;
-            var visitorTaskStatusUrl = $"/visitor/task-status/{taskId}";
+            var visitorTaskStatusUrl = string.Format(visitorTaskStatusUrlFormat, taskId);
             while (true)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
@@ -507,23 +509,28 @@ public class ModHoundClient :
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex, "Mod Hound's response from getting the task status for {TaskId} returned non-successful status code: {StatusCode}", taskId, taskStatusRequest.StatusCode);
-                    superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                     return;
                 }
                 lastTaskStatusResponse = await taskStatusRequest.Content.ReadFromJsonAsync<GetTaskStatusResponse>().ConfigureAwait(false);
                 if (lastTaskStatusResponse is null)
                 {
                     logger.LogWarning("Mod Hound's response from getting the task status for {TaskId} could not be understood: {Response}", taskId, await taskStatusRequest.Content.ReadAsStringAsync().ConfigureAwait(false));
-                    superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                     break;
                 }
                 if (lastTaskStatusResponse.State is not (TaskStatusState.PENDING or TaskStatusState.STARTED or TaskStatusState.PROCESSING))
                     break;
-                Status = $"Your Request {lastTaskStatusResponse.State switch { TaskStatusState.PENDING => "is Pending", TaskStatusState.STARTED => "has Started", _ => "is Being Processed" }}";
+                Status = string.Format(AppText.ModHoundClient_Status_RequestQueueState, lastTaskStatusResponse.State switch
+                {
+                    TaskStatusState.PENDING => AppText.ModHoundClient_Status_RequestQueueState_Pending,
+                    TaskStatusState.STARTED => AppText.ModHoundClient_Status_RequestQueueState_Started,
+                    _ => AppText.ModHoundClient_Status_RequestQueueState_Default
+                });
                 ProgressMax = lastTaskStatusResponse.Total;
                 ProgressValue = lastTaskStatusResponse.Current;
             }
-            Status = "Reading Mod Hound's Response";
+            Status = AppText.ModHoundClient_Status_ReadingResponse;
             RequestPhase = 3;
             ProgressMax = 9;
             ProgressValue = 0;
@@ -532,17 +539,17 @@ public class ModHoundClient :
             if (lastTaskStatusResponse.State is TaskStatusState.FAILURE)
             {
                 logger.LogWarning("Mod Hound's response from getting the task status for {TaskId} returned failure state with error: {Error}", taskId, lastTaskStatusResponse.Error);
-                superSnacks.OfferRefreshments(new MarkupString($"Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later.<br /><br />Specifically, Mod Hound said:<br /><pre>{WebUtility.HtmlEncode(lastTaskStatusResponse.Error)}</pre>"), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_DetailedScrapWithTheDog, WebUtility.HtmlEncode(lastTaskStatusResponse.Error))), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             if (lastTaskStatusResponse.ResultId is not { } resultId
                 || string.IsNullOrWhiteSpace(resultId))
             {
                 logger.LogWarning("Mod Hound's response from getting the task status for {TaskId} produced a blank result ID", taskId);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
-            var getReportRequest = await httpClient.GetAsync($"/visitor/track/{lastTaskStatusResponse.ResultId}/{lastTaskStatusResponse.Type}").ConfigureAwait(false);
+            var getReportRequest = await httpClient.GetAsync(string.Format(getReportUrlFormat, lastTaskStatusResponse.ResultId, lastTaskStatusResponse.Type)).ConfigureAwait(false);
             try
             {
                 getReportRequest.EnsureSuccessStatusCode();
@@ -550,7 +557,7 @@ public class ModHoundClient :
             catch (Exception ex)
             {
                 logger.LogWarning(ex, "Mod Hound's response from getting the report for result {ResultId} of type {Type} returned non-successful status code: {StatusCode}", lastTaskStatusResponse.ResultId, lastTaskStatusResponse.Type, getReportRequest.StatusCode);
-                superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                 return;
             }
             var getReportResponse = await getReportRequest.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -713,7 +720,7 @@ public class ModHoundClient :
                     }
                     modHoundReport.NotTrackedRecords.Add(record);
                 }
-            Status = "Saving Mod Hound Report";
+            Status = AppText.ModHoundClient_Status_SavingReport;
             RequestPhase = 4;
             ProgressMax = null;
             ProgressValue = null;
@@ -722,7 +729,7 @@ public class ModHoundClient :
             await LoadAvailableReportsAsync().ConfigureAwait(false);
             if (availableReports.FirstOrDefault(mhrs => mhrs.Id == modHoundReport.Id) is { } newlyAvailableReport)
                 SelectedReport = newlyAvailableReport;
-            superSnacks.OfferRefreshments(new MarkupString($"Good news, your Mod Hound report is finished and ready to view!"), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableCheck);
+            superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Success_ReportReady), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableCheck);
         }
         catch (RegexParseException)
         {
@@ -731,7 +738,7 @@ public class ModHoundClient :
         catch (Exception ex)
         {
             logger.LogError(ex, $"unhandled exception while attempting to request, parse, and commit Mod Hound report");
-            superSnacks.OfferRefreshments(new MarkupString("Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later."), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+            superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
             return;
         }
         finally

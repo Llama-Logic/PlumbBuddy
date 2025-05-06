@@ -22,9 +22,9 @@
 			{
 				<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
 					<MudButton OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
-						Request New Report
+						@StringLocalizer[nameof(AppText.ModHoundDisplay_RequestNewReport_Label)]
 					</MudButton>
-					<MudTooltip Arrow Text="Manage Settings for Mod Hound">
+					<MudTooltip Arrow Text="@AppText.ModHoundDisplay_ManageSettings_Tip">
 						<MudIconButton Icon="@MaterialDesignIcons.Normal.Cog" OnClick="HandleShowSettingsAsync" />
 					</MudTooltip>
 				</MudButtonGroup>
@@ -49,7 +49,7 @@
 			}
 			@if (ObservedCollection(() => ModHoundClient.AvailableReports) is { Count: > 0 } availableReports)
 			{
-				<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Label="Display Report" Variant="Variant.Filled">
+				<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Label="@AppText.ModHoundDisplay_DisplayReport_Label" Variant="Variant.Filled">
 					@foreach (var availableReport in availableReports.OrderByDescending(ar => ar.Retrieved))
 					{
 						<MudSelectItem Value="@availableReport" />
@@ -70,7 +70,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.HeartBroken" IconColor="Color.Warning" IconSize="Size.Large" Style="@(outdatedCount == 0 ? "opacity: .35;" : string.Empty)" Value="@IModHoundClient.SectionOutdated">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Warning">
-								Outdated
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Outdated_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Warning" Value="@outdatedCount" />
@@ -79,7 +79,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.InboxMultiple" IconColor="Color.Warning" IconSize="Size.Large" Style="@(duplicatesCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionDuplicates">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Warning">
-								Duplicates
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Duplicates_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Warning" Value="@duplicatesCount" />
@@ -88,7 +88,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.SkullCrossbones" IconColor="Color.Error" IconSize="Size.Large" Style="@(brokenObsoleteCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionBrokenObsolete">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Error">
-								Broken/Obsolete
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_BrokenObsolete_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Error" Value="@brokenObsoleteCount" />
@@ -97,7 +97,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.NotEqualVariant" IconColor="Color.Error" IconSize="Size.Large" Style="@(incompatibleCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionIncompatible">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Error">
-								Incompatible
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Incompatible_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Error" Value="@incompatibleCount" />
@@ -106,7 +106,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.ImageBroken" IconColor="Color.Error" IconSize="Size.Large" Style="@(missingRequirementsCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionMissingRequirements">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Error">
-								Missing Requirements
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_MissingRequirements_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Error" Value="@missingRequirementsCount" />
@@ -115,7 +115,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.LightbulbQuestion" IconSize="Size.Large" Style="@(unknownStatusCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionUnknownStatus">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3>
-								Unknown Status
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_UnknownStatus_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Value="@unknownStatusCount" />
@@ -124,7 +124,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.LightbulbOn" IconColor="Color.Success" IconSize="Size.Large" Style="@(upToDateCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionUpToDate">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3 Color="Color.Success">
-								Up to Date
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_UpToDate_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Color="Color.Success" Value="@upToDateCount" />
@@ -133,7 +133,7 @@
 					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.TrackLightOff" IconSize="Size.Large" Style="@(notTrackedCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionNotTracked">
 						<MudStack AlignItems="AlignItems.Center" Row>
 							<MudTextM3>
-								Not Tracked
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]
 							</MudTextM3>
 							<MudSpacer />
 							<MudChip T="int?" Value="@notTrackedCount" />
@@ -141,9 +141,8 @@
 					</MudListItem>
 				</MudList>
 			}
-			<MudTextM3 Align="Align.Center" Size="Size.Small">
-				Like Mod Hound?
-				You can support its maintenance and continued development by letting others know about it, and considering supporting <a href="https://www.patreon.com/lumpinou" style="color: var(--mud-palette-primary);" target="_blank">Lumpinou on Patreon!</a>
+			<MudTextM3 Align="Align.Center" Class="markdown-caption">
+				<MudMarkdown Value="@AppText.ModHoundDisplay_SupportLumpinou_Label" />
 			</MudTextM3>
 		</MudStack>
 	</MudItem>
@@ -160,11 +159,11 @@
 								@(
 									displayedReportSection switch
 									{
-										IModHoundClient.SectionOutdated => "Outdated",
-										IModHoundClient.SectionDuplicates => "Duplicates",
-										IModHoundClient.SectionBrokenObsolete => "Broken/Obsolete",
-										IModHoundClient.SectionUnknownStatus => "Unknown Status",
-										IModHoundClient.SectionUpToDate => "Up to Date",
+										IModHoundClient.SectionOutdated => AppText.ModHoundDisplay_SectionMenu_Outdated_Label,
+										IModHoundClient.SectionDuplicates => AppText.ModHoundDisplay_SectionMenu_Duplicates_Label,
+										IModHoundClient.SectionBrokenObsolete => AppText.ModHoundDisplay_SectionMenu_BrokenObsolete_Label,
+										IModHoundClient.SectionUnknownStatus => AppText.ModHoundDisplay_SectionMenu_UnknownStatus_Label,
+										IModHoundClient.SectionUpToDate => AppText.ModHoundDisplay_SectionMenu_UpToDate_Label,
 										_ => throw new NotSupportedException()
 									}
 								)
@@ -173,11 +172,11 @@
 								@(
 									displayedReportSection switch
 									{
-										IModHoundClient.SectionOutdated => "Files updated since you downloaded them",
-										IModHoundClient.SectionDuplicates => "Files for which only one version must be kept",
-										IModHoundClient.SectionBrokenObsolete => "Broken or obsolete (discontinued) files with no updates available (as far as Mod Hound is aware)",
-										IModHoundClient.SectionUnknownStatus => "Files with \"unknown status\", which may or may not be okay to use",
-										IModHoundClient.SectionUpToDate => "Files that SEEM up to date and are not known to be broken",
+										IModHoundClient.SectionOutdated => AppText.ModHoundDisplay_Section_Outdated_Subtitle,
+										IModHoundClient.SectionDuplicates => AppText.ModHoundDisplay_Section_Duplicates_Subtitle,
+										IModHoundClient.SectionBrokenObsolete => AppText.ModHoundDisplay_Section_BrokenObsolete_Subtitle,
+										IModHoundClient.SectionUnknownStatus => AppText.ModHoundDisplay_Section_UnknownStatus_Subtitle,
+										IModHoundClient.SectionUpToDate => AppText.ModHoundDisplay_Section_UpToDate_Subtitle,
 										_ => throw new NotSupportedException()
 									}
 								)
@@ -192,60 +191,60 @@
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="FileName" SortBy="new Func<ModHoundReportRecord, object>(mhrr => mhrr.FileName)">
-								File Name
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_FileName)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="ModName" SortBy="new Func<ModHoundReportRecord, object>(mhrr => mhrr.ModName)">
-								Mod Name
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_ModName)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="CreatorName" SortBy="new Func<ModHoundReportRecord, object>(mhrr => mhrr.CreatorName)">
-								Creator Name
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_CreatorName)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="LastUpdateDate" SortBy="new Func<ModHoundReportRecord, object>(mhrr => mhrr.LastUpdateDate)">
-								Last Update Date
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_LastUpdateDate)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="DateOfInstalledFile" SortBy="new Func<ModHoundReportRecord, object>(mhrr => mhrr.DateOfInstalledFile)">
-								Date of Installed File
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_DateOfInstalledFile)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
-							Update Notes
+							@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_UpdateNotes)]
 						</MudTh>
 					</HeaderContent>
 					<RowTemplate>
 						<MudTd>
 							<MudStack Row Spacing="0">
-								<MudTooltip Arrow Text="@StringLocalizer[nameof(AppText.CatalogDisplay_Files_ViewThisFile_Tip)]">
+								<MudTooltip Arrow Text="@AppText.CatalogDisplay_Files_ViewThisFile_Tip">
 									<MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" OnClick="@(() => ViewModHoundReportRecordFile(context))" Size="Size.Small" />
 								</MudTooltip>
-								<MudTooltip Arrow Text="Download this Mod">
+								<MudTooltip Arrow Text="@AppText.ModHoundDisplay_DownloadThisMod_Tip">
 									<MudIconButton Disabled="@(context.ModLinkOrIndexHref is null)" Icon="@MaterialDesignIcons.Normal.Download" OnClick="@(() => DownloadModHoundReportRecordUpdateAsync(context))" Size="Size.Small" />
 								</MudTooltip>
 							</MudStack>
 						</MudTd>
-						<MudTd DataLabel="File">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_FileName">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.FileName" />
 						</MudTd>
-						<MudTd DataLabel="Mod Name">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_ModName">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.ModName" />
 						</MudTd>
-						<MudTd DataLabel="Creator Name">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_CreatorName">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.CreatorName" />
 						</MudTd>
-						<MudTd DataLabel="Last Update Date">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_LastUpdateDate">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.LastUpdateDateString" />
 						</MudTd>
-						<MudTd DataLabel="Date of Installed File">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_DateOfInstalledFile">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.DateOfInstalledFileString" />
 						</MudTd>
-						<MudTd>
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_UpdateNotes">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.UpdateNotes" />
 						</MudTd>
 					</RowTemplate>
@@ -256,11 +255,11 @@
 						@(
 							displayedReportSection switch
 							{
-								IModHoundClient.SectionOutdated => "There are no outdated mods to display for this page.",
-								IModHoundClient.SectionDuplicates => "There are no duplicate mods to display for this page.",
-								IModHoundClient.SectionBrokenObsolete => "There are no broken/obsolete mods to display for this page.",
-								IModHoundClient.SectionUnknownStatus => "There are no unknown status mods to display for this page.",
-								IModHoundClient.SectionUpToDate => "There are no up-to-date mods to display for this page.",
+								IModHoundClient.SectionOutdated => AppText.ModHoundDisplay_Section_Outdated_NoResults_Label,
+								IModHoundClient.SectionDuplicates => AppText.ModHoundDisplay_Section_Duplicates_NoResults_Label,
+								IModHoundClient.SectionBrokenObsolete => AppText.ModHoundDisplay_Section_BrokenObsolete_NoResults_Label,
+								IModHoundClient.SectionUnknownStatus => AppText.ModHoundDisplay_Section_UnknownStatus_NoResults_Label,
+								IModHoundClient.SectionUpToDate => AppText.ModHoundDisplay_Section_UpToDate_NoResults_Label,
 								_ => throw new NotSupportedException()
 							}
 						)
@@ -274,10 +273,10 @@
 					<MudStack AlignItems="AlignItems.Center" Row>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
-								Incompatible
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Incompatible_Label)]
 							</MudTextM3>
 							<MudTextM3 Typo="TypoM3.Title" Size="Size.Small">
-								Must keep only one mod — click on a mod listed to view it on your computer
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_Incompatible_Subtitle)]
 							</MudTextM3>
 						</MudStack>
 						<MudSpacer />
@@ -292,7 +291,9 @@
 									<TitleContent>
 										<div class="d-flex">
 											<MudIcon Icon="@MaterialDesignIcons.Normal.NotEqualVariant" class="mr-3"></MudIcon>
-											<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Incompatibility")</MudTextM3>
+											<MudTextM3>
+												@StringLocalizer[AppText.ModHoundDisplay_Section_Incompatibility_RecordHeader_Format, (index + 1).ToOrdinalWords().Transform(To.TitleCase)]
+											</MudTextM3>
 										</div>
 									</TitleContent>
 									<ChildContent>
@@ -313,7 +314,7 @@
 					{
 						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
 							<strong>
-								There are no incomptaible mods to display.
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_Incompatible_NoResults_Label)]
 							</strong>
 						</MudTextM3>
 					}
@@ -326,10 +327,10 @@
 					<MudStack AlignItems="AlignItems.Center" Row>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
-								Missing Requirements
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_MissingRequirements_Label)]
 							</MudTextM3>
 							<MudTextM3 Typo="TypoM3.Title" Size="Size.Small">
-								Mods missing their Requirements
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_MissingRequirements_Subtitle)]
 							</MudTextM3>
 						</MudStack>
 						<MudSpacer />
@@ -344,12 +345,14 @@
 									<TitleContent>
 										<div class="d-flex">
 											<MudIcon Icon="@MaterialDesignIcons.Normal.ImageBroken" class="mr-3"></MudIcon>
-											<MudTextM3>@($"{(index + 1).ToOrdinalWords().Transform(To.TitleCase)} Missing Requirement")</MudTextM3>
+											<MudTextM3>
+												@StringLocalizer[AppText.ModHoundDisplay_Section_MissingRequirements_RecordHeader_Format, (index + 1).ToOrdinalWords().Transform(To.TitleCase)]
+											</MudTextM3>
 										</div>
 									</TitleContent>
 									<ChildContent>
 										<MudNavMenu>
-											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Alert" IconColor="Color.Warning" Title="Mods Missing the Requirement">
+											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Alert" IconColor="Color.Warning" Title="@AppText.ModHoundDisplay_Section_MissingRequirements_Dependents_Label">
 												@foreach (var dependent in missingRequirementsRecord?.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>())
 												{
 													<MudNavLink Href="javascript:void(0)" Icon="@MaterialDesignIcons.Normal.Certificate">
@@ -359,18 +362,20 @@
 													</MudNavLink>
 												}
 											</MudNavGroup>
-											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Asterisk" IconColor="Color.Error" Title="Mods that Make Up the Requirement">
+											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Asterisk" IconColor="Color.Error" Title="@AppText.ModHoundDisplay_Section_MissingRequirements_Dependencies_Label">
 												@foreach (var dependency in missingRequirementsRecord?.Dependencies ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependency>())
 												{
 													<MudNavLink Href="@(dependency.ModLinkOrIndexHref is { } href ? href.ToString() : "javascript:void(0)")" Icon="@MaterialDesignIcons.Normal.Certificate" Target="@(dependency.ModLinkOrIndexHref is null ? string.Empty : "_blank")">
-														<MudStack Spacing="0">
-															<MudTextM3>
-																<MudHighlighter HighlightedText="@searchText" Text="@(dependency.Label)" />
-															</MudTextM3>
-															<MudTextM3 Typo="TypoM3.Label" Size="Size.Small">
-																@(dependency.ModLinkOrIndexHref)
-															</MudTextM3>
-														</MudStack>
+														<MudTooltip Arrow Text="@AppText.ModHoundDisplay_DownloadThisMod_Tip">
+															<MudStack Spacing="0">
+																<MudTextM3>
+																	<MudHighlighter HighlightedText="@searchText" Text="@(dependency.Label)" />
+																</MudTextM3>
+																<MudTextM3 Typo="TypoM3.Label" Size="Size.Small">
+																	@(dependency.ModLinkOrIndexHref)
+																</MudTextM3>
+															</MudStack>
+														</MudTooltip>
 													</MudNavLink>
 												}
 											</MudNavGroup>
@@ -384,7 +389,7 @@
 					{
 						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
 							<strong>
-								There are no mods missing requirements to display.
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_MissingRequirements_NoResults_Label)]
 							</strong>
 						</MudTextM3>
 					}
@@ -395,7 +400,7 @@
 				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(100vh - 280px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
 					<ToolBarContent>
 						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
-							Not Tracked
+							@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]
 						</MudTextM3>
 						<MudSpacer />
 						<MudTextField @bind-Value="@(Binding(() => ModHoundClient.SearchText).Value)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0" Clearable DebounceInterval="250" IconSize="Size.Medium" Immediate Placeholder="@(AppText.Common_Search)" />
@@ -403,28 +408,28 @@
 					<HeaderContent>
 						<MudTh>
 							<MudTableSortLabel SortLabel="FileName" SortBy="new Func<ModHoundReportNotTrackedRecord, object>(mhrr => mhrr.FileName)">
-								File Name
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_FileName)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="FileDate" SortBy="new Func<ModHoundReportNotTrackedRecord, object>(mhrr => mhrr.FileDate)">
-								File Date
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_FileDate)]
 							</MudTableSortLabel>
 						</MudTh>
 						<MudTh>
 							<MudTableSortLabel SortLabel="FileType" SortBy="new Func<ModHoundReportNotTrackedRecord, object>(mhrr => mhrr.FileType)">
-								File Type
+								@StringLocalizer[nameof(AppText.ModHoundDisplay_ColumnHeader_FileType)]
 							</MudTableSortLabel>
 						</MudTh>
 					</HeaderContent>
 					<RowTemplate>
-						<MudTd DataLabel="Name">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_FileName">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.FileName" />
 						</MudTd>
-						<MudTd DataLabel="Date">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_FileDate">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.FileDateString" />
 						</MudTd>
-						<MudTd DataLabel="Type">
+						<MudTd DataLabel="@AppText.ModHoundDisplay_ColumnHeader_FileType">
 							<MudHighlighter HighlightedText="@searchText" Text="@context.FileType.ToString()" />
 						</MudTd>
 					</RowTemplate>
@@ -432,7 +437,7 @@
 						<MudTablePager />
 					</PagerContent>
 					<NoRecordsContent>
-						There are no not tracked mods to display for this page.
+						@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_NotTracked_NoResults_Label)]
 					</NoRecordsContent>
 				</MudTable>
 			}

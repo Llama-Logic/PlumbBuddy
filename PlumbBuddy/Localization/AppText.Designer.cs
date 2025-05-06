@@ -963,6 +963,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Indefinite.
+        /// </summary>
+        internal static string Common_Indefinite {
+            get {
+                return ResourceManager.GetString("Common_Indefinite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Label.
         /// </summary>
         internal static string Common_Label {
@@ -1499,6 +1508,15 @@ namespace PlumbBuddy.Localization {
         internal static string Home_ModHealth_Label {
             get {
                 return ResourceManager.GetString("Home_ModHealth_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Hound.
+        /// </summary>
+        internal static string Home_ModHound_Label {
+            get {
+                return ResourceManager.GetString("Home_ModHound_Label", resourceCulture);
             }
         }
         
@@ -4102,6 +4120,573 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Put your mod package files in the clipboard?.
+        /// </summary>
+        internal static string ModHoundClient_Question_PackageFilesInClipboard_Caption {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Question_PackageFilesInClipboard_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I can put your mod package file paths in the clipboard so you can paste them into the sandbox for testing purposes. Would you like me to?.
+        /// </summary>
+        internal static string ModHoundClient_Question_PackageFilesInClipboard_Text {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Question_PackageFilesInClipboard_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something went wrong in my communication with Mod Hound. I&apos;ve made a note about it in my log. Perhaps you should try again later.&lt;br /&gt;&lt;br /&gt;Specifically, Mod Hound said:&lt;br /&gt;&lt;pre&gt;{0}&lt;/pre&gt;.
+        /// </summary>
+        internal static string ModHoundClient_Snack_Error_DetailedScrapWithTheDog {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Error_DetailedScrapWithTheDog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whoops, this regular expression isn&apos;t valid:&lt;br /&gt;&lt;br /&gt;&lt;code&gt;{0}&lt;/code&gt;&lt;br /&gt;&lt;br /&gt;Would you like to work with it in a Regular Expressions sandbox to see if you can fix it?.
+        /// </summary>
+        internal static string ModHoundClient_Snack_Error_InvalidPackageExclusionRegex {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Error_InvalidPackageExclusionRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I have cancelled your Mod Hound report request, which was to include a whopping {0:n0} packages. Homes, that is just &lt;strong&gt;too much&lt;/strong&gt;. Most of that &lt;em&gt;just has to be CC anyway, right?&lt;/em&gt; You should know Mod Hound doesn&apos;t analyze CC, so excluding it would enable me to actually request reports..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Error_PackageHardLimitExceeded {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Error_PackageHardLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something went wrong in my communication with Mod Hound. I&apos;ve made a note about it in my log. Perhaps you should try again later..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Error_ScrapWithTheDog {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Error_ScrapWithTheDog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m already communicating with Mod Hound on your behalf. I&apos;ll let you know when I&apos;m done..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Normal_RequestAlreadyInProgress {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Normal_RequestAlreadyInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {0}, and according to Mod Hound, nothing has changed since then. I&apos;ve selected that report for you for your convenience..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Success_MatchingCachedReport {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Success_MatchingCachedReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Good news, your Mod Hound report is finished and ready to view!.
+        /// </summary>
+        internal static string ModHoundClient_Snack_Success_ReportReady {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Success_ReportReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uhh, you&apos;re sending a somewhat large batch of {0:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn&apos;t analyze CC anyway..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exclude CC.
+        /// </summary>
+        internal static string ModHoundClient_SnackAction_ExcludeCC {
+            get {
+                return ResourceManager.GetString("ModHoundClient_SnackAction_ExcludeCC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load Sandbox.
+        /// </summary>
+        internal static string ModHoundClient_SnackAction_LoadSandbox {
+            get {
+                return ResourceManager.GetString("ModHoundClient_SnackAction_LoadSandbox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Mod Hound&apos;s Response.
+        /// </summary>
+        internal static string ModHoundClient_Status_AwaitingResponse {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_AwaitingResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preparing Mod Hound Request.
+        /// </summary>
+        internal static string ModHoundClient_Status_PreparingRequest {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_PreparingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading Mod Hound&apos;s Response.
+        /// </summary>
+        internal static string ModHoundClient_Status_ReadingResponse {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_ReadingResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Request {0}.
+        /// </summary>
+        internal static string ModHoundClient_Status_RequestQueueState {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_RequestQueueState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is Being Processed.
+        /// </summary>
+        internal static string ModHoundClient_Status_RequestQueueState_Default {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_RequestQueueState_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is Pending.
+        /// </summary>
+        internal static string ModHoundClient_Status_RequestQueueState_Pending {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_RequestQueueState_Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to has Started.
+        /// </summary>
+        internal static string ModHoundClient_Status_RequestQueueState_Started {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_RequestQueueState_Started", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving Mod Hound Report.
+        /// </summary>
+        internal static string ModHoundClient_Status_SavingReport {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_SavingReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submitting Request to Mod Hound.
+        /// </summary>
+        internal static string ModHoundClient_Status_SubmittingRequest {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_SubmittingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Mods Directory Cataloger.
+        /// </summary>
+        internal static string ModHoundClient_Status_WaitingForModsDirectoryCataloger {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Status_WaitingForModsDirectoryCataloger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator Name.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_CreatorName {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_CreatorName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date of Installed File.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_DateOfInstalledFile {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_DateOfInstalledFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Date.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_FileDate {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_FileDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Name.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_FileName {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_FileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Type.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_FileType {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_FileType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last Update Date.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_LastUpdateDate {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_LastUpdateDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Name.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_ModName {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_ModName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Notes.
+        /// </summary>
+        internal static string ModHoundDisplay_ColumnHeader_UpdateNotes {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ColumnHeader_UpdateNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display Report.
+        /// </summary>
+        internal static string ModHoundDisplay_DisplayReport_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_DisplayReport_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download this Mod.
+        /// </summary>
+        internal static string ModHoundDisplay_DownloadThisMod_Tip {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_DownloadThisMod_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Settings for Mod Hound.
+        /// </summary>
+        internal static string ModHoundDisplay_ManageSettings_Tip {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_ManageSettings_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request New Report.
+        /// </summary>
+        internal static string ModHoundDisplay_RequestNewReport_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_RequestNewReport_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no broken/obsolete mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_BrokenObsolete_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_BrokenObsolete_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Broken or obsolete (discontinued) files with no updates available (as far as Mod Hound is aware).
+        /// </summary>
+        internal static string ModHoundDisplay_Section_BrokenObsolete_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_BrokenObsolete_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no duplicate mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Duplicates_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Duplicates_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files for which only one version must be kept.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Duplicates_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Duplicates_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Incompatibility.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Incompatibility_RecordHeader_Format {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Incompatibility_RecordHeader_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no incomptaible mods to display..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Incompatible_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Incompatible_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must keep only one mod — click on a mod listed to view it on your computer.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Incompatible_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Incompatible_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods that Make Up the Requirement.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_MissingRequirements_Dependencies_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_MissingRequirements_Dependencies_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods Missing the Requirement.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_MissingRequirements_Dependents_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_MissingRequirements_Dependents_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no mods missing requirements to display..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_MissingRequirements_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_MissingRequirements_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Missing Requirement.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_MissingRequirements_RecordHeader_Format {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_MissingRequirements_RecordHeader_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods missing their Requirements.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_MissingRequirements_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_MissingRequirements_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no not tracked mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_NotTracked_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_NotTracked_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no outdated mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Outdated_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Outdated_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files updated since you downloaded them.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_Outdated_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_Outdated_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no unknown status mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_UnknownStatus_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_UnknownStatus_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files with &quot;unknown status&quot;, which may or may not be okay to use.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_UnknownStatus_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_UnknownStatus_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no up-to-date mods to display for this page..
+        /// </summary>
+        internal static string ModHoundDisplay_Section_UpToDate_NoResults_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_UpToDate_NoResults_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files that SEEM up to date and are not known to be broken.
+        /// </summary>
+        internal static string ModHoundDisplay_Section_UpToDate_Subtitle {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Section_UpToDate_Subtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Broken/Obsolete.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_BrokenObsolete_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_BrokenObsolete_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicates.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_Duplicates_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_Duplicates_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incompatible.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_Incompatible_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_Incompatible_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Requirements.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_MissingRequirements_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_MissingRequirements_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Tracked.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_NotTracked_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_NotTracked_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outdated.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_Outdated_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_Outdated_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown Status.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_UnknownStatus_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_UnknownStatus_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Up to Date.
+        /// </summary>
+        internal static string ModHoundDisplay_SectionMenu_UpToDate_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SectionMenu_UpToDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file no longer exists, so I can&apos;t show it to you..
+        /// </summary>
+        internal static string ModHoundDisplay_Snack_Error_CannotViewRemovedFile {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_Snack_Error_CannotViewRemovedFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Like Mod Hound? You can support its maintenance and continued development by letting others know about it, and considering supporting [Lumpinou on Patreon](https://www.patreon.com/lumpinou)!.
+        /// </summary>
+        internal static string ModHoundDisplay_SupportLumpinou_Label {
+            get {
+                return ResourceManager.GetString("ModHoundDisplay_SupportLumpinou_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Hash from Mod File....
         /// </summary>
         internal static string ModRequirementEditor_AddModFile_Label {
@@ -4545,6 +5130,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically catalog mod manifests when composition succeeds.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This ensures there&apos;s a record of mods you manifest in my database even if you&apos;re not manifesting them from within your own Mods folder..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically check for updates.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label {
@@ -4559,6 +5162,26 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip {
             get {
                 return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically subsume identically credited single-file mods when initializing a manifest.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileMods" +
+                        "WhenInitializingAManifest_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I&apos;ll assume it&apos;s a new version of the same mod and incoporate the previous versions&apos; hashes to preserve referential backward compatibility..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileMods" +
+                        "WhenInitializingAManifest_Tip", resourceCulture);
             }
         }
         
@@ -7245,6 +7868,132 @@ namespace PlumbBuddy.Localization {
         internal static string SettingsDialog_General_Label {
             get {
                 return ResourceManager.GetString("SettingsDialog_General_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages Excluded.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExcluded_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExcluded_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Hound has limits of how many mod files it will analyze and it is not designed to analyze custom content package files (CAS clothing, hairstyles, Build &amp; Buy objects, etc. as opposed to mod package files). How should I determine which package files in your Mods folder are custom content?.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusionMode_HelperText {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusionMode_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages Exclusion Mode.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusionMode_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusionMode_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test Package File Paths with Regular Expressions.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusionMode_Patterns_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusionMode_Patterns_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Look for Leading Text in Package File Paths.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusionMode_StartsWith_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusionMode_StartsWith_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When testing the path of a package file, I will always begin by considering it in the format Mod Hound expects, which means using forward slashes (/) instead of backslashes (\), even when in Windows. The path will always be relative to the root of your Mods folder, without a leading forward slash..
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusions_EUA {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusions_EUA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If any of these exclusions match a package file, I will consider it a custom content package file and won&apos;t bother Mod Hound with it..
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusions_HelperText {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusions_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages Exclusions.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusions_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusions_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type a new exclusion and press enter.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesExclusions_Placeholder {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesExclusions_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages Included.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_PackagesIncluded_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_PackagesIncluded_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use the Default Setting.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_Retention_Default_Tip {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_Retention_Default_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I will hold on to reports Mod Hound has created for you for up to this period of time..
+        /// </summary>
+        internal static string SettingsDialog_ModHound_Retention_HelperText {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_Retention_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep my Mod Hound Reports Forever.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_Retention_Indefinite_Tip {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_Retention_Indefinite_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Retention Period.
+        /// </summary>
+        internal static string SettingsDialog_ModHound_Retention_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_ModHound_Retention_Label", resourceCulture);
             }
         }
         
