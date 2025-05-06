@@ -261,6 +261,77 @@ little-ms-sam:
       dark: null
       light: null
 
+lumpinou:
+  display_name: Lumpinou
+  description: |
+    Visit my [website](https://lumpinoumods.com/)!
+  palette_light:
+    Primary: '#3747a8ff'
+    Secondary: '#3646a7ff'
+    Tertiary: '#c70096ff'
+    Info: '#904f8bff'
+    Success: '#ab796fff'
+    Warning: '#ab796fff'
+    Error: '#cc2a2aff'
+    AppbarText: '#f6eff8ff'
+    AppbarBackground: '#b495b1ff'
+    DrawerText: '#4a125aff'
+    DrawerIcons: '#3747a8ff'
+    DrawerBackground: '#dbd2deff'
+    Surface: '#ffe9e972'
+    Background: '#ffe9e9ff'
+    BackgroundGray: '#a0799d'
+    LinesDefault: '#a0799dff'
+    LinesInputs: '#a0799dff'
+    Divider: '#a0799dff'
+    TextPrimary: '#8a49c0ff'
+    TextSecondary: '#712a9aff'
+    TextDisabled: '#a43be1ff'
+    ActionDefault: '#904f8bff'
+    ActionDisabled: '#997396ff'
+  palette_dark:
+    Primary: '#7986cbff'
+    Secondary: '#e699ffff'
+    Tertiary: '#997396ff'
+    Info: '#6a78d6ff'
+    Success: '#731edbff'
+    Warning: '#af8123ff'
+    Error: '#9b073eff'
+    AppbarText: '#ffd6bcff'
+    AppbarBackground: '#212a4fff'
+    DrawerText: '#ffd6bcff'
+    DrawerIcons: '#9b073eff'
+    DrawerBackground: '#1b2138ff'
+    Surface: '#2f2f2f72'
+    Background: '#2f2f2fff'
+    BackgroundGray: '#464646ff'
+    LinesDefault: '#9d28bdff'
+    LinesInputs: '#9d28bdff'
+    Divider: '#731edbff'
+    DividerLight: '#9d28bdff'
+    TextPrimary: '#ffd6bcff'
+    TextSecondary: '#b687b2ff'
+    TextDisabled: '#745271ff'
+    ActionDefault: '#3e50a8ff'
+    ActionDisabled: '#2e3e8dff'
+    DisabledBackground: '#610527ff'
+  backgrounded_tabs:
+    mod-health:
+      dark: mod-health-dark.jpg
+      light: mod-health-light.jpg
+    catalog:
+      dark: catalog-dark.jpg
+      light: catalog-light.jpg
+    manifest-editor:
+      dark: manifest-editor-dark.jpg
+      light: manifest-editor-light.jpg
+    archivist:
+      dark: archivist-dark.jpg
+      light: archivist-light.jpg
+    parlay:
+      dark: parlay-dark.jpg
+      light: parlay-light.jpg
+
 meg:
   display_name: Meg
   description: |

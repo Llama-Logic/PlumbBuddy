@@ -504,11 +504,11 @@ partial class ManifestEditor
                     addTransformedCollectionElements(model.Translators, component.Translators, t => new ModFileManifestModelTranslator { Name = t.name, Culture = t.language });
                     componentManifests.Add(component, model);
                 }
-                if (components.Count is 1
+                if (Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest
+                    && components.Count is 1
                     && components[0] is { } singleComponent
                     && !singleComponent.IsManifestPreExisting
-                    && componentManifests[singleComponent] is { } manifest
-                    && Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest)
+                    && componentManifests[singleComponent] is { } manifest)
                 {
                     var subsumedHashes = new HashSet<ImmutableArray<byte>>(manifest.SubsumedHashes, ImmutableArrayEqualityComparer<byte>.Default);
                     var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
@@ -525,6 +525,7 @@ partial class ManifestEditor
                         subsumedHashes.Add([..dbManifest.CalculatedModFileManifestHash.Sha256]);
                         subsumedHashes.UnionWith(dbManifest.SubsumedHashes.Select(sh => sh.Sha256.ToImmutableArray()));
                     }
+                    subsumedHashes.Remove(manifest.Hash);
                     manifest.SubsumedHashes.Clear();
                     manifest.SubsumedHashes.UnionWith(subsumedHashes);
                 }

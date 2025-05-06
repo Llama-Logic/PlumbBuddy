@@ -8,30 +8,30 @@
 @inject IStringLocalizer<AppText> StringLocalizer
 
 <style>
-	.mud-dialog {
-	border-top-left-radius: var(--mud-default-borderradius);
-	border-top-right-radius: var(--mud-default-borderradius);
+	.mud-dialog:has(div.settings-dialog-stack) {
+		border-top-left-radius: var(--mud-default-borderradius);
+		border-top-right-radius: var(--mud-default-borderradius);
 	}
 
-	.mud-dialog-title {
-	display: none !important;
+	.mud-dialog:has(div.settings-dialog-stack) .mud-dialog-title {
+		display: none !important;
 	}
 
-	.mud-tab-slider {
-	display: none !important;
+	.mud-dialog:has(div.settings-dialog-stack) .mud-tab-slider {
+		display: none !important;
 	}
 
-	.custom-active-tab {
-	background-color: var(--mud-palette-surface);
-	color: var(--mud-palette-primary) !important;
+	.mud-dialog:has(div.settings-dialog-stack) .custom-active-tab {
+		background-color: var(--mud-palette-surface);
+		color: var(--mud-palette-primary) !important;
 	}
 
-	.custom-active-tab:hover {
-	color: var(--mud--palette-primary-text) !important;
+	.mud-dialog:has(div.settings-dialog-stack) .custom-active-tab:hover {
+		color: var(--mud--palette-primary-text) !important;
 	}
 </style>
 
-<MudStack>
+<MudStack Class="settings-dialog-stack">
 	<MudTabs @ref="@tabs" @bind-ActivePanelIndex="ActivePanelIndex" Color="Color.Primary" Border="false" ActiveTabClass="custom-active-tab" ApplyEffectsToContainer KeepPanelsAlive PanelClass="pa-6" SliderAnimation="false">
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.SettingsDialog_General_Label)]" Icon="@MaterialDesignIcons.Normal.Cog">
 			<MudStack Class="ma-4">

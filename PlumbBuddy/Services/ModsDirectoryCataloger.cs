@@ -207,7 +207,7 @@ public class ModsDirectoryCataloger :
                 : null,
             Key = key,
             MessageToTranslators = modFileManifestModel.MessageToTranslators,
-            Name = modFileManifestModel.Name,
+            Name = modFileManifestModel.Name ?? string.Empty,
             TranslationSubmissionUrl = modFileManifestModel.TranslationSubmissionUrl,
             TuningFullInstance = modFileManifestModel.TuningFullInstance is not 0
                 ? unchecked((long)modFileManifestModel.TuningFullInstance)
@@ -254,7 +254,7 @@ public class ModsDirectoryCataloger :
             modFileManifestModel.IncompatiblePacks
         ).ConfigureAwait(false))
             modFileManifest.IncompatiblePacks.Add(incompatiblePack);
-        foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages)
+        foreach (var repurposedLanguage in modFileManifestModel.RepurposedLanguages.Where(rl => rl.ActualLocale is not null && rl.GameLocale is not null))
             modFileManifest.RepurposedLanguages.Add(new ModFileManifestRepurposedLanguage(modFileManifest)
             {
                 ActualLocale = repurposedLanguage.ActualLocale,
@@ -308,7 +308,7 @@ public class ModsDirectoryCataloger :
                         requiredMod.IgnoreIfPackUnavailable
                     ).ConfigureAwait(false)
                     : null,
-                Name = requiredMod.Name,
+                Name = requiredMod.Name ?? string.Empty,
                 RequirementIdentifier = requiredMod.RequirementIdentifier is { } identifier
                     ? await TransformNormalizedEntity
                     (
