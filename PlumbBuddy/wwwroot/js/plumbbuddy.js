@@ -301,6 +301,15 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                         range: range,
                     },
                     {
+                        label: "GhostPowersPoints",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{${1:0}.GhostPowersPoints}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
                         label: "Influence",
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         insertText: "{${1:0}.Influence}",
@@ -373,9 +382,27 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
                         range: range,
                     },
                     {
+                        label: "SmallBusinessPoints",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{${1:0}.SmallBusinessPoints}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
                         label: "String",
                         kind: monaco.languages.CompletionItemKind.Keyword,
                         insertText: "{${1:0}.String}",
+                        insertTextRules:
+                            monaco.languages.CompletionItemInsertTextRule
+                                .InsertAsSnippet,
+                        range: range,
+                    },
+                    {
+                        label: "UnitName",
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: "{${1:0}.UnitName}",
                         insertTextRules:
                             monaco.languages.CompletionItemInsertTextRule
                                 .InsertAsSnippet,
