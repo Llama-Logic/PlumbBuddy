@@ -109,7 +109,7 @@ public sealed class UpdateManager :
                 latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
 #else
                 (
-                    latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith($".{RuntimeInformation.ProcessArchitecture switch { Architecture.Arm64 => "arm64", _ => "x64" }}.msix", StringComparison.OrdinalIgnoreCase))
+                    latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith($"_{RuntimeInformation.ProcessArchitecture switch { Architecture.Arm64 => "arm64", _ => "x64" }}.msix", StringComparison.OrdinalIgnoreCase))
                     ?? latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith(".msix", StringComparison.OrdinalIgnoreCase))
                 )
 #endif
