@@ -105,15 +105,15 @@ public sealed class UpdateManager :
             (
                 version,
                 latestMostStableRelease.Body,
-                latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith
-                (
 #if MACCATALYST
-                    ".zip",
+                latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
 #else
-                    ".msix",
+                (
+                    latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith($".{RuntimeInformation.ProcessArchitecture switch { Architecture.Arm64 => "arm64", _ => "x64" }}.msix", StringComparison.OrdinalIgnoreCase))
+                    ?? latestMostStableRelease.Assets?.FirstOrDefault(a => a.Name.EndsWith(".msix", StringComparison.OrdinalIgnoreCase))
+                )
 #endif
-                    StringComparison.OrdinalIgnoreCase
-                ))?.BrowserDownloadUrl is string downloadUrlStr
+                ?.BrowserDownloadUrl is string downloadUrlStr
                 && Uri.TryCreate(downloadUrlStr, UriKind.Absolute, out var downloadUrl)
                 ? downloadUrl
                 : null
