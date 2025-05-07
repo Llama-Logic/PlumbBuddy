@@ -344,7 +344,6 @@ public class ModHoundClient :
                 .Select(mf => new
                 {
                     Path = mf.Path.Replace("\\", "/"), // MH thinks in POSIX
-                    mf.Creation,
                     mf.LastWrite
                 })
                 .ToListAsync()
@@ -352,7 +351,7 @@ public class ModHoundClient :
                 .Select(mf => new
                 {
                     name = mf.Path[(mf.Path.LastIndexOf('/') + 1)..mf.Path.LastIndexOf('.')],
-                    date = (mf.Creation < mf.LastWrite ? mf.Creation : mf.LastWrite).LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
+                    date = mf.LastWrite.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
                     extension = mf.Path[(mf.Path.LastIndexOf('.') + 1)..],
                     fullPath = $"Mods/{mf.Path}"
                 })
