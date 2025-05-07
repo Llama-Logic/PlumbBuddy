@@ -43,8 +43,8 @@ partial class ModHoundDisplay
             && sortDirection is SortDirection.Ascending or SortDirection.Descending)
             recordsInScope = sortLabel switch
             {
-                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName),
-                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName),
+                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName.ToUpper()),
+                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName.ToUpper()),
                 "FileDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileDate),
                 "FileDate" => recordsInScope.OrderBy(mhrr => mhrr.FileDate),
                 "FileType" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileType),
@@ -88,12 +88,12 @@ partial class ModHoundDisplay
             && sortDirection is SortDirection.Ascending or SortDirection.Descending)
             recordsInScope = sortLabel switch
             {
-                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName),
-                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName),
-                "ModName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.ModName),
-                "ModName" => recordsInScope.OrderBy(mhrr => mhrr.ModName),
-                "CreatorName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.CreatorName),
-                "CreatorName" => recordsInScope.OrderBy(mhrr => mhrr.CreatorName),
+                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.FileName.ToUpper()),
+                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName.ToUpper()),
+                "ModName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.ModName.ToUpper()),
+                "ModName" => recordsInScope.OrderBy(mhrr => mhrr.ModName.ToUpper()),
+                "CreatorName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.CreatorName.ToUpper()),
+                "CreatorName" => recordsInScope.OrderBy(mhrr => mhrr.CreatorName.ToUpper()),
                 "LastUpdateDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.LastUpdateDate),
                 "LastUpdateDate" => recordsInScope.OrderBy(mhrr => mhrr.LastUpdateDate),
                 "DateOfInstalledFile" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mhrr => mhrr.DateOfInstalledFile),
