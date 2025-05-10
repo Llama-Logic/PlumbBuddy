@@ -355,7 +355,7 @@
 											<MudNavGroup Expanded Icon="@MaterialDesignIcons.Normal.Alert" IconColor="Color.Warning" Title="@AppText.ModHoundDisplay_Section_MissingRequirements_Dependents_Label">
 												@foreach (var dependent in missingRequirementsRecord?.Dependents ?? Enumerable.Empty<ModHoundReportMissingRequirementsRecordDependent>())
 												{
-													<MudNavLink Href="javascript:void(0)" Icon="@MaterialDesignIcons.Normal.Certificate">
+													<MudNavLink Href="javascript:void(0)" Icon="@MaterialDesignIcons.Normal.Certificate" Style="pointer-events: none;">
 														<MudTextM3>
 															<MudHighlighter HighlightedText="@searchText" Text="@(dependent.Label)" />
 														</MudTextM3>
