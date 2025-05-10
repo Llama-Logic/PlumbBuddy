@@ -355,8 +355,9 @@ public partial class Archivist :
                 && fileInfo.LastWriteTime > gameStarted;
             DiagnosticStatus = $"{fileInfo.Name} / SHA256 Package";
             var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
-            if (chronicles.Any(c => c.Snapshots.Any(s => s.OriginalPackageSha256.SequenceEqual(fileHash) || s.EnhancedPackageSha256.SequenceEqual(fileHash))))
-                return;
+            using (var chroniclesLockHeldForLoadCheck = await chroniclesLock.LockAsync().ConfigureAwait(false))
+                if (chronicles.Any(c => c.Snapshots.Any(s => s.OriginalPackageSha256.SequenceEqual(fileHash) || s.EnhancedPackageSha256.SequenceEqual(fileHash))))
+                    return;
             var fileHashArray = Unsafe.As<ImmutableArray<byte>, byte[]>(ref fileHash);
             package = await DataBasePackedFile.FromPathAsync(fileInfo.FullName).ConfigureAwait(false);
             var packageKeys = await package.GetKeysAsync().ConfigureAwait(false);
