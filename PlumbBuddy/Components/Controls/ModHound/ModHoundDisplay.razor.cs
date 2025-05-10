@@ -113,7 +113,7 @@ partial class ModHoundDisplay
                 && mhrr.LastUpdateDateString.ToUpper().Contains(searchText)
                 || mhrr.ModName.ToUpper().Contains(searchText)
                 || mhrr.UpdateNotes != null
-                && mhrr.UpdateNotes.Contains(searchText));
+                && mhrr.UpdateNotes.ToUpper().Contains(searchText));
         }
         return new TableData<ModHoundReportRecord>
         {
