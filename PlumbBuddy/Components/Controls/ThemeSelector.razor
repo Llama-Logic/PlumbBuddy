@@ -11,9 +11,9 @@
     <MudFlexBreak />
     @foreach (var (slug, customTheme) in CustomThemes.Themes.OrderBy(kv => kv.Key))
     {
-        <MudItem xs="3">
+        <MudItem xs="4">
             <MudCard Elevation="5" Class="@(Settings.Theme == slug ? "mud-background-primary-selected" : "mud-background")">
-                <MudCardMedia Image="@($"/img/custom-themes/{slug}/logo.png")" Height="160" />
+                <MudCardMedia Image="@($"/img/custom-themes/{slug}/logo.png")" Height="240" />
                 <MudCardContent>
                     <MudStack Spacing="0" Class="align-center">
                         <MudTextM3 Typo="TypoM3.Title">@(customTheme.DisplayName)</MudTextM3>
