@@ -4156,7 +4156,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I have cancelled your Mod Hound report request, which was to include a whopping {0:n0} packages. Homes, that is just &lt;strong&gt;too much&lt;/strong&gt;. Most of that &lt;em&gt;just has to be CC anyway, right?&lt;/em&gt; You should know Mod Hound doesn&apos;t analyze CC, so excluding it would enable me to actually request reports..
+        ///   Looks up a localized string similar to I have cancelled your Mod Hound report request, which was to include a whopping {0:n0} packages. Homes, that is just &lt;strong&gt;too much&lt;/strong&gt;. Most of that &lt;em&gt;just has to be CC anyway, right?&lt;/em&gt; You should know Mod Hound doesn&apos;t analyze CC, so excluding it would enable me to actually request reports. Let&apos;s the total we&apos;re sending to at or below {1:n0}, which is Mod Hound&apos;s current package limit..
         /// </summary>
         internal static string ModHoundClient_Snack_Error_PackageHardLimitExceeded {
             get {
@@ -4201,7 +4201,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uhh, you&apos;re sending a somewhat large batch of {0:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn&apos;t analyze CC anyway..
+        ///   Looks up a localized string similar to Uhh, you&apos;re sending a somewhat large batch of {0:n0} packages to Mod Hound. You may want to consider excluding CC, since Mod Hound doesn&apos;t analyze CC anyway. If you can get the number packages you&apos;re sending to Mod Hound below {1:n0}, I&apos;ll stop getting on your case about this..
         /// </summary>
         internal static string ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages {
             get {

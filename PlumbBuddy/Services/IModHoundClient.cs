@@ -3,9 +3,6 @@ namespace PlumbBuddy.Services;
 public interface IModHoundClient :
     INotifyPropertyChanged
 {
-    const int PackagesBatchHardLimit = 26_000;
-    const int PackagesBatchWarningThreshold = 5_000;
-
     const string SectionBrokenObsolete = "BrokenObsolete";
     const string SectionDuplicates = "Duplicates";
     const string SectionIncompatible = "Incompatible";

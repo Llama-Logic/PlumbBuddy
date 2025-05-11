@@ -161,7 +161,7 @@
 				@if (ModHoundPackagesBatchYieldIncluded is { } batchYieldIncluded && ModHoundPackagesBatchYieldExcluded is { } batchYieldExcluded)
 				{
 					<MudStack Row>
-						<MudNumericField Adornment="Adornment.Start" AdornmentColor="@(batchYieldIncluded > IModHoundClient.PackagesBatchHardLimit ? Color.Error : batchYieldIncluded > IModHoundClient.PackagesBatchWarningThreshold ? Color.Warning : Color.Success)" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" HideSpinButtons ReadOnly Label="@AppText.SettingsDialog_ModHound_PackagesIncluded_Label" Value="@batchYieldIncluded" />
+						<MudNumericField Adornment="Adornment.Start" AdornmentColor="@(batchYieldIncluded > 26000 ? Color.Error : batchYieldIncluded > 5000 ? Color.Warning : Color.Success)" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedPlus" HideSpinButtons ReadOnly Label="@AppText.SettingsDialog_ModHound_PackagesIncluded_Label" Value="@batchYieldIncluded" />
 						<MudNumericField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.PackageVariantClosedMinus" HideSpinButtons ReadOnly Label="@AppText.SettingsDialog_ModHound_PackagesExcluded_Label" Value="@batchYieldExcluded" />
 					</MudStack>
 				}

@@ -3,21 +3,25 @@ namespace PlumbBuddy.Services;
 public class PublicCatalogs :
     IPublicCatalogs
 {
-    public PublicCatalogs(ILogger<PublicCatalogs> logger, ISettings settings)
+    public PublicCatalogs(ILogger<PublicCatalogs> logger, IPlatformFunctions platformFunctions, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(settings);
         this.logger = logger;
+        this.platformFunctions = platformFunctions;
         this.settings = settings;
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         if (this.settings.UsePublicPackCatalog)
             Task.Run(() => FetchPackCatalogAsync());
         client = new() { BaseAddress = new("https://plumbbuddy.app/community-data/") };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(this.platformFunctions.UserAgent);
     }
 
     readonly HttpClient client;
     readonly ILogger<PublicCatalogs> logger;
     IReadOnlyDictionary<string, PackDescription>? packCatalog;
+    readonly IPlatformFunctions platformFunctions;
     readonly ISettings settings;
 
     ~PublicCatalogs() =>
@@ -86,6 +90,14 @@ public class PublicCatalogs :
             logger.LogWarning(ex, "Failed to fetch pack catalog with force = {Force}", force);
             settings.UsePublicPackCatalog = false;
         }
+    }
+
+    public async Task<IntegrationSettings> GetIntegrationSettingsAsync()
+    {
+        var responseMessage = await client.GetAsync("integration-settings.yml").ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
+        var integrationSettingsYaml = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        return Yaml.CreateYamlDeserializer().Deserialize<IntegrationSettings>(integrationSettingsYaml);
     }
 
     public async Task<IReadOnlyDictionary<string, SupportDiscord>> GetSupportDiscordsAsync(bool? useCache = null)

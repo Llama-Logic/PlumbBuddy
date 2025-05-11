@@ -13,10 +13,11 @@ public class ModHoundClient :
     const string visitorTaskStatusUrlFormat = "/visitor/task-status/{0}";
     static readonly JsonSerializerOptions visitorLoadDirectoryRequestBodyJsonSerializerOptions = new() { WriteIndented = false };
 
-    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, IPublicCatalogs publicCatalogs, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
+        ArgumentNullException.ThrowIfNull(publicCatalogs);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
@@ -24,6 +25,7 @@ public class ModHoundClient :
         ArgumentNullException.ThrowIfNull(blazorFramework);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
+        this.publicCatalogs = publicCatalogs;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
@@ -56,6 +58,7 @@ public class ModHoundClient :
     readonly IPlatformFunctions platformFunctions;
     int? progressValue;
     int? progressMax;
+    readonly IPublicCatalogs publicCatalogs;
     readonly AsyncLock requestLock;
     int? requestPhase;
     string searchText;
@@ -392,6 +395,41 @@ public class ModHoundClient :
                 ignoreFolderName = "CC",
                 timeZone = TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName)
             };
+            if ((await publicCatalogs.GetIntegrationSettingsAsync().ConfigureAwait(false)).ModHound is not { } modHoundIntegrationSettings)
+            {
+                logger.LogWarning("Mod Hound integration settings empty");
+                superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
+                return;
+            }
+            if (!string.IsNullOrWhiteSpace(modHoundIntegrationSettings.ReportServiceUnavailableMessage))
+            {
+                superSnacks.OfferRefreshments(new MarkupString(modHoundIntegrationSettings.ReportServiceUnavailableMessage), Severity.Error, options =>
+                {
+                    options.Icon = MaterialDesignIcons.Normal.PowerPlugOff;
+                    options.RequireInteraction = true;
+                });
+                return;
+            }
+            var packageFilesBeingSent = postDirectoryRequestBodyObject.files.Count(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
+            if (packageFilesBeingSent > modHoundIntegrationSettings.PackagesBatchHardLimit)
+            {
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_PackageHardLimitExceeded, packageFilesBeingSent, modHoundIntegrationSettings.PackagesBatchHardLimit)), Severity.Error, options =>
+                {
+                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
+                    options.Icon = MaterialDesignIcons.Normal.TableOff;
+                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
+                    options.RequireInteraction = true;
+                });
+                return;
+            }
+            if (packageFilesBeingSent > modHoundIntegrationSettings.PackagesBatchWarningThreshold)
+                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages, packageFilesBeingSent, modHoundIntegrationSettings.PackagesBatchWarningThreshold)), Severity.Warning, options =>
+                {
+                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
+                    options.Icon = MaterialDesignIcons.Normal.TableClock;
+                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
+                    options.RequireInteraction = true;
+                });
             var postDirectoryRequestBodyJson = JsonSerializer.Serialize(postDirectoryRequestBodyObject, visitorLoadDirectoryRequestBodyJsonSerializerOptions);
             byte[] postDirectoryRequestBodyJsonSha256;
             using (var postDirectoryRequestBodyJsonStream = new MemoryStream(Encoding.UTF8.GetBytes(postDirectoryRequestBodyJson)))
@@ -431,26 +469,6 @@ public class ModHoundClient :
                 superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Success_MatchingCachedReport, freshIdenticalReport.Retrieved.Humanize())), Severity.Success, options => options.Icon = MaterialDesignIcons.Normal.TableSync);
                 return;
             }
-            var packageFilesBeingSent = postDirectoryRequestBodyObject.files.Count(file => file.extension.Equals("package", StringComparison.OrdinalIgnoreCase));
-            if (packageFilesBeingSent > IModHoundClient.PackagesBatchHardLimit)
-            {
-                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_PackageHardLimitExceeded, packageFilesBeingSent)), Severity.Error, options =>
-                {
-                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
-                    options.Icon = MaterialDesignIcons.Normal.TableOff;
-                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
-                    options.RequireInteraction = true;
-                });
-                return;
-            }
-            if (packageFilesBeingSent > IModHoundClient.PackagesBatchWarningThreshold)
-                superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Warning_ExcessiveNumberOfPackages, packageFilesBeingSent)), Severity.Warning, options =>
-                {
-                    options.Action = AppText.ModHoundClient_SnackAction_ExcludeCC;
-                    options.Icon = MaterialDesignIcons.Normal.TableClock;
-                    options.OnClick = _ => blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowSettingsDialogAsync(4);
-                    options.RequireInteraction = true;
-                });
             using var checkModFilesPageRequest = await httpClient.GetAsync(visitorLoad).ConfigureAwait(false);
             try
             {
