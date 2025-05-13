@@ -393,7 +393,7 @@ public class ModHoundClient :
                 files = files.Where(file => !file.extension.Equals("package", StringComparison.OrdinalIgnoreCase) || !exclusionTests.Any(exclusionTest => exclusionTest(file.fullPath[5..]))).ToImmutableArray(),
                 ignoreFolder = false,
                 ignoreFolderName = "CC",
-                timeZone = TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName)
+                timeZone = await platformFunctions.GetTimezoneIanaNameAsync().ConfigureAwait(false)
             };
             if ((await publicCatalogs.GetIntegrationSettingsAsync().ConfigureAwait(false)).ModHound is not { } modHoundIntegrationSettings)
             {

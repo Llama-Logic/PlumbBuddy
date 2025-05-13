@@ -41,9 +41,15 @@ partial class PlatformFunctions :
     static readonly PropertyChangedEventArgs progressStateChangedEventArgs = new(nameof(ProgressState));
     static readonly PropertyChangedEventArgs progressValueChangedEventArgs = new(nameof(ProgressValue));
 
-    public PlatformFunctions(ISettings settings)
+    const string etcLocalTimeSymlinkPath = "/etc/localtime";
+    const string etcLocalTimePrefix = "/var/db/timezone/zoneinfo/";
+    const string readLinkBinaryPath = "readlink";
+
+    public PlatformFunctions(ILogger<PlatformFunctions> logger, ISettings settings)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
+        this.logger = logger;
         this.settings = settings;
         userNotificationCenter = UNUserNotificationCenter.Current;
         Task.Run(InitializeNotificationsAsync);
@@ -51,6 +57,7 @@ partial class PlatformFunctions :
 
     DateTimeOffset? lastGameProcessScan;
     Process? lastGameProcess;
+    readonly ILogger<PlatformFunctions> logger;
     int progressMaximum;
     AppProgressState progressState;
     int progressValue;
@@ -177,6 +184,35 @@ partial class PlatformFunctions :
             }
         }
         return null;
+    }
+
+    public async Task<string> GetTimezoneIanaNameAsync()
+    {
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = readLinkBinaryPath,
+                    Arguments = etcLocalTimeSymlinkPath,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+            process.Start();
+            var target = (await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false)).Trim();
+            await process.WaitForExitAsync().ConfigureAwait(false);
+            return !string.IsNullOrEmpty(target) && target.StartsWith(etcLocalTimePrefix)
+                ? target[etcLocalTimePrefix.Length..]
+                : TimeZoneInfo.Local.Id;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "failed to execute and/or read the standard output from: {Binary} {Arguments}", readLinkBinaryPath, etcLocalTimeSymlinkPath);
+            return TimeZoneInfo.Local.Id;
+        }
     }
 
     public async Task<Version?> GetTS4InstallationVersionAsync()

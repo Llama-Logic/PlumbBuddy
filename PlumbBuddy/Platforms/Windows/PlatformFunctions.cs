@@ -227,6 +227,9 @@ partial class PlatformFunctions :
         }
     }
 
+    public Task<string> GetTimezoneIanaNameAsync() =>
+        Task.FromResult(TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName));
+
     public Task<Version?> GetTS4InstallationVersionAsync()
     {
         var executable = new FileInfo(Path.Combine(settings.InstallationFolderPath, "Game", "Bin", "TS4_x64.exe"));
