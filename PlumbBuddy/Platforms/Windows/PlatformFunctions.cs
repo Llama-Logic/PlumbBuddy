@@ -228,7 +228,7 @@ partial class PlatformFunctions :
     }
 
     public Task<string> GetTimezoneIanaNameAsync() =>
-        Task.FromResult(TZConvert.WindowsToIana(TimeZoneInfo.Local.StandardName));
+        Task.FromResult(TZConvert.WindowsToIana(TimeZoneInfo.Local.Id));
 
     public Task<Version?> GetTS4InstallationVersionAsync()
     {
