@@ -10,7 +10,7 @@ public static class Yaml
             .WithNamingConvention(UnderscoredNamingConvention.Instance);
 
     public static IDeserializer CreateYamlDeserializer() =>
-        ConfigureBuilder(new DeserializerBuilder()).Build();
+        ConfigureBuilder(new DeserializerBuilder()).IgnoreUnmatchedProperties().Build();
 
     public static ISerializer CreateYamlSerializer() =>
         ConfigureBuilder(new SerializerBuilder()).Build();

@@ -327,6 +327,7 @@ public class ModHoundClient :
             superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Normal_RequestAlreadyInProgress), Severity.Normal, options => options.Icon = MaterialDesignIcons.Normal.HandBackLeft);
             return;
         }
+        var reportServiceRequestStopwatch = new Stopwatch();
         try
         {
             Status = AppText.ModHoundClient_Status_WaitingForModsDirectoryCataloger;
@@ -494,6 +495,9 @@ public class ModHoundClient :
             httpClient.DefaultRequestHeaders.Referrer = referer;
             httpClient.DefaultRequestHeaders.Add("X-CSRFToken", csrfToken);
             using var postDirectoryRequestBody = new StringContent(postDirectoryRequestBodyJson, new MediaTypeHeaderValue("application/json"));
+            reportServiceRequestStopwatch.Start();
+            using var reportServiceTimeoutCancellationTokenSource = new CancellationTokenSource(new TimeSpan(Math.Max(Math.Min(modHoundIntegrationSettings.ReportServiceTimeout.Ticks, TimeSpan.FromMinutes(10).Ticks), TimeSpan.FromMinutes(1).Ticks)));
+            var reportServiceTimeoutCancellationToken = reportServiceTimeoutCancellationTokenSource.Token;
             using var postDirectoryRequest = await httpClient.PostAsync(visitorLoadDirectory, postDirectoryRequestBody).ConfigureAwait(false);
             try
             {
@@ -518,7 +522,8 @@ public class ModHoundClient :
             var visitorTaskStatusUrl = string.Format(visitorTaskStatusUrlFormat, taskId);
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                reportServiceTimeoutCancellationToken.ThrowIfCancellationRequested();
+                await Task.Delay(TimeSpan.FromSeconds(1), reportServiceTimeoutCancellationToken).ConfigureAwait(false);
                 var taskStatusRequest = await httpClient.GetAsync(visitorTaskStatusUrl).ConfigureAwait(false);
                 try
                 {
@@ -530,7 +535,7 @@ public class ModHoundClient :
                     superSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundClient_Snack_Error_ScrapWithTheDog), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.Alert);
                     return;
                 }
-                lastTaskStatusResponse = await taskStatusRequest.Content.ReadFromJsonAsync<GetTaskStatusResponse>().ConfigureAwait(false);
+                lastTaskStatusResponse = await taskStatusRequest.Content.ReadFromJsonAsync<GetTaskStatusResponse>(reportServiceTimeoutCancellationToken).ConfigureAwait(false);
                 if (lastTaskStatusResponse is null)
                 {
                     logger.LogWarning("Mod Hound's response from getting the task status for {TaskId} could not be understood: {Response}", taskId, await taskStatusRequest.Content.ReadAsStringAsync().ConfigureAwait(false));
@@ -548,6 +553,7 @@ public class ModHoundClient :
                 ProgressMax = lastTaskStatusResponse.Total;
                 ProgressValue = lastTaskStatusResponse.Current;
             }
+            reportServiceRequestStopwatch.Stop();
             Status = AppText.ModHoundClient_Status_ReadingResponse;
             RequestPhase = 3;
             ProgressMax = 9;
@@ -752,6 +758,12 @@ public class ModHoundClient :
         catch (RegexParseException)
         {
             return;
+        }
+        catch (OperationCanceledException ex)
+        {
+            reportServiceRequestStopwatch.Stop();
+            logger.LogError(ex, $"reporting service timeout exceeded");
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModHoundClient_Snack_Error_RequestServiceTimeoutExceeded, reportServiceRequestStopwatch.Elapsed.Humanize())), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.TimerCancel);
         }
         catch (Exception ex)
         {

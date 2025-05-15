@@ -3293,4 +3293,8 @@ The missing key hashes are:
   <data name="OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label" xml:space="preserve">
     <value>Automatically subsume identically credited single-file mods when initializing a manifest</value>
   </data>
+  <data name="ModHoundClient_Snack_Error_RequestServiceTimeoutExceeded" xml:space="preserve">
+    <value>I cancelled your Mod Hound report request because it had been running for {0}. It may be that Mod Hound is experiencing service availability issues at the moment. Please try your request again later.</value>
+    <comment>{0} = The amount of time the request had been running</comment>
+  </data>
 </root>

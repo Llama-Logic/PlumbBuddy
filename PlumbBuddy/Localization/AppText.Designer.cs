@@ -4165,6 +4165,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I cancelled your Mod Hound report request because it had been running for {0}. It may be that Mod Hound is experiencing service availability issues at the moment. Please try your request again later..
+        /// </summary>
+        internal static string ModHoundClient_Snack_Error_RequestServiceTimeoutExceeded {
+            get {
+                return ResourceManager.GetString("ModHoundClient_Snack_Error_RequestServiceTimeoutExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Something went wrong in my communication with Mod Hound. I&apos;ve made a note about it in my log. Perhaps you should try again later..
         /// </summary>
         internal static string ModHoundClient_Snack_Error_ScrapWithTheDog {
