@@ -40,13 +40,21 @@ public abstract class DepthScan :
             {
                 if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FolderLock);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_GameIsRunning), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FolderLock;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_CannotFind), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Depth_MoveCloserToModsRoot_Error_CannotFind), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileQuestion;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 if (file.Directory is not { } originDirectory)
@@ -55,12 +63,12 @@ public abstract class DepthScan :
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderQuestion;
                         options.Action = AppText.Common_ShowMe;
-                        options.VisibleStateDuration = 30000;
                         options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
                         };
+                        options.RequireInteraction = true;
                     });
                     return Task.CompletedTask;
                 }
@@ -74,12 +82,12 @@ public abstract class DepthScan :
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderSwap;
                         options.Action = AppText.Common_ShowMe;
-                        options.VisibleStateDuration = 30000;
                         options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
                         };
+                        options.RequireInteraction = true;
                     });
                     return Task.CompletedTask;
                 }
@@ -99,12 +107,12 @@ public abstract class DepthScan :
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderAlert;
                         options.Action = AppText.Common_ShowMe;
-                        options.VisibleStateDuration = 60000;
                         options.OnClick = _ =>
                         {
                             platformFunctions.ViewFile(file);
                             return Task.CompletedTask;
                         };
+                        options.RequireInteraction = true;
                     });
                     return Task.CompletedTask;
                 }
@@ -125,7 +133,11 @@ public abstract class DepthScan :
                 }
                 catch (Exception moveEx)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileAlert;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(Path.Combine(targetDirectory.FullName, file.Name));
@@ -133,12 +145,12 @@ public abstract class DepthScan :
                 {
                     options.Icon = MaterialDesignIcons.Normal.FolderMove;
                     options.Action = AppText.Common_ShowMe;
-                    options.VisibleStateDuration = 30000;
                     options.OnClick = _ =>
                     {
                         platformFunctions.ViewFile(newFile);
                         return Task.CompletedTask;
                     };
+                    options.RequireInteraction = true;
                 });
                 return Task.CompletedTask;
             }
@@ -147,7 +159,11 @@ public abstract class DepthScan :
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFilePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileQuestion;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 platformFunctions.ViewFile(file);

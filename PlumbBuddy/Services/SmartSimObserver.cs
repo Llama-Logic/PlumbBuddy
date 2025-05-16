@@ -1089,8 +1089,8 @@ public partial class SmartSimObserver :
             logger.LogError(ex, "unexpected exception encountered while scanning");
             superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Error_ModsHealthScanFailed, ex.GetType().Name, ex.Message)), Severity.Error, options =>
             {
-                options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+                options.RequireInteraction = true;
             });
             await platformFunctions.SetBadgeNumberAsync(0).ConfigureAwait(false);
         }
@@ -1162,8 +1162,8 @@ public partial class SmartSimObserver :
             logger.LogError(ex, "unexpected exception encountered while initializing scans");
             superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Error_InitializingScansFailed, ex.GetType().Name, ex.Message)), Severity.Error, options =>
             {
-                options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.BottleTonicPlus;
+                options.RequireInteraction = true;
             });
             platformFunctions.SetBadgeNumberAsync(0).Wait();
         }

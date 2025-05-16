@@ -622,8 +622,8 @@ public partial class Archivist :
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", fileInfo.FullName);
             superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Archivist_Warning_CannotReadSaveFile, fileInfo.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
             {
-                options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.ContentSaveAlert;
+                options.RequireInteraction = true;
             });
         }
         finally

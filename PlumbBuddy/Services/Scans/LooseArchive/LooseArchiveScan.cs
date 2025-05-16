@@ -36,7 +36,11 @@ public abstract class LooseArchiveScan :
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, looseArchiveRelativePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_LooseArchive_MoveToDownloads_Error_CannotFind), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_LooseArchive_MoveToDownloads_Error_CannotFind), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileQuestion;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 var downloads = settings.DownloadsFolderPath;
@@ -55,7 +59,11 @@ public abstract class LooseArchiveScan :
                 }
                 if (moveEx is not null)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Common_Error_CannotMove, moveEx.GetType().Name, moveEx.Message)), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileAlert;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 var newFile = new FileInfo(prospectiveTargetPath);
@@ -77,7 +85,11 @@ public abstract class LooseArchiveScan :
                 var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, looseArchiveRelativePath));
                 if (!file.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileQuestion);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Corrupt_ShowFile_Error_NotFound), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileQuestion;
+                        options.RequireInteraction = true;
+                    });
                     return Task.CompletedTask;
                 }
                 platformFunctions.ViewFile(file);

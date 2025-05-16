@@ -5510,6 +5510,38 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to read:&lt;br /&gt;
+        ///&lt;strong&gt;{0}::{1}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{2}: {3}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string Parlay_Snack_Error_RefreshStringTableEntriesUnexpectedException {
+            get {
+                return ResourceManager.GetString("Parlay_Snack_Error_RefreshStringTableEntriesUnexpectedException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
+        ///I ran into a problem trying to write {0} locale to:&lt;br /&gt;
+        ///&lt;strong&gt;{1}&lt;/strong&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///Brief technical details:&lt;br /&gt;
+        ///&lt;span style=&quot;font-family: monospace;&quot;&gt;{2}: {3}&lt;/span&gt;&lt;br /&gt;
+        ///&lt;br /&gt;
+        ///More detailed technical information is available in my log..
+        /// </summary>
+        internal static string Parlay_Snack_Error_SaveTranslationUnexpectedException {
+            get {
+                return ResourceManager.GetString("Parlay_Snack_Error_SaveTranslationUnexpectedException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next Autofill.
         /// </summary>
         internal static string Parlay_StringTable_Footer_NextAutofill {

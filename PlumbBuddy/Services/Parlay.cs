@@ -532,20 +532,10 @@ public sealed class Parlay :
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while processing {ModFilePath}::{StringTableKey}", selectedPackagePath, originalStringTableKey);
-            superSnacks.OfferRefreshments(new MarkupString(string.Format(
-                """
-                <h3>Whoops!</h3>
-                I ran into a problem trying to read:<br />
-                <strong>{0}::{1}</strong><br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{2}: {3}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """, selectedPackagePath, originalStringTableKey, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Parlay_Snack_Error_RefreshStringTableEntriesUnexpectedException, selectedPackagePath, originalStringTableKey, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
             {
-                options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.MessageAlert;
+                options.RequireInteraction = true;
             });
         }
     }
@@ -645,20 +635,10 @@ public sealed class Parlay :
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while saving translation of {ModFilePath} from {OriginalLocaleKey} to {TranslationLocaleKey} in {TranslationFilePath}", maybeNullOriginalPackageFile, maybeNullOriginalStringTableKey, maybeNullTranslationLocale, maybeNullTranslationPackageFile);
-            superSnacks.OfferRefreshments(new MarkupString(string.Format(
-                """
-                <h3>Whoops!</h3>
-                I ran into a problem trying to write {0} locale to:<br />
-                <strong>{1}</strong><br />
-                <br />
-                Brief technical details:<br />
-                <span style="font-family: monospace;">{2}: {3}</span><br />
-                <br />
-                More detailed technical information is available in my log.
-                """, maybeNullTranslationLocale, maybeNullTranslationPackageFile?.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Parlay_Snack_Error_SaveTranslationUnexpectedException, maybeNullTranslationLocale, maybeNullTranslationPackageFile?.FullName, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
                 {
-                    options.RequireInteraction = true;
                     options.Icon = MaterialDesignIcons.Normal.MessageAlert;
+                    options.RequireInteraction = true;
                 });
         }
         finally

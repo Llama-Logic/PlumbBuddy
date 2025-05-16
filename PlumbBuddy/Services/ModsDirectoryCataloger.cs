@@ -862,8 +862,8 @@ public class ModsDirectoryCataloger :
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", path);
             superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModsDirectoryCataloger_Warning_CannotReadModFile, path, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
             {
-                options.RequireInteraction = true;
                 options.Icon = MaterialDesignIcons.Normal.PackageVariantRemove;
+                options.RequireInteraction = true;
             });
         }
     }

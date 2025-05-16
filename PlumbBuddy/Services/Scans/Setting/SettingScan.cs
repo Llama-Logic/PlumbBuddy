@@ -52,12 +52,20 @@ public abstract class SettingScan :
                 var optionsIniFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Options.ini"));
                 if (!optionsIniFile.Exists)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_OptionsMissing), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_OptionsMissing), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.FileAlert;
+                        options.RequireInteraction = true;
+                    });
                     return;
                 }
                 if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_GameIsRunning), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.LockAlert);
+                    superSnacks.OfferRefreshments(new MarkupString(AppText.Scan_Setting_Fix_Error_GameIsRunning), Severity.Error, options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.LockAlert;
+                        options.RequireInteraction = true;
+                    });
                     return;
                 }
                 var parser = new IniDataParser();

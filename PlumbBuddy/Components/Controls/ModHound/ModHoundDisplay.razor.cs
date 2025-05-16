@@ -132,7 +132,11 @@ partial class ModHoundDisplay
     {
         if (!file.Exists)
         {
-            SuperSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundDisplay_Snack_Error_CannotViewRemovedFile), Severity.Error, options => options.Icon = MaterialDesignIcons.Normal.FileAlert);
+            SuperSnacks.OfferRefreshments(new MarkupString(AppText.ModHoundDisplay_Snack_Error_CannotViewRemovedFile), Severity.Error, options =>
+            {
+                options.Icon = MaterialDesignIcons.Normal.FileAlert;
+                options.RequireInteraction = true;
+            });
             return;
         }
         PlatformFunctions.ViewFile(file);

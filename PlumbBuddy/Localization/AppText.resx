@@ -3297,4 +3297,26 @@ The missing key hashes are:
     <value>I cancelled your Mod Hound report request because it had been running for {0}. It may be that Mod Hound is experiencing service availability issues at the moment. Please try your request again later.</value>
     <comment>{0} = The amount of time the request had been running</comment>
   </data>
+  <data name="Parlay_Snack_Error_RefreshStringTableEntriesUnexpectedException" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to read:&lt;br /&gt;
+&lt;strong&gt;{0}::{1}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{2}: {3}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>{0} = The path to the original mod package, {1} = The resource key of the original STBL, {2} = The type of the exception, {3} = The message from the exception</comment>
+  </data>
+  <data name="Parlay_Snack_Error_SaveTranslationUnexpectedException" xml:space="preserve">
+    <value>&lt;h3&gt;Whoops!&lt;/h3&gt;
+I ran into a problem trying to write {0} locale to:&lt;br /&gt;
+&lt;strong&gt;{1}&lt;/strong&gt;&lt;br /&gt;
+&lt;br /&gt;
+Brief technical details:&lt;br /&gt;
+&lt;span style="font-family: monospace;"&gt;{2}: {3}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+More detailed technical information is available in my log.</value>
+    <comment>{0} = The locale of the translation, {1} = The path of the translation override package file, {2} = The type of the exception, {3} = The message from the exception</comment>
+  </data>
 </root>
