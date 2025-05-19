@@ -2480,7 +2480,7 @@ More detailed technical information is available in my log.</value>
     <comment>{0} = The New Version Number</comment>
   </data>
   <data name="DesktopInterface_Loading" xml:space="preserve">
-    <value>Just a moment, I'll will be right with you...</value>
+    <value>Just a moment, I'll be right with you...</value>
   </data>
   <data name="DesktopInterface_Loading_HideMainWindow" xml:space="preserve">
     <value>Starting Sims 4 Mods monitoring...</value>
