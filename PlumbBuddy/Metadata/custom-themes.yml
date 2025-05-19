@@ -129,6 +129,85 @@ deaderpool:
       dark: parlay.jpg
       light: parlay.jpg
 
+down-in-simsland:
+
+  # This will be displayed in the UI
+  display_name: Down-In-Simsland
+
+  # This is in Markdown, so it can include a link to your website or Patreon feed. see: https://www.markdownguide.org/
+  description: |
+    Discover on [Tumblr](https://down-in-simsland.tumblr.com/) :)
+
+  # This is how rounded the corners of surfaces are (minimum: 0px; maximum: 25px)
+  default_border_radius: 16px
+
+  # This must be Roboto, Montserrat, Segoe UI, or Ubuntu (unless you want to provide us with a font)
+  font: Segoe UI
+  
+  # COLOR PALETTES
+  # Any of the colors from the palette may be ommitted if you are comfortable with the value from the factory-default theme
+  # Colors are represented in 32-bit hex RGBA: #RRGGBBAA
+
+  # If this palette is present, PlumbBuddy will say your theme supports Light mode
+  palette_light:
+    Black: '#272c34ff'
+    White: '#ffffffff'
+    Primary: '#0c9362ff'
+    PrimaryContrastText: '#ffffffff'
+    Secondary: '#15b77dff'
+    SecondaryContrastText: '#ffffffff'
+    Tertiary: '#55bf73ff'
+    TertiaryContrastText: '#ffffffff'
+    Info: '#2e21c5ff'
+    InfoContrastText: '#ffffffff'
+    Success: '#15b77dff'
+    SuccessContrastText: '#ffffffff'
+    Warning: '#fc5e2cff'
+    WarningContrastText: '#ffffffff'
+    Error: '#f6143cff'
+    ErrorContrastText: '#ffffffff'
+    Dark: '#424242ff'
+    DarkContrastText: '#ffffffff'
+    TextPrimary: '#424242ff'
+    TextSecondary: '#272c348a'
+    TextDisabled: '#272c3461'
+    ActionDefault: '#272c348a'
+    ActionDisabled: '#272c3442'
+    ActionDisabledBackground: '#272c341f'
+    Background: '#ffffffff'
+    BackgroundGray: '#f5f5f5ff'
+    Surface: '#ffffffa6'
+    DrawerBackground: '#ffffffa6'
+    DrawerText: '#424242ff'
+    DrawerIcon: '#616161ff'
+    AppbarBackground: '#2d7a76a6'
+    AppbarText: '#ffffffff'
+    LinesDefault: '#272c341f'
+    LinesInputs: '#bdbdbdff'
+    TableLines: '#e0e0e0ff'
+    TableStriped: '#272c3405'
+    TableHover: '#272c3410'
+    Divider: '#e0e0e0ff'
+    DividerLight: '#272c34cc'
+    Skeleton: '#0000001c'
+  backgrounded_tabs:
+    mod-health:
+      dark: Health.jpg
+      light: Health.jpg
+    catalog:
+      dark: Catalog.jpg
+      light: Catalog.jpg
+    manifest-editor:
+      dark: Manifest.jpg
+      light: Manifest.jpg
+    archivist:
+      dark: Archivist.jpg
+      light: Archivist.jpg
+      position: center
+    parlay:
+      dark: Parlay.jpg
+      light: Parlay.jpg
+
 helen-the-hunter:
   display_name: Helen the Hunter
   description: |
