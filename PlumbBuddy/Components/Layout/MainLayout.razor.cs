@@ -85,7 +85,16 @@ public partial class MainLayout
                 theme.LayoutProperties.DefaultBorderRadius = customTheme.DefaultBorderRadius;
             if (!string.IsNullOrWhiteSpace(customTheme.Font))
             {
-                string[] fontFamily = [customTheme.Font];
+                string[] fontFamily =
+                [
+                    customTheme.Font,
+                    "system-ui",
+                    "-apple-system",
+                    "Helvetica Neue",
+                    "Helvetica",
+                    "Arial",
+                    "sans-serif"
+                ];
                 var typography = theme.Typography;
                 typography.Body1.FontFamily = fontFamily;
                 typography.Body2.FontFamily = fontFamily;
