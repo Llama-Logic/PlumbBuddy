@@ -145,6 +145,14 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="**/*.sh" />
+        <Compile Remove="AppxPackages\**" />
+        <Content Remove="AppxPackages\**" />
+        <EmbeddedResource Remove="AppxPackages\**" />
+        <MauiXaml Remove="AppxPackages\**" />
+        <None Remove="AppxPackages\**" />
+        <PRIResource Remove="AppxPackages\**" />
+        <None Remove="Metadata\**" />
         <Content Remove="wwwroot/img/**/*.png" />
     </ItemGroup>
 
@@ -158,10 +166,6 @@
         <None Update="Platforms/MacCatalyst/Resources/plumbbuddy_icon.icns">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Remove="Metadata\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -184,10 +188,6 @@
             <LastGenOutput>AppText.Designer.cs</LastGenOutput>
             <Generator>ResXFileCodeGenerator</Generator>
         </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="**/*.sh" />
     </ItemGroup>
 
 </Project>
