@@ -87,6 +87,7 @@ public sealed class DependencyScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = modWithMissingPacks,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDependencyScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..modWithMissingPacks.MissingPackCodes.Select(missingPackCode => new ScanIssueResolution
@@ -131,6 +132,7 @@ public sealed class DependencyScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = modWithIncompatiblePacks,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDependencyScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     new()
@@ -344,6 +346,7 @@ public sealed class DependencyScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = modWithMissingDependencyMod,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDependencyScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..(resolution is null
@@ -385,6 +388,7 @@ public sealed class DependencyScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = list,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDependencyScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..downloadResolutions

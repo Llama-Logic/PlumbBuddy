@@ -260,7 +260,29 @@
                         </ChildContent>
                     </MudStepExtended>
                 </ChildContent>
+				<ActionContent>
+					<MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Class="flex-grow-1">
+						@if (isFoldersGuideVisible)
+						{
+							<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+								<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideFolders{Type}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" />
+							</MudTooltip>
+						}
+						@if (isModHealthGuideVisible && Type is not UserType.Casual)
+						{
+							<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+								<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealth{Type}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" />
+							</MudTooltip>
+						}
+					</MudStack>
+				</ActionContent>
             </MudStepperExtended>
         </DialogContent>
     </MudDialog>
 </MudLoading>
+
+<style>
+	div.flex-grow-1[aria-hidden="true"] {
+		display: none;
+	}
+</style>

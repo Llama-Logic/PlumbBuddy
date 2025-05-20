@@ -9,6 +9,9 @@ public sealed class McccMissingScan :
     {
     }
 
+    protected override string GuideRedirectSuffix =>
+        nameof(McccMissingScan);
+
     protected override string ModName =>
         AppText.Scan_Missing_ModName_MCCommandCenter;
 

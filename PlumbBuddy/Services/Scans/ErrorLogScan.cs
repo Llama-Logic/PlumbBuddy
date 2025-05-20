@@ -130,6 +130,7 @@ public sealed class ErrorLogScan :
                 Type = ScanIssueType.Uncomfortable,
                 Origin = this,
                 Data = errorFilePath,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthErrorLogScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     new()

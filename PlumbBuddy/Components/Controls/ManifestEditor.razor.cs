@@ -59,10 +59,10 @@ partial class ManifestEditor
     IReadOnlyList<string> features = [];
     ChipSetField? featuresChipSetField;
     int hashingLevel = 1;
-    bool isComposing;
-    bool isLoading;
     IReadOnlyList<string> incompatiblePacks = [];
     ChipSetField? incompatibleChipSetField;
+    bool isComposing;
+    bool isLoading;
     string loadingText = string.Empty;
     ModComponentEditor? modComponentEditor;
     string name = string.Empty;
@@ -1224,6 +1224,9 @@ partial class ManifestEditor
         await stepper.SetActiveIndex(6);
         StateHasChanged();
     }
+
+    async Task LaunchGuideAsync() =>
+        await Browser.OpenAsync($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideManifestEditor{stepper?.GetActiveIndex() switch { 0 => "Select", 1 => "Details", 2 => "Components", 3 => "Requirements", 4 => "CrossMod", 5 => "Hashing", 6 => "Confirm", _ => string.Empty }}", BrowserLaunchMode.External);
 
     Task<bool> OfferToCancelAsync() =>
         DialogService.ShowCautionDialogAsync(AppText.ManifestEditor_Caution_OfferToCancel_Caption, AppText.ManifestEditor_Caution_OfferToCancel_Text);

@@ -9,6 +9,9 @@ public sealed class BeMissingScan :
     {
     }
 
+    protected override string GuideRedirectSuffix =>
+        nameof(BeMissingScan);
+
     protected override string ModName =>
         AppText.Scan_Missing_ModName_BetterExceptions;
 

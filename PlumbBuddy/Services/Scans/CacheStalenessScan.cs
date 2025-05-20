@@ -61,6 +61,7 @@ public sealed class CacheStalenessScan :
                     Origin = this,
                     Data = "stale",
                     Type = ScanIssueType.Sick,
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthCacheStalenessScan{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()

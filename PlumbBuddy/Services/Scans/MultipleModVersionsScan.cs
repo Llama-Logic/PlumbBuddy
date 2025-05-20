@@ -84,6 +84,7 @@ public sealed class MultipleModVersionsScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = modFileManfiestHashId,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthMultipleModVersionsScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..urlResolutions,

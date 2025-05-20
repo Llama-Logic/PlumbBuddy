@@ -15,6 +15,8 @@ public abstract class MissingScan :
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly ISettings settings;
 
+    protected abstract string GuideRedirectSuffix { get; }
+
     protected abstract string ModName { get; }
 
     protected abstract Uri ModUrl { get; }
@@ -198,6 +200,7 @@ public abstract class MissingScan :
                     Origin = this,
                     Type = ScanIssueType.Uncomfortable,
                     Data = "missing",
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealth{GuideRedirectSuffix}{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()

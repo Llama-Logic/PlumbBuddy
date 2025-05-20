@@ -24,7 +24,7 @@ public abstract class CorruptScan :
     readonly ModsDirectoryFileType modsDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings settings;
+    protected readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();

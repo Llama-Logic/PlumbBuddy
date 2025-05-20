@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject IParlay Parlay
 @inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings
 @inject IStringLocalizer<AppText> StringLocalizer
 
 @if (Observed(() => Parlay.Packages) is { Count: > 0 } packages)
@@ -23,6 +24,9 @@
 			</MudTooltip>
 			<MudTooltip Color="Color.Secondary" Text="@(AppText.Parlay_MergeTranslationStringTable_Tip)">
 				<MudIconButton Color="Color.Secondary" Disabled="@(Observed(() => Parlay.TranslationPackageFile) is null || Observed(() => Parlay.EditingEntry) is not null)" Icon="@MaterialDesignIcons.Normal.TableArrowLeft" OnClick="MergeStringTableAsync" />
+			</MudTooltip>
+			<MudTooltip Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+				<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideParlay{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
 			</MudTooltip>
 		</MudStack>
 	</MudItem>

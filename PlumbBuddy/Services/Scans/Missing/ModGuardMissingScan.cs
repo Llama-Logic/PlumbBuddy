@@ -9,6 +9,9 @@ public sealed class ModGuardMissingScan :
     {
     }
 
+    protected override string GuideRedirectSuffix =>
+        nameof(ModGuardMissingScan);
+
     protected override string ModName =>
         AppText.Scan_Missing_ModName_ModGuard;
 

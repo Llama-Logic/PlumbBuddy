@@ -1251,7 +1251,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Just a moment, I&apos;ll will be right with you....
+        ///   Looks up a localized string similar to Just a moment, I&apos;ll be right with you....
         /// </summary>
         internal static string DesktopInterface_Loading {
             get {
@@ -8432,6 +8432,24 @@ namespace PlumbBuddy.Localization {
         internal static string ThemeSelector_LightOrDarkMode {
             get {
                 return ResourceManager.GetString("ThemeSelector_LightOrDarkMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to see helpful details about this feature on PlumbBuddy&apos;s web site..
+        /// </summary>
+        internal static string Tooltip_GuideLink {
+            get {
+                return ResourceManager.GetString("Tooltip_GuideLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to see helpful details about this problem on PlumbBuddy&apos;s web site..
+        /// </summary>
+        internal static string Tooltip_GuideLink_ModHealthScan {
+            get {
+                return ResourceManager.GetString("Tooltip_GuideLink_ModHealthScan", resourceCulture);
             }
         }
         

@@ -16,6 +16,9 @@
 			<MudTooltip Arrow Color="Color.Secondary" Text="@(AppText.Archivist_ScanFolderForSaves_Tip)">
 				<MudIconButton Variant="Variant.Filled" Color="Color.Secondary" Icon="@MaterialDesignIcons.Normal.FolderSearch" Disabled="@(!Observed(() => Settings.ArchivistEnabled))" OnClick="BrowseForFolderToScanAsync" />
 			</MudTooltip>
+			<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+				<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideArchivist")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
+			</MudTooltip>
 		</MudStack>
 	</MudPaper>
 	<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Class="flex-grow-1">

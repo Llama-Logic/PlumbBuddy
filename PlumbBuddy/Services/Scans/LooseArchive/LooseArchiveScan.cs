@@ -20,7 +20,7 @@ public abstract class LooseArchiveScan :
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    readonly ISettings settings;
+    protected readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
 
     protected abstract ScanIssue GenerateHealthyScanIssue();

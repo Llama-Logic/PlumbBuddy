@@ -60,6 +60,7 @@ public sealed class MismatchedInscribedHashesScan :
                 Type = ScanIssueType.Dead,
                 Origin = this,
                 Data = mod,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthMismatchedInscribedHashesScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..settings.Type is UserType.Creator

@@ -168,12 +168,30 @@
 			</MudStack>
 		</MudTabPanel>
     </MudTabs>
-    <MudGrid Justify="Justify.FlexEnd" Class="pa-2">
-        <MudButton OnClick="CancelOnClickHandler">
+    <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Class="pa-2">
+		@if (ActivePanelIndex is 2)
+		{
+			<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+				<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideFolders{Type}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
+			</MudTooltip>
+		}
+		else if (ActivePanelIndex is 3)
+		{
+			<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+				<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealth{Type}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
+			</MudTooltip>
+		}
+		else if (ActivePanelIndex is 4)
+		{
+			<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+				<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHound{Type}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
+			</MudTooltip>
+		}
+		<MudButton OnClick="CancelOnClickHandler">
             @MarkupLocalizer[nameof(AppText.Common_Cancel)]
         </MudButton>
         <MudButton Color="Color.Primary" OnClick="OkOnClickHandlerAsync" Class="ml-2">
             @MarkupLocalizer[nameof(AppText.Common_Ok)]
         </MudButton>
-    </MudGrid>
+    </MudStack>
 </MudStack>

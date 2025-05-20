@@ -28,6 +28,7 @@ public sealed class ModSettingScan :
             Origin = this,
             Type = ScanIssueType.Dead,
             Data = deadScanIssueData,
+            GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthModSettingScan{settings.Type}", UriKind.Absolute),
             Resolutions =
             [
                 new()

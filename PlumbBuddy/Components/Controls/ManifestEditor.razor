@@ -25,7 +25,7 @@
 							<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
 								@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Heading_2)]
 							</MudTextM3>
-							<MudGrid Justify="Justify.Center" Class="mb-4">
+							<MudGrid Justify="Justify.Center" Class="mb-4 align-center">
 								<MudItem xs="10">
 									<MudTextM3 Typo="TypoM3.Body" Align="Align.Center" Class="mt-4">
 										@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_Guidance)]
@@ -46,6 +46,11 @@
 										<MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.ArrowDecisionAuto" OnClick="HandleUpdateAllManifestsInAFolderAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Select_BatchUpdate_Label)]</MudButton>
 									</MudTooltip>
 								</MudItem>
+								<MudItem>
+									<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+										<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideManifestEditorUpdatingAManifest")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
+									</MudTooltip>
+								</MudItem>
 							</MudGrid>
 						</div>
 					</ChildContent>
@@ -64,7 +69,12 @@
 									<MudForm @ref="@detailsStepForm">
 										<MudTextField T="string" @bind-Text="@name" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.Common_Name)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.Spotlight" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_ModName_HelperText)]" Immediate Class="mt-4" />
 										<MudTextField T="string" @bind-Text="@description" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.Common_Description)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Outline.TextBox" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_ModDescription_HelperText)]" Immediate Class="mt-4" />
-										<ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.Common_Creators)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_HelperText)]" Class="mt-4" />
+										<MudStack Row AlignItems="AlignItems.Center" Class="mt-4">
+											<ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.Common_Creators)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_HelperText)]" Class="flex-grow-1" />
+											<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+												<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideManifestEditorDetailsCreators")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
+											</MudTooltip>
+										</MudStack>
 										<MudTextFieldExtended InputType="InputType.Url" @bind-Value="@url" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_Label)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_DownloadPageUrl_HelperText)]" Immediate Class="mt-4">
 											<AdornmentStart>
 												<MudIcon Icon="@MaterialDesignIcons.Normal.Download" Color="Color.Tertiary" />
@@ -451,20 +461,22 @@
                 </MudStepExtended>
             </ChildContent>
             <ActionContent>
-                <MudGrid Class="align-center">
-                    <MudItem>
-                        @if (components.Count > 0 && !isComposing)
-                        {
-                            <MudButton OnClick="HandleCancelOnClickAsync" Variant="Variant.Filled" Color="Color.Warning">@MarkupLocalizer[nameof(AppText.Common_Cancel)]</MudButton>
-                        }
-                    </MudItem>
-                    <MudItem>
-                        <MudTooltip Text="@StringLocalizer[nameof(AppText.ManifestEditor_UsePublicPackCatalog_Tip)]" Color="Color.Tertiary" Placement="Placement.Top" Arrow>
-                            <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Label="@StringLocalizer[nameof(AppText.ManifestEditor_UsePublicPackCatalog_Label)]" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
-                        </MudTooltip>
-                    </MudItem>
-                </MudGrid>
-            </ActionContent>
+                <MudStack Row AlignItems="AlignItems.Center" Class="flex-grow-1">
+                    @if (components.Count > 0 && !isComposing)
+                    {
+                        <MudButton OnClick="HandleCancelOnClickAsync" Variant="Variant.Filled" Color="Color.Warning">@MarkupLocalizer[nameof(AppText.Common_Cancel)]</MudButton>
+                    }
+                    <MudTooltip Text="@StringLocalizer[nameof(AppText.ManifestEditor_UsePublicPackCatalog_Tip)]" Color="Color.Tertiary" Placement="Placement.Top" Arrow>
+                        <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Label="@StringLocalizer[nameof(AppText.ManifestEditor_UsePublicPackCatalog_Label)]" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+                    </MudTooltip>
+					<div class="flex-grow-1">
+
+					</div>
+					<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+						<MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" OnClick="LaunchGuideAsync" />
+					</MudTooltip>
+				</MudStack>
+			</ActionContent>
         </MudStepperExtended>
     </MudLoading>
     <MudOverlay Absolute ZIndex="20" Visible="@batchOverlayVisible" Class="expand-overlay-content">
@@ -479,3 +491,9 @@
         </MudGrid>
     </MudOverlay>
 </div>
+
+<style>
+	div.flex-grow-1[aria-hidden="true"] {
+		display: none;
+	}
+</style>

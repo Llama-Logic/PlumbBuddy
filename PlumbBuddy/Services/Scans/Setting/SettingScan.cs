@@ -28,7 +28,7 @@ public abstract class SettingScan :
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     readonly ModsDirectoryFileType modDirectoryFileType;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly ISettings settings;
+    protected readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
     readonly ISuperSnacks superSnacks;
     readonly string undesirableScanIssueData;

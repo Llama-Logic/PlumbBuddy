@@ -3319,4 +3319,10 @@ Brief technical details:&lt;br /&gt;
 More detailed technical information is available in my log.</value>
     <comment>{0} = The locale of the translation, {1} = The path of the translation override package file, {2} = The type of the exception, {3} = The message from the exception</comment>
   </data>
+  <data name="Tooltip_GuideLink" xml:space="preserve">
+    <value>Click here to see helpful details about this feature on PlumbBuddy's web site.</value>
+  </data>
+  <data name="Tooltip_GuideLink_ModHealthScan" xml:space="preserve">
+    <value>Click here to see helpful details about this problem on PlumbBuddy's web site.</value>
+  </data>
 </root>

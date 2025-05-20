@@ -28,6 +28,7 @@ public sealed class LooseZipArchiveScan :
             Origin = this,
             Type = ScanIssueType.Sick,
             Data = fileOfInterest.Path,
+            GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthLooseZipArchiveScan{settings.Type}", UriKind.Absolute),
             Resolutions =
             [
                 new()

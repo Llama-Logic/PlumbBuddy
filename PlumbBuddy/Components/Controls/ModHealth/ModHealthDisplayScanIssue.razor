@@ -11,9 +11,17 @@
 					</MudAvatar>
 				</CardHeaderAvatar>
 				<CardHeaderContent>
-					<MudTextM3 Typo="TypoM3.Title">
-						@(scanIssue.Caption)
-					</MudTextM3>
+					<MudStack Row AlignItems="AlignItems.Center">
+						<MudTextM3 Typo="TypoM3.Title" Class="flex-grow-1">
+							@(scanIssue.Caption)
+						</MudTextM3>
+						@if (scanIssue.GuideUrl is { } guideUrl)
+						{
+							<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink_ModHealthScan)" Color="Color.Info">
+								<MudIconButton Href="@(guideUrl.ToString())" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
+							</MudTooltip>
+						}
+					</MudStack>
 				</CardHeaderContent>
 			</MudCardHeader>
 			<MudCardContent>

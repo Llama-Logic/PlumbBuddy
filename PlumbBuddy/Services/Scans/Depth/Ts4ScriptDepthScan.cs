@@ -28,6 +28,7 @@ public sealed class Ts4ScriptDepthScan :
             Origin = this,
             Type = ScanIssueType.Sick,
             Data = modFile.Path,
+            GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDepthScan{settings.Type}", UriKind.Absolute),
             Resolutions =
             [
                 new()

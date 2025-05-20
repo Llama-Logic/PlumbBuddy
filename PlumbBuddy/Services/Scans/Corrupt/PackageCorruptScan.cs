@@ -18,6 +18,7 @@ public sealed class PackageCorruptScan :
             Origin = this,
             Type = ScanIssueType.Dead,
             Data = modFile.Path,
+            GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthCorruptScan{settings.Type}", UriKind.Absolute),
             Resolutions =
             [
                 new()

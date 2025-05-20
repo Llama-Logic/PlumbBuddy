@@ -5,7 +5,9 @@ partial class OnboardingDialog
     IReadOnlyList<string> defaultCreators = [];
     ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
+    bool isFoldersGuideVisible;
     bool isLoading;
+    bool isModHealthGuideVisible;
     string? loadingText;
 
     string ArchiveFolderPath
@@ -207,6 +209,8 @@ partial class OnboardingDialog
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
+        isFoldersGuideVisible = false;
+        isModHealthGuideVisible = false;
         if (targetIndex is >= 6)
         {
             if (DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst)
@@ -231,6 +235,7 @@ partial class OnboardingDialog
         {
             case 3:
                 await ScanForFoldersAsync();
+                isFoldersGuideVisible = true;
                 return false;
             case 4:
                 var prevent = false;
@@ -239,6 +244,8 @@ partial class OnboardingDialog
                     await foldersSelector.ValidateAsync();
                     prevent = !foldersSelector.IsValid;
                 }
+                if (!prevent)
+                    isModHealthGuideVisible = true;
                 return prevent;
         }
         return false;

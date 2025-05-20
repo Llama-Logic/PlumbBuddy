@@ -58,6 +58,7 @@ public class ExclusivityScan :
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = (exclusivity, conflictedMods),
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthExclusivityScan{settings.Type}", UriKind.Absolute),
                 Resolutions =
                 [
                     ..conflictedMods.SelectMany(mod => mod.FilePaths).Select((filePath, index) => new ScanIssueResolution()

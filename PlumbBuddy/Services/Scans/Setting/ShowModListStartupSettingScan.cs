@@ -34,6 +34,7 @@ public class ShowModListStartupSettingScan :
             Origin = this,
             Type = ScanIssueType.Uncomfortable,
             Data = uncomfortableScanIssueData,
+            GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthShowModListStartupSettingScan{settings.Type}", UriKind.Absolute),
             Resolutions =
             [
                 new()
