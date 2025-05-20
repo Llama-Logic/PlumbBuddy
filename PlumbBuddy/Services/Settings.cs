@@ -631,10 +631,16 @@ class Settings :
     {
         var showThemeManager = ShowThemeManager;
         var versionAtLastStartup = VersionAtLastStartup;
+        var modHoundExcludePackagesMode = ModHoundExcludePackagesMode;
+        var modHoundPackageExclusions = ModHoundPackagesExclusions;
         Type = UserType.Casual;
         preferences.Clear();
         ShowThemeManager = showThemeManager;
         VersionAtLastStartup = versionAtLastStartup;
+        ModHoundExcludePackagesMode = modHoundExcludePackagesMode;
+        ModHoundPackagesExclusions = modHoundPackageExclusions;
+        foreach (var property in typeof(ISettings).GetProperties())
+            OnPropertyChanged(property.Name);
     }
 
     TEnum Get<TEnum>(string key, TEnum defaultValue)
