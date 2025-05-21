@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.4.16</ApplicationDisplayVersion>
-        <ApplicationVersion>1.4.16</ApplicationVersion>
+        <ApplicationDisplayVersion>1.4.17</ApplicationDisplayVersion>
+        <ApplicationVersion>1.4.17</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
