@@ -230,7 +230,11 @@ partial class OnboardingDialog
             return false;
         }
         if (direction is StepChangeDirection.Backward)
+        {
+            isFoldersGuideVisible = targetIndex is 3;
+            isModHealthGuideVisible = targetIndex is 4;
             return false;
+        }
         switch (targetIndex)
         {
             case 3:

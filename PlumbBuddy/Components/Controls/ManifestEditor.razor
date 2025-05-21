@@ -71,7 +71,7 @@
 										<MudTextField T="string" @bind-Text="@description" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.Common_Description)]" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Outline.TextBox" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_ModDescription_HelperText)]" Immediate Class="mt-4" />
 										<MudStack Row AlignItems="AlignItems.Center" Class="mt-4">
 											<ChipSetField @ref="@creatorsChipSetField" @bind-Values="@creators" Color="Color.Tertiary" Label="@StringLocalizer[nameof(AppText.Common_Creators)]" AdornmentIcon="@MaterialDesignIcons.Normal.AccountGroup" AdornmentColor="Color.Tertiary" ChipIcon="@MaterialDesignIcons.Normal.Account" Placeholder="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_Placeholder)]" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Details_Creators_HelperText)]" Class="flex-grow-1" />
-											<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+											<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink_ManifestEditorCreators)" Color="Color.Info">
 												<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideManifestEditorDetailsCreators")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
 											</MudTooltip>
 										</MudStack>

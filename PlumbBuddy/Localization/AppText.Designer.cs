@@ -8445,6 +8445,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Click here to be redirected to PlumbBuddy&apos;s website to see information about how to provide support for your mods..
+        /// </summary>
+        internal static string Tooltip_GuideLink_ManifestEditorCreators {
+            get {
+                return ResourceManager.GetString("Tooltip_GuideLink_ManifestEditorCreators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Click here to see helpful details about this problem on PlumbBuddy&apos;s web site..
         /// </summary>
         internal static string Tooltip_GuideLink_ModHealthScan {
