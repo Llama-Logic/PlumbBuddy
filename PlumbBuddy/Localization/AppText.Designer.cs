@@ -4192,7 +4192,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {0}, and according to Mod Hound, nothing has changed since then. I&apos;ve selected that report for you for your convenience..
+        ///   Looks up a localized string similar to Good news, I already asked Mod Hound about this exact configuration of your Mods folder {0}, and according to Mod Hound, nothing has changed since then. I&apos;ve selected that report for you for your convenience..
         /// </summary>
         internal static string ModHoundClient_Snack_Success_MatchingCachedReport {
             get {
@@ -4426,7 +4426,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request New Report.
+        ///   Looks up a localized string similar to Request Report.
         /// </summary>
         internal static string ModHoundDisplay_RequestNewReport_Label {
             get {

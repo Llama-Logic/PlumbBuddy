@@ -27,6 +27,9 @@
 					<MudTooltip Arrow Text="@AppText.ModHoundDisplay_ManageSettings_Tip">
 						<MudIconButton Icon="@MaterialDesignIcons.Normal.Cog" OnClick="HandleShowSettingsAsync" />
 					</MudTooltip>
+					<MudTooltip Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+						<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHound{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" />
+					</MudTooltip>
 				</MudButtonGroup>
 			}
 			@if (Observed(() => ModHoundClient.RequestPhase) is { } requestPhase)
@@ -141,14 +144,9 @@
 					</MudListItem>
 				</MudList>
 			}
-			<MudStack Row AlignItems="AlignItems.Center">
-				<MudTextM3 Align="Align.Center" Class="markdown-caption">
-					<MudMarkdown Value="@AppText.ModHoundDisplay_SupportLumpinou_Label" />
-				</MudTextM3>
-				<MudTooltip Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
-					<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHound{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="mt-n7 mb-n6" />
-				</MudTooltip>
-			</MudStack>
+			<MudTextM3 Align="Align.Center" Class="markdown-caption">
+				<MudMarkdown Value="@AppText.ModHoundDisplay_SupportLumpinou_Label" />
+			</MudTextM3>
 		</MudStack>
 	</MudItem>
 	<MudItem Class="mod-hound-report py-0" xs="9">

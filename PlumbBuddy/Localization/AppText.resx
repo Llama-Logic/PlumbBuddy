@@ -3036,7 +3036,7 @@ The missing key hashes are:
     <value>What does your mod do? What's it for? Probably best to keep this short, but sweet.</value>
   </data>
   <data name="ModHoundDisplay_RequestNewReport_Label" xml:space="preserve">
-    <value>Request New Report</value>
+    <value>Request Report</value>
   </data>
   <data name="ModHoundDisplay_ManageSettings_Tip" xml:space="preserve">
     <value>Manage Settings for Mod Hound</value>
@@ -3174,7 +3174,7 @@ The missing key hashes are:
     <value>Something went wrong in my communication with Mod Hound. I've made a note about it in my log. Perhaps you should try again later.</value>
   </data>
   <data name="ModHoundClient_Snack_Success_MatchingCachedReport" xml:space="preserve">
-    <value>Good news, I already asked Mod Hound about this exact configuration of your Mods folder about {0}, and according to Mod Hound, nothing has changed since then. I've selected that report for you for your convenience.</value>
+    <value>Good news, I already asked Mod Hound about this exact configuration of your Mods folder {0}, and according to Mod Hound, nothing has changed since then. I've selected that report for you for your convenience.</value>
     <comment>{0} = How long ago the previously retrieved report was retrieved</comment>
   </data>
   <data name="ModHoundClient_Snack_Error_InvalidPackageExclusionRegex" xml:space="preserve">
