@@ -475,13 +475,26 @@ window.mudTableClickRow = (tableSelector, rowIndex) => {
     Array.from(document.querySelector(`${tableSelector} tbody`).children)[rowIndex].click();
 };
 
-window.registerExternalLinkHandler = handlerInstance =>
-    document.body.addEventListener('click', e => {
-        if (e.target.tagName === 'A' && e.target.href && !e.target.href.startsWith(window.location.origin)) {
-            e.preventDefault();
-            handlerInstance.invokeMethodAsync('LaunchExternalUrlAsync', e.target.href);
+(function () {
+    function findAncestorAnchor(element) {
+        while (element) {
+            if (element.tagName === 'A') {
+                return element;
+            }
+            element = element.parentElement;
         }
-    });
+        return null;
+    }
+
+    window.registerExternalLinkHandler = handlerInstance =>
+        document.body.addEventListener('click', e => {
+            const anchor = findAncestorAnchor(e.target);
+            if (anchor && anchor.href && !anchor.href.startsWith(window.location.origin)) {
+                e.preventDefault();
+                handlerInstance.invokeMethodAsync('LaunchExternalUrlAsync', anchor.href);
+            }
+        });
+}());
 
 window.scrollToCenterElement = (parentSelector, childSelector) => {
     const parent = document.querySelector(parentSelector);
