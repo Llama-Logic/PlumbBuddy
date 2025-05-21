@@ -11,7 +11,6 @@
 	.mud-dialog:has(div.settings-dialog-stack) {
 		border-top-left-radius: var(--mud-default-borderradius);
 		border-top-right-radius: var(--mud-default-borderradius);
-		overflow-y:hidden;
 	}
 
 	.mud-dialog:has(div.settings-dialog-stack) .mud-dialog-title {
@@ -100,7 +99,7 @@
 			</MudStack>
 		</MudTabPanel>
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
-			<div class="mx-n6 my-n2 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 210px);">
+			<div class="mx-n6 my-n2 px-6 py-2">
 				<ThemeSelector @ref="@themeSelector" />
 			</div>
 		</MudTabPanel>
