@@ -40,7 +40,10 @@ html {
 }
 
 body {
-    zoom: var(--plumbbuddy-zoom);
+    height: var(--plumbbuddy-zoomed-vh);
+    transform: scale(var(--plumbbuddy-zoom));
+    transform-origin: 0 0;
+    width: var(--plumbbuddy-zoomed-vw);
 }
 
 article.mud-markdown-body > *:last-child {
