@@ -4426,7 +4426,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Request Report.
+        ///   Looks up a localized string similar to Fetch Report.
         /// </summary>
         internal static string ModHoundDisplay_RequestNewReport_Label {
             get {

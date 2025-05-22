@@ -3036,7 +3036,7 @@ The missing key hashes are:
     <value>What does your mod do? What's it for? Probably best to keep this short, but sweet.</value>
   </data>
   <data name="ModHoundDisplay_RequestNewReport_Label" xml:space="preserve">
-    <value>Request Report</value>
+    <value>Fetch Report</value>
   </data>
   <data name="ModHoundDisplay_ManageSettings_Tip" xml:space="preserve">
     <value>Manage Settings for Mod Hound</value>

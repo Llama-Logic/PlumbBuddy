@@ -52,7 +52,7 @@
 										<MudStack AlignItems="AlignItems.Center" Row Spacing="0">
 											<MudSlider T="double" @bind-Value="UiZoom" Min="0.25" Max="4" Step="0.05" Size="Size.Medium" Variant="Variant.Filled">
 												<MudTextM3>
-													@(UiZoom.ToString("p"))
+													@(UiZoom.ToString("p0"))
 												</MudTextM3>
 											</MudSlider>
 											<MudTooltip Arrow Text="@AppText.SettingsDialog_ModHound_Retention_Default_Tip">
