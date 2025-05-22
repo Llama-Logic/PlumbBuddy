@@ -8,7 +8,7 @@ partial class SettingsDialog
     ModHoundExcludePackagesMode modHoundExcludePackagesMode;
     IReadOnlyList<string> modHoundPackagesExclusions = [];
     ChipSetField? modHoundPackagesExclusionsChipSetField;
-    double originalUiZoom;
+    decimal originalUiZoom;
     MudTabs? tabs;
     ThemeSelector? themeSelector;
     UserType type;
@@ -119,7 +119,7 @@ partial class SettingsDialog
         }
     }
 
-    double UiZoom
+    decimal UiZoom
     {
         get => Settings.UiZoom;
         set => Settings.UiZoom = value;
@@ -127,8 +127,8 @@ partial class SettingsDialog
 
     int UiZoomPercent
     {
-        get => (int)(UiZoom * 100D);
-        set => UiZoom = value / 100D;
+        get => (int)(UiZoom * 100M);
+        set => UiZoom = value / 100M;
     }
 
     string UserDataFolderPath { get; set; } = string.Empty;

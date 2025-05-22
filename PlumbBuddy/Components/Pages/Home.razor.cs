@@ -229,10 +229,10 @@ partial class Home
     [JSInvokable]
     public void UserInvokedAccessibilityZoom(string command)
     {
-        if (command == "in" && Settings.UiZoom <= 3.95)
-            Settings.UiZoom += 0.05;
-        else if (command == "out" && Settings.UiZoom >= 0.3)
-            Settings.UiZoom -= 0.05;
+        if (command == "in" && Settings.UiZoom <= 3.95M)
+            Settings.UiZoom += 0.05M;
+        else if (command == "out" && Settings.UiZoom >= 0.3M)
+            Settings.UiZoom -= 0.05M;
         else if (command == "reset")
             Settings.UiZoom = 1;
     }

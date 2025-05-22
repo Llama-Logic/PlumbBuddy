@@ -197,7 +197,7 @@ partial class OnboardingDialog
         }
     }
 
-    double UiZoom
+    decimal UiZoom
     {
         get => Settings.UiZoom;
         set => Settings.UiZoom = value;
@@ -205,8 +205,8 @@ partial class OnboardingDialog
 
     int UiZoomPercent
     {
-        get => (int)(UiZoom * 100D);
-        set => UiZoom = value / 100D;
+        get => (int)(UiZoom * 100M);
+        set => UiZoom = value / 100M;
     }
 
     string UserDataFolderPath

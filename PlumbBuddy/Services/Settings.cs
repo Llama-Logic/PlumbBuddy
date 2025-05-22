@@ -625,14 +625,14 @@ class Settings :
         }
     }
 
-    public double UiZoom
+    public decimal UiZoom
     {
-        get => Math.Max(Math.Min(preferences.Get(nameof(UiZoom), 1D), 4), 0.25);
+        get => Math.Truncate((decimal)Math.Max(Math.Min(preferences.Get(nameof(UiZoom), 1D), 4), 0.25) * 20M)  / 20M;
         set
         {
             if (UiZoom == value)
                 return;
-            preferences.Set(nameof(UiZoom), Math.Max(Math.Min(value, 4), 0.25));
+            preferences.Set(nameof(UiZoom), Math.Max(Math.Min((double)value, 4), 0.25));
             OnPropertyChanged();
         }
     }
