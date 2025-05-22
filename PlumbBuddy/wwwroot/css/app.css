@@ -63,6 +63,15 @@ article.mud-markdown-body > *:last-child {
     transition: opacity 0.5s ease-in-out;
 }
 
+input.plain-numeric {
+    background: transparent;
+    width: 100%;
+}
+
+input.plain-numeric:hover, input.plain-numeric:focus {
+    outline: none;
+}
+
 .mud-dialog {
     max-height: calc(var(--plumbbuddy-zoomed-vh) - var(--mud-appbar-height));
 }
