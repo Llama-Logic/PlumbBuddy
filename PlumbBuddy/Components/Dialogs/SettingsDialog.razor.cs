@@ -125,6 +125,12 @@ partial class SettingsDialog
         set => Settings.UiZoom = value;
     }
 
+    int UiZoomPercent
+    {
+        get => (int)(UiZoom * 100D);
+        set => UiZoom = value / 100D;
+    }
+
     string UserDataFolderPath { get; set; } = string.Empty;
 
     public void Dispose() =>
