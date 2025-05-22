@@ -625,6 +625,18 @@ class Settings :
         }
     }
 
+    public double UiZoom
+    {
+        get => Math.Max(Math.Min(preferences.Get(nameof(UiZoom), 1D), 4), 0.25);
+        set
+        {
+            if (UiZoom == value)
+                return;
+            preferences.Set(nameof(UiZoom), Math.Max(Math.Min(value, 4), 0.25));
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Forget()

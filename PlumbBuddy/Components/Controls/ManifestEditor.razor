@@ -119,7 +119,7 @@
 							</MudTextM3>
 							<MudGrid Justify="Justify.Center" Class="mb-4">
 								<MudItem Class="mt-4" xs="8">
-									<MudPaper Class="overflow-y-auto pa-4" Style="height: calc(100vh - 435px);">
+									<MudPaper Class="overflow-y-auto pa-4" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 435px);">
 										@if (ComponentsStepSelectedComponent is { } component)
 										{
 											<ModComponentEditor @ref="@modComponentEditor" ModComponent="@component" />
@@ -127,7 +127,7 @@
 									</MudPaper>
 								</MudItem>
 								<MudItem Class="mt-4" xs="4">
-									<MudPaper Class="overflow-y-auto" Style="height: calc(100vh - 435px);">
+									<MudPaper Class="overflow-y-auto" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 435px);">
 										<MudTreeView T="ModComponent" @bind-SelectedValue="@ComponentsStepSelectedComponent" @bind-SelectedValues="@componentsStepSelectedComponents" Color="Color.Tertiary" SelectionMode="@componentsStepSelectionMode" Items="@componentTreeItemData" AutoExpand AutoSelectParent ExpandOnDoubleClick Hover Class="manifest-editor-components-step-tree-view" Style="overflow-wrap: anywhere;">
 											<ItemTemplate>
 												<MudTreeViewItem @bind-Expanded="@context.Expanded" CanExpand="@context.Expandable" Icon="@context.Icon" Items="@context.Children" Text="@context.Text" Value="@context.Value" />

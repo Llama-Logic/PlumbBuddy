@@ -3328,4 +3328,10 @@ More detailed technical information is available in my log.</value>
   <data name="Tooltip_GuideLink_ManifestEditorCreators" xml:space="preserve">
     <value>Click here to be redirected to PlumbBuddy's website to see information about how to provide support for your mods.</value>
   </data>
+  <data name="SettingsDialog_UIZoom_HelperText" xml:space="preserve">
+    <value>Dragging this slider is tricky as my UI will change at the same time. Try clicking the slider thumb and using the ⬅️ and ➡️ arrow keys.</value>
+  </data>
+  <data name="SettingsDialog_UIZoom_Label" xml:space="preserve">
+    <value>UI Scale</value>
+  </data>
 </root>

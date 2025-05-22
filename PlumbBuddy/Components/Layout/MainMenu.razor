@@ -13,7 +13,7 @@
 @inject IUpdateManager UpdateManager
 @inject IStringLocalizer<AppText> StringLocalizer
 
-<div style="height: 100vh; position: fixed;">
+<div style="height: var(--plumbbuddy-zoomed-vh); position: fixed;">
     <MudBadge Color="Color.Warning" Content="@devToolsUnlockProgress" Origin="Origin.BottomCenter" Overlap="true" Visible="@devToolsUnlockProgressBadgeVisible">
 		<MudImage Src="@(Observed(() => Settings.Theme) is { } customThemeName && CustomThemes.Themes.TryGetValue(customThemeName, out var customTheme) && customTheme.CustomAppLogo ? $"/img/custom-themes/{customThemeName}/applogo.svg" : "/img/PlumbBuddyLogo.svg")" Width="208" Height="208" ObjectFit="ObjectFit.Fill" Style="margin: 16px;" @onclick="HandleVersionOnClick" />
     </MudBadge>

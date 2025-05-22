@@ -8,6 +8,7 @@ partial class SettingsDialog
     ModHoundExcludePackagesMode modHoundExcludePackagesMode;
     IReadOnlyList<string> modHoundPackagesExclusions = [];
     ChipSetField? modHoundPackagesExclusionsChipSetField;
+    double originalUiZoom;
     MudTabs? tabs;
     ThemeSelector? themeSelector;
     UserType type;
@@ -118,6 +119,12 @@ partial class SettingsDialog
         }
     }
 
+    double UiZoom
+    {
+        get => Settings.UiZoom;
+        set => Settings.UiZoom = value;
+    }
+
     string UserDataFolderPath { get; set; } = string.Empty;
 
     public void Dispose() =>
@@ -134,6 +141,15 @@ partial class SettingsDialog
 
     void HandleSetModHoundReportRetentionPeriodIndefinite() =>
         ModHoundReportRetentionPeriodTicks = null;
+
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISettings.UiZoom))
+            StaticDispatcher.Dispatch(StateHasChanged);
+    }
+
+    void HandleSetUiZoomDefault() =>
+        UiZoom = 1;
 
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -154,13 +170,17 @@ partial class SettingsDialog
         }
     }
 
-    protected override void OnInitialized() =>
+    protected override void OnInitialized()
+    {
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
+    }
 
     /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        originalUiZoom = Settings.UiZoom;
         AutomaticallyCatalogOnComposition = Settings.AutomaticallyCatalogOnComposition;
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
@@ -194,6 +214,7 @@ partial class SettingsDialog
 
     void CancelOnClickHandler()
     {
+        UiZoom = originalUiZoom;
         themeSelector?.Cancel();
         MudDialog?.Close(DialogResult.Cancel());
     }

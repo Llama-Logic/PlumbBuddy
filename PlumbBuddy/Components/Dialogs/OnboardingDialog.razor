@@ -46,8 +46,22 @@
                             <MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
                                 @MarkupLocalizer[nameof(AppText.OnboardingDialog_Theme_Heading_3)]
                             </MudTextM3>
-                            <div class="mt-4 mb-2 mx-n6 px-6 py-2 overflow-y-auto" style="max-height: calc(100vh - 440px);">
-                                <ThemeSelector />
+							<div class="mt-4 mb-2 mx-n6 px-6 py-2 overflow-y-auto" style="max-height: calc(var(--plumbbuddy-zoomed-vh) - 440px);">
+								<MudStack>
+									<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Resize" HelperText="@(AppText.SettingsDialog_UIZoom_HelperText)" Label="@(AppText.SettingsDialog_UIZoom_Label)" Variant="Variant.Filled">
+										<MudStack AlignItems="AlignItems.Center" Row Spacing="0">
+											<MudSlider T="double" @bind-Value="UiZoom" Min="0.25" Max="4" Step="0.05" Size="Size.Medium" Variant="Variant.Filled">
+												<MudTextM3>
+													@(UiZoom.ToString("p"))
+												</MudTextM3>
+											</MudSlider>
+											<MudTooltip Arrow Text="@AppText.SettingsDialog_ModHound_Retention_Default_Tip">
+												<MudIconButton Icon="@MaterialDesignIcons.Normal.EyeRefresh" OnClick="HandleSetUiZoomDefault" />
+											</MudTooltip>
+										</MudStack>
+									</MudField>
+									<ThemeSelector />
+								</MudStack>
                             </div>
                         </ChildContent>
                     </MudStepExtended>

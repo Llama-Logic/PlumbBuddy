@@ -5,6 +5,7 @@ partial class Home
     const int manfiestEditorTabIndex = 5;
 
     int activePanelIndex;
+    DotNetObjectReference<Home>? javaScriptThis;
     bool keepPanelsAlive;
 
     public int ActivePanelIndex
@@ -29,6 +30,7 @@ partial class Home
         {
             Settings.PropertyChanged -= HandleSettingsPropertyChanged;
             UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
+            javaScriptThis?.Dispose();
         }
     }
 
@@ -36,6 +38,8 @@ partial class Home
     {
         if (e.PropertyName is nameof(ISettings.Theme))
             StaticDispatcher.Dispatch(() => _ = SetCustomThemeBackgroundsAsync());
+        else if (e.PropertyName is nameof(ISettings.UiZoom))
+            StaticDispatcher.Dispatch(() => _ = SetUiZoomAsync());
     }
 
     void HandleUserInterfaceMessagingBeginManifestingModRequested(object? sender, BeginManifestingModRequestedEventArgs e)
@@ -58,6 +62,9 @@ partial class Home
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        javaScriptThis = DotNetObjectReference.Create(this);
+        await SetUiZoomAsync();
+        await JSRuntime.InvokeVoidAsync("handleZoomFromDotNet", javaScriptThis, nameof(UserInvokedAccessibilityZoom));
         await SetCustomThemeBackgroundsAsync();
     }
 
@@ -214,5 +221,19 @@ partial class Home
                     await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-tab-background-manifest-editor-size", size);
             }
         }
+    }
+
+    async Task SetUiZoomAsync() =>
+        await JSRuntime.InvokeVoidAsync("setCssVariable", "--plumbbuddy-zoom", Settings.UiZoom.ToString());
+
+    [JSInvokable]
+    public void UserInvokedAccessibilityZoom(string command)
+    {
+        if (command == "in" && Settings.UiZoom <= 3.95)
+            Settings.UiZoom += 0.05;
+        else if (command == "out" && Settings.UiZoom >= 0.3)
+            Settings.UiZoom -= 0.05;
+        else if (command == "reset")
+            Settings.UiZoom = 1;
     }
 }

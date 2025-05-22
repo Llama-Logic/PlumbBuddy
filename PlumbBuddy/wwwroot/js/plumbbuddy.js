@@ -1,3 +1,4 @@
+
 window.blurElement = selector =>
     document.querySelector(selector).blur();
 
@@ -19,6 +20,43 @@ window.handleReturnFromDotNet = (selector, handlerInstance, handlerAsyncMethodNa
         }
     });
 };
+
+(function () {
+    let zoomHandled = false;
+    window.handleZoomFromDotNet = (handlerInstance, handlerAsyncMethodName) => {
+        if (zoomHandled) {
+            throw new Error('Zoom already handled');
+        }
+        zoomHandled = true;
+
+        window.addEventListener('keydown', async e => {
+            if (e.ctrlKey) {
+                if (e.key === '+' || e.key === '=') {
+                    e.preventDefault();
+                    await handlerInstance.invokeMethodAsync(handlerAsyncMethodName, 'in');
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    await handlerInstance.invokeMethodAsync(handlerAsyncMethodName, 'out');
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    await handlerInstance.invokeMethodAsync(handlerAsyncMethodName, 'reset');
+                }
+            }
+        });
+
+        window.addEventListener('wheel', async e => {
+            if (e.ctrlKey) {
+                if (e.deltaY < 0) {
+                    e.preventDefault();
+                    await handlerInstance.invokeMethodAsync(handlerAsyncMethodName, 'in');
+                } else if (e.deltaY > 0) {
+                    e.preventDefault();
+                    await handlerInstance.invokeMethodAsync(handlerAsyncMethodName, 'out');
+                }
+            }
+        }, { passive: false });
+    };
+}());
 
 (function () {
     let initialized = false;

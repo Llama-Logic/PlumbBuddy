@@ -9,7 +9,7 @@
 }
 
 .mod-health-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow-y: auto;
     padding: 24px;
 }
@@ -19,17 +19,17 @@
         background-position: var(--plumbbuddy-tab-background-mod-health-position);
         background-repeat: var(--plumbbuddy-tab-background-mod-health-repeat);
         background-size: var(--plumbbuddy-tab-background-mod-health-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 
 .catalog-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow-y: hidden;
     padding: 24px;
 }
@@ -39,17 +39,17 @@
         background-position: var(--plumbbuddy-tab-background-catalog-position);
         background-repeat: var(--plumbbuddy-tab-background-catalog-repeat);
         background-size: var(--plumbbuddy-tab-background-catalog-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 
 .mod-hound-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow-y: hidden;
     padding: 24px;
 }
@@ -59,17 +59,17 @@
         background-position: var(--plumbbuddy-tab-background-mod-hound-position);
         background-repeat: var(--plumbbuddy-tab-background-mod-hound-repeat);
         background-size: var(--plumbbuddy-tab-background-mod-hound-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 
 .archivist-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow-y: auto;
     padding: 24px;
 }
@@ -79,17 +79,17 @@
         background-position: var(--plumbbuddy-tab-background-archivist-position);
         background-repeat: var(--plumbbuddy-tab-background-archivist-repeat);
         background-size: var(--plumbbuddy-tab-background-archivist-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 
 .parlay-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow-y: auto;
     padding: 24px;
 }
@@ -99,17 +99,17 @@
         background-position: var(--plumbbuddy-tab-background-parlay-position);
         background-repeat: var(--plumbbuddy-tab-background-parlay-repeat);
         background-size: var(--plumbbuddy-tab-background-parlay-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 
 .manifest-editor-tab-container {
-    height: calc(100vh - 112px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 112px);
     overflow: hidden;
 }
 
@@ -118,12 +118,12 @@
         background-position: var(--plumbbuddy-tab-background-manifest-editor-position);
         background-repeat: var(--plumbbuddy-tab-background-manifest-editor-repeat);
         background-size: var(--plumbbuddy-tab-background-manifest-editor-size);
-        height: 100vh;
+        height: var(--plumbbuddy-zoomed-vh);
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-        width: 100vw;
+        width: var(--plumbbuddy-zoomed-vw);
         z-index: -10;
     }
 

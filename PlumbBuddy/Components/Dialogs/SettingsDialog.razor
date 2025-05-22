@@ -17,10 +17,6 @@
 		display: none !important;
 	}
 
-	.mud-dialog:has(div.settings-dialog-stack) .mud-tab-slider {
-		display: none !important;
-	}
-
 	.mud-dialog:has(div.settings-dialog-stack) .custom-active-tab {
 		background-color: var(--mud-palette-surface);
 		color: var(--mud-palette-primary) !important;
@@ -100,7 +96,21 @@
 		</MudTabPanel>
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">
 			<div class="mx-n6 my-n2 px-6 py-2">
-				<ThemeSelector @ref="@themeSelector" />
+				<MudStack>
+					<MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Resize" HelperText="@(AppText.SettingsDialog_UIZoom_HelperText)" Label="@(AppText.SettingsDialog_UIZoom_Label)" Variant="Variant.Filled">
+						<MudStack AlignItems="AlignItems.Center" Row Spacing="0">
+							<MudSlider T="double" @bind-Value="UiZoom" Min="0.25" Max="4" Step="0.05" Size="Size.Medium" Variant="Variant.Filled">
+								<MudTextM3>
+									@(UiZoom.ToString("p"))
+								</MudTextM3>
+							</MudSlider>
+							<MudTooltip Arrow Text="@AppText.SettingsDialog_ModHound_Retention_Default_Tip">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.EyeRefresh" OnClick="HandleSetUiZoomDefault" />
+							</MudTooltip>
+						</MudStack>
+					</MudField>
+					<ThemeSelector @ref="@themeSelector" />
+				</MudStack>
 			</div>
 		</MudTabPanel>
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Folders_Label)]" Icon="@MaterialDesignIcons.Normal.Folder">

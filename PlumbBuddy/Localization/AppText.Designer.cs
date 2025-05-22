@@ -8039,6 +8039,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dragging this slider is tricky as my UI will change at the same time. Try clicking the slider thumb and using the ⬅️ and ➡️ arrow keys..
+        /// </summary>
+        internal static string SettingsDialog_UIZoom_HelperText {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UIZoom_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI Scale.
+        /// </summary>
+        internal static string SettingsDialog_UIZoom_Label {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UIZoom_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
         ///I ran into a problem trying to read the file which contains your game options for The Sims 4:&lt;br /&gt;
         ///&lt;strong&gt;{0}&lt;/strong&gt;&lt;br /&gt;

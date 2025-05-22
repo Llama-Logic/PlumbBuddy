@@ -155,7 +155,7 @@
 			var searchText = Observed(() => ModHoundClient.SearchText);
 			if (displayedReportSection is IModHoundClient.SectionOutdated or IModHoundClient.SectionDuplicates or IModHoundClient.SectionBrokenObsolete or IModHoundClient.SectionUnknownStatus or IModHoundClient.SectionUpToDate)
 			{
-				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(100vh - 280px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 280px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
 					<ToolBarContent>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
@@ -287,7 +287,7 @@
 					</MudStack>
 					@if (records.Any())
 					{
-						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 236px);">
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 236px);">
 							@foreach (var (incompatibilityRecord, index) in records)
 							{
 								<MudExpansionPanel>
@@ -315,7 +315,7 @@
 					}
 					else
 					{
-						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 228px);">
 							<strong>
 								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_Incompatible_NoResults_Label)]
 							</strong>
@@ -341,7 +341,7 @@
 					</MudStack>
 					@if (records.Any())
 					{
-						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(100vh - 236px);">
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 236px);">
 							@foreach (var (missingRequirementsRecord, index) in records)
 							{
 								<MudExpansionPanel>
@@ -390,7 +390,7 @@
 					}
 					else
 					{
-						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(100vh - 228px);">
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 228px);">
 							<strong>
 								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_MissingRequirements_NoResults_Label)]
 							</strong>
@@ -400,7 +400,7 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionNotTracked)
 			{
-				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(100vh - 280px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 280px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
 					<ToolBarContent>
 						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
 							@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]

@@ -1,5 +1,6 @@
 #if WINDOWS
 using H.NotifyIcon.Core;
+using Microsoft.AspNetCore.Components.WebView.Maui;
 #endif
 
 namespace PlumbBuddy;
@@ -28,9 +29,6 @@ public partial class MainPage :
         this.userInterfaceMessaging = userInterfaceMessaging;
         InitializeComponent();
         BindingContext = this;
-#if WINDOWS
-        UpdateTrayIconVisibility();
-#endif
         ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
     }
 

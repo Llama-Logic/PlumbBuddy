@@ -52,6 +52,7 @@ public interface ISettings :
     string UserDataFolderPath { get; set; }
     Version? VersionAtLastStartup { get; set; }
     bool WriteScaffoldingToSubdirectory { get; set; }
+    double UiZoom { get; set; }
 
     void Forget();
 }

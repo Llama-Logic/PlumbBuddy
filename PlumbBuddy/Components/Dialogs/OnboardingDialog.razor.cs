@@ -197,6 +197,12 @@ partial class OnboardingDialog
         }
     }
 
+    double UiZoom
+    {
+        get => Settings.UiZoom;
+        set => Settings.UiZoom = value;
+    }
+
     string UserDataFolderPath
     {
         get => Settings.UserDataFolderPath;
@@ -205,7 +211,7 @@ partial class OnboardingDialog
 
     /// <inheritdoc />
     public void Dispose() =>
-        Settings.PropertyChanged -= HandleUserPreferencesChanged;
+        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
@@ -255,14 +261,17 @@ partial class OnboardingDialog
         return false;
     }
 
-    void HandleUserPreferencesChanged(object? sender, PropertyChangedEventArgs e) =>
+    void HandleSetUiZoomDefault() =>
+        UiZoom = 1;
+
+    void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e) =>
         StaticDispatcher.Dispatch(StateHasChanged);
 
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Settings.PropertyChanged += HandleUserPreferencesChanged;
+        Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SetDefaultScansForUserType(Settings.Type);
     }
 
