@@ -1,8 +1,8 @@
 #if WINDOWS
 using H.NotifyIcon.Core;
 using Microsoft.AspNetCore.Components.WebView.Maui;
-using Animation = Microsoft.Maui.Controls.Animation;
 #endif
+using Animation = Microsoft.Maui.Controls.Animation;
 
 namespace PlumbBuddy;
 
@@ -120,7 +120,7 @@ public partial class MainPage :
         if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
         {
             tabView.Items[1].IsVisible = true;
-            var tcs = new TaskCompletionSource();
+            TaskCompletionSource tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
             await tcs.Task;

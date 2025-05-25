@@ -42,7 +42,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
-        <PythonBinary>/usr/local/bin/python3.7</PythonBinary>
+        <PythonBinary>~/.pyenv/versions/3.7.17/bin/python3.7</PythonBinary>
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <TargetFramework>net8.0-maccatalyst</TargetFramework>
         <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
@@ -236,8 +236,10 @@
 
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">
         <Exec Command="$(PythonBinary) -m compileall -b -q -j0 &quot;$(ProjectDir)Proxy&quot;" />
-        <PackByteCode From="$(ProjectDir)Proxy" To="$(ProjectDir)PlumbBuddy_Proxy.ts4script" />
-        <DeleteByteCode In="$(ProjectDir)Proxy" />
+        <PackByteCode Condition="$([MSBuild]::IsOSPlatform('windows'))" From="$(ProjectDir)Proxy" To="$(ProjectDir)PlumbBuddy_Proxy.ts4script" />
+        <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" WorkingDirectory="$(ProjectDir)Proxy" Command="zip -r &quot;$(ProjectDir)PlumbBuddy_Proxy.ts4script&quot; . -i '*.pyc' -x &quot;*.DS_Store&quot;" />
+        <DeleteByteCode Condition="$([MSBuild]::IsOSPlatform('windows'))" In="$(ProjectDir)Proxy" />
+        <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" Command="find &quot;$(ProjectDir)Proxy&quot; -name '*.pyc' -delete" />
     </Target>
 
 </Project>

@@ -8,7 +8,6 @@ public partial class ProxyHost :
     {
         AllowOutOfOrderMetadataProperties = true,
         AllowTrailingCommas = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Always,
         DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower,
         IncludeFields = true,
         NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
