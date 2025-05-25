@@ -231,6 +231,10 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
     overflow-y: auto;
 }
 
+.main-tabs > .mud-tabs-tabbar {
+    padding-top: 16px;
+}
+
 .scan-issues-container, .scan-issues-container * {
     overflow-wrap: anywhere;
     word-break: normal;
@@ -371,36 +375,36 @@ div.content-is-vertical-stepper div.mud-dialog-content > div:first-child > div:f
 .catalog-list {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
-    height: calc(var(--plumbbuddy-zoomed-vh) - 240px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 168px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .catalog-details {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
-    height: calc(var(--plumbbuddy-zoomed-vh) - 240px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 168px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .mod-hound-outline {
-    height: calc(var(--plumbbuddy-zoomed-vh) - 165px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 102px);
 }
 
 .mod-hound-report {
-    height: calc(var(--plumbbuddy-zoomed-vh) - 165px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 102px);
 }
 
 .chronicle-list {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 60%);
-    height: calc(var(--plumbbuddy-zoomed-vh) - 242px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 170px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .chronicle-details {
     backdrop-filter: blur(10px);
     background-color: color-mix(in srgb, transparent, var(--mud-palette-surface) 40%);
-    height: calc(var(--plumbbuddy-zoomed-vh) - 242px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 170px);
     -webkit-backdrop-filter: blur(10px);
 }
 

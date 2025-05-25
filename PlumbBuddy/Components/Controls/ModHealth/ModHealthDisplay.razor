@@ -2,7 +2,7 @@
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject ISmartSimObserver SmartSimObserver
 
-<MudGrid Justify="Justify.Center" Class="scan-issues-container">
+<MudGrid Justify="Justify.Center" Class="scan-issues-container" Spacing="4">
 	@if (Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
 	{
 		foreach (var scanIssue in ObservedCollection(() => SmartSimObserver.ScanIssues))

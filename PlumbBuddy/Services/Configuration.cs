@@ -20,6 +20,7 @@ static class Configuration
         services.AddSingleton<IArchivist, Archivist>();
         services.AddSingleton<IParlay, Parlay>();
         services.AddSingleton<IModHoundClient, ModHoundClient>();
+        services.AddSingleton<IProxyHost, ProxyHost>();
         return services;
     }
 }

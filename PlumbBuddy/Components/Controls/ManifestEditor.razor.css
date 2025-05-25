@@ -1,4 +1,4 @@
 .step-content {
-    height: calc(var(--plumbbuddy-zoomed-vh) - 335px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 290px);
     overflow-y: auto;
 }

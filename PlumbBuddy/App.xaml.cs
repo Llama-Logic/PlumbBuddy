@@ -3,21 +3,16 @@ namespace PlumbBuddy;
 public partial class App :
     Application
 {
-    //const string packCodesModelMigration = "20241015012905_ModelV1";
-
-    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
+    public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory)
     {
+        ArgumentNullException.ThrowIfNull(lifetimeScope);
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
-        ArgumentNullException.ThrowIfNull(appLifecycleManager);
-        ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
+        this.lifetimeScope = lifetimeScope;
         this.settings = settings;
-        this.appLifecycleManager = appLifecycleManager;
-        this.userInterfaceMessaging = userInterfaceMessaging;
         using var pbDbContext = pbDbContextFactory.CreateDbContext();
         var allMigrations = pbDbContext.Database.GetMigrations();
-        //if (!allMigrations.Contains(packCodesModelMigration))
-        //    throw new InvalidOperationException("The pack codes model migration was removed. This logic needs to be refactored.");
         var pendingMigrations = pbDbContext.Database.GetPendingMigrations();
         try
         {
@@ -121,13 +116,13 @@ public partial class App :
         // but guess what, it's time for school
         lifetimeScope.Resolve<ISmartSimObserver>();
         lifetimeScope.Resolve<IArchivist>();
+        lifetimeScope.Resolve<IProxyHost>();
         InitializeComponent();
     }
 
-    readonly IAppLifecycleManager appLifecycleManager;
+    readonly ILifetimeScope lifetimeScope;
     readonly ISettings settings;
-    readonly IUserInterfaceMessaging userInterfaceMessaging;
 
     protected override Window CreateWindow(IActivationState? activationState) =>
-        new(new MainPage(settings, appLifecycleManager, userInterfaceMessaging));
+        new(new MainPage(settings, lifetimeScope.Resolve<IAppLifecycleManager>(), lifetimeScope.Resolve<IUserInterfaceMessaging>(), lifetimeScope.Resolve<IProxyHost>()));
 }

@@ -1,0 +1,23 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IProxyHost ProxyHost
+@inject ISuperSnacks SuperSnacks
+
+@if (Observed(() => ProxyHost.IsClientConnected))
+{
+	<MudTooltip Arrow Color="Color.Success">
+		<ChildContent>
+			<MudIcon Class="mr-2 mt-1" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.AccessPointNetwork" />
+		</ChildContent>
+		<TooltipContent>
+			<MudStack Row>
+				<MudIcon Icon="@MaterialDesignIcons.Normal.AccessPointNetwork" />
+				<MudTextM3 Typo="TypoM3.Title">I'm Talking to Your Mods</MudTextM3>
+			</MudStack>
+			<MudDivider />
+			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				I've been waiting by the phone and got a call from one or more of your mods! They might ask for my help to improve your gameplay experience, such as by showing nifty advanced user interfaces built by modders or by giving them faster storage systems that will lighten their performance impact on The Sims 4. If they do ask for my help, I'll get your permission first.
+			</MudTextM3>
+		</TooltipContent>
+	</MudTooltip>
+}

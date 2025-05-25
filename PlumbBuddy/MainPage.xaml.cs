@@ -1,6 +1,7 @@
 #if WINDOWS
 using H.NotifyIcon.Core;
 using Microsoft.AspNetCore.Components.WebView.Maui;
+using Animation = Microsoft.Maui.Controls.Animation;
 #endif
 
 namespace PlumbBuddy;
@@ -19,20 +20,23 @@ public partial class MainPage :
             ? Microsoft.Maui.Graphics.Colors.White
             : Microsoft.Maui.Graphics.Colors.Black;
 
-    public MainPage(ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging)
+    public MainPage(ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging, IProxyHost proxyHost)
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
+        ArgumentNullException.ThrowIfNull(proxyHost);
         this.settings = settings;
         this.appLifecycleManager = appLifecycleManager;
         this.userInterfaceMessaging = userInterfaceMessaging;
+        this.proxyHost = proxyHost;
         InitializeComponent();
         BindingContext = this;
         ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
+    readonly IProxyHost proxyHost;
     readonly ISettings settings;
     bool showFileDropInterface;
 #if WINDOWS
@@ -63,9 +67,15 @@ public partial class MainPage :
     void HandleCancelFileDropClicked(object sender, EventArgs e) =>
         userInterfaceMessaging.IsFileDroppingEnabled = false;
 
+    void HandleProxyHostPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IProxyHost.IsClientConnected))
+            _ = StaticDispatcher.DispatchAsync(RefreshTabViewAsync);
+    }
+
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-#if WIDNOWSX
+#if WINDOWS
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
 #endif
@@ -81,12 +91,14 @@ public partial class MainPage :
     {
         settings.PropertyChanged += HandleSettingsPropertyChanged;
         userInterfaceMessaging.PropertyChanged += HandleUserInterfaceMessagingPropertyChanged;
+        proxyHost.PropertyChanged += HandleProxyHostPropertyChanged;
     }
 
     protected override void OnDisappearing()
     {
         settings.PropertyChanged -= HandleSettingsPropertyChanged;
         userInterfaceMessaging.PropertyChanged -= HandleUserInterfaceMessagingPropertyChanged;
+        proxyHost.PropertyChanged -= HandleProxyHostPropertyChanged;
 #if WINDOWS
         if (trayIcon is not null)
         {
@@ -101,6 +113,26 @@ public partial class MainPage :
     {
         base.OnHandlerChanged();
         appLifecycleManager.WindowFirstShown(Window);
+    }
+
+    async Task RefreshTabViewAsync()
+    {
+        if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
+        {
+            tabView.Items[1].IsVisible = true;
+            var tcs = new TaskCompletionSource();
+            using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
+            animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
+            await tcs.Task;
+        }
+        else if (!proxyHost.IsClientConnected && tabView.TabBarHeight == 80)
+        {
+            var tcs = new TaskCompletionSource();
+            using var animation = new Animation(v => tabView.TabBarHeight = v, 80, 0);
+            animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
+            await tcs.Task;
+            tabView.Items[1].IsVisible = false;
+        }
     }
 
     public async Task ShowWebViewAsync()
@@ -118,10 +150,11 @@ public partial class MainPage :
             });
         }
         blazorWebView.Opacity = 0.01;
-        blazorWebView.IsVisible = true;
+        tabView.IsVisible = true;
         await Task.Delay(750);
         await Task.WhenAll(pleaseWait.FadeTo(0, 500), blazorWebView.FadeTo(1, 500));
         pleaseWait.IsVisible = false;
+        await RefreshTabViewAsync();
     }
 
     [RelayCommand]

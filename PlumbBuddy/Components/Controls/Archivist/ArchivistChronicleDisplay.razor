@@ -5,7 +5,7 @@
 
 @if (Observed(() => Archivist.SelectedChronicle) is { } selectedChronicle)
 {
-	<MudTable CustomHeader Items="@(ObservedCollection(() => selectedChronicle.Snapshots).OrderByDescending(s => s.LastWriteTime))" Breakpoint="Breakpoint.None" Class="rounded" Dense Filter="IncludeSnapshot" FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 360px)" Outlined Virtualize>
+	<MudTable CustomHeader Items="@(ObservedCollection(() => selectedChronicle.Snapshots).OrderByDescending(s => s.LastWriteTime))" Breakpoint="Breakpoint.None" Class="rounded" Dense Filter="IncludeSnapshot" FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 288px)" Outlined Virtualize>
 		<HeaderContent>
 			<MudTHeadRow>
 				<MudTh colspan="3">

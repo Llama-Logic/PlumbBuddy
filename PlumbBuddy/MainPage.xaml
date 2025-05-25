@@ -4,24 +4,75 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:local="clr-namespace:PlumbBuddy"
     xmlns:localization="clr-namespace:PlumbBuddy.Localization"
+    xmlns:sf="http://schemas.syncfusion.com/maui/toolkit"
     xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     >
     <Grid
         x:Name="pageContainer"
         >
-        <BlazorWebView
-            x:Name="blazorWebView"
-            HostPage="wwwroot/index.html"
+        <Grid.Resources>
+            <Style TargetType="sf:SfTabItem">
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup>
+                            <VisualState x:Name="Normal" >
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="{x:Static local:MainPage.TextColor}" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Selected">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="{x:Static local:MainPage.TextColor}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+        <sf:SfTabView
+            x:Name="tabView"
+            TabBarHeight="0"
+            IndicatorPlacement="Top"
+            IndicatorWidthMode="Stretch"
             IsVisible="Hidden"
+            TabBarPlacement="Bottom"
             >
-            <BlazorWebView.RootComponents>
-                <RootComponent
-                    Selector="#app"
-                    ComponentType="{x:Type local:Components.Routes}"
-                    />
-            </BlazorWebView.RootComponents>
-        </BlazorWebView>
+            <sf:SfTabView.Items>
+                <sf:SfTabItem
+                    Header="PlumbBuddy"
+                    ImageSource="plumbbuddy_logo.png"
+                    >
+                    <sf:SfTabItem.Content>
+                        <BlazorWebView
+                            x:Name="blazorWebView"
+                            HostPage="wwwroot/index.html"
+                            >
+                            <BlazorWebView.RootComponents>
+                                <RootComponent
+                                    Selector="#app"
+                                    ComponentType="{x:Type local:Components.Routes}"
+                                    />
+                            </BlazorWebView.RootComponents>
+                        </BlazorWebView>
+                    </sf:SfTabItem.Content>
+                </sf:SfTabItem>
+                <sf:SfTabItem
+                    Header="Core Library Inspector"
+                    ImageSource="core_library.png"
+                    IsVisible="False"
+                    >
+                    <sf:SfTabItem.Content>
+                        <WebView
+                            Source="about:blank"
+                            >
+                        </WebView>
+                    </sf:SfTabItem.Content>
+                </sf:SfTabItem>
+            </sf:SfTabView.Items>
+        </sf:SfTabView>
         <StackLayout
             x:Name="pleaseWait"
             HorizontalOptions="Center"

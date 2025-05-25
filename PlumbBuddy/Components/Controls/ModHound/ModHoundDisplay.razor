@@ -8,57 +8,52 @@
 @inject IStringLocalizer<AppText> StringLocalizer
 @inject ISuperSnacks SuperSnacks
 
-<MudGrid Class="mt-1" Justify="Justify.Center">
-	<MudItem Class="mod-hound-outline overflow-y-auto" xs="3">
-		<MudStack AlignItems="AlignItems.Center">
-			<MudImage Src="/img/ModHoundLogo.png" Style="width: 80%; aspect-ratio: 1 / 1;" />
-			@if (Observed(() => ModHoundClient.Status) is { } status)
-			{
-				<MudTextM3 Align="Align.Center">
-					@status
-				</MudTextM3>
-			}
-			else
-			{
-				<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-					<MudButton OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
-						@StringLocalizer[nameof(AppText.ModHoundDisplay_RequestNewReport_Label)]
-					</MudButton>
-					<MudTooltip Arrow Text="@AppText.ModHoundDisplay_ManageSettings_Tip">
-						<MudIconButton Icon="@MaterialDesignIcons.Normal.Cog" OnClick="HandleShowSettingsAsync" />
-					</MudTooltip>
-					<MudTooltip Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
-						<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHound{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" />
-					</MudTooltip>
-				</MudButtonGroup>
-			}
-			@if (Observed(() => ModHoundClient.RequestPhase) is { } requestPhase)
-			{
-				if (requestPhase is 2 or 3 && Observed(() => ModHoundClient.ProgressValue) is { } value && Observed(() => ModHoundClient.ProgressMax) is { } max)
+<MudGrid Justify="Justify.Center">
+	<MudItem>
+		<MudStack Row AlignItems="AlignItems.Center">
+			<div style="width: 110px; height: 110px;">
+				@if (Observed(() => ModHoundClient.RequestPhase) is { } requestPhase)
 				{
-					if (requestPhase is 2)
+					if (requestPhase is 2 && Observed(() => ModHoundClient.ProgressValue) is { } value && Observed(() => ModHoundClient.ProgressMax) is { } max)
 					{
-						<MudProgressLinear Buffer BufferValue="@value" Color="Color.Primary" Max="@max" />
+						<MudProgressCircular Value="@value" Color="Color.Primary" Max="@max" Class="absolute z-10" Style="width: 110px; height: 110px;" />
 					}
 					else
 					{
-						<MudProgressLinear Buffer BufferValue="@max" Color="Color.Primary" Max="@max" Value="@value" />
+						<MudProgressCircular Color="Color.Primary" Indeterminate Class="absolute z-10" Style="width: 110px; height: 110px;" />
 					}
+				}
+				<MudImage Src="/img/ModHoundLogo.png" Style="width: 110px; height: 110px;" />
+			</div>
+			<MudStack AlignItems="AlignItems.Center">
+				@if (Observed(() => ModHoundClient.Status) is { } status)
+				{
+					<MudChip Color="Color.Primary" Icon="@MaterialDesignIcons.Normal.SyncCircle" Value="@status" />
 				}
 				else
 				{
-					<MudProgressLinear Color="Color.Primary" Indeterminate />
+					<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
+						<MudButton OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
+							@(new MarkupString(AppText.ModHoundDisplay_RequestNewReport_Label.Replace(" ", "&nbsp;")))
+						</MudButton>
+						<MudTooltip Arrow Text="@AppText.ModHoundDisplay_ManageSettings_Tip">
+							<MudIconButton Icon="@MaterialDesignIcons.Normal.Cog" OnClick="HandleShowSettingsAsync" />
+						</MudTooltip>
+						<MudTooltip Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+							<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHound{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" />
+						</MudTooltip>
+					</MudButtonGroup>
 				}
-			}
-			@if (ObservedCollection(() => ModHoundClient.AvailableReports) is { Count: > 0 } availableReports)
-			{
-				<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Label="@AppText.ModHoundDisplay_DisplayReport_Label" Variant="Variant.Filled">
-					@foreach (var availableReport in availableReports.OrderByDescending(ar => ar.Retrieved))
-					{
-						<MudSelectItem Value="@availableReport" />
-					}
-				</MudSelect>
-			}
+				@if (ObservedCollection(() => ModHoundClient.AvailableReports) is { Count: > 0 } availableReports)
+				{
+					<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Label="@AppText.ModHoundDisplay_DisplayReport_Label" Variant="Variant.Filled">
+						@foreach (var availableReport in availableReports.OrderByDescending(ar => ar.Retrieved))
+						{
+							<MudSelectItem Value="@availableReport" />
+						}
+					</MudSelect>
+				}
+			</MudStack>
 			@if (Observed(() => ModHoundClient.SelectedReport) is { } selectedReport)
 			{
 				int outdatedCount = (Observed(() => ModHoundClient.OutdatedCount) ?? 0);
@@ -69,93 +64,67 @@
 				int unknownStatusCount = (Observed(() => ModHoundClient.UnknownStatusCount) ?? 0);
 				int upToDateCount = (Observed(() => ModHoundClient.UpToDateCount) ?? 0);
 				int notTrackedCount = (Observed(() => ModHoundClient.NotTrackedCount) ?? 0);
-				<MudList @bind-SelectedValue="@Binding(() => ModHoundClient.SelectedReportSection).Value" Color="Color.Primary">
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.HeartBroken" IconColor="Color.Warning" IconSize="Size.Large" Style="@(outdatedCount == 0 ? "opacity: .35;" : string.Empty)" Value="@IModHoundClient.SectionOutdated">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Warning">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Outdated_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Warning" Value="@outdatedCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.InboxMultiple" IconColor="Color.Warning" IconSize="Size.Large" Style="@(duplicatesCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionDuplicates">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Warning">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Duplicates_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Warning" Value="@duplicatesCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.SkullCrossbones" IconColor="Color.Error" IconSize="Size.Large" Style="@(brokenObsoleteCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionBrokenObsolete">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Error">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_BrokenObsolete_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Error" Value="@brokenObsoleteCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.NotEqualVariant" IconColor="Color.Error" IconSize="Size.Large" Style="@(incompatibleCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionIncompatible">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Error">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_Incompatible_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Error" Value="@incompatibleCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.ImageBroken" IconColor="Color.Error" IconSize="Size.Large" Style="@(missingRequirementsCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionMissingRequirements">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Error">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_MissingRequirements_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Error" Value="@missingRequirementsCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.LightbulbQuestion" IconSize="Size.Large" Style="@(unknownStatusCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionUnknownStatus">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3>
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_UnknownStatus_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Value="@unknownStatusCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.LightbulbOn" IconColor="Color.Success" IconSize="Size.Large" Style="@(upToDateCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionUpToDate">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3 Color="Color.Success">
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_UpToDate_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Color="Color.Success" Value="@upToDateCount" />
-						</MudStack>
-					</MudListItem>
-					<MudListItem Class="py-0" Icon="@MaterialDesignIcons.Normal.TrackLightOff" IconSize="Size.Large" Style="@(notTrackedCount == 0 ? "opacity: .35;" : string.Empty)" Value="IModHoundClient.SectionNotTracked">
-						<MudStack AlignItems="AlignItems.Center" Row>
-							<MudTextM3>
-								@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]
-							</MudTextM3>
-							<MudSpacer />
-							<MudChip T="int?" Value="@notTrackedCount" />
-						</MudStack>
-					</MudListItem>
-				</MudList>
+				var selectedReportSection = (Observed(() => ModHoundClient.SelectedReportSection));
+				<MudStack>
+					<MudStack Row>
+						<MudBadge Color="Color.Warning" Content="@outdatedCount.ToString()" Origin="Origin.BottomCenter" Visible="@(outdatedCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_Outdated_Label)" Color="Color.Warning">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.HeartBroken" Color="Color.Warning" Disabled="@(outdatedCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionOutdated ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionOutdated)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Warning" Content="@duplicatesCount.ToString()" Origin="Origin.BottomCenter" Visible="@(duplicatesCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_Duplicates_Label)" Color="Color.Warning">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.InboxMultiple" Color="Color.Warning" Disabled="@(duplicatesCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionDuplicates ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionDuplicates)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Error" Content="@brokenObsoleteCount.ToString()" Origin="Origin.BottomCenter" Visible="@(brokenObsoleteCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_BrokenObsolete_Label)" Color="Color.Error">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.SkullCrossbones" Color="Color.Error" Disabled="@(brokenObsoleteCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionBrokenObsolete ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionBrokenObsolete)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Error" Content="@incompatibleCount.ToString()" Origin="Origin.BottomCenter" Visible="@(incompatibleCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_Incompatible_Label)" Color="Color.Error">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.NotEqualVariant" Color="Color.Error" Disabled="@(incompatibleCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionIncompatible ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionIncompatible)" />
+							</MudTooltip>
+						</MudBadge>
+					</MudStack>
+					<MudStack Row>
+						<MudBadge Color="Color.Error" Content="@missingRequirementsCount.ToString()" Origin="Origin.BottomCenter" Visible="@(missingRequirementsCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_MissingRequirements_Label)" Color="Color.Error">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.ImageBroken" Color="Color.Error" Disabled="@(missingRequirementsCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionMissingRequirements ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionMissingRequirements)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Dark" Content="@unknownStatusCount.ToString()" Origin="Origin.BottomCenter" Visible="@(unknownStatusCount > 0)">
+							<MudTooltip Color="Color.Dark" Text="@(AppText.ModHoundDisplay_SectionMenu_UnknownStatus_Label)">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.LightbulbQuestion" Disabled="@(unknownStatusCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionUnknownStatus ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionUnknownStatus)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Success" Content="@upToDateCount.ToString()" Origin="Origin.BottomCenter" Visible="@(upToDateCount > 0)">
+							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_UpToDate_Label)" Color="Color.Success">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.LightbulbOn" Color="Color.Success" Disabled="@(upToDateCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionUpToDate ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionUpToDate)" />
+							</MudTooltip>
+						</MudBadge>
+						<MudBadge Color="Color.Dark" Content="@notTrackedCount.ToString()" Origin="Origin.BottomCenter" Visible="@(notTrackedCount > 0)">
+							<MudTooltip Color="Color.Dark" Text="@(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)">
+								<MudIconButton Icon="@MaterialDesignIcons.Normal.TrackLightOff" Disabled="@(notTrackedCount == 0)" Variant="@(selectedReportSection == IModHoundClient.SectionNotTracked ? Variant.Filled : Variant.Outlined)" OnClick="@(() => ModHoundClient.SelectedReportSection = IModHoundClient.SectionNotTracked)" />
+							</MudTooltip>
+						</MudBadge>
+					</MudStack>
+				</MudStack>
 			}
-			<MudTextM3 Align="Align.Center" Class="markdown-caption">
+			<MudTextM3 Align="Align.Center" Class="markdown-caption flex-shrink-1">
 				<MudMarkdown Value="@AppText.ModHoundDisplay_SupportLumpinou_Label" />
 			</MudTextM3>
 		</MudStack>
 	</MudItem>
-	<MudItem Class="mod-hound-report py-0" xs="9">
+	<MudFlexBreak />
+	<MudItem xs="12">
 		@if (Observed(() => ModHoundClient.SelectedReport) is { } displayedReport && Observed(() => ModHoundClient.SelectedReportSection) is { } displayedReportSection)
 		{
 			var searchText = Observed(() => ModHoundClient.SearchText);
 			if (displayedReportSection is IModHoundClient.SectionOutdated or IModHoundClient.SectionDuplicates or IModHoundClient.SectionBrokenObsolete or IModHoundClient.SectionUnknownStatus or IModHoundClient.SectionUpToDate)
 			{
-				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 280px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
 					<ToolBarContent>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
@@ -287,7 +256,7 @@
 					</MudStack>
 					@if (records.Any())
 					{
-						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 236px);">
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 303px);">
 							@foreach (var (incompatibilityRecord, index) in records)
 							{
 								<MudExpansionPanel>
@@ -315,7 +284,7 @@
 					}
 					else
 					{
-						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 228px);">
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 165px);">
 							<strong>
 								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_Incompatible_NoResults_Label)]
 							</strong>
@@ -341,7 +310,7 @@
 					</MudStack>
 					@if (records.Any())
 					{
-						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 236px);">
+						<MudExpansionPanels Class="mt-2 overflow-y-auto" MultiExpansion Style="height: calc(var(--plumbbuddy-zoomed-vh) - 303px);">
 							@foreach (var (missingRequirementsRecord, index) in records)
 							{
 								<MudExpansionPanel>
@@ -390,7 +359,7 @@
 					}
 					else
 					{
-						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 228px);">
+						<MudTextM3 Align="Align.Center" Class="pa-8" Style="height: calc(var(--plumbbuddy-zoomed-vh) - 165px);">
 							<strong>
 								@StringLocalizer[nameof(AppText.ModHoundDisplay_Section_MissingRequirements_NoResults_Label)]
 							</strong>
@@ -400,7 +369,7 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionNotTracked)
 			{
-				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 280px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
 					<ToolBarContent>
 						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
 							@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]

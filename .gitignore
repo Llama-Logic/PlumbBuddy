@@ -403,3 +403,6 @@ FodyWeavers.xsd
 # macOS deployment semantics
 .env
 PlumbBuddy.zip
+
+# Compiled TS4 script mods
+*.ts4script
