@@ -175,7 +175,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Metadata\**" />
-        <Content Include="Resources\Images\core_library.png" />
         <EmbeddedResource Include="PlumbBuddy_Proxy.ts4script" />
     </ItemGroup>
 

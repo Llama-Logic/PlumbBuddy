@@ -59,18 +59,6 @@
                         </BlazorWebView>
                     </sf:SfTabItem.Content>
                 </sf:SfTabItem>
-                <sf:SfTabItem
-                    Header="Core Library Inspector"
-                    ImageSource="core_library.png"
-                    IsVisible="False"
-                    >
-                    <sf:SfTabItem.Content>
-                        <WebView
-                            Source="about:blank"
-                            >
-                        </WebView>
-                    </sf:SfTabItem.Content>
-                </sf:SfTabItem>
             </sf:SfTabView.Items>
         </sf:SfTabView>
         <StackLayout

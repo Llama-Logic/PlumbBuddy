@@ -92,6 +92,9 @@ public partial class MainPage :
         settings.PropertyChanged += HandleSettingsPropertyChanged;
         userInterfaceMessaging.PropertyChanged += HandleUserInterfaceMessagingPropertyChanged;
         proxyHost.PropertyChanged += HandleProxyHostPropertyChanged;
+#if WINDOWS
+        UpdateTrayIconVisibility();
+#endif
     }
 
     protected override void OnDisappearing()
@@ -119,8 +122,7 @@ public partial class MainPage :
     {
         if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
         {
-            tabView.Items[1].IsVisible = true;
-            TaskCompletionSource tcs = new TaskCompletionSource();
+            var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
             await tcs.Task;
@@ -131,7 +133,6 @@ public partial class MainPage :
             using var animation = new Animation(v => tabView.TabBarHeight = v, 80, 0);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
             await tcs.Task;
-            tabView.Items[1].IsVisible = false;
         }
     }
 
