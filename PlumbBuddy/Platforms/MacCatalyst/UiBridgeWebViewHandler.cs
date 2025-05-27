@@ -1,4 +1,5 @@
 using Foundation;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using System.Drawing;
 using System.Runtime.Versioning;
@@ -6,8 +7,12 @@ using WebKit;
 
 namespace PlumbBuddy;
 
-partial class UiBridgeWebViewHandler
+class UiBridgeWebViewHandler :
+    WebViewHandler
 {
+    public UiBridgeWebView UiBridgeWebView =>
+        (UiBridgeWebView)VirtualView;
+
     protected override WKWebView CreatePlatformView()
     {
         var config = new WKWebViewConfiguration();
@@ -84,7 +89,7 @@ partial class UiBridgeWebViewHandler
                 urlSchemeTask.DidFailWithError(new NSError((NSString)"PlumbBuddy", 404));
                 return;
             }
-            var (found, content, contentType) = await webViewHandler.GetContentAsync(uri);
+            var (found, content, contentType) = await webViewHandler.UiBridgeWebView.GetContentAsync(uri);
             if (!found)
             {
                 urlSchemeTask.DidFailWithError(new NSError((NSString)"PlumbBuddy", 404));

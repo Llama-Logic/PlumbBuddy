@@ -11,7 +11,7 @@ public class AppDelegate :
 
     void ConfigureMauiAppBuilder(MauiAppBuilder builder)
     {
-        builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<UiBridgeWebView, UiBridgeWebViewHandler>())
+        builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<UiBridgeWebView, UiBridgeWebViewHandler>());
         builder.Services.AddSingleton<IAppLifecycleManager>(Program.AppLifecycleManager);
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
         builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
