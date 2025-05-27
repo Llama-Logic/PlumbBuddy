@@ -124,5 +124,5 @@ public partial class App :
     readonly ISettings settings;
 
     protected override Window CreateWindow(IActivationState? activationState) =>
-        new(new MainPage(settings, lifetimeScope.Resolve<IAppLifecycleManager>(), lifetimeScope.Resolve<IUserInterfaceMessaging>(), lifetimeScope.Resolve<IProxyHost>()));
+        new(new MainPage(lifetimeScope, settings, lifetimeScope.Resolve<IAppLifecycleManager>(), lifetimeScope.Resolve<IUserInterfaceMessaging>(), lifetimeScope.Resolve<IProxyHost>()));
 }

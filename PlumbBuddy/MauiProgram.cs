@@ -53,6 +53,7 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             })
+            .ConfigureMauiHandlers(handlers => handlers.AddHandler<UiBridgeWebView, UiBridgeWebViewHandler>())
             .ConfigureContainer(new AutofacServiceProviderFactory(), configureContainerBuilder);
 
         builder.Services.AddSingleton(FolderPicker.Default);

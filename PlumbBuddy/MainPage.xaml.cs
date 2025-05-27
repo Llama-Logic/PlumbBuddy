@@ -2,6 +2,7 @@
 using H.NotifyIcon.Core;
 using Microsoft.AspNetCore.Components.WebView.Maui;
 #endif
+using Syncfusion.Maui.Toolkit.TabView;
 using Animation = Microsoft.Maui.Controls.Animation;
 
 namespace PlumbBuddy;
@@ -20,12 +21,14 @@ public partial class MainPage :
             ? Microsoft.Maui.Graphics.Colors.White
             : Microsoft.Maui.Graphics.Colors.Black;
 
-    public MainPage(ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging, IProxyHost proxyHost)
+    public MainPage(ILifetimeScope lifetimeScope, ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging, IProxyHost proxyHost)
     {
+        ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         ArgumentNullException.ThrowIfNull(proxyHost);
+        this.lifetimeScope = lifetimeScope;
         this.settings = settings;
         this.appLifecycleManager = appLifecycleManager;
         this.userInterfaceMessaging = userInterfaceMessaging;
@@ -36,6 +39,7 @@ public partial class MainPage :
     }
 
     readonly IAppLifecycleManager appLifecycleManager;
+    readonly ILifetimeScope lifetimeScope;
     readonly IProxyHost proxyHost;
     readonly ISettings settings;
     bool showFileDropInterface;
@@ -118,10 +122,22 @@ public partial class MainPage :
         appLifecycleManager.WindowFirstShown(Window);
     }
 
+    void AddATab()
+    {
+        // var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, new ZipArchive(File.OpenRead("/Users/daniel/Desktop/bridged-ui.zip"), ZipArchiveMode.Read, false), "bridged-ui");
+        // var tab = new SfTabItem
+        // {
+        //     Content = webView,
+        //     Header = "Example Bridged UI"
+        // };
+        // tabView.Items.Add(tab);
+    }
+
     async Task RefreshTabViewAsync()
     {
-        if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
+        if (proxyHost.IsClientConnected /*|| true*/ && tabView.TabBarHeight == 0)
         {
+            AddATab();
             var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
