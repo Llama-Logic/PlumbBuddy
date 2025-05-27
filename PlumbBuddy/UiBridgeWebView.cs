@@ -3,6 +3,12 @@ namespace PlumbBuddy;
 public partial class UiBridgeWebView :
     WebView
 {
+    static readonly Uri indexUrl = new($"{uriPrefix}index.html", UriKind.Absolute);
+    static readonly JsonSerializerOptions messageSerializationOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
 #if WINDOWS
     const string scheme = "http";
 #else
@@ -10,34 +16,35 @@ public partial class UiBridgeWebView :
 #endif
     const string uriPrefix = $"{scheme}://bridged-ui/";
 
-    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, ZipArchive scriptModFile, string bridgedUiRootPath)
+    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, ZipArchive scriptModFile, string bridgedUiRootPath)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(updateManager);
         ArgumentNullException.ThrowIfNull(scriptModFile);
         ArgumentNullException.ThrowIfNull(bridgedUiRootPath);
         Logger = logger;
         Settings = settings;
+        this.updateManager = updateManager;
         this.scriptModFile = scriptModFile;
         this.bridgedUiRootPath = bridgedUiRootPath;
     }
 
     readonly string bridgedUiRootPath;
     readonly ZipArchive scriptModFile;
+    readonly IUpdateManager updateManager;
 
     public ILogger<UiBridgeWebView> Logger { get; }
 
     public ISettings Settings { get; }
 
-    private partial void InitializeWebView();
-
-    private partial void Navigate(Uri uri);
-
-    protected override void OnHandlerChanged()
+    string GetBridgedUiGatewayJavaScript()
     {
-        base.OnHandlerChanged();
-        InitializeWebView();
-        Navigate(new($"{uriPrefix}index.html", UriKind.Absolute));
+        using var customThemesMetadataStream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream("PlumbBuddy.Metadata.BridgedUiGateway.js")
+            ?? throw new Exception("Bridged UI Gateway JavaScript embedded resource not found");
+        using var customThemesMetadataStreamReader = new StreamReader(customThemesMetadataStream);
+        return customThemesMetadataStreamReader.ReadToEnd().Replace("__PB_VERSION__", updateManager.CurrentVersion.ToString(), StringComparison.Ordinal);
     }
 
     public async ValueTask<(bool found, ReadOnlyMemory<byte> content, string contentType)> GetContentAsync(Uri uri)
@@ -104,4 +111,25 @@ public partial class UiBridgeWebView :
             }
         );
     }
+
+    string GetMessageJson(object message) =>
+        JsonSerializer.Serialize(message, messageSerializationOptions);
+
+    private partial void InitializeWebView();
+
+    private partial void Navigate(Uri uri);
+
+    protected override void OnHandlerChanged()
+    {
+        base.OnHandlerChanged();
+        InitializeWebView();
+        Navigate(indexUrl);
+    }
+
+    void OnMessageFromBridgedUi(string message)
+    {
+        SendMessageToBridgedUi(new { DebugMessage = "Polo." });
+    }
+
+    private partial void SendMessageToBridgedUi(object message);
 }

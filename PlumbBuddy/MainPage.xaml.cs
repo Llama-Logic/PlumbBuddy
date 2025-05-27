@@ -124,8 +124,10 @@ public partial class MainPage :
 
     async Task RefreshTabViewAsync()
     {
-        if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
+        if (/*(*/proxyHost.IsClientConnected /*|| true)*/ && tabView.TabBarHeight == 0)
         {
+            //var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, lifetimeScope.Resolve<IUpdateManager>(), new ZipArchive(File.OpenRead(@"C:\Users\Daniel\Desktop\bridged-ui.zip"), ZipArchiveMode.Read, false), "bridged-ui");
+            //tabView.Items.Add(new SfTabItem { Content = webView, Header = "JS Test" });
             var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());

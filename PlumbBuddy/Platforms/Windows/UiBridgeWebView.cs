@@ -48,20 +48,32 @@ public partial class UiBridgeWebView
         }
     }
 
-    void HandleWebView2CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+    void HandleCoreWebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
+    {
+        if (args.TryGetWebMessageAsString() is { } message)
+            OnMessageFromBridgedUi(message);
+    }
+
+    void HandleCoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
     {
         if (args.Exception is not null)
             return;
         var core = sender.CoreWebView2;
         // turn on Dev Tools for Amethyst, Lumpinou, and... everybody else
         core.Settings.AreDevToolsEnabled = Settings.Type is UserType.Creator;
+        core.Settings.IsWebMessageEnabled = true;
+        _ = core.AddScriptToExecuteOnDocumentCreatedAsync(GetBridgedUiGatewayJavaScript());
         core.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+        core.WebMessageReceived += HandleCoreWebMessageReceived;
         core.WebResourceRequested += HandlerCoreWebResourceRequested;
     }
 
     private partial void InitializeWebView() =>
-        PlatformWebView.CoreWebView2Initialized += HandleWebView2CoreWebView2Initialized;
+        PlatformWebView.CoreWebView2Initialized += HandleCoreWebView2Initialized;
 
     private partial void Navigate(Uri uri) =>
         PlatformWebView.Source = uri;
+
+    private partial void SendMessageToBridgedUi(object message) =>
+        PlatformWebView.CoreWebView2.PostWebMessageAsJson(GetMessageJson(message));
 }
