@@ -12,9 +12,10 @@ public partial class UiBridgeWebView :
 #if WINDOWS
     const string scheme = "http";
 #else
-    const string scheme = "plumbbuddy";
 #endif
-    const string uriPrefix = $"{scheme}://bridged-ui/";
+    const string uriPrefix = $"{Scheme}://bridged-ui/";
+
+    public const string Scheme = "plumbbuddy";
 
     public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, ZipArchive scriptModFile, string bridgedUiRootPath)
     {
@@ -38,7 +39,7 @@ public partial class UiBridgeWebView :
 
     public ISettings Settings { get; }
 
-    string GetBridgedUiGatewayJavaScript()
+    public string GetBridgedUiGatewayJavaScript()
     {
         using var customThemesMetadataStream = Assembly.GetExecutingAssembly()
             .GetManifestResourceStream("PlumbBuddy.Metadata.BridgedUiGateway.js")
@@ -126,7 +127,7 @@ public partial class UiBridgeWebView :
         Navigate(indexUrl);
     }
 
-    void OnMessageFromBridgedUi(string message)
+    public void OnMessageFromBridgedUi(string message)
     {
         SendMessageToBridgedUi(new { DebugMessage = "Polo." });
     }

@@ -19,4 +19,7 @@ public partial class UiBridgeWebView
         using var request = new NSUrlRequest(nsUrl);
         PlatformWebView.LoadRequest(request);
     }
+
+    private partial void SendMessageToBridgedUi(object message) =>
+        PlatformWebView.EvaluateJavaScriptAsync($"window.gateway.onMessageFromPlumbBuddy({GetMessageJson(message)});");
 }

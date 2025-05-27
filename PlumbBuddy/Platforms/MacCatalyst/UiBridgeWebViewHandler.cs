@@ -16,13 +16,15 @@ class UiBridgeWebViewHandler :
     protected override WKWebView CreatePlatformView()
     {
         var config = new WKWebViewConfiguration();
-        config.SetUrlSchemeHandler(new SchemeHandler(this), urlScheme: "plumbbuddy");
+        config.SetUrlSchemeHandler(new UrlSchemeHandler(this), urlScheme: UiBridgeWebView.Scheme);
 
         var contentController = new WKUserContentController();
+        contentController.AddUserScript(new((NSString)UiBridgeWebView.GetBridgedUiGatewayJavaScript(), WKUserScriptInjectionTime.AtDocumentStart, true));
+        contentController.AddScriptMessageHandler(new ScriptMessageHandler(this), "plumbBuddy");
         config.UserContentController = contentController;
 
         const string blockAllExceptPlumbBuddy =
-            """
+            $$"""
             [
                 {
                     "trigger": {
@@ -34,7 +36,7 @@ class UiBridgeWebViewHandler :
                 },
                 {
                     "trigger": {
-                        "url-filter": "^plumbbuddy://.*"
+                        "url-filter": "{{UiBridgeWebView.Scheme}}://.*"
                     },
                     "action": {
                         "type": "ignore-previous-rules"
@@ -68,18 +70,35 @@ class UiBridgeWebViewHandler :
         return platformView;
     }
 
-    class SchemeHandler :
+    class ScriptMessageHandler :
         NSObject,
-        IWKUrlSchemeHandler
+        IWKScriptMessageHandler
     {
-        public SchemeHandler(UiBridgeWebViewHandler webViewHandler)
+        public ScriptMessageHandler(UiBridgeWebViewHandler webViewHandler)
         {
             ArgumentNullException.ThrowIfNull(webViewHandler);
             this.webViewHandler = webViewHandler;
         }
 
         readonly UiBridgeWebViewHandler webViewHandler;
-        
+
+        [Export("userContentController:didReceiveScriptMessage:")]
+        public void DidReceiveScriptMessage(WKUserContentController _, WKScriptMessage msg) =>
+            webViewHandler.UiBridgeWebView.OnMessageFromBridgedUi(msg.Body.ToString());
+    }
+
+    class UrlSchemeHandler :
+        NSObject,
+        IWKUrlSchemeHandler
+    {
+        public UrlSchemeHandler(UiBridgeWebViewHandler webViewHandler)
+        {
+            ArgumentNullException.ThrowIfNull(webViewHandler);
+            this.webViewHandler = webViewHandler;
+        }
+
+        readonly UiBridgeWebViewHandler webViewHandler;
+
         [Export("webView:startURLSchemeTask:")]
         [SupportedOSPlatform("ios11.0")]
         public async void StartUrlSchemeTask(WKWebView webView, IWKUrlSchemeTask urlSchemeTask)
