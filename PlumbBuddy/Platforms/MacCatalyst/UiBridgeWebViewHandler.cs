@@ -16,15 +16,23 @@ partial class UiBridgeWebViewHandler
         var contentController = new WKUserContentController();
         config.UserContentController = contentController;
 
-        const string blockHttpJson =
+        const string blockAllExceptPlumbBuddy =
             """
             [
                 {
                     "trigger": {
-                        "url-filter": "^(https?)://.*"
+                        "url-filter": ".*"
                     },
                     "action": {
                         "type": "block"
+                    }
+                },
+                {
+                    "trigger": {
+                        "url-filter": "^plumbbuddy://.*"
+                    },
+                    "action": {
+                        "type": "ignore-previous-rules"
                     }
                 }
             ]
@@ -32,14 +40,14 @@ partial class UiBridgeWebViewHandler
 
         WKContentRuleListStore.DefaultStore.CompileContentRuleList
         (
-            identifier: "BlockHttpAndHttps",
-            encodedContentRuleList: blockHttpJson,
+            identifier: "BlockAllExceptPlumbbuddy",
+            encodedContentRuleList: blockAllExceptPlumbBuddy,
             completionHandler: (ruleList, error) =>
             {
                 if (ruleList is not null)
                     contentController.AddContentRuleList(ruleList);
                 else
-                    UiBridgeWebView.Logger.LogWarning("Failed to block http and https due to this nonsense: {NSError}", error);
+                    UiBridgeWebView.Logger.LogWarning("Failed to sandbox due to this nonsense: {NSError}", error);
             }
         );
 
@@ -76,8 +84,8 @@ partial class UiBridgeWebViewHandler
                 urlSchemeTask.DidFailWithError(new NSError((NSString)"PlumbBuddy", 404));
                 return;
             }
-            var (content, contentType) = await webViewHandler.GetContentAsync(uri);
-            if (content.IsEmpty)
+            var (found, content, contentType) = await webViewHandler.GetContentAsync(uri);
+            if (!found)
             {
                 urlSchemeTask.DidFailWithError(new NSError((NSString)"PlumbBuddy", 404));
                 return;

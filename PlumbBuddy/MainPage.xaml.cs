@@ -124,18 +124,18 @@ public partial class MainPage :
 
     void AddATab()
     {
-        // var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, new ZipArchive(File.OpenRead("/Users/daniel/Desktop/bridged-ui.zip"), ZipArchiveMode.Read, false), "bridged-ui");
-        // var tab = new SfTabItem
-        // {
-        //     Content = webView,
-        //     Header = "Example Bridged UI"
-        // };
-        // tabView.Items.Add(tab);
+        var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, new ZipArchive(File.OpenRead("C:\\Users\\Daniel\\Desktop\\bridged-ui.zip"), ZipArchiveMode.Read, false), "bridged-ui");
+        var tab = new SfTabItem
+        {
+            Content = webView,
+            Header = "Example Bridged UI"
+        };
+        tabView.Items.Add(tab);
     }
 
     async Task RefreshTabViewAsync()
     {
-        if (proxyHost.IsClientConnected /*|| true*/ && tabView.TabBarHeight == 0)
+        if ((proxyHost.IsClientConnected || true) && tabView.TabBarHeight == 0)
         {
             AddATab();
             var tcs = new TaskCompletionSource();
