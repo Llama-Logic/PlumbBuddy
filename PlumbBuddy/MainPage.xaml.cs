@@ -122,22 +122,10 @@ public partial class MainPage :
         appLifecycleManager.WindowFirstShown(Window);
     }
 
-    void AddATab()
-    {
-        var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, new ZipArchive(File.OpenRead("/Users/daniel/Desktop/bridged-ui.zip"), ZipArchiveMode.Read, false), "bridged-ui");
-        var tab = new SfTabItem
-        {
-            Content = webView,
-            Header = "Example Bridged UI"
-        };
-        tabView.Items.Add(tab);
-    }
-
     async Task RefreshTabViewAsync()
     {
-        if ((proxyHost.IsClientConnected || true) && tabView.TabBarHeight == 0)
+        if (proxyHost.IsClientConnected && tabView.TabBarHeight == 0)
         {
-            AddATab();
             var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
             animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
