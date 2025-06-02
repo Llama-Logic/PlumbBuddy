@@ -20,7 +20,7 @@ public class AppLifecycleManager :
     public bool HideMainWindowAtLaunch =>
         false;
 
-    bool IsForeground =>
+    public bool IsForeground =>
         UIApplication.SharedApplication.ApplicationState is UIApplicationState.Active;
 
     public bool IsVisible =>
