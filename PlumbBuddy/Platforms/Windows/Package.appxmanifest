@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Package
     xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
     xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -41,6 +41,12 @@
                 <uap5:Extension Category="windows.startupTask">
                     <uap5:StartupTask TaskId="WakeUp" Enabled="true" DisplayName="PlumbBuddy" />
                 </uap5:Extension>
+                <uap:Extension Category="windows.protocol">
+                    <uap:Protocol Name="plumbbuddy">
+                        <uap:DisplayName>PlumbBuddy Protocol</uap:DisplayName>
+                        <uap:Logo>$placeholder$.png</uap:Logo>
+                    </uap:Protocol>
+                </uap:Extension>
             </Extensions>
         </Application>
     </Applications>

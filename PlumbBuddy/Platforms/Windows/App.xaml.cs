@@ -2,6 +2,7 @@
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 using Microsoft.Windows.AppLifecycle;
 using PlumbBuddy.Platforms.Windows;
+using Windows.Win32;
 
 namespace PlumbBuddy.WinUI;
 
@@ -27,6 +28,7 @@ public partial class App :
         }
         else
         {
+            PInvoke.AllowSetForegroundWindow(keyInstance.ProcessId);
             keyInstance.RedirectActivationToAsync(args).GetAwaiter().GetResult();
             Environment.Exit(0);
         }

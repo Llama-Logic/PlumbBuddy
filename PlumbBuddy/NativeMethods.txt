@@ -1,5 +1,6 @@
-GetForegroundWindow
+AllowSetForegroundWindow
 GetSystemCpuSetInformation
 GetWindowPlacement
 IsIconic
+SetForegroundWindow
 SetWindowPlacement

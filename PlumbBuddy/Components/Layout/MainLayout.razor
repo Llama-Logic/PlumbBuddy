@@ -7,6 +7,7 @@
 @inject IJSRuntime JSRuntime
 @inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
+@inject IProxyHost ProxyHost
 @inject ISettings Settings
 @inject ISnackbar Snackbar
 @inject ISuperSnacks SuperSnacks
@@ -40,12 +41,39 @@
 				{
 					if (@manualLightDarkModeToggleEnabled)
 					{
-						<MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)">
+						<MudTooltip Arrow Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleMode_Tip)">
 							<MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggle" ThumbOffIcon="@MaterialDesignIcons.Normal.LightbulbOn" ThumbIcon="@MaterialDesignIcons.Normal.LightbulbNight" Color="Color.Primary" Style="margin-left: 15px;" />
 						</MudTooltip>
 					}
-					<MudTooltip Arrow="true" Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)">
+					<MudTooltip Arrow Text="@(AppText.MainLayout_DevTools_ThemeManager_ToggleModeControl_Tip)">
 						<MudSwitchM3 T="bool" @bind-Value="@ManualLightDarkModeToggleEnabled" ThumbOffIcon="@MaterialDesignIcons.Normal.RefreshAuto" ThumbIcon="@MaterialDesignIcons.Normal.CarShiftPattern" Color="Color.Primary" Style="margin-left: 15px;" />
+					</MudTooltip>
+				}
+				@if (Observed(() => Settings.Type) is UserType.Creator)
+				{
+					<MudTooltip Arrow Color="@(Observed(() => ProxyHost.IsBridgedUiDevelopmentModeEnabled) ? Color.Warning : Color.Tertiary)">
+						<ChildContent>
+							<MudSwitchM3 T="bool" @bind-Value="@Binding(() => ProxyHost.IsBridgedUiDevelopmentModeEnabled).Value" ThumbOffIcon="@MaterialDesignIcons.Normal.FolderLock" ThumbIcon="@MaterialDesignIcons.Normal.FolderSwap" Color="@(Observed(() => ProxyHost.IsBridgedUiDevelopmentModeEnabled) ? Color.Warning : Color.Tertiary)" Style="margin-left: 15px;" />
+						</ChildContent>
+						<TooltipContent>
+							<MudStack Row>
+								<MudIcon Icon="@(Observed(() => ProxyHost.IsBridgedUiDevelopmentModeEnabled) ? MaterialDesignIcons.Normal.FolderSwap : MaterialDesignIcons.Normal.FolderLock)" />
+								<MudTextM3 Typo="TypoM3.Title">UI Bridge Dev Mode</MudTextM3>
+							</MudStack>
+							<MudDivider />
+							<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+								When this is on, the guards preventing script mods from leaving the Mods folder or providing a custom URL with the <code>ui_root</code> parameter are disabled, making it easier to work on a bridged UI since it need not be continuously repacked to see changes.
+								Native web view sandboxing restrictions are still active.
+							</MudTextM3>
+							<MudDivider />
+							<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+								<em>
+									<strong>Warning</strong>:
+									Do not turn this on unless you're actively developing a bridged UI, <strong>even if instructed to do so by a mod</strong>.
+									Under normal circumstances, these guards protect you from mallicious activity.
+								</em>
+							</MudTextM3>
+						</TooltipContent>
 					</MudTooltip>
 				}
 				<MudPaper Elevation="0" Outlined Class="rounded-pill mx-4 px-1 d-flex align-center">

@@ -65,7 +65,7 @@
 				int upToDateCount = (Observed(() => ModHoundClient.UpToDateCount) ?? 0);
 				int notTrackedCount = (Observed(() => ModHoundClient.NotTrackedCount) ?? 0);
 				var selectedReportSection = (Observed(() => ModHoundClient.SelectedReportSection));
-				<MudStack>
+				<MudStack Spacing="8">
 					<MudStack Row>
 						<MudBadge Color="Color.Warning" Content="@outdatedCount.ToString()" Origin="Origin.BottomCenter" Visible="@(outdatedCount > 0)">
 							<MudTooltip Text="@(AppText.ModHoundDisplay_SectionMenu_Outdated_Label)" Color="Color.Warning">

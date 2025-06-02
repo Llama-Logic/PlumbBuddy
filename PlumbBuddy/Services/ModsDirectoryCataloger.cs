@@ -1,6 +1,3 @@
-using PlumbBuddy.Data;
-using System.IO;
-
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -768,7 +765,7 @@ public class ModsDirectoryCataloger :
             return;
         var path = fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..];
         var filesOfInterestPath = Path.Combine("Mods", path);
-        if (path is SmartSimObserver.GlobalModsManifestPackageName)
+        if (path is SmartSimObserver.IntegrationPackageName or SmartSimObserver.IntegrationScriptModName)
             return;
         try
         {

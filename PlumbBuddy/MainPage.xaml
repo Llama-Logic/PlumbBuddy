@@ -5,6 +5,7 @@
     xmlns:local="clr-namespace:PlumbBuddy"
     xmlns:localization="clr-namespace:PlumbBuddy.Localization"
     xmlns:sf="http://schemas.syncfusion.com/maui/toolkit"
+    xmlns:sfrm="clr-namespace:Syncfusion.Maui.RadialMenu;assembly=Syncfusion.Maui.RadialMenu"
     xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     >
@@ -16,7 +17,7 @@
                 <Setter Property="VisualStateManager.VisualStateGroups">
                     <VisualStateGroupList>
                         <VisualStateGroup>
-                            <VisualState x:Name="Normal" >
+                            <VisualState x:Name="Normal">
                                 <VisualState.Setters>
                                     <Setter Property="TextColor" Value="{x:Static local:MainPage.TextColor}" />
                                 </VisualState.Setters>
@@ -34,12 +35,22 @@
         </Grid.Resources>
         <sf:SfTabView
             x:Name="tabView"
-            TabBarHeight="0"
+            CenterButtonTapped="HandleTabViewCenterButtonTapped"
             IndicatorPlacement="Top"
             IndicatorWidthMode="Stretch"
-            IsVisible="Hidden"
+            IsVisible="False"
+            TabBarHeight="0"
             TabBarPlacement="Bottom"
             >
+            <sf:SfTabView.CenterButtonSettings>
+                <sf:CenterButtonSettings
+                    Height="80"
+                    ImageSize="80"
+                    ImageSource="window_settings.png"
+                    TextColor="{x:Static local:MainPage.TextColor}"
+                    DisplayMode="Image"
+                    />
+            </sf:SfTabView.CenterButtonSettings>
             <sf:SfTabView.Items>
                 <sf:SfTabItem
                     Header="PlumbBuddy"
@@ -61,6 +72,56 @@
                 </sf:SfTabItem>
             </sf:SfTabView.Items>
         </sf:SfTabView>
+        <sfrm:SfRadialMenu
+            x:Name="tabViewRadialMenu"
+            CenterButtonBackFontFamily="MauiMaterialAssets"
+            CenterButtonBackFontSize="28"
+            CenterButtonBackgroundColor="#333"
+            CenterButtonBackText="&#xe72d;"
+            CenterButtonFontFamily="MauiMaterialAssets"
+            CenterButtonFontSize="28"
+            CenterButtonText="&#xe719;"
+            CenterButtonTextColor="LightBlue"
+            EnableCenterButtonAnimation="True"
+            EnableRotation="True"
+            IsVisible="False"
+            RimRadius="200"
+            SelectionColor="#555"
+            Closed="HandleTabViewRadialMenuClosed"
+            >
+            <sfrm:SfRadialMenu.Items>
+                <sfrm:SfRadialMenuItem
+                    BackgroundColor="#440"
+                    Image="icon_close.png"
+                    TextColor="White"
+                    ItemTapped="HandleTabViewRadialMenuCloseItemTapped"
+                    />
+                <sfrm:SfRadialMenuItem
+                    BackgroundColor="#336"
+                    Image="icon_information.png"
+                    TextColor="White"
+                    >
+                    <sfrm:SfRadialMenuItem.Items>
+                        <sfrm:SfRadialMenuItem
+                            BackgroundColor="#336"
+                            Image="icon_forum.png"
+                            TextColor="White"
+                            />
+                        <sfrm:SfRadialMenuItem
+                            BackgroundColor="#336"
+                            Image="icon_cpu_64_bit.png"
+                            TextColor="White"
+                            />
+                    </sfrm:SfRadialMenuItem.Items>
+                </sfrm:SfRadialMenuItem>
+                <sfrm:SfRadialMenuItem
+                    BackgroundColor="#050"
+                    Image="icon_refresh.png"
+                    TextColor="White"
+                    ItemTapped="HandleTabViewRadialMenuRefreshItemTapped"
+                    />
+            </sfrm:SfRadialMenu.Items>
+        </sfrm:SfRadialMenu>
         <StackLayout
             x:Name="pleaseWait"
             HorizontalOptions="Center"

@@ -5231,7 +5231,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generate global manifest package.
+        ///   Looks up a localized string similar to Enable runtime mod integration.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label {
             get {
@@ -5240,7 +5240,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a package file that lets Mod Creators know what I know about your manifested mods. It&apos;s basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy..
+        ///   Looks up a localized string similar to When this is on, I will write two mod files to your Mods folder and maintain them. They contain information about your particular game and mods setup, and a communications channel which allows your mods to work with me to improve your gameplay experience..
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip {
             get {
@@ -8292,7 +8292,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use this switch to temporarily disable generation of the global manifest package. Don&apos;t worry if you forget to turn this back on if you had it enabled. I&apos;ll do that for you. 💖.
+        ///   Looks up a localized string similar to Use this switch to temporarily disable generation of the integration mod files. Don&apos;t worry if you forget to turn this back on if you had it enabled. I&apos;ll do that for you. 💖.
         /// </summary>
         internal static string SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip {
             get {

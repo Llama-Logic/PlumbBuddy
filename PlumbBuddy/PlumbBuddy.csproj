@@ -111,6 +111,7 @@
         <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+        <PackageReference Include="Syncfusion.Maui.RadialMenu" Version="29.2.7" />
         <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.5" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -196,48 +197,11 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <UsingTask TaskName="PackByteCode" TaskFactory="CodeTaskFactory" AssemblyName="Microsoft.Build.Tasks.Core">
-        <ParameterGroup>
-            <From ParameterType="System.String" Required="true" />
-            <To ParameterType="System.String" Required="true" />
-        </ParameterGroup>
-        <Task>
-            <Reference Include="System.IO.Compression" />
-            <Reference Include="System.IO.Compression.FileSystem" />
-            <Using Namespace="System.IO" />
-            <Using Namespace="System.IO.Compression" />
-            <Code Type="Fragment" Language="cs">
-                <![CDATA[
-                    if (File.Exists(To))
-                        File.Delete(To);
-                    using (var zip = ZipFile.Open(To, ZipArchiveMode.Create))
-                        foreach (var byteCodeFile in new DirectoryInfo(From).GetFiles("*.pyc", SearchOption.AllDirectories))
-                            zip.CreateEntryFromFile(byteCodeFile.FullName, byteCodeFile.FullName.Substring(From.Length + 1), CompressionLevel.Optimal);
-                ]]>
-            </Code>
-        </Task>
-    </UsingTask>
-
-    <UsingTask TaskName="DeleteByteCode" TaskFactory="CodeTaskFactory" AssemblyName="Microsoft.Build.Tasks.Core">
-        <ParameterGroup>
-            <In ParameterType="System.String" Required="true" />
-        </ParameterGroup>
-        <Task>
-            <Using Namespace="System.IO" />
-            <Code Type="Fragment" Language="cs">
-                <![CDATA[
-                    foreach (var byteCodeFile in new DirectoryInfo(In).GetFiles("*.pyc", SearchOption.AllDirectories))
-                        byteCodeFile.Delete();
-                ]]>
-            </Code>
-        </Task>
-    </UsingTask>
-
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">
         <Exec Command="$(PythonBinary) -m compileall -b -q -j0 &quot;$(ProjectDir)Proxy&quot;" />
-        <PackByteCode Condition="$([MSBuild]::IsOSPlatform('windows'))" From="$(ProjectDir)Proxy" To="$(ProjectDir)PlumbBuddy_Proxy.ts4script" />
-        <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" WorkingDirectory="$(ProjectDir)Proxy" Command="zip -r &quot;$(ProjectDir)PlumbBuddy_Proxy.ts4script&quot; . -i '*.pyc' -x &quot;*.DS_Store&quot;" />
-        <DeleteByteCode Condition="$([MSBuild]::IsOSPlatform('windows'))" In="$(ProjectDir)Proxy" />
+        <Exec Condition="$([MSBuild]::IsOSPlatform('windows'))" Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)PackScriptMod.ps1&quot; -ProjectDir $(ProjectDir)" />
+        <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" WorkingDirectory="$(ProjectDir)Proxy" Command="zip -r &quot;$(ProjectDir)PlumbBuddy_Proxy.ts4script&quot; . -i '*.pyc' '*.html' '*.md' '*.css' '*.scss' '*.js' '*.json' '*.mjs' '*.ts' '*.vue' '*.jpg' '*.jpeg' '*.gif' '*.png' '*.ico' '*.ttf' '*.otf' '*.eot' '*.woff' '*.woff2' '*.browserslistrc' '*.editorconfig' -x '*.DS_Store' '*.__MACOSX' '*node_modules*'" />
+        <Exec Condition="$([MSBuild]::IsOSPlatform('windows'))" Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)DeleteByteCode.ps1&quot; -ProjectDir $(ProjectDir)" />
         <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" Command="find &quot;$(ProjectDir)Proxy&quot; -name '*.pyc' -delete" />
     </Target>
 
