@@ -1,3 +1,4 @@
+@using PlumbBuddy.Services.ScriptApi
 @inherits ReactiveComponentBase
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IProxyHost ProxyHost
@@ -7,7 +8,7 @@
 {
 	<MudTooltip Arrow Color="Color.Success">
 		<ChildContent>
-			<MudIcon Class="mr-2 mt-1" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.AccessPointNetwork" />
+			<MudIcon Class="mr-3 mt-1" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.AccessPointNetwork" />
 		</ChildContent>
 		<TooltipContent>
 			<MudStack Row>

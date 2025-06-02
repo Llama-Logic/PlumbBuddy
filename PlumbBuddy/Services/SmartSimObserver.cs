@@ -7,7 +7,8 @@ public partial class SmartSimObserver :
     static readonly Regex modsDirectoryRelativePathPattern = GetModsDirectoryRelativePathPattern();
     static readonly Regex trimmedLocalPathSegmentsPattern = GetTrimmedLocalPathSegmentsPattern();
 
-    public const string GlobalModsManifestPackageName = "PlumbBuddy_GlobalModsManifest.package";
+    public const string IntegrationPackageName = "PlumbBuddy_Integration.package";
+    public const string IntegrationScriptModName = "PlumbBuddy_Integration.ts4script";
 
     static ModsDirectoryFileType CatalogIfLikelyErrorOrTraceLogInRoot(string userDataDirectoryRelativePath)
     {
@@ -91,7 +92,8 @@ public partial class SmartSimObserver :
     readonly AsyncLock fresheningTaskLock;
     readonly AsyncLock gameProcessOptimizationLock;
     Version? gameVersion;
-    ImmutableArray<byte> globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+    ImmutableArray<byte> integrationPackageLastSha256 = ImmutableArray<byte>.Empty;
+    ImmutableArray<byte> integrationScriptModLastSha256 = ImmutableArray<byte>.Empty;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? installationDirectoryWatcher;
     IReadOnlyList<string> installedPackCodes = [];
@@ -173,7 +175,7 @@ public partial class SmartSimObserver :
             if (installedPackCodes.SequenceEqual(cleaned))
                 return;
             installedPackCodes = [..cleaned];
-            FreshenGlobalManifest(force: true);
+            FreshenIntegration(force: true);
             OnPropertyChanged();
         }
     }
@@ -298,18 +300,18 @@ public partial class SmartSimObserver :
         }
     }
 
-    bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath, out bool wasGlobalManifestChange)
+    bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath, out bool wasIntegrationChange)
     {
         if (modsDirectoryRelativePathPattern.IsMatch(userDataDirectoryRelativePath))
         {
             NoticeIfGameIsRunning();
             var modsDirectoryRelativePath = userDataDirectoryRelativePath[5..];
-            wasGlobalManifestChange = modsDirectoryRelativePath is GlobalModsManifestPackageName;
-            if (!wasGlobalManifestChange)
+            wasIntegrationChange = modsDirectoryRelativePath is IntegrationPackageName or IntegrationScriptModName;
+            if (!wasIntegrationChange)
                 modsDirectoryCataloger.Catalog(modsDirectoryRelativePath);
-            return !wasGlobalManifestChange;
+            return !wasIntegrationChange;
         }
-        wasGlobalManifestChange = false;
+        wasIntegrationChange = false;
         return false;
     }
 
@@ -564,7 +566,7 @@ public partial class SmartSimObserver :
                 UpdateScanInitializationStatus();
                 NoticeIfGameIsRunning();
                 modsDirectoryCataloger.Catalog(string.Empty);
-                FreshenGlobalManifest(force: true);
+                FreshenIntegration(force: true);
             }
         }
         finally
@@ -632,7 +634,8 @@ public partial class SmartSimObserver :
             }
             if (userDataDirectoryWatcher is not null)
             {
-                var globalModsManifestPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", GlobalModsManifestPackageName));
+                var integrationPackageFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", IntegrationPackageName));
+                var integrationScriptModFile = new FileInfo(Path.Combine(userDataDirectoryWatcher.Path, "Mods", IntegrationScriptModName));
                 userDataDirectoryWatcher.Changed -= UserDataDirectoryFileSystemEntryChangedHandler;
                 userDataDirectoryWatcher.Created -= UserDataDirectoryFileSystemEntryCreatedHandler;
                 userDataDirectoryWatcher.Deleted -= UserDataDirectoryFileSystemEntryDeletedHandler;
@@ -640,16 +643,27 @@ public partial class SmartSimObserver :
                 userDataDirectoryWatcher.Renamed -= UserDataDirectoryFileSystemEntryRenamedHandler;
                 userDataDirectoryWatcher.Dispose();
                 userDataDirectoryWatcher = null;
-                if (globalModsManifestPackageFile.Exists)
+                if (integrationPackageFile.Exists)
                 {
                     try
                     {
-                        globalModsManifestPackageFile.Delete();
+                        integrationPackageFile.Delete();
                     }
                     catch (IOException)
                     {
                     }
-                    globalModsManifestLastSha256 = ImmutableArray<byte>.Empty;
+                    integrationPackageLastSha256 = ImmutableArray<byte>.Empty;
+                }
+                if (integrationScriptModFile.Exists)
+                {
+                    try
+                    {
+                        integrationScriptModFile.Delete();
+                    }
+                    catch (IOException)
+                    {
+                    }
+                    integrationScriptModLastSha256 = ImmutableArray<byte>.Empty;
                 }
                 cacheComponents = [];
                 IsModsDisabledGameSettingOn = false;
@@ -681,14 +695,14 @@ public partial class SmartSimObserver :
         }
     }
 
-    void FreshenGlobalManifest(bool force = false)
+    void FreshenIntegration(bool force = false)
     {
         if (!settings.GenerateGlobalManifestPackage)
             return;
-        _ = Task.Run(() => FreshenGlobalManifestAsync(force));
+        _ = Task.Run(() => FreshenIntegrationAsync(force));
     }
 
-    async Task FreshenGlobalManifestAsync(bool force = false)
+    async Task FreshenIntegrationAsync(bool force = false)
     {
         var enqueuedFresheningTaskLockPotentiallyHeld = await enqueuedFresheningTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedFresheningTaskLockPotentiallyHeld is null)
@@ -698,58 +712,73 @@ public partial class SmartSimObserver :
         var modsDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Mods"));
         if (!modsDirectory.Exists)
             return;
-        var globalModsManifestPackageFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, GlobalModsManifestPackageName));
-        if (!force
-            && globalModsManifestPackageFileInfo.Exists
-            && globalModsManifestLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false)))
-            return;
-        var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
-        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        foreach (var modFileHashElements in await pbDbContext.ModFileHashes
-            .Where(mfh => mfh.ModFiles.Any() && mfh.ModFileManifests.Any())
-            .Select(mfh => new
-            {
-                Paths = mfh.ModFiles.Select(mf => mf.Path!).ToList(),
-                Manifests = mfh.ModFileManifests.Select(mfm => new
+        await Task.Delay(500).ConfigureAwait(false);
+        var integrationPackageFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, IntegrationPackageName));
+        if (force
+            || !integrationPackageFileInfo.Exists
+            || !integrationPackageLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false)))
+        {
+            var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            foreach (var modFileHashElements in await pbDbContext.ModFileHashes
+                .Where(mfh => mfh.ModFiles.Any() && mfh.ModFileManifests.Any())
+                .Select(mfh => new
                 {
-                    mfm.Key,
-                    mfm.TuningName,
-                    CalculatedSha256 = mfm.CalculatedModFileManifestHash.Sha256,
-                    SubsumedSha256 = mfm.SubsumedHashes.Select(mfmh => mfmh.Sha256).ToList()
-                }).ToList()
-            })
-            .ToListAsync()
-            .ConfigureAwait(false))
-            foreach (var manifest in modFileHashElements.Manifests)
-            {
-                var hashes = manifest.SubsumedSha256
-                    .Append(manifest.CalculatedSha256)
-                    .Select(byteArray => byteArray.ToImmutableArray())
-                    .Select(ia => ia.ToHexString())
-                    .Distinct()
-                    .Select(hex => hex.ToByteSequence().ToImmutableArray())
-                    .ToImmutableArray();
-                manifestedModFiles.AddRange(modFileHashElements.Paths.Select(path =>
-                {
-                    var manifestedModFile = new GlobalModsManifestModelManifestedModFile
+                    Paths = mfh.ModFiles.Select(mf => mf.Path!).ToList(),
+                    Manifests = mfh.ModFileManifests.Select(mfm => new
                     {
-                        ModsFolderPath = path,
-                        ManifestKey = manifest.Key,
-                        ManifestTuningName = manifest.TuningName
-                    };
-                    manifestedModFile.Hashes.UnionWith(hashes);
-                    return manifestedModFile;
-                }));
+                        mfm.Key,
+                        mfm.TuningName,
+                        CalculatedSha256 = mfm.CalculatedModFileManifestHash.Sha256,
+                        SubsumedSha256 = mfm.SubsumedHashes.Select(mfmh => mfmh.Sha256).ToList()
+                    }).ToList()
+                })
+                .ToListAsync()
+                .ConfigureAwait(false))
+                foreach (var manifest in modFileHashElements.Manifests)
+                {
+                    var hashes = manifest.SubsumedSha256
+                        .Append(manifest.CalculatedSha256)
+                        .Select(byteArray => byteArray.ToImmutableArray())
+                        .Select(ia => ia.ToHexString())
+                        .Distinct()
+                        .Select(hex => hex.ToByteSequence().ToImmutableArray())
+                        .ToImmutableArray();
+                    manifestedModFiles.AddRange(modFileHashElements.Paths.Select(path =>
+                    {
+                        var manifestedModFile = new GlobalModsManifestModelManifestedModFile
+                        {
+                            ModsFolderPath = path,
+                            ManifestKey = manifest.Key,
+                            ManifestTuningName = manifest.TuningName
+                        };
+                        manifestedModFile.Hashes.UnionWith(hashes);
+                        return manifestedModFile;
+                    }));
+                }
+            var model = new GlobalModsManifestModel();
+            foreach (var packCode in InstalledPackCodes)
+                model.InstalledPacks.Add(packCode);
+            foreach (var manifestedModFile in manifestedModFiles.OrderBy(mfm => mfm.ModsFolderPath))
+                model.ManifestedModFiles.Add(manifestedModFile);
+            using var integrationPackage = new DataBasePackedFile();
+            await integrationPackage.SetAsync(GlobalModsManifestModel.ResourceKey, model).ConfigureAwait(false);
+            await integrationPackage.SaveAsAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false);
+            integrationPackageLastSha256 = await ModFileManifestModel.GetFileSha256HashAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false);
+        }
+        var integrationScriptModFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, IntegrationScriptModName));
+        if (force
+            || !integrationScriptModFileInfo.Exists
+            || !integrationScriptModLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(integrationScriptModFileInfo.FullName).ConfigureAwait(false)))
+        {
+            using var integrationScriptModResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PlumbBuddy.PlumbBuddy_Proxy.ts4script");
+            if (integrationScriptModResourceStream is not null)
+            {
+                using (var integrationScriptModFileStream = integrationScriptModFileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.None))
+                    await integrationScriptModResourceStream.CopyToAsync(integrationScriptModFileStream).ConfigureAwait(false);
+                integrationScriptModLastSha256 = await ModFileManifestModel.GetFileSha256HashAsync(integrationScriptModFileInfo.FullName).ConfigureAwait(false);
             }
-        var model = new GlobalModsManifestModel();
-        foreach (var packCode in InstalledPackCodes)
-            model.InstalledPacks.Add(packCode);
-        foreach (var manifestedModFile in manifestedModFiles.OrderBy(mfm => mfm.ModsFolderPath))
-            model.ManifestedModFiles.Add(manifestedModFile);
-        using var globalManifestPackage = new DataBasePackedFile();
-        await globalManifestPackage.SetAsync(GlobalModsManifestModel.ResourceKey, model).ConfigureAwait(false);
-        await globalManifestPackage.SaveAsAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false);
-        globalModsManifestLastSha256 = await ModFileManifestModel.GetFileSha256HashAsync(globalModsManifestPackageFileInfo.FullName).ConfigureAwait(false);
+        }
     }
 
     string GetRelativePathInUserDataFolder(string fullPath)
@@ -772,7 +801,7 @@ public partial class SmartSimObserver :
         if (e.PropertyName == nameof(IModsDirectoryCataloger.State))
         {
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Cataloging)
-                FreshenGlobalManifest(force: true);
+                FreshenIntegration(force: true);
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
                 Scan();
         }
@@ -791,11 +820,17 @@ public partial class SmartSimObserver :
             ApplyGameProcessEnhancements();
         else if (e.PropertyName is nameof(ISettings.GenerateGlobalManifestPackage))
         {
-            var globalModsManifestPackageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", GlobalModsManifestPackageName));
-            if (!settings.GenerateGlobalManifestPackage && globalModsManifestPackageFile.Exists)
-                globalModsManifestPackageFile.Delete();
+            var integrationPackageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", IntegrationPackageName));
+            var integrationScriptModFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", IntegrationScriptModName));
+            if (!settings.GenerateGlobalManifestPackage && (integrationPackageFile.Exists || integrationScriptModFile.Exists))
+            {
+                if (integrationPackageFile.Exists)
+                    integrationPackageFile.Delete();
+                if (integrationScriptModFile.Exists)
+                    integrationScriptModFile.Delete();
+            }
             else if (settings.GenerateGlobalManifestPackage)
-                FreshenGlobalManifest(force: true);
+                FreshenIntegration(force: true);
         }
         else if (e.PropertyName is nameof(ISettings.InstallationFolderPath))
         {
@@ -1180,10 +1215,10 @@ public partial class SmartSimObserver :
         var relativePath = GetRelativePathInUserDataFolder(e.FullPath);
         if (ResampleGameOptionsIfTheyChanged(relativePath))
             return;
-        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
+        if (CatalogIfInModsDirectory(relativePath, out var integrationWasOverwritten))
             return;
-        if (globalManifestWasOverwritten)
-            FreshenGlobalManifest();
+        if (integrationWasOverwritten)
+            FreshenIntegration();
     }
 
     void UserDataDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
@@ -1219,13 +1254,13 @@ public partial class SmartSimObserver :
         }
         if (CatalogIfModsDirectory(relativePath))
         {
-            FreshenGlobalManifest();
+            FreshenIntegration();
             return;
         }
-        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
+        if (CatalogIfInModsDirectory(relativePath, out var integrationWasOverwritten))
             return;
-        if (globalManifestWasOverwritten)
-            FreshenGlobalManifest();
+        if (integrationWasOverwritten)
+            FreshenIntegration();
     }
 
     void UserDataDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e)
@@ -1251,13 +1286,13 @@ public partial class SmartSimObserver :
         }
         if (CatalogIfModsDirectory(relativePath))
         {
-            FreshenGlobalManifest();
+            FreshenIntegration();
             return;
         }
-        if (CatalogIfInModsDirectory(relativePath, out var globalManifestWasDeleted))
+        if (CatalogIfInModsDirectory(relativePath, out var integrationWasDeleted))
             return;
-        if (globalManifestWasDeleted)
-            FreshenGlobalManifest();
+        if (integrationWasDeleted)
+            FreshenIntegration();
     }
 
     void UserDataDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e)
@@ -1296,13 +1331,13 @@ public partial class SmartSimObserver :
             Scan();
         if (CatalogIfModsDirectory(oldRelativePath) | CatalogIfModsDirectory(relativePath))
         {
-            FreshenGlobalManifest();
+            FreshenIntegration();
             return;
         }
-        if (CatalogIfInModsDirectory(oldRelativePath, out var globalManifestWasRenamed) | CatalogIfInModsDirectory(relativePath, out var globalManifestWasOverwritten))
+        if (CatalogIfInModsDirectory(oldRelativePath, out var integrationWasRenamed) | CatalogIfInModsDirectory(relativePath, out var integrationWasOverwritten))
             return;
-        if (globalManifestWasRenamed || globalManifestWasOverwritten)
-            FreshenGlobalManifest();
+        if (integrationWasRenamed || integrationWasOverwritten)
+            FreshenIntegration();
     }
 
     void UserDataDirectoryWatcherErrorHandler(object sender, ErrorEventArgs e)

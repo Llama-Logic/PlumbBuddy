@@ -1,3 +1,5 @@
+using PlumbBuddy.Services.ScriptApi;
+
 namespace PlumbBuddy.Services;
 
 static class Configuration

@@ -1279,10 +1279,10 @@ If you don't have one, but you're interested in getting a commission for all the
     <value>Automatically check for updates</value>
   </data>
   <data name="OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label" xml:space="preserve">
-    <value>Generate global manifest package</value>
+    <value>Enable runtime mod integration</value>
   </data>
   <data name="OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip" xml:space="preserve">
-    <value>This is a package file that lets Mod Creators know what I know about your manifested mods. It's basically the modder equivalent of my Catalog tab. They can use this information to improve your experience in the game, not violate your privacy.</value>
+    <value>When this is on, I will write two mod files to your Mods folder and maintain them. They contain information about your particular game and mods setup, and a communications channel which allows your mods to work with me to improve your gameplay experience.</value>
   </data>
   <data name="OnboardingDialog_Caution_SpookingMacs_Caption" xml:space="preserve">
     <value>I may be about to spook your Mac</value>
@@ -1402,7 +1402,7 @@ Move available features on the left over to the required list on the right. What
     <value>Start over</value>
   </data>
   <data name="SupportDiscordStepsDialog_GenerateGlobalManifestPackage_Tip" xml:space="preserve">
-    <value>Use this switch to temporarily disable generation of the global manifest package. Don't worry if you forget to turn this back on if you had it enabled. I'll do that for you. 💖</value>
+    <value>Use this switch to temporarily disable generation of the integration mod files. Don't worry if you forget to turn this back on if you had it enabled. I'll do that for you. 💖</value>
   </data>
   <data name="SupportDiscordStepsDialog_ClearCache_AlreadyClear_Caption" xml:space="preserve">
     <value>The Cache is Already Clear</value>

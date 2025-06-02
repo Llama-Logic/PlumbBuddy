@@ -1,7 +1,28 @@
-from plumbbuddy_proxy import logger
 from typing import Callable, Generic, List, Optional, TypeVar
+from plumbbuddy_proxy import logger
 
 T = TypeVar('T')
+
+class Event(Generic[T]):
+    def __init__(self, receive_dispatch: Callable[[Callable[[T], None]], None]):
+        self._listeners: List[Callable[[T], None]] = []
+        def dispatch(data: T):
+            for listener in self._listeners:
+                try:
+                    listener(data)
+                except Exception as ex:
+                    logger.warning('Naughty script mod threw %s while dispatching an event; swallowing to protect game stability', ex)
+        receive_dispatch(dispatch)
+    
+    def add_listener(self, listener: Callable[[T], None]):
+        self._listeners.append(listener)
+    
+    def remove_listener(self, listener: Callable[[T], None]) -> bool:
+        try:
+            self._listeners.remove(listener)
+            return True
+        except ValueError:
+            return False
 
 class Eventual(Generic[T]):
     """

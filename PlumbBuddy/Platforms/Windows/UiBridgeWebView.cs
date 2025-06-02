@@ -74,6 +74,6 @@ public partial class UiBridgeWebView
     private partial void Navigate(Uri uri) =>
         PlatformWebView.Source = uri;
 
-    private partial void SendMessageToBridgedUi(object message) =>
-        PlatformWebView.CoreWebView2.PostWebMessageAsJson(GetMessageJson(message));
+    private partial void SendMessageToBridgedUi(string messageJson) =>
+        PlatformWebView.CoreWebView2.PostWebMessageAsJson(messageJson);
 }
