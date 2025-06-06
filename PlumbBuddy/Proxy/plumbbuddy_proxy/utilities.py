@@ -5,6 +5,7 @@ from functools import wraps
 import inspect
 import logging
 import os
+import time
 from sims4.utils import blueprintmethod, blueprintproperty
 
 def get_mod_root(file, depth=2):
@@ -103,12 +104,23 @@ def is_flexmethod(target_function):
         return len(spec.args) >= 2 and spec.args[0] == 'cls' and spec.args[1] == 'inst'
     return False
 
+class UTCFormatter(logging.Formatter):
+    def converter(self, timestamp):
+        return time.gmtime(timestamp)
+
+    def formatTime(self, record, datefmt=None):
+        ct = self.converter(record.created)
+        if datefmt:
+            return time.strftime(datefmt, ct)
+        else:
+            return time.strftime("%Y-%m-%d %H:%M:%S", ct)
+
 def Logger(name, root, filename, prefix='', version='N/A', mode='development', **kwargs):
     path = os.path.join(root, filename)
     handler = logging.FileHandler(path, mode='w')
     log_mode = logging.DEBUG if mode == 'development' else logging.INFO
 
-    formatter = logging.Formatter('[%(levelname)s] %(message)s')
+    formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', datefmt = '%Y-%m-%d %H:%M:%S')
 
     logger = logging.getLogger(name)
     logger.setLevel(log_mode)
