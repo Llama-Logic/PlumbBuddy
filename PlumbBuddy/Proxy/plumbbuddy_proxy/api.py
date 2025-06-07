@@ -8,14 +8,17 @@ from plumbbuddy_proxy import logger
 import os
 from clock import ServerClock
 import services
+import subprocess
+import sys
 from ui.ui_dialog_notification import UiDialogNotification
 from uuid import UUID
 import webbrowser
 
-def _focus_plumbbuddy():
+def _try_to_foreground_plumbbuddy():
     if os.name == 'nt':
         webbrowser.open('plumbbuddy://focus')
-
+    elif os.name == 'posix' and sys.platform == 'darwin':
+        subprocess.run(['/usr/bin/osascript', '-e', 'tell application id "com.llamalogic.plumbbuddy" to activate'])
 
 def _show_notification(text: str, title: str = None):
     client = services.client_manager().get_first_client()
@@ -53,7 +56,7 @@ class BridgedUi:
         eventual = Eventual[bool]()
         ipc.send({
             'type': 'focus_bridged_ui',
-            'unique-id': self._unique_id
+            'unique_id': str(self._unique_id)
         })
         self._eventual_focus = eventual
         return eventual
@@ -203,9 +206,14 @@ class Gateway:
             eventual_focus = bridged_ui._eventual_focus
             if eventual_focus is None:
                 return
-            eventual_focus._set_result(message['success'])
+            focus_succeeded = message['success']
+            eventual_focus._set_result(focus_succeeded)
             bridged_ui._eventual_focus = None
-            _focus_plumbbuddy()
+            if focus_succeeded:
+                _try_to_foreground_plumbbuddy()
+            return
+        if message_type == 'foreground_plumbbuddy':
+            _try_to_foreground_plumbbuddy()
             return
         if message_type == 'show_notification':
             notification_text = None
@@ -301,7 +309,7 @@ class Gateway:
         already_loaded = self._get_bridged_ui(unique_id)
         if already_loaded is not None:
             eventual._set_result(already_loaded)
-            _focus_plumbbuddy()
+            _try_to_foreground_plumbbuddy()
             return eventual
         if not ipc.is_connected:
             eventual._set_fault(PlumbBuddyNotConnectedError())
@@ -325,7 +333,7 @@ class Gateway:
             'tab_name': tab_name,
             'tab_icon_path': tab_icon_path
         })
-        _focus_plumbbuddy()
+        _try_to_foreground_plumbbuddy()
         return eventual
 
 gateway = Gateway()
@@ -337,6 +345,6 @@ def _tick_server_clock(original, *args, **kwargs):
     try:
         ipc.connect()
     except Exception as ex:
-        logger.error('[Gateway] _tick_server_clock ipc.connect() exception: %s', ex)
+        logger.exception(ex)
     while not ipc._messages_from_plumbbuddy.empty():
         gateway._process_message_from_plumbbuddy(ipc._messages_from_plumbbuddy.get())

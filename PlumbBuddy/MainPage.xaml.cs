@@ -116,8 +116,7 @@ public partial class MainPage :
     void HandleProxyHostBridgedUiRequested(object? sender, BridgedUiRequestedEventArgs e) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
-            appLifecycleManager.ShowWindow();
-            await proxyHost.ShowInGameNotificationAsync($"{e.RequestorName} is attempting to show a bridged UI it wants to call {e.TabName}. Please switch over to PlumbBuddy to approve or deny this request.");
+            await proxyHost.ForegroundPlumbBuddyAsync();
             if (await DisplayAlert("Bridged UI Requested",
                 $"""
                 {e.RequestorName} is asking for permission to show a bridged UI it wants to call {e.TabName}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game.

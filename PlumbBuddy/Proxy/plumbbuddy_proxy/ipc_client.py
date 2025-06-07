@@ -16,7 +16,6 @@ class InterProcessCommunicationClient():
 
     def __init__(self):
         self._connection_state = 0
-        self._last_exception = None
         self._socket = None
         self._thread = None
         self._dispatch_connection_state_changed: Callable[[int], None] = lambda _: None
@@ -67,15 +66,6 @@ class InterProcessCommunicationClient():
         """
         return self._connection_state == 0
     
-    @property
-    def last_exception(self) -> BaseException:
-        """
-        Gets the last exception encountered by the IPC client
-
-        :returns: The last exception encountered by the IPC client; otherwise, None
-        """
-        return self._last_exception
-    
     def _reset_message_queues(self):
         self._messages_from_plumbbuddy = Queue()
         self._messages_to_plumbbuddy = Queue()
@@ -88,7 +78,6 @@ class InterProcessCommunicationClient():
         connect_ex_result = self._socket.connect_ex(("127.0.0.1", PORT))
         logger.debug("[IPC Client] connect_ex_result: %d", connect_ex_result)
         if connect_ex_result != 0:
-            self._last_exception = OSError(connect_ex_result, "connect_ex failed")
             self._socket = None
             self._thread = None
             self._set_connection_state(0)
@@ -123,7 +112,7 @@ class InterProcessCommunicationClient():
                 except socket.timeout:
                     continue
         except Exception as ex:
-            self._last_exception = ex
+            logger.exception(ex)
         finally:
             self.disconnect()
 
@@ -134,7 +123,6 @@ class InterProcessCommunicationClient():
         if not self.is_disconnected:
             return
         
-        self._last_exception = None
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._thread = threading.Thread(target = self._socket_work, daemon = True, name = "PlumbBuddy IPC")
         self._set_connection_state(1)

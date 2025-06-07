@@ -33,9 +33,6 @@ class AppLifecycleManager :
 
     public bool HideMainWindowAtLaunch { get; }
 
-    public bool IsForeground =>
-        isWindowActive;
-
     public bool IsVisible =>
         appWindow is { } nonNullAppWindow
         && nonNullAppWindow.IsVisible;

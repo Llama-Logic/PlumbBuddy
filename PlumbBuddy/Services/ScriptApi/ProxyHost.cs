@@ -255,13 +255,24 @@ public partial class ProxyHost :
                         logger.LogWarning(ex, "unparsable message from proxy: {Message}", messageJson);
                         continue;
                     }
-                    await ProcessMessageAsync(message, proxyJsonSerializerOptions).ConfigureAwait(false);
+                    try
+                    {
+                        await ProcessMessageAsync(message, proxyJsonSerializerOptions).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "unhandled exception while processing message from proxy: {Message}", messageJson);
+                    }
                 }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(serializedMessageRentedArray);
-                }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(serializedMessageRentedArray);
+                    }
             }
+            ProxyDisconnected?.Invoke(this, EventArgs.Empty);
+        }
+        catch (EndOfStreamException)
+        {
             ProxyDisconnected?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
@@ -288,6 +299,12 @@ public partial class ProxyHost :
             }
         }
     }
+
+    public Task ForegroundPlumbBuddyAsync() =>
+        SendMessageToProxyAsync(new ForegroundPlumbBuddyMessage
+        {
+            Type = nameof(HostMessageType.ForegroundPlumbbuddy).Underscore().ToLowerInvariant()
+        });
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -462,7 +479,7 @@ public partial class ProxyHost :
             case ComponentMessageType.FocusBridgedUi:
                 if (TryParseMessage<FocusBridgedUiMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "bridged UI focus request", out var focusBridgedUiMessage))
                 {
-                    var success = loadedBridgedUis.ContainsKey(focusBridgedUiMessage.UniqueId) && !appLifecycleManager.IsForeground;
+                    var success = loadedBridgedUis.ContainsKey(focusBridgedUiMessage.UniqueId);
                     if (success)
                         BridgedUiFocusRequested?.Invoke(this, new() { UniqueId = focusBridgedUiMessage.UniqueId });
                     await SendMessageToProxyAsync(new FocusBridgedUiResponseMessage

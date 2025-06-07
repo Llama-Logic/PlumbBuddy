@@ -73,5 +73,5 @@ def _start_services(original, self, *args, **kwargs):
         self.register_service(PlumbBuddyProxyService(), is_init_critical = False)
         logger.debug('[Game Service] _start_services register_service success')
     except Exception as ex:
-        logger.error("[Game Service] _start_services exception: %s", ex)
+        logger.exception(ex)
     original(self, *args, **kwargs)
