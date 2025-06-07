@@ -8,5 +8,6 @@ public enum HostMessageType
     BridgedUiLookUpResponse,
     BridgedUiRequestResponse,
     FocusBridgedUiResponse,
+    ForegroundPlumbbuddy,
     ShowNotification
 }

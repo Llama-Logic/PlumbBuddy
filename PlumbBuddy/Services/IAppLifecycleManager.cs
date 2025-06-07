@@ -7,8 +7,6 @@ public interface IAppLifecycleManager
     /// </summary>
     bool HideMainWindowAtLaunch { get; }
 
-    bool IsForeground { get; }
-
     /// <summary>
     /// Gets whether the app is visible in the Taskbar or Dock
     /// </summary>

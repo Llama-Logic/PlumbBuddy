@@ -12,9 +12,5 @@
 	<string>PlumbBuddy</string>
 	<key>CFBundleIconFile</key>
 	<string>plumbbuddy_icon</string>
-    <key>CFBundleURLSchemes</key>
-    <array>
-      <string>plumbbuddy</string>
-    </array>
 </dict>
 </plist>
