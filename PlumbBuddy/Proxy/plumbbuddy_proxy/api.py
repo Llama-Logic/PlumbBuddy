@@ -46,6 +46,12 @@ class BridgedUi:
     @property
     def destroyed(self) -> Event[any]:
         return self._destroyed
+    
+    def close(self):
+        ipc.send({
+            'type': 'close_bridged_ui',
+            'unique-id': str(self._unique_id)
+        })
 
     def focus(self) -> Eventual[bool]:
         if self._eventual_focus is not None:

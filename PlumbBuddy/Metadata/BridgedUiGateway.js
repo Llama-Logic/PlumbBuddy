@@ -88,6 +88,24 @@
             return this.#announcement;
         }
 
+        get destroyed() {
+            return this.#destroyed;
+        }
+
+        close() {
+            sendMessageToPlumbBuddy({
+                type: 'closeBridgedUi',
+                uniqueId: this.#uniqueId,
+            })
+        }
+
+        focus() {
+            sendMessageToPlumbBuddy({
+                type: 'focusBridgedUi',
+                uniqueId: this.#uniqueId,
+            })
+        }
+
         sendData(data) {
             sendMessageToPlumbBuddy({
                 type: 'sendDataToBridgedUi',
@@ -100,42 +118,49 @@
     const bridgedUis = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
-    let dispatchDataReceived;
-    const dataReceived = new Event(dispatch => dispatchDataReceived = dispatch);
+    let dispatchDataReceived = null;
 
-    const gateway = {
-        dataReceived,
+    class Gateway {
+        #dataReceived;
+        #uniqueId = sanitizeUuid('__UNIQUE_ID__');
+        #version = '__PB_VERSION__';
 
-        announce: announcement => {
+        constructor() {
+            if (dispatchDataReceived) {
+                throw new Error('Gateway has already been initialized for you. Use window.gateway.')
+            }
+            this.#dataReceived = new Event(dispatch => dispatchDataReceived = dispatch);
+        }
+
+        get dataReceived() {
+            return this.#dataReceived;
+        }
+
+        get uniqueId() {
+            return this.#uniqueId;
+        }
+
+        get version() {
+            return this.#version;
+        }
+
+        /**
+         * Makes an announcement to all script mods and other components with a reference to this bridged UI
+         * @param {*} announcement the data to announce
+         */
+        announce(announcement) {
             sendMessageToPlumbBuddy({
                 type: 'announcement',
                 announcement
             });
-        },
-
-        /**
-         * Attempts to close a loaded bridged UI
-         * @param {String} uniqueId the UUID for the tab of the bridged UI
-         */
-        closeBridgedUi: uniqueId => {
-            uniqueId = sanitizeUuid(uniqueId);
-            if (!uniqueId) {
-                throw new Error('uniqueId is not optional');
-            }
-            sendMessageToPlumbBuddy({
-                type: 'closeBridgedUi',
-                uniqueId,
-            });
-        },
-
-        getUniqueId: () => myUniqueId,
+        }
 
         /**
          * Attempts to look up a loaded bridged UI
          * @param {String} uniqueId the UUID for the tab of the bridged UI
          * @returns {Promise} an promise that will resolve with the bridged UI or a fault that it is not currently loaded
          */
-        lookUpBridgedUi: function(uniqueId) {
+        lookUpBridgedUi(uniqueId) {
             uniqueId = sanitizeUuid(uniqueId);
             if (!uniqueId) {
                 throw new Error('uniqueId is not optional');
@@ -155,12 +180,9 @@
                 uniqueId,
             });
             return madePromise.promise;
-        },
+        }
 
-        /**
-         * FOR INTERNAL USE ONLY: DO NOT CALL
-         */
-        onMessageFromPlumbBuddy: function(message) {
+        onMessageFromPlumbBuddy(message) {
             if (message.type === 'bridgedUiAnnouncement') {
                 const uniqueId = sanitizeUuid(message.uniqueId);
                 const bridgedUi = bridgedUis[uniqueId];
@@ -242,7 +264,7 @@
                 }
                 promisedBridgedUi.reject(fault);
             }
-        },
+        }
 
         /**
          * Requests a bridged UI from PlumbBuddy
@@ -255,7 +277,7 @@
          * @param {String?} tabIconPath a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
          * @returns {Promise} an promise that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, etc.)
          */
-        requestBridgedUi: function(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath) {
+        requestBridgedUi(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath) {
             uniqueId = sanitizeUuid(uniqueId);
             if (!uiRoot) {
                 throw new Error('uiRoot is not optional');
@@ -293,11 +315,13 @@
                 tabIconPath,
             });
             return madePromise.promise;
-        },
-    };
+        }
+    }
+
+    const gateway = new Gateway();
 
     if (window.chrome?.webview) {
-        window.chrome.webview.addEventListener('message', e =>  gateway.onMessageFromPlumbBuddy(e.data));
+        window.chrome.webview.addEventListener('message', e => gateway.onMessageFromPlumbBuddy(e.data));
     }
 
     Object.freeze(gateway);
@@ -308,5 +332,5 @@
         enumerable: true,
     });
 
-    console.info('PlumbBuddy %s Gateway loaded successfully. Use window.gateway to communicate with mods and services. This is bridged UI "%s".', '__PB_VERSION__', gateway.getUniqueId());
+    console.info('PlumbBuddy %s Gateway loaded successfully. Use window.gateway to communicate with mods and services. This is bridged UI "%s".', gateway.version, gateway.uniqueId);
 }());
