@@ -9,6 +9,7 @@ global using CommunityToolkit.Maui.Storage;
 global using CommunityToolkit.Mvvm.Input;
 global using CsvHelper;
 global using CsvHelper.Configuration;
+global using Epiforge.Extensions.Collections;
 global using Epiforge.Extensions.Collections.ObjectModel;
 global using H.NotifyIcon;
 global using Humanizer;
