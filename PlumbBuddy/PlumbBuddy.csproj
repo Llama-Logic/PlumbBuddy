@@ -85,6 +85,7 @@
         <PackageReference Include="ini-parser" Version="2.5.2" />
         <PackageReference Include="LlamaLogic.Packages" Version="2.23.1" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.114.46" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.15" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />

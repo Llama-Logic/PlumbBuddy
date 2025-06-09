@@ -9,5 +9,6 @@ public enum HostMessageType
     BridgedUiRequestResponse,
     FocusBridgedUiResponse,
     ForegroundPlumbbuddy,
+    RelationalDataStorageQueryResults,
     ShowNotification
 }
