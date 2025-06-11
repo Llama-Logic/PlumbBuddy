@@ -182,8 +182,8 @@ class BridgedUiNotFoundError(Exception):
 
 class Gateway:
     def __init__(self):
-        self._global_relational_data_stores: Dict[UUID, RelationalDataStorage] = {}
-        self._save_specific_relational_data_stores: Dict[UUID, RelationalDataStorage] = {}
+        self._global_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
+        self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._reset_cache()
 
         @listen_for(ipc.connection_state_changed)
@@ -310,6 +310,16 @@ class Gateway:
         if message_type == 'foreground_plumbbuddy':
             _try_to_foreground_plumbbuddy()
             return
+        if message_type == 'relational_data_storage_query_results':
+            unique_id = UUID(message['unique_id'])
+            data_stores = self._save_specific_relational_data_stores if message['is_save_specific'] else self._global_relational_data_stores
+            relational_data_storage = None
+            try:
+                relational_data_storage = data_stores[unique_id]
+            except KeyError:
+                return
+            relational_data_storage['query_completed'](RelationalDataStorageQueryCompletedEventData(message))
+            return
         if message_type == 'show_notification':
             notification_text = None
             try:
@@ -329,24 +339,25 @@ class Gateway:
         self._requested_bridged_uis: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_ui_look_ups: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
-        
-    def close_bridged_ui(self, unique_id: UUID):
-        """
-        Attempts to close a loaded bridged UI
-        
-        :unique_id: the UUID for the tab of the bridged UI
-        """
-        if not ipc.is_connected:
-            raise PlumbBuddyNotConnectedError()
-        if unique_id is None:
-            raise Exception('unique_id is not optional')
-        ipc.send({
-            'type': 'close_bridged_ui',
-            'unique_id': str(unique_id)
-        })
 
     def get_relational_data_storage(self, unique_id: UUID, is_save_specific: bool) -> RelationalDataStorage:
-        pass
+        if unique_id is None:
+            raise Exception('unique_id is not optional')
+        data_stores = self._save_specific_relational_data_stores if is_save_specific else self._global_relational_data_stores
+        relational_data_storage = None
+        try:
+            relational_data_storage = data_stores[unique_id]
+        except KeyError:
+            pass
+        if relational_data_storage is not None:
+            return relational_data_storage[0]
+        self._dispatches = {}
+        def receive_dispatches(received_dispatches: dict):
+            self._dispatches = received_dispatches
+        relational_data_storage = RelationalDataStorage(unique_id, is_save_specific, receive_dispatches)
+        data_stores[unique_id] = (relational_data_storage, self._dispatches)
+        del self._dispatches
+        return relational_data_storage
     
     def look_up_bridged_ui(self, unique_id: UUID) -> Eventual[BridgedUi]:
         """

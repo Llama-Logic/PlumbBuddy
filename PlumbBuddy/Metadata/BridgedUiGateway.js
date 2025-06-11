@@ -34,6 +34,17 @@
         }
     }
 
+    function deepFreeze(obj) {
+        Object.freeze(obj);
+        for (const key of Object.getOwnPropertyNames(obj)) {
+            const value = obj[key];
+            if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+                deepFreeze(value);
+            }
+        }
+        return obj;
+    }
+
     function makePromise() {
         let makingPromise = {};
         makingPromise.promise = new Promise((resolve, reject) => {
@@ -112,6 +123,16 @@
                 recipient: this.#uniqueId,
                 data
             })
+        }
+    }
+
+    class RelationalDataStorageQueryRecordSet {
+        #fieldNames;
+        #records;
+
+        constructor(recordSetMessageExcerpt) {
+            this.#fieldNames = deepFreeze(recordSetMessageExcerpt.fieldNames);
+            this.#records = deepFreeze(recordSetMessageExcerpt.records);
         }
     }
 
