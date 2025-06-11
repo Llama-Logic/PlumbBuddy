@@ -1,5 +1,5 @@
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
-from plumbbuddy_proxy.asynchronous import Event, Eventual
+from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
 from distributor.shared_messages import IconInfoData
 from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
@@ -146,6 +146,8 @@ class RelationalDataStorage:
     def execute(self, sql: str, tag: str = None, *args) -> UUID:
         if not sql:
             raise ValueError('sql must not be empty')
+        if not ipc.is_connected:
+            raise PlumbBuddyNotConnectedError()
         query_id = uuid4()
         ipc.send({
             'is_save_specific': self.is_save_specific,
@@ -180,7 +182,11 @@ class BridgedUiNotFoundError(Exception):
 
 class Gateway:
     def __init__(self):
+        self._global_relational_data_stores: Dict[UUID, RelationalDataStorage] = {}
+        self._save_specific_relational_data_stores: Dict[UUID, RelationalDataStorage] = {}
         self._reset_cache()
+
+        @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
             if connection_state == 0:
                 requested_bridged_uis = getattr(self, '_requested_bridged_uis', None)
@@ -198,7 +204,6 @@ class Gateway:
                     for bridged_ui_tuple in bridged_uis.values():
                         bridged_ui_tuple[1]['destroyed'](None)
                 self._reset_cache()
-        ipc.connection_state_changed.add_listener(handle_ipc_connection_state_changed)
 
     def _get_bridged_ui(self, unique_id: UUID):
         bridged_ui = None
@@ -339,6 +344,9 @@ class Gateway:
             'type': 'close_bridged_ui',
             'unique_id': str(unique_id)
         })
+
+    def get_relational_data_storage(self, unique_id: UUID, is_save_specific: bool) -> RelationalDataStorage:
+        pass
     
     def look_up_bridged_ui(self, unique_id: UUID) -> Eventual[BridgedUi]:
         """

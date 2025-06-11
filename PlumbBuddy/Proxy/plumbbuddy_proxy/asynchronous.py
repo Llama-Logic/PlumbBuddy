@@ -24,6 +24,12 @@ class Event(Generic[T]):
         except ValueError:
             return False
 
+def listen_for(event: Event[T]):
+    def factory(listener: Callable[[T], None]):
+        event.add_listener(listener)
+        return listener
+    return factory
+
 class Eventual(Generic[T]):
     """
     Represents an operation that will complete... eventually
