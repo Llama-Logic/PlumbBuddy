@@ -6,7 +6,8 @@ public class RelationalDataStorageQueryResultsMessage
     public string? ErrorMessage { get; set; }
     public bool IsSaveSpecific { get; set; }
     public Guid QueryId { get; set; }
-    public IList<IList<IDictionary<string, object?>>> RecordSets { get; } = [];
+    public IList<RelationalDataStorageQueryRecordSet> RecordSets { get; } = [];
+    public string? Tag { get; set; }
     public required string Type { get; set; }
     public Guid UniqueId { get; set; }
 }

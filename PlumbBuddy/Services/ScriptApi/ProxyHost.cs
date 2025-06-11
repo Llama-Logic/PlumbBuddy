@@ -1,3 +1,5 @@
+using Serializer = ProtoBuf.Serializer;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Globalization", "CA1308: Normalize strings to uppercase", Justification = "This is for Python, CA. You have your head up your ass.")]
@@ -35,6 +37,7 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
+    static readonly string[] writeAheadLoggingExtensions = [".wal", ".shm"];
 
     static JsonSerializerOptions AddConverters(JsonSerializerOptions options)
     {
@@ -67,24 +70,28 @@ public partial class ProxyHost :
         }
     }
 
-    public ProxyHost(ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager)
+    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager)
     {
+        ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        this.platformFunctions = platformFunctions;
         this.logger = logger;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.appLifecycleManager = appLifecycleManager;
-        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         cancellationTokenSource = new();
         cancellationToken = cancellationTokenSource.Token;
         connectedClients = new();
         bridgedUiLoadingLocks = new();
+        fileSystemWatcherLock = new();
         loadedBridgedUis = new();
         relationalDataStorageConnectionInitializationLocks = new();
         saveSpecificDataStoragePropagationLock = new();
+        ConnectToUserDataFolder();
+        this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         listener = new(IPAddress.Loopback, port);
         listener.Start();
         _ = Task.Run(ListenAsync);
@@ -99,17 +106,23 @@ public partial class ProxyHost :
     readonly CancellationToken cancellationToken;
     readonly ConcurrentDictionary<TcpClient, AsyncLock> connectedClients;
     FileSystemWatcher? fileSystemWatcher;
+    readonly AsyncLock fileSystemWatcherLock;
     bool isBridgedUiDevelopmentModeEnabled;
     bool isClientConnected;
     readonly TcpListener listener;
     readonly ConcurrentDictionary<Guid, ICSharpCode.SharpZipLib.Zip.ZipFile?> loadedBridgedUis;
     readonly ILogger<ProxyHost> logger;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
+    readonly IPlatformFunctions platformFunctions;
+    ulong preSaveCreated;
+    ulong preSaveNucleusId;
+    ulong preSaveSimNow;
     readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionInitializationLocks;
+    AsyncProducerConsumerQueue<string>? saveAnalysisQueue;
     ulong saveCreated;
     ulong saveNucleusId;
     ulong saveSimNow;
-    readonly AsyncLock saveSpecificDataStoragePropagationLock;
+    readonly AsyncReaderWriterLock saveSpecificDataStoragePropagationLock;
     readonly ISettings settings;
 
     public bool IsBridgedUiDevelopmentModeEnabled
@@ -145,6 +158,46 @@ public partial class ProxyHost :
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? ProxyConnected;
     public event EventHandler? ProxyDisconnected;
+
+    async Task AnalyzeSavesAsync()
+    {
+        if (this.saveAnalysisQueue is not { } saveAnalysisQueue)
+            return;
+        while (await saveAnalysisQueue.OutputAvailableAsync().ConfigureAwait(false))
+        {
+            var saveFile = new FileInfo(await saveAnalysisQueue.DequeueAsync().ConfigureAwait(false));
+            var savesPath = Path.Combine(settings.UserDataFolderPath, "saves");
+            if (!saveFile.FullName.StartsWith(savesPath, platformFunctions.FileSystemStringComparison))
+                continue;
+            var saveFileLength = saveFile.Length;
+            while (true)
+            {
+                await Task.Delay(1000).ConfigureAwait(false);
+                saveFile.Refresh();
+                if (saveFile.Length == saveFileLength)
+                    break;
+                saveFileLength = saveFile.Length;
+            }
+            var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
+            var savePackageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
+            var saveGameDataKeys = savePackageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+            if (saveGameDataKeys.Length is <= 0 or >= 2)
+                continue;
+            var saveGameDataKey = saveGameDataKeys[0];
+            var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
+            if (saveGameData.Account is not { } account
+                || account.Created != preSaveCreated
+                || account.NucleusId != preSaveNucleusId)
+                continue;
+            saveCreated = preSaveCreated;
+            saveNucleusId = preSaveNucleusId;
+            saveSimNow = preSaveSimNow;
+            preSaveCreated = default;
+            preSaveNucleusId = default;
+            preSaveSimNow = default;
+            await SnapshotSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+        }
+    }
 
     async Task BridgedUiRequestResolvedAsync(Guid uniqueId, int denialReason)
     {
@@ -188,9 +241,28 @@ public partial class ProxyHost :
 
     void ConnectToUserDataFolder()
     {
+        using var fileSystemWatcherLockHeld = fileSystemWatcherLock.Lock();
         if (fileSystemWatcher is not null)
-            DisconnectFromUserDataFolder();
-
+            DisconnectFromUserDataFolder(fileSystemWatcherLockHeld);
+        if (!Directory.Exists(settings.UserDataFolderPath))
+            return;
+        saveAnalysisQueue = new();
+        _ = Task.Run(AnalyzeSavesAsync);
+        fileSystemWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
+        {
+            Filter = "*.save",
+            IncludeSubdirectories = true,
+            InternalBufferSize = 64 * 1024,
+            NotifyFilter =
+                  NotifyFilters.CreationTime
+                | NotifyFilters.DirectoryName
+                | NotifyFilters.FileName
+                | NotifyFilters.LastWrite
+                | NotifyFilters.Size
+        };
+        fileSystemWatcher.Created += HandleFileSystemWatcherCreated;
+        fileSystemWatcher.Error += HandleFileSystemWatcherError;
+        fileSystemWatcher.EnableRaisingEvents = true;
     }
 
     public void DestroyBridgedUi(Guid uniqueId) =>
@@ -225,8 +297,27 @@ public partial class ProxyHost :
             cachedArchive.Delete();
     }
 
-    void DisconnectFromUserDataFolder()
+    void DisconnectFromUserDataFolder(IDisposable? fileSystemWatcherLockHeld = null)
     {
+        var disposeLockHeld = fileSystemWatcherLockHeld is null;
+        if (disposeLockHeld)
+            fileSystemWatcherLockHeld = fileSystemWatcherLock.Lock();
+        try
+        {
+            saveAnalysisQueue?.CompleteAdding();
+            saveAnalysisQueue = null;
+            if (fileSystemWatcher is null)
+                return;
+            fileSystemWatcher.Created -= HandleFileSystemWatcherCreated;
+            fileSystemWatcher.Error -= HandleFileSystemWatcherError;
+            fileSystemWatcher.Dispose();
+            fileSystemWatcher = null;
+        }
+        finally
+        {
+            if (disposeLockHeld)
+                fileSystemWatcherLockHeld?.Dispose();
+        }
     }
 
     public void Dispose()
@@ -241,6 +332,7 @@ public partial class ProxyHost :
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+            DisconnectFromUserDataFolder();
             cancellationTokenSource.Cancel();
             listener.Dispose();
             cancellationTokenSource.Dispose();
@@ -283,10 +375,10 @@ public partial class ProxyHost :
                         logger.LogError(ex, "unhandled exception while processing message from proxy: {Message}", messageJson);
                     }
                 }
-                    finally
-                    {
-                        ArrayPool<byte>.Shared.Return(serializedMessageRentedArray);
-                    }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(serializedMessageRentedArray);
+                }
             }
             ProxyDisconnected?.Invoke(this, EventArgs.Empty);
         }
@@ -325,63 +417,57 @@ public partial class ProxyHost :
             Type = nameof(HostMessageType.ForegroundPlumbbuddy).Underscore().ToLowerInvariant()
         });
 
-    async Task<SqliteConnection> GetRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, CancellationToken cancellationToken = default)
+    void HandleFileSystemWatcherCreated(object sender, FileSystemEventArgs e) =>
+        saveAnalysisQueue?.Enqueue(e.FullPath);
+
+    void HandleFileSystemWatcherError(object sender, ErrorEventArgs e)
     {
-        var tcs = new TaskCompletionSource<DirectoryInfo>();
-        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
-        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
-        var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
-        Directory.CreateDirectory(rdsPath);
-        if (isSaveSpecific)
-        {
-            var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
-            if (!saveSpecificDirectory.Exists)
-                saveSpecificDirectory.Create();
-            using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.LockAsync(cancellationToken).ConfigureAwait(false);
-            var simNowDirectory = new DirectoryInfo(Path.Combine(saveSpecificDirectory.FullName, saveSimNow.ToString("x16")));
-            if (!simNowDirectory.Exists)
-            {
-                simNowDirectory.Create();
-                saveSpecificDirectory.Refresh();
-                var allSimNowDirectories = saveSpecificDirectory
-                    .GetDirectories("*.*", SearchOption.TopDirectoryOnly)
-                    .Select(directory => (directory, simNow: ulong.TryParse(directory.Name, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var simNow) ? simNow : ulong.MaxValue))
-                    .OrderBy(t => t.simNow)
-                    .ToImmutableArray();
-                var currentIndex = allSimNowDirectories.FindIndex(t => t.directory.Name == simNowDirectory.Name);
-                if (currentIndex > 0)
-                {
-                    var sourceDirectory = allSimNowDirectories[currentIndex - 1].directory;
-                    var sourceFiles = sourceDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-                    while (sourceFiles.Any(file => file.Extension.Equals(".wal", StringComparison.OrdinalIgnoreCase) || file.Extension.Equals(".shm", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        await Task.Delay(250, cancellationToken).ConfigureAwait(false);
-                        sourceFiles = sourceDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-                    }
-                    foreach (var file in sourceFiles)
-                        file.CopyTo(Path.Combine(simNowDirectory.FullName, file.Name));
-                }
-            }
-            rdsPath = simNowDirectory.FullName;
-        }
-        using var relationalDataStorageConnectionInitializationLockHeld = await relationalDataStorageConnectionInitializationLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
-        var databaseFile = new FileInfo(Path.Combine(rdsPath, $"{uniqueId:n}.sqlite"));
-        var enableWriteAheadLogging = !databaseFile.Exists;
-        var connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
-        await connection.OpenAsync(CancellationToken.None);
-        if (enableWriteAheadLogging)
-        {
-            var pragmaCommand = connection.CreateCommand();
-            pragmaCommand.CommandText = "PRAGMA journal_mode=WAL;";
-            await pragmaCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-        }
-        return connection;
+        logger.LogError(e.GetException(), "saves directory monitoring encountered unexpected unhandled exception");
+        ConnectToUserDataFolder();
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.Type))
             IsBridgedUiDevelopmentModeEnabled = false;
+        else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
+            ConnectToUserDataFolder();
+    }
+
+    async Task InitializeSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
+    {
+        using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+        var tcs = new TaskCompletionSource<DirectoryInfo>();
+        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
+        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+        var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+        Directory.CreateDirectory(rdsPath);
+        var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
+        if (!saveSpecificDirectory.Exists)
+            saveSpecificDirectory.Create();
+        var restoreDirectory = saveSpecificDirectory
+            .GetDirectories("*.*", SearchOption.TopDirectoryOnly)
+            .Select(directory => (directory, simNow: ulong.TryParse(directory.Name, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var simNow) ? simNow : ulong.MaxValue))
+            .Where(t => t.simNow <= saveSimNow)
+            .OrderByDescending(t => t.simNow)
+            .Take(1)
+            .Select(t => t.directory)
+            .FirstOrDefault();
+        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+        var sqliteWriteAheadLoggingCleanupStopwatch = new Stopwatch();
+        sqliteWriteAheadLoggingCleanupStopwatch.Start();
+        while (sqliteWriteAheadLoggingCleanupStopwatch.Elapsed <= TimeSpan.FromSeconds(10)
+            && saveSpecificFiles.Any(file => writeAheadLoggingExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
+        {
+            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
+            saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+        }
+        sqliteWriteAheadLoggingCleanupStopwatch.Stop();
+        foreach (var file in saveSpecificFiles)
+            file.Delete();
+        if (restoreDirectory is not null)
+            foreach (var file in restoreDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
+                file.CopyTo(Path.Combine(saveSpecificDirectory.FullName, file.Name));
     }
 
     async Task ListenAsync()
@@ -424,7 +510,7 @@ public partial class ProxyHost :
             Type = nameof(HostMessageType.BridgedUiLookUpResponse).Camelize(),
             UniqueId = lookUpMessage.UniqueId
         });
-}
+    }
 
     async Task ProcessBridgedUiRequestAsync(BridgedUiRequestMessage requestMessage)
     {
@@ -497,7 +583,7 @@ public partial class ProxyHost :
             await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_ScriptModNotFound).ConfigureAwait(false);
             return;
         }
-        if (archive.GetEntry(Path.Combine([..new string[] { requestMessage.UiRoot, "index.html" }.Where(segment => !string.IsNullOrWhiteSpace(segment))]).Replace("\\", "/", StringComparison.Ordinal)) is null)
+        if (archive.GetEntry(Path.Combine([.. new string[] { requestMessage.UiRoot, "index.html" }.Where(segment => !string.IsNullOrWhiteSpace(segment))]).Replace("\\", "/", StringComparison.Ordinal)) is null)
         {
             await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_IndexNotFound).ConfigureAwait(false);
             return;
@@ -562,16 +648,28 @@ public partial class ProxyHost :
                     });
                 }
                 break;
-            case ComponentMessageType.GameServiceMessage:
-                logger.LogDebug
-                (
-                    "game service message: {Name}",
-                    messageRoot.TryGetProperty("name", out var nameProperty)
-                    && nameProperty.ValueKind == JsonValueKind.String
-                    && nameProperty.GetString() is { } namePropertyValue
-                    ? namePropertyValue
-                    : "[UNKNOWN]"
-                );
+            case ComponentMessageType.GameServiceEvent:
+                if (TryParseMessage<GameServiceEventMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "game service event", out var gameServiceEventMessage)
+                    && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent))
+                {
+                    if (gameServiceEvent is GameServiceEvent.Load)
+                    {
+                        saveCreated = gameServiceEventMessage.Created;
+                        saveNucleusId = gameServiceEventMessage.NucleusId;
+                        saveSimNow = gameServiceEventMessage.SimNow;
+                        await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+                    }
+                    else if (gameServiceEvent is GameServiceEvent.PreSave)
+                    {
+                        preSaveCreated = gameServiceEventMessage.Created;
+                        preSaveNucleusId = gameServiceEventMessage.NucleusId;
+                        preSaveSimNow = gameServiceEventMessage.SimNow;
+                    }
+                }
+                break;
+            case ComponentMessageType.QueryRelationalDataStorage:
+                if (TryParseMessage<QueryRelationalDataStorageMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "query relational data storage", out var queryRelationalDataStorageMessage))
+                    _ = Task.Run(() => ProcessQueryRelationalDataStorageMessageAsync(queryRelationalDataStorageMessage));
                 break;
             case ComponentMessageType.SendDataToBridgedUi:
                 if (!messageRoot.TryGetProperty("recipient", out var recipientProperty)
@@ -607,6 +705,81 @@ public partial class ProxyHost :
             return;
         }
         await ProcessMessageAsync(message, bridgedUiJsonSerializerOptions, uniqueId).ConfigureAwait(false);
+    }
+
+    [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities", Justification = "That's on modders. We give them parameters.")]
+    async Task ProcessQueryRelationalDataStorageMessageAsync(QueryRelationalDataStorageMessage queryRelationalDataStorageMessage)
+    {
+        var errorCode = 0;
+        string? errorMessage = null;
+        var recordSets = new List<RelationalDataStorageQueryRecordSet>();
+        await WithRelationalDataStorageConnectionAsync(queryRelationalDataStorageMessage.UniqueId, queryRelationalDataStorageMessage.IsSaveSpecific, async conn =>
+        {
+            var com = conn.CreateCommand();
+            com.CommandText = queryRelationalDataStorageMessage.Query;
+            foreach (var parameter in queryRelationalDataStorageMessage.Parameters)
+                com.Parameters.AddWithValue(null, parameter);
+            try
+            {
+                await using var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+                do
+                {
+                    var recordSet = new RelationalDataStorageQueryRecordSet();
+                    for (var i = 0; i < reader.FieldCount; ++i)
+                        recordSet.FieldNames.Add(reader.GetName(i));
+                    while (await reader.ReadAsync().ConfigureAwait(false))
+                    {
+                        var record = new List<object?>();
+                        for (var i = 0; i < reader.FieldCount; ++i)
+                        {
+                            var value = reader.GetValue(i);
+                            if (value == DBNull.Value)
+                                value = null;
+                            record.Add(value);
+                        }
+                        recordSet.Records.Add(record);
+                    }
+                    recordSets.Add(recordSet);
+                } while (await reader.NextResultAsync().ConfigureAwait(false));
+            }
+            catch (SqliteException sqlEx)
+            {
+                errorCode = sqlEx.ErrorCode;
+                errorMessage = sqlEx.Message;
+            }
+            catch (Exception ex)
+            {
+                errorCode = -1;
+                errorMessage = ex.Message;
+            }
+        }).ConfigureAwait(false);
+        var proxyResults = new RelationalDataStorageQueryResultsMessage
+        {
+            ErrorCode = errorCode,
+            ErrorMessage = errorMessage,
+            IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
+            QueryId = queryRelationalDataStorageMessage.QueryId,
+            Tag = queryRelationalDataStorageMessage.Tag,
+            Type = nameof(HostMessageType.RelationalDataStorageQueryResults).Underscore().ToLowerInvariant(),
+            UniqueId = queryRelationalDataStorageMessage.UniqueId
+        };
+        var bridgedUiResults = new RelationalDataStorageQueryResultsMessage
+        {
+            ErrorCode = errorCode,
+            ErrorMessage = errorMessage,
+            IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
+            QueryId = queryRelationalDataStorageMessage.QueryId,
+            Tag = queryRelationalDataStorageMessage.Tag,
+            Type = nameof(HostMessageType.RelationalDataStorageQueryResults).Camelize(),
+            UniqueId = queryRelationalDataStorageMessage.UniqueId
+        };
+        foreach (var recordSet in recordSets)
+        {
+            proxyResults.RecordSets.Add(recordSet);
+            bridgedUiResults.RecordSets.Add(recordSet);
+        }
+        await SendMessageToProxyAsync(proxyResults).ConfigureAwait(false);
+        SendMessageToBridgedUis(bridgedUiResults);
     }
 
     void PromptPlayerForBridgedUiAuthorization(BridgedUiRequestMessage request, ICSharpCode.SharpZipLib.Zip.ZipFile? archive = null)
@@ -689,4 +862,92 @@ public partial class ProxyHost :
             Title = title,
             Type = nameof(HostMessageType.ShowNotification).Underscore().ToLowerInvariant()
         }).ConfigureAwait(false);
+
+    async Task SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
+    {
+        using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+        var tcs = new TaskCompletionSource<DirectoryInfo>();
+        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
+        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+        var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+        Directory.CreateDirectory(rdsPath);
+        var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
+        if (!saveSpecificDirectory.Exists)
+            saveSpecificDirectory.Create();
+        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+        if (saveSpecificFiles.Length is 0)
+            return;
+        var snapshotDirectory = new DirectoryInfo(Path.Combine(saveSpecificDirectory.FullName, saveSimNow.ToString("x16")));
+        if (snapshotDirectory.Exists)
+            foreach (var file in snapshotDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
+                file.Delete();
+        else
+            snapshotDirectory.Create();
+        var sqliteWriteAheadLoggingCleanupStopwatch = new Stopwatch();
+        sqliteWriteAheadLoggingCleanupStopwatch.Start();
+        while (sqliteWriteAheadLoggingCleanupStopwatch.Elapsed <= TimeSpan.FromSeconds(10)
+            && saveSpecificFiles.Any(file => writeAheadLoggingExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
+        {
+            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
+            saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+        }
+        sqliteWriteAheadLoggingCleanupStopwatch.Stop();
+        foreach (var file in saveSpecificFiles)
+            file.CopyTo(Path.Combine(snapshotDirectory.FullName, file.Name));
+        foreach (var invalidatedSnapshotDirectory in saveSpecificDirectory
+            .GetDirectories("*.*", SearchOption.TopDirectoryOnly)
+            .Select(directory => (directory, simNow: ulong.TryParse(directory.Name, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var simNow) ? simNow : ulong.MaxValue))
+            .Where(t => t.simNow > saveSimNow)
+            .Select(t => t.directory))
+            invalidatedSnapshotDirectory.Delete(true);
+    }
+
+    async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
+    {
+        IDisposable? saveSpecificDataStoragePropagationLockHeld = null;
+        if (isSaveSpecific)
+            saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var tcs = new TaskCompletionSource<DirectoryInfo>();
+            StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
+            var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+            var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+            SqliteConnection? connection = null;
+            try
+            {
+                using (var relationalDataStorageConnectionInitializationLockHeld = await relationalDataStorageConnectionInitializationLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false))
+                {
+                    var databaseFile = new FileInfo(Path.Combine(rdsPath, $"{uniqueId:n}.sqlite"));
+                    var enableWriteAheadLogging = !databaseFile.Exists;
+                    connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
+                    await connection.OpenAsync(CancellationToken.None);
+                    if (enableWriteAheadLogging)
+                    {
+                        var enableWalCommand = connection.CreateCommand();
+                        enableWalCommand.CommandText = "PRAGMA journal_mode=WAL;";
+                        await enableWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+                    }
+                }
+                await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
+                if (isSaveSpecific)
+                {
+                    var fullCheckpointWalCommand = connection.CreateCommand();
+                    fullCheckpointWalCommand.CommandText = "PRAGMA wal_checkpoint(FULL);";
+                    await fullCheckpointWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+                    var truncateWalCommand = connection.CreateCommand();
+                    truncateWalCommand.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);";
+                    await truncateWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                connection?.Dispose();
+            }
+        }
+        finally
+        {
+            saveSpecificDataStoragePropagationLockHeld?.Dispose();
+        }
+    }
 }

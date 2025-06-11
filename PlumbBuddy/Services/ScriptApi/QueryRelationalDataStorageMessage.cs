@@ -6,5 +6,6 @@ public class QueryRelationalDataStorageMessage
     public IList<object?> Parameters { get; } = [];
     public required string Query { get; set; }
     public Guid QueryId { get; set; }
+    public string? Tag { get; set; }
     public Guid UniqueId { get; set; }
 }

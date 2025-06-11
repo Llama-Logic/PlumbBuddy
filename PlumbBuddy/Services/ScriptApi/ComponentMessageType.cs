@@ -7,7 +7,7 @@ public enum ComponentMessageType
     BridgedUiRequest,
     CloseBridgedUi,
     FocusBridgedUi,
-    GameServiceMessage,
+    GameServiceEvent,
     QueryRelationalDataStorage,
     SendDataToBridgedUi
 }

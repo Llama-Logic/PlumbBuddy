@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from plumbbuddy_proxy.asynchronous import Event, Eventual
 from distributor.shared_messages import IconInfoData
 from plumbbuddy_proxy.utilities import inject_to
@@ -11,7 +11,7 @@ import services
 import subprocess
 import sys
 from ui.ui_dialog_notification import UiDialogNotification
-from uuid import UUID
+from uuid import uuid4, UUID
 import webbrowser
 
 def _try_to_foreground_plumbbuddy():
@@ -73,6 +73,90 @@ class BridgedUi:
             'recipient': str(self._unique_id),
             'data': data
         })
+
+class RelationalDataStorageQueryRecordSet:
+    def __init__(self, record_set_message_excerpt: dict):
+        self._field_names = tuple(record_set_message_excerpt['field_names'])
+        records = []
+        for record in record_set_message_excerpt['records']:
+            records.append(tuple(record))
+        self._records = tuple(records)
+    
+    @property
+    def field_names(self) -> Sequence[str]:
+        return self._field_names
+    
+    @property
+    def records(self) -> Sequence[Tuple]:
+        return self._records
+
+class RelationalDataStorageQueryCompletedEventData:
+    def __init__(self, response_message: dict):
+        self._error_code: int = response_message['error_code']
+        self._error_message: str = response_message['error_message']
+        self._query_id = UUID(response_message['query_id'])
+        record_sets = []
+        for response_record_set in response_message['record_sets']:
+            record_sets.append(RelationalDataStorageQueryRecordSet(response_record_set))
+        self._record_sets = tuple(record_sets)
+        self._tag: str = response_message['tag']
+    
+    @property
+    def error_code(self) -> int:
+        return self._error_code
+    
+    @property
+    def error_message(self) -> str:
+        return self._error_message
+    
+    @property
+    def query_id(self) -> UUID:
+        return self._query_id
+    
+    @property
+    def record_sets(self) -> Sequence[RelationalDataStorageQueryRecordSet]:
+        return self._record_sets
+    
+    @property
+    def tag(self) -> str:
+        return self._tag
+
+class RelationalDataStorage:
+    def __init__(self, unique_id: UUID, is_save_specific: bool, receive_dispatches: Callable[[dict], None]):
+        self._unique_id = unique_id
+        self._is_save_specific = is_save_specific
+        dispatches = {}
+        def set_dispatch_query_completed(dispatch: Callable[[RelationalDataStorageQueryCompletedEventData], None]):
+            dispatches['query_completed'] = dispatch
+        self._query_completed: Event[RelationalDataStorageQueryCompletedEventData] = Event(set_dispatch_query_completed)
+        receive_dispatches(dispatches)
+
+    @property
+    def unique_id(self) -> UUID:
+        return self._unique_id
+    
+    @property
+    def is_save_specific(self) -> bool:
+        return self._is_save_specific
+    
+    @property
+    def query_completed(self) -> Event[RelationalDataStorageQueryCompletedEventData]:
+        return self._query_completed
+    
+    def execute(self, sql: str, tag: str = None, *args) -> UUID:
+        if not sql:
+            raise ValueError('sql must not be empty')
+        query_id = uuid4()
+        ipc.send({
+            'is_save_specific': self.is_save_specific,
+            'parameters': args,
+            'query': sql,
+            'query_id': str(query_id),
+            'tag': tag,
+            'type': 'query_relational_data_storage',
+            'unique_id': str(self.unique_id)
+        })
+        return query_id
 
 class PlumbBuddyNotConnectedError(Exception):
     def __init__(self):
