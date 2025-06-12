@@ -15,6 +15,10 @@ class Event(Generic[T]):
         receive_dispatch(dispatch)
     
     def add_listener(self, listener: Callable[[T], None]):
+        if not listener:
+            raise ValueError('listener is not optional')
+        if not callable(listener):
+            raise ValueError('listener must be callable')
         self._listeners.append(listener)
     
     def remove_listener(self, listener: Callable[[T], None]) -> bool:

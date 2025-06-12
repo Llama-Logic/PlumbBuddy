@@ -49,21 +49,24 @@ class BridgedUi:
     @property
     def announcement(self) -> Event[any]:
         """
-        Dispatched when this bridged UI makes an announcement; event data will be what was announced
+        Gets the event which is dispatched when this bridged UI makes an announcement; event data will be what was announced
         """
+
         return self._annoucement
     
     @property
     def destroyed(self) -> Event[any]:
         """
-        Dispatched when this bridged UI has been destroyed for any reason
+        Gets the event which is dispatched when this bridged UI has been destroyed for any reason
         """
+
         return self._destroyed
     
-    def close(self):
+    def close(self) -> None:
         """
         Closes the bridged UI
         """
+
         ipc.send({
             'type': 'close_bridged_ui',
             'unique-id': str(self._unique_id)
@@ -75,6 +78,7 @@ class BridgedUi:
 
         :returns: an Eventual that will resolve with a bool indicating whether the bridged UI was focused
         """
+
         if self._eventual_focus is not None:
             return self._eventual_focus
         eventual = Eventual[bool]()
@@ -85,12 +89,13 @@ class BridgedUi:
         self._eventual_focus = eventual
         return eventual
     
-    def send_data(self, data):
+    def send_data(self, data) -> None:
         """
         Sends data to the bridged UI
 
-        :data: the data to be send
+        :param data: the data to be send
         """
+
         ipc.send({
             'type': 'send_data_to_bridged_ui',
             'recipient': str(self._unique_id),
@@ -111,10 +116,18 @@ class RelationalDataStorageQueryRecordSet:
     
     @property
     def field_names(self) -> Sequence[str]:
+        """
+        Gets the names of the fields of the record set
+        """
+
         return self._field_names
     
     @property
     def records(self) -> Sequence[Tuple]:
+        """
+        Gets the records of the record set
+        """
+
         return self._records
 
 class RelationalDataStorageQueryCompletedEventData:
@@ -134,22 +147,42 @@ class RelationalDataStorageQueryCompletedEventData:
     
     @property
     def error_code(self) -> int:
+        """
+        Gets the SQLite error code raised by the query; -1 if another type of error occured; otherwise, 0
+        """
+
         return self._error_code
     
     @property
     def error_message(self) -> str:
+        """
+        Gets the message of the error if one was raised; otherwise, None
+        """
+
         return self._error_message
     
     @property
     def query_id(self) -> UUID:
+        """
+        Gets the UUID which was assigned to the query when execute was called on the connection
+        """
+
         return self._query_id
     
     @property
     def record_sets(self) -> Sequence[RelationalDataStorageQueryRecordSet]:
+        """
+        Gets the record sets resulting from the query
+        """
+
         return self._record_sets
     
     @property
     def tag(self) -> str:
+        """
+        Gets the tag string if one was provided when execute was called on the connection; otherwise, None
+        """
+
         return self._tag
 
 class RelationalDataStorage:
@@ -168,19 +201,42 @@ class RelationalDataStorage:
 
     @property
     def unique_id(self) -> UUID:
+        """
+        Gets the UUID of the relational data
+        """
+
         return self._unique_id
     
     @property
     def is_save_specific(self) -> bool:
+        """
+        Gets whether the relational data is specific to the currently open save file
+        """
+
         return self._is_save_specific
     
     @property
     def query_completed(self) -> Event[RelationalDataStorageQueryCompletedEventData]:
+        """
+        Gets the event which is dispatched when a query for this connection has been completed
+        """
+
         return self._query_completed
     
     def execute(self, sql: str, tag: str = None, *args) -> UUID:
+        """
+        Executes a query with this connection
+
+        :param sql: SQLite query
+        :param tag: (optional) a tag to associate with the query, making its results easier to identify by other components
+        :param *args: the parameters to replace instances of '?' with in sql
+        :returns: the UUID which has been assigned to the query
+        """
+
         if not sql:
             raise ValueError('sql must not be empty')
+        if not isinstance(sql, str):
+            raise TypeError('sql must be a str')
         if not ipc.is_connected:
             raise PlumbBuddyNotConnectedError()
         query_id = uuid4()
@@ -189,7 +245,7 @@ class RelationalDataStorage:
             'parameters': args,
             'query': sql,
             'query_id': str(query_id),
-            'tag': tag,
+            'tag': str(tag) if tag else None,
             'type': 'query_relational_data_storage',
             'unique_id': str(self.unique_id)
         })
@@ -375,8 +431,8 @@ class Gateway:
         """
         Gets a Relational Data Storage connection
 
-        :unique_id: the UUID for the Relational Data Storage instance
-        :is_save_specific: True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
+        :param unique_id: the UUID for the Relational Data Storage instance
+        :param is_save_specific: True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
         :returns: a Relational Data Storage connection
         """
         if unique_id is None:
@@ -400,7 +456,7 @@ class Gateway:
         """
         Attempts to look up a loaded bridged UI
         
-        :unique_id: the UUID for the tab of the bridged UI
+        :param unique_id: the UUID for the tab of the bridged UI
         :returns: an Eventual that will resolve with the bridged UI or a fault that it is not currently loaded
         """
         if unique_id is None:
@@ -434,13 +490,13 @@ class Gateway:
         """
         Requests a bridged UI from PlumbBuddy
 
-        :script_mod: either a Mods folder relative path to the `.ts4script` file containing the bridged UI's files *-or-* the hex of the SHA 256 calculated hash of the `.ts4script` file if it is manifested
-        :ui_root: the path inside the `.ts4script` file to the root of the bridged UI's files (this is where `index.html` should be located)
-        :unique_id: the UUID you are assigning to this tab to identify it to other gateway participants
-        :requestor_name: the name of party making the request, to be presented to the player
-        :request_reason: the reason the party is making the request, to be presented to the player
-        :tab_name: the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
-        :tab_icon_path: (optional) a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
+        :param script_mod: either a Mods folder relative path to the `.ts4script` file containing the bridged UI's files *-or-* the hex of the SHA 256 calculated hash of the `.ts4script` file if it is manifested
+        :param ui_root: the path inside the `.ts4script` file to the root of the bridged UI's files (this is where `index.html` should be located)
+        :param unique_id: the UUID you are assigning to this tab to identify it to other gateway participants
+        :param requestor_name: the name of party making the request, to be presented to the player
+        :param request_reason: the reason the party is making the request, to be presented to the player
+        :param tab_name: the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
+        :param tab_icon_path: (optional) a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
         :returns: an Eventual that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, etc.)
         """
         if ui_root is None or len(ui_root) == 0:

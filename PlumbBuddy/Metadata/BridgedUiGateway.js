@@ -1,38 +1,7 @@
 (function () {
-    const sanitizeUuid = uuid => String(uuid).replace(/[^\da-f]/g, '').toLowerCase();
-    const myUniqueId = sanitizeUuid('__UNIQUE_ID__');
     const sendMessageToPlumbBuddy = window.chrome?.webview
         ? message => window.chrome.webview.postMessage(JSON.stringify(message))
         : message => window.webkit.messageHandlers.plumbBuddy.postMessage(JSON.stringify(message));
-
-    class Event {
-        #listeners = [];
-
-        constructor(receiveDispatch) {
-            receiveDispatch(data => {
-                this.#listeners.forEach(listener => {
-                    try {
-                        listener(data);
-                    } catch (ex) {
-                        console.error('Naughty bridged UI threw %o while dispatching event', ex);
-                    }
-                })
-            });
-        }
-
-        addListener(listener) {
-            this.#listeners.push(listener);
-        }
-
-        removeListener(listener) {
-            const index = this.#listeners.indexOf(listener);
-            if (index < 0) {
-                return false;
-            }
-            this.#listeners.splice(index, 1);
-            return true;
-        }
-    }
 
     function deepFreeze(obj) {
         Object.freeze(obj);
@@ -52,6 +21,45 @@
             makingPromise.reject = reject;
         });
         return makingPromise;
+    }
+
+    function sanitizeUuid(uuid) {
+        return String(uuid).replace(/[^\da-f]/g, '').toLowerCase();
+    }
+
+    class Event {
+        #listeners = [];
+
+        constructor(receiveDispatch) {
+            receiveDispatch(data => {
+                this.#listeners.forEach(listener => {
+                    try {
+                        listener(data);
+                    } catch (ex) {
+                        console.error('Naughty bridged UI threw %o while dispatching event', ex);
+                    }
+                })
+            });
+        }
+
+        addListener(listener) {
+            if (!listener) {
+                throw new Error('listener is not optional');
+            }
+            if (typeof listener !== 'function' && !(listener instanceof Function)) {
+                throw new Error('listener must be callable');
+            }
+            this.#listeners.push(listener);
+        }
+
+        removeListener(listener) {
+            const index = this.#listeners.indexOf(listener);
+            if (index < 0) {
+                return false;
+            }
+            this.#listeners.splice(index, 1);
+            return true;
+        }
     }
 
     class ScriptModNotFoundError extends Error {
@@ -82,6 +90,9 @@
         }
     }
 
+    /**
+     * A PlumbBuddy Runtime Mod Integration Bridged UI
+     */
     class BridgedUi {
         #announcement;
         #destroyed;
@@ -95,37 +106,48 @@
             receiveDispatces(dispatches);
         }
 
+        /**
+         * Gets the event which is dispatched when this bridged UI makes an announcement; event data will be what was announced
+         * @returns {Event}
+         */
         get announcement() {
             return this.#announcement;
         }
 
+        /**
+         * Gets the event which is dispatched when this bridged UI has been destroyed for any reason
+         * @returns {Event}
+         */
         get destroyed() {
             return this.#destroyed;
         }
 
+        /**
+         * Closes the bridged UI
+         */
         close() {
             sendMessageToPlumbBuddy({
                 type: 'closeBridgedUi',
                 uniqueId: this.#uniqueId,
-            })
+            });
         }
 
-        focus() {
-            sendMessageToPlumbBuddy({
-                type: 'focusBridgedUi',
-                uniqueId: this.#uniqueId,
-            })
-        }
-
+        /**
+         * Sends data to the bridged UI
+         * @param {*} data the data to be send
+         */
         sendData(data) {
             sendMessageToPlumbBuddy({
                 type: 'sendDataToBridgedUi',
                 recipient: this.#uniqueId,
-                data
-            })
+                data,
+            });
         }
     }
 
+    /**
+     * A PlumbBuddy Runtime Mod Integration Relational Data Storage Query Record Set
+     */
     class RelationalDataStorageQueryRecordSet {
         #fieldNames;
         #records;
@@ -135,15 +157,26 @@
             this.#records = deepFreeze(recordSetMessageExcerpt.records);
         }
 
+        /**
+         * Gets the names of the fields of the record set
+         * @returns {Array<String>}
+         */
         get fieldNames() {
             return this.#fieldNames;
         }
 
+        /**
+         * Gets the records of the record set
+         * @returns {Array<Array<Object>>}
+         */
         get records() {
             return this.#records;
         }
     }
 
+    /**
+     * Data for the queryCompleted event of a PlumbBuddy Runtime Mod Integration Relational Data Storage Connection
+     */
     class RelationalDataStorageQueryCompletedEventData {
         #errorCode;
         #errorMessage;
@@ -158,13 +191,126 @@
             this.#recordSets = Object.freeze(responseMessage.recordSets.map(recordSet => new RelationalDataStorageQueryRecordSet(recordSet)));
             this.#tag = responseMessage.tag;
         }
+
+        /**
+         * Gets the SQLite error code raised by the query; -1 if another type of error occured; otherwise, 0
+         * @returns {Number}
+         */
+        get errorCode() {
+            return this.#errorCode;
+        }
+
+        /**
+         * Gets the message of the error if one was raised; otherwise, None
+         * @returns {String}
+         */
+        get errorMessage() {
+            return this.#errorMessage;
+        }
+
+        /**
+         * Gets the UUID which was assigned to the query when execute was called on the connection
+         * @returns {String}
+         */
+        get queryId() {
+            return this.#queryId;
+        }
+
+        /**
+         * Gets the record sets resulting from the query
+         * @returns {Array<RelationalDataStorageQueryRecordSet>}
+         */
+        get recordSets() {
+            return this.#recordSets;
+        }
+
+        /**
+         * Gets the tag string if one was provided when execute was called on the connection; otherwise, None
+         * @returns {String}
+         */
+        get tag() {
+            return this.#tag;
+        }
+    }
+
+    /**
+     * A PlumbBuddy Runtime Mod Integration Relational Data Storage Connection
+     */
+    class RelationalDataStorage {
+        #uniqueId;
+        #isSaveSpecific;
+        #queryCompleted;
+
+        constructor(uniqueId, isSaveSpecific) {
+            this.#uniqueId = uniqueId;
+            this.#isSaveSpecific = isSaveSpecific;
+            const dispatches = {};
+            this.#queryCompleted = new Event(dispatch => dispatches.queryCompleted = dispatch);
+            receiveDispatces(dispatches);
+        }
+
+        /**
+         * Gets the UUID of the relational data
+         * @returns {String}
+         */
+        get uniqueId() {
+            return this.#uniqueId;
+        }
+
+        /**
+         * Gets whether the relational data is specific to the currently open save file
+         * @returns {Boolean}
+         */
+        get isSaveSpecific() {
+            return this.#isSaveSpecific;
+        }
+
+        /**
+         * Gets the event which is dispatched when a query for this connection has been completed
+         * @returns {Event}
+         */
+        get queryCompleted() {
+            return this.#queryCompleted;
+        }
+
+        /**
+         * Executes a query with this connection
+         * @param {String} sql SQLite query
+         * @param {String} tag (optional) a tag to associate with the query, making its results easier to identify by other components
+         * @param {...any} parameters the parameters to replace instances of '?' with in sql
+         * @returns {String} the UUID which has been assigned to the query
+         */
+        execute(sql, tag, ...parameters) {
+            if (!sql) {
+                throw new Error('sql is not optional');
+            }
+            if (typeof sql !== 'string' && !(sql instanceof String)) {
+                throw new Error('sql must be a string');
+            }
+            const queryId = sanitizeUuid(crypto.randomUUID());
+            sendMessageToPlumbBuddy({
+                isSaveSpecific: this.#isSaveSpecific,
+                parameters,
+                query: sql,
+                queryId,
+                tag: tag ? String(tag) : null,
+                type: 'queryRelationalDataStorage',
+                uniqueId: this.#uniqueId,
+            });
+            return queryId;
+        }
     }
 
     const bridgedUis = [];
+    const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
+    const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
 
+    /**
+     * The PlumbBuddy Runtime Mod Integration Gateway
+     */
     class Gateway {
         #dataReceived;
         #uniqueId = sanitizeUuid('__UNIQUE_ID__');
@@ -201,14 +347,39 @@
         }
 
         /**
+         * Gets a Relational Data Storage connection
+         * @param {String} uniqueId the UUID for the Relational Data Storage instance
+         * @param {Boolean} isSaveSpecific True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
+         * @returns {RelationalDataStorage}
+         */
+        getRelationalDataStorage(uniqueId, isSaveSpecific) {
+            uniqueId = sanitizeUuid(uniqueId);
+            if (uniqueId.length !== 32) {
+                throw new Error('uniqueId is not optional must be a valid UUID');
+            }
+            const dataStores = isSaveSpecific ? saveSpecificRelationalDataStores : globalRelationalDataStores;
+            const alreadyLoaded = dataStores[uniqueId];
+            if (alreadyLoaded) {
+                return alreadyLoaded.dataStore;
+            }
+            let dispatches;
+            const dataStore = new RelationalDataStorage(uniqueId, isSaveSpecific, receiveDispatces => dispatches = receiveDispatces);
+            dataStores[uniqueId] = {
+                dataStore,
+                dispatches
+            };
+            return dataStore;
+        }
+
+        /**
          * Attempts to look up a loaded bridged UI
          * @param {String} uniqueId the UUID for the tab of the bridged UI
          * @returns {Promise} an promise that will resolve with the bridged UI or a fault that it is not currently loaded
          */
         lookUpBridgedUi(uniqueId) {
             uniqueId = sanitizeUuid(uniqueId);
-            if (!uniqueId) {
-                throw new Error('uniqueId is not optional');
+            if (uniqueId.length !== 32) {
+                throw new Error('uniqueId is not optional must be a valid UUID');
             }
             const alreadyLoaded = bridgedUis[uniqueId];
             if (alreadyLoaded) {
@@ -308,6 +479,14 @@
                     fault = new Error('Unknown denial reason')
                 }
                 promisedBridgedUi.reject(fault);
+            } else if (message.type === 'relationalDataStorageQueryResults') {
+                const uniqueId = sanitizeUuid(message.uniqueId);
+                const dataStores = message.isSaveSpecific ? saveSpecificRelationalDataStores : globalRelationalDataStores;
+                const dataStoreRecord = dataStores[uniqueId];
+                if (!dataStoreRecord) {
+                    return;
+                }
+                dataStoreRecord.dispatches.queryCompleted(new RelationalDataStorageQueryCompletedEventData(message));
             }
         }
 
@@ -323,12 +502,12 @@
          * @returns {Promise} an promise that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, etc.)
          */
         requestBridgedUi(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath) {
-            uniqueId = sanitizeUuid(uniqueId);
             if (!uiRoot) {
                 throw new Error('uiRoot is not optional');
             }
-            if (!uniqueId) {
-                throw new Error('uniqueId is not optional');
+            uniqueId = sanitizeUuid(uniqueId);
+            if (uniqueId.length !== 32) {
+                throw new Error('uniqueId is not optional must be a valid UUID');
             }
             if (!requestorName) {
                 throw new Error('requestorName is not optional');
