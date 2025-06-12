@@ -131,8 +131,32 @@
         #records;
 
         constructor(recordSetMessageExcerpt) {
-            this.#fieldNames = deepFreeze(recordSetMessageExcerpt.fieldNames);
+            this.#fieldNames = Object.freeze(recordSetMessageExcerpt.fieldNames);
             this.#records = deepFreeze(recordSetMessageExcerpt.records);
+        }
+
+        get fieldNames() {
+            return this.#fieldNames;
+        }
+
+        get records() {
+            return this.#records;
+        }
+    }
+
+    class RelationalDataStorageQueryCompletedEventData {
+        #errorCode;
+        #errorMessage;
+        #queryId;
+        #recordSets;
+        #tag;
+
+        constructor(responseMessage) {
+            this.#errorCode = responseMessage.errorCode;
+            this.#errorMessage = responseMessage.errorMessage;
+            this.#queryId = sanitizeUuid(responseMessage.queryId);
+            this.#recordSets = Object.freeze(responseMessage.recordSets.map(recordSet => new RelationalDataStorageQueryRecordSet(recordSet)));
+            this.#tag = responseMessage.tag;
         }
     }
 

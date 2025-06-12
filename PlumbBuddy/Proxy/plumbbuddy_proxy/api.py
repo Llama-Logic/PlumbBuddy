@@ -30,6 +30,10 @@ def _show_notification(text: str, title: str = None):
     notification.show_dialog(icon_override = IconInfoData(obj_instance = client.active_sim))
 
 class BridgedUi:
+    """
+    A PlumbBuddy Runtime Mod Integration Bridged UI
+    """
+
     def __init__(self, unique_id: UUID, receive_dispatches: Callable[[dict], None]):
         self._unique_id = unique_id
         self._eventual_focus: Eventual[bool] = None
@@ -44,19 +48,33 @@ class BridgedUi:
     
     @property
     def announcement(self) -> Event[any]:
+        """
+        Dispatched when this bridged UI makes an announcement; event data will be what was announced
+        """
         return self._annoucement
     
     @property
     def destroyed(self) -> Event[any]:
+        """
+        Dispatched when this bridged UI has been destroyed for any reason
+        """
         return self._destroyed
     
     def close(self):
+        """
+        Closes the bridged UI
+        """
         ipc.send({
             'type': 'close_bridged_ui',
             'unique-id': str(self._unique_id)
         })
 
     def focus(self) -> Eventual[bool]:
+        """
+        Attempts to focus the bridged UI
+
+        :returns: an Eventual that will resolve with a bool indicating whether the bridged UI was focused
+        """
         if self._eventual_focus is not None:
             return self._eventual_focus
         eventual = Eventual[bool]()
@@ -68,6 +86,11 @@ class BridgedUi:
         return eventual
     
     def send_data(self, data):
+        """
+        Sends data to the bridged UI
+
+        :data: the data to be send
+        """
         ipc.send({
             'type': 'send_data_to_bridged_ui',
             'recipient': str(self._unique_id),
@@ -75,6 +98,10 @@ class BridgedUi:
         })
 
 class RelationalDataStorageQueryRecordSet:
+    """
+    A PlumbBuddy Runtime Mod Integration Relational Data Storage Query Record Set
+    """
+
     def __init__(self, record_set_message_excerpt: dict):
         self._field_names = tuple(record_set_message_excerpt['field_names'])
         records = []
@@ -91,6 +118,10 @@ class RelationalDataStorageQueryRecordSet:
         return self._records
 
 class RelationalDataStorageQueryCompletedEventData:
+    """
+    Data for the query_completed event of a PlumbBuddy Runtime Mod Integration Relational Data Storage Connection
+    """
+
     def __init__(self, response_message: dict):
         self._error_code: int = response_message['error_code']
         self._error_message: str = response_message['error_message']
@@ -122,6 +153,10 @@ class RelationalDataStorageQueryCompletedEventData:
         return self._tag
 
 class RelationalDataStorage:
+    """
+    A PlumbBuddy Runtime Mod Integration Relational Data Storage Connection
+    """
+
     def __init__(self, unique_id: UUID, is_save_specific: bool, receive_dispatches: Callable[[dict], None]):
         self._unique_id = unique_id
         self._is_save_specific = is_save_specific
@@ -181,10 +216,14 @@ class BridgedUiNotFoundError(Exception):
         super().__init__('The referenced bridged UI is not currently loaded')
 
 class Gateway:
+    """
+    The PlumbBuddy Runtime Mod Integration Gateway
+    """
+
     def __init__(self):
         self._global_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
-        self._reset_cache()
+        self._reset_bridged_ui_cache()
 
         @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
@@ -203,35 +242,27 @@ class Gateway:
                 if bridged_uis is not None:
                     for bridged_ui_tuple in bridged_uis.values():
                         bridged_ui_tuple[1]['destroyed'](None)
-                self._reset_cache()
+                self._reset_bridged_ui_cache()
 
     def _get_bridged_ui(self, unique_id: UUID):
-        bridged_ui = None
         try:
-            bridged_ui = self._bridged_uis[unique_id][0]
+            return self._bridged_uis[unique_id][0]
         except KeyError:
-            pass
-        return bridged_ui
+            return None
 
     def _process_message_from_plumbbuddy(self, message: dict):
         message_type = message['type']
         if message_type == 'bridged_ui_announcement':
-            unique_id = UUID(message['unique_id'])
-            bridged_ui_tuple = None
             try:
-                bridged_ui_tuple = self._bridged_uis[unique_id]
+                self._bridged_uis[UUID(message['unique_id'])][1]['announcement'](message['announcement'])
             except KeyError:
-                return
-            bridged_ui_tuple[1]['announcement'](message['announcement'])
+                pass
             return
         if message_type == 'bridged_ui_destroyed':
-            unique_id = UUID(message['unique_id'])
-            bridged_ui_tuple = None
             try:
-                bridged_ui_tuple = self._bridged_uis.pop(unique_id)
+                self._bridged_uis.pop(UUID(message['unique_id']))[1]['destroyed'](None)
             except KeyError:
-                return
-            bridged_ui_tuple[1]['destroyed'](None)
+                pass
             return
         if message_type == 'bridged_ui_look_up_response':
             unique_id = UUID(message['unique_id'])
@@ -313,12 +344,12 @@ class Gateway:
         if message_type == 'relational_data_storage_query_results':
             unique_id = UUID(message['unique_id'])
             data_stores = self._save_specific_relational_data_stores if message['is_save_specific'] else self._global_relational_data_stores
-            relational_data_storage = None
+            dispatches = None
             try:
-                relational_data_storage = data_stores[unique_id]
+                _, dispatches = data_stores[unique_id]
             except KeyError:
                 return
-            relational_data_storage['query_completed'](RelationalDataStorageQueryCompletedEventData(message))
+            dispatches['query_completed'](RelationalDataStorageQueryCompletedEventData(message))
             return
         if message_type == 'show_notification':
             notification_text = None
@@ -335,22 +366,28 @@ class Gateway:
                 _show_notification(notification_text, notification_title)
             return
 
-    def _reset_cache(self):
+    def _reset_bridged_ui_cache(self):
         self._requested_bridged_uis: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_ui_look_ups: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
 
     def get_relational_data_storage(self, unique_id: UUID, is_save_specific: bool) -> RelationalDataStorage:
+        """
+        Gets a Relational Data Storage connection
+
+        :unique_id: the UUID for the Relational Data Storage instance
+        :is_save_specific: True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
+        :returns: a Relational Data Storage connection
+        """
         if unique_id is None:
             raise Exception('unique_id is not optional')
+        if not isinstance(unique_id, UUID):
+            raise TypeError('unique_id must be UUID')
         data_stores = self._save_specific_relational_data_stores if is_save_specific else self._global_relational_data_stores
-        relational_data_storage = None
         try:
-            relational_data_storage = data_stores[unique_id]
+            return data_stores[unique_id][0]
         except KeyError:
             pass
-        if relational_data_storage is not None:
-            return relational_data_storage[0]
         self._dispatches = {}
         def receive_dispatches(received_dispatches: dict):
             self._dispatches = received_dispatches
@@ -368,6 +405,8 @@ class Gateway:
         """
         if unique_id is None:
             raise Exception('unique_id is not optional')
+        if not isinstance(unique_id, UUID):
+            raise TypeError('unique_id must be UUID')
         eventual = Eventual[BridgedUi]()
         already_loaded = self._get_bridged_ui(unique_id)
         if already_loaded is not None:
@@ -408,6 +447,8 @@ class Gateway:
             raise Exception('ui_root is not optional')
         if unique_id is None:
             raise Exception('unique_id is not optional')
+        if not isinstance(unique_id, UUID):
+            raise TypeError('unique_id must be UUID')
         if requestor_name is None or len(requestor_name) == 0:
             raise Exception('requestor_name is not optional')
         if request_reason is None or len(request_reason) == 0:
