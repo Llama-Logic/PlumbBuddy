@@ -29,6 +29,7 @@ public interface IPlatformFunctions :
     AppProgressState ProgressState { get; set; }
     int ProgressValue { get; set; }
 
+    Task<bool> ForegroundGameAsync(DirectoryInfo installationDirectory);
     Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory);
     Task<string> GetTimezoneIanaNameAsync();
     Task<Version?> GetTS4InstallationVersionAsync();

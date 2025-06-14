@@ -4,3 +4,4 @@ GetWindowPlacement
 IsIconic
 SetForegroundWindow
 SetWindowPlacement
+ShowWindow

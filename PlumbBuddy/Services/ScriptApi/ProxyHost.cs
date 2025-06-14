@@ -16,7 +16,6 @@ public partial class ProxyHost :
         PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         ReadCommentHandling = JsonCommentHandling.Skip,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
@@ -32,7 +31,6 @@ public partial class ProxyHost :
         PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         ReadCommentHandling = JsonCommentHandling.Skip,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
         RespectNullableAnnotations = true,
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
@@ -403,11 +401,9 @@ public partial class ProxyHost :
                 IsClientConnected = !connectedClients.IsEmpty;
                 client.Dispose();
             }
-            if (connectedClients.Count is 0)
-            {
+            if (connectedClients.IsEmpty)
                 foreach (var loadedBridgedUiUniqueId in loadedBridgedUis.Keys)
                     await DestroyBridgedUiAsync(loadedBridgedUiUniqueId).ConfigureAwait(false);
-            }
         }
     }
 
@@ -481,6 +477,10 @@ public partial class ProxyHost :
                 IsClientConnected = !connectedClients.IsEmpty;
                 ProxyConnected?.Invoke(this, EventArgs.Empty);
                 _ = Task.Run(() => EscortClientAsync(client));
+                await SendMessageToProxyAsync(new SendLoadedSaveIdentifiersMessage
+                {
+                    Type = nameof(HostMessageType.SendLoadedSaveIdentifiers).Underscore().ToLowerInvariant()
+                }).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)
@@ -648,6 +648,9 @@ public partial class ProxyHost :
                     });
                 }
                 break;
+            case ComponentMessageType.ForegroundGame:
+                await platformFunctions.ForegroundGameAsync(new(settings.InstallationFolderPath)).ConfigureAwait(false);
+                break;
             case ComponentMessageType.GameServiceEvent:
                 if (TryParseMessage<GameServiceEventMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "game service event", out var gameServiceEventMessage)
                     && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent))
@@ -688,6 +691,14 @@ public partial class ProxyHost :
                     }, bridgedUiJsonSerializerOptions)
                 });
                 break;
+            case ComponentMessageType.SendLoadedSaveIdentifiersResponse:
+                if (TryParseMessage<SendLoadedSaveIdentifiersResponseMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "send loaded save identifiers response", out var sendLoadedSaveIdentifiersResponseMessage))
+                {
+                    saveCreated = sendLoadedSaveIdentifiersResponseMessage.Created;
+                    saveNucleusId = sendLoadedSaveIdentifiersResponseMessage.NucleusId;
+                    saveSimNow = sendLoadedSaveIdentifiersResponseMessage.SimNow;
+                }
+                break;
         }
     }
 
@@ -713,14 +724,45 @@ public partial class ProxyHost :
         var errorCode = 0;
         string? errorMessage = null;
         var recordSets = new List<RelationalDataStorageQueryRecordSet>();
+        var executionStopwatch = new Stopwatch();
         await WithRelationalDataStorageConnectionAsync(queryRelationalDataStorageMessage.UniqueId, queryRelationalDataStorageMessage.IsSaveSpecific, async conn =>
         {
-            var com = conn.CreateCommand();
-            com.CommandText = queryRelationalDataStorageMessage.Query;
-            foreach (var parameter in queryRelationalDataStorageMessage.Parameters)
-                com.Parameters.AddWithValue(null, parameter);
             try
             {
+                var com = conn.CreateCommand();
+                com.CommandText = queryRelationalDataStorageMessage.Query;
+                if (queryRelationalDataStorageMessage.Parameters?.Any() ?? false)
+                    foreach (var (key, value) in queryRelationalDataStorageMessage.Parameters)
+                    {
+                        if (value is JsonElement jsonValue)
+                        {
+                            if (jsonValue.ValueKind is JsonValueKind.Null)
+                                com.Parameters.AddWithValue(key, DBNull.Value);
+                            else if (jsonValue.ValueKind is JsonValueKind.False)
+                                com.Parameters.AddWithValue(key, 0);
+                            else if (jsonValue.ValueKind is JsonValueKind.True)
+                                com.Parameters.AddWithValue(key, 1);
+                            else if (jsonValue.ValueKind is JsonValueKind.String)
+                                com.Parameters.AddWithValue(key, jsonValue.GetString());
+                            else if (jsonValue.ValueKind is JsonValueKind.Number)
+                            {
+                                if (jsonValue.TryGetInt64(out var int64))
+                                    com.Parameters.AddWithValue(key, int64);
+                                else if (jsonValue.TryGetDouble(out var dbl))
+                                    com.Parameters.AddWithValue(key, dbl);
+                            }
+                            else if (jsonValue.ValueKind is JsonValueKind.Object
+                                && jsonValue.TryGetProperty("base64", out var base64Property)
+                                && base64Property.ValueKind is JsonValueKind.String
+                                && base64Property.GetString() is { } base64)
+                                com.Parameters.AddWithValue(key, Convert.FromBase64String(base64));
+                            else
+                                throw new NotSupportedException($"unsupported value kind: {jsonValue.ValueKind}");
+                            continue;
+                        }
+                        com.Parameters.AddWithValue(key, value ?? DBNull.Value);
+                    }
+                executionStopwatch.Start();
                 await using var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
                 do
                 {
@@ -752,11 +794,16 @@ public partial class ProxyHost :
                 errorCode = -1;
                 errorMessage = ex.Message;
             }
+            finally
+            {
+                executionStopwatch.Stop();
+            }
         }).ConfigureAwait(false);
         var proxyResults = new RelationalDataStorageQueryResultsMessage
         {
             ErrorCode = errorCode,
             ErrorMessage = errorMessage,
+            ExecutionSeconds = executionStopwatch.Elapsed.TotalSeconds,
             IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
             QueryId = queryRelationalDataStorageMessage.QueryId,
             Tag = queryRelationalDataStorageMessage.Tag,
@@ -767,6 +814,7 @@ public partial class ProxyHost :
         {
             ErrorCode = errorCode,
             ErrorMessage = errorMessage,
+            ExecutionSeconds = executionStopwatch.Elapsed.TotalSeconds,
             IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
             QueryId = queryRelationalDataStorageMessage.QueryId,
             Tag = queryRelationalDataStorageMessage.Tag,
@@ -912,13 +960,20 @@ public partial class ProxyHost :
             var tcs = new TaskCompletionSource<DirectoryInfo>();
             StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
             var appDataDirectory = await tcs.Task.ConfigureAwait(false);
-            var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+            var databaseDirectoryPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+            if (isSaveSpecific)
+            {
+                var saveSpecificDirectory = new DirectoryInfo(Path.Combine(databaseDirectoryPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
+                if (!saveSpecificDirectory.Exists)
+                    saveSpecificDirectory.Create();
+                databaseDirectoryPath = saveSpecificDirectory.FullName;
+            }
             SqliteConnection? connection = null;
             try
             {
                 using (var relationalDataStorageConnectionInitializationLockHeld = await relationalDataStorageConnectionInitializationLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false))
                 {
-                    var databaseFile = new FileInfo(Path.Combine(rdsPath, $"{uniqueId:n}.sqlite"));
+                    var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
                     var enableWriteAheadLogging = !databaseFile.Exists;
                     connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
                     await connection.OpenAsync(CancellationToken.None);

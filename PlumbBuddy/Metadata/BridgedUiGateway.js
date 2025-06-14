@@ -14,6 +14,20 @@
         return obj;
     }
 
+    function generateUUIDv4() {
+        const bytes = crypto.getRandomValues(new Uint8Array(16));
+
+        // Per RFC4122 standard
+        bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+        bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant 10xxxxxx
+
+        return sanitizeUuid([...bytes].map(b => b.toString(16).padStart(2, '0')).join(''));
+    }
+
+    function isValidUuid(uuid) {
+        return /^[\da-f]{8}\-([\da-f]{4}\-){3}[\da-f]{12}$/i.test(String(uuid));
+    }
+    
     function makePromise() {
         let makingPromise = {};
         makingPromise.promise = new Promise((resolve, reject) => {
@@ -24,7 +38,17 @@
     }
 
     function sanitizeUuid(uuid) {
-        return String(uuid).replace(/[^\da-f]/g, '').toLowerCase();
+        uuid = String(uuid).replace(/[^\da-f]/g, '').toLowerCase();
+        if (uuid.length !== 32) {
+            return null;
+        }
+        return [
+            uuid.slice(0, 8),
+            uuid.slice(8, 12),
+            uuid.slice(12, 16),
+            uuid.slice(16, 20),
+            uuid.slice(20)
+        ].join('-');
     }
 
     class Event {
@@ -180,6 +204,7 @@
     class RelationalDataStorageQueryCompletedEventData {
         #errorCode;
         #errorMessage;
+        #executionSeconds;
         #queryId;
         #recordSets;
         #tag;
@@ -187,6 +212,7 @@
         constructor(responseMessage) {
             this.#errorCode = responseMessage.errorCode;
             this.#errorMessage = responseMessage.errorMessage;
+            this.#executionSeconds = responseMessage.executionSeconds;
             this.#queryId = sanitizeUuid(responseMessage.queryId);
             this.#recordSets = Object.freeze(responseMessage.recordSets.map(recordSet => new RelationalDataStorageQueryRecordSet(recordSet)));
             this.#tag = responseMessage.tag;
@@ -206,6 +232,14 @@
          */
         get errorMessage() {
             return this.#errorMessage;
+        }
+
+        /**
+         * Gets the number of seconds for which the query was executing
+         * @returns {Number}
+         */
+        get executionSeconds() {
+
         }
 
         /**
@@ -241,12 +275,12 @@
         #isSaveSpecific;
         #queryCompleted;
 
-        constructor(uniqueId, isSaveSpecific) {
+        constructor(uniqueId, isSaveSpecific, receiveDispatches) {
             this.#uniqueId = uniqueId;
             this.#isSaveSpecific = isSaveSpecific;
             const dispatches = {};
             this.#queryCompleted = new Event(dispatch => dispatches.queryCompleted = dispatch);
-            receiveDispatces(dispatches);
+            receiveDispatches(dispatches);
         }
 
         /**
@@ -277,20 +311,35 @@
          * Executes a query with this connection
          * @param {String} sql SQLite query
          * @param {String} tag (optional) a tag to associate with the query, making its results easier to identify by other components
-         * @param {...any} parameters the parameters to replace instances of '?' with in sql
+         * @param {Object} parameters the parameters of the query
          * @returns {String} the UUID which has been assigned to the query
          */
-        execute(sql, tag, ...parameters) {
+        execute(sql, tag, parameters) {
             if (!sql) {
                 throw new Error('sql is not optional');
             }
             if (typeof sql !== 'string' && !(sql instanceof String)) {
                 throw new Error('sql must be a string');
             }
-            const queryId = sanitizeUuid(crypto.randomUUID());
+            const queryId = generateUUIDv4();
+            serializationSafeParameters = {};
+            if (parameters) {
+                Object.keys(parameters).forEach(key => {
+                    const value = parameters[key];
+                    if (value instanceof Uint8Array) {
+                        let binary = '';
+                        for (let i = 0; i < value.length; ++i) {
+                            binary += String.fromCharCode(value[i]);
+                        }
+                        serializationSafeParameters[key] = { base64: btoa(binary) };
+                        return;
+                    }
+                    serializationSafeParameters[key] = value;
+                });
+            }
             sendMessageToPlumbBuddy({
                 isSaveSpecific: this.#isSaveSpecific,
-                parameters,
+                parameters: serializationSafeParameters,
                 query: sql,
                 queryId,
                 tag: tag ? String(tag) : null,
@@ -347,6 +396,15 @@
         }
 
         /**
+         * Causes PlumbBuddy to attempt bring the game to the foreground of the user's desktop, which will work if it, itself, in the foreground
+         */
+        foregroundGame() {
+            sendMessageToPlumbBuddy({
+                type: 'foregroundGame',
+            });
+        }
+
+        /**
          * Gets a Relational Data Storage connection
          * @param {String} uniqueId the UUID for the Relational Data Storage instance
          * @param {Boolean} isSaveSpecific True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
@@ -354,8 +412,8 @@
          */
         getRelationalDataStorage(uniqueId, isSaveSpecific) {
             uniqueId = sanitizeUuid(uniqueId);
-            if (uniqueId.length !== 32) {
-                throw new Error('uniqueId is not optional must be a valid UUID');
+            if (!isValidUuid(uniqueId)) {
+                throw new Error('uniqueId is not optional and must be a valid UUID');
             }
             const dataStores = isSaveSpecific ? saveSpecificRelationalDataStores : globalRelationalDataStores;
             const alreadyLoaded = dataStores[uniqueId];
@@ -378,8 +436,8 @@
          */
         lookUpBridgedUi(uniqueId) {
             uniqueId = sanitizeUuid(uniqueId);
-            if (uniqueId.length !== 32) {
-                throw new Error('uniqueId is not optional must be a valid UUID');
+            if (!isValidUuid(uniqueId)) {
+                throw new Error('uniqueId is not optional and must be a valid UUID');
             }
             const alreadyLoaded = bridgedUis[uniqueId];
             if (alreadyLoaded) {
@@ -506,6 +564,9 @@
                 throw new Error('uiRoot is not optional');
             }
             uniqueId = sanitizeUuid(uniqueId);
+            if (!isValidUuid(uniqueId)) {
+                throw new Error('uniqueId is not optional and must be a valid UUID');
+            }
             if (uniqueId.length !== 32) {
                 throw new Error('uniqueId is not optional must be a valid UUID');
             }
@@ -539,6 +600,14 @@
                 tabIconPath,
             });
             return madePromise.promise;
+        }
+
+        /**
+         * Generates a random UUID
+         * @returns {string}
+         */
+        uuid4() {
+            return generateUUIDv4();
         }
     }
 

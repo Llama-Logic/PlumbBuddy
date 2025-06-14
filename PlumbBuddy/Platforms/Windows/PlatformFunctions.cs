@@ -3,6 +3,7 @@ using Windows.UI.Notifications;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.SystemInformation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace PlumbBuddy.Platforms.Windows;
 
@@ -207,6 +208,20 @@ partial class PlatformFunctions :
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public async Task<bool> ForegroundGameAsync(DirectoryInfo installationDirectory)
+    {
+        if (await GetGameProcessAsync(installationDirectory).ConfigureAwait(false) is not { } gameProcess
+            || gameProcess.HasExited)
+            return false;
+        var gameMainWindowHandle = gameProcess.MainWindowHandle;
+        if (gameMainWindowHandle == IntPtr.Zero)
+            return false;
+        var gameHwnd = new HWND(gameMainWindowHandle);
+        if (PInvoke.IsIconic(gameHwnd))
+            PInvoke.ShowWindow(gameHwnd, SHOW_WINDOW_CMD.SW_RESTORE);
+        return PInvoke.SetForegroundWindow(gameHwnd);        
+    }
 
     public Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {

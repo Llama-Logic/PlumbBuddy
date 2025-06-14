@@ -18,8 +18,18 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.0</ApplicationDisplayVersion>
-        <ApplicationVersion>1.5.0</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5.1</ApplicationDisplayVersion>
+        <ApplicationVersion>1.5.1</ApplicationVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <InformationalVersion>$(ApplicationVersion)+debug</InformationalVersion>
+        <ProxyScriptModLoggingMode>debug</ProxyScriptModLoggingMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <InformationalVersion>$(ApplicationVersion)+release</InformationalVersion>
+        <ProxyScriptModLoggingMode>release</ProxyScriptModLoggingMode>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -199,7 +209,12 @@
     </ItemGroup>
 
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">
+        <ReadLinesFromFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py">
+            <Output TaskParameter="Lines" ItemName="OriginalProxyScriptLines" />
+        </ReadLinesFromFile>
+        <WriteLinesToFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py" Lines="@(OriginalProxyScriptLines->Replace('__VERSION__', '$(InformationalVersion)')->Replace('__LOGGING_MODE__', '$(ProxyScriptModLoggingMode)'))" Overwrite="true" />
         <Exec Command="$(PythonBinary) -m compileall -b -q -j0 &quot;$(ProjectDir)Proxy&quot;" />
+        <WriteLinesToFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py" Lines="@(OriginalProxyScriptLines)" Overwrite="true" />
         <Exec Condition="$([MSBuild]::IsOSPlatform('windows'))" Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)PackScriptMod.ps1&quot; -ProjectDir $(ProjectDir)" />
         <Exec Condition="$([MSBuild]::IsOSPlatform('osx'))" WorkingDirectory="$(ProjectDir)Proxy" Command="zip -r &quot;$(ProjectDir)PlumbBuddy_Proxy.ts4script&quot; . -i '*.pyc' '*.html' '*.md' '*.css' '*.scss' '*.js' '*.json' '*.mjs' '*.ts' '*.vue' '*.jpg' '*.jpeg' '*.gif' '*.png' '*.ico' '*.ttf' '*.otf' '*.eot' '*.woff' '*.woff2' '*.browserslistrc' '*.editorconfig' -x '*.DS_Store' '*.__MACOSX' '*node_modules*'" />
         <Exec Condition="$([MSBuild]::IsOSPlatform('windows'))" Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)DeleteByteCode.ps1&quot; -ProjectDir $(ProjectDir)" />

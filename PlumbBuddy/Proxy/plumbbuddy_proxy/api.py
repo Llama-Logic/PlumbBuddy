@@ -1,3 +1,4 @@
+import base64
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
 from distributor.shared_messages import IconInfoData
@@ -7,12 +8,27 @@ from sims4.localization import LocalizationHelperTuning
 from plumbbuddy_proxy import logger
 import os
 from clock import ServerClock
+from datetime import timedelta
 import services
 import subprocess
 import sys
 from ui.ui_dialog_notification import UiDialogNotification
 from uuid import uuid4, UUID
 import webbrowser
+
+def _attach_save_characteristics(ipc_message: dict) -> dict:
+    try:
+        persistence = services.get_persistence_service()
+        account = persistence.get_account_proto_buff()
+        return {
+            **ipc_message,
+            'nucleus_id': account.nucleus_id,
+            'created': account.created,
+            'sim_now': int(services.time_service().sim_now)
+        }
+    except Exception as ex:
+        logger.exception(ex)
+        return ipc_message
 
 def _try_to_foreground_plumbbuddy():
     if os.name == 'nt':
@@ -138,6 +154,7 @@ class RelationalDataStorageQueryCompletedEventData:
     def __init__(self, response_message: dict):
         self._error_code: int = response_message['error_code']
         self._error_message: str = response_message['error_message']
+        self._execution_time = timedelta(response_message['execution_seconds'])
         self._query_id = UUID(response_message['query_id'])
         record_sets = []
         for response_record_set in response_message['record_sets']:
@@ -160,6 +177,14 @@ class RelationalDataStorageQueryCompletedEventData:
         """
 
         return self._error_message
+    
+    @property
+    def execution_time(self) -> timedelta:
+        """
+        Gets the duration of time for which the query was executing
+        """
+
+        return self._execution_time
     
     @property
     def query_id(self) -> UUID:
@@ -223,7 +248,7 @@ class RelationalDataStorage:
 
         return self._query_completed
     
-    def execute(self, sql: str, tag: str = None, *args) -> UUID:
+    def execute(self, sql: str, tag: str = None, parameters: dict = None) -> UUID:
         """
         Executes a query with this connection
 
@@ -240,9 +265,13 @@ class RelationalDataStorage:
         if not ipc.is_connected:
             raise PlumbBuddyNotConnectedError()
         query_id = uuid4()
+        serialization_safe_parameters = {}
+        if parameters and isinstance(parameters, dict):
+            for key, value in parameters.items():
+                serialization_safe_parameters[key] = { 'base64': base64.b64encode(value).decode('utf-8') } if isinstance(value, bytes) else value
         ipc.send({
             'is_save_specific': self.is_save_specific,
-            'parameters': args,
+            'parameters': serialization_safe_parameters,
             'query': sql,
             'query_id': str(query_id),
             'tag': str(tag) if tag else None,
@@ -406,6 +435,11 @@ class Gateway:
             except KeyError:
                 return
             dispatches['query_completed'](RelationalDataStorageQueryCompletedEventData(message))
+            return
+        if message_type == 'send_loaded_save_identifiers':
+            ipc.send(_attach_save_characteristics({
+                'type': 'send_loaded_save_identifiers_response'
+            }))
             return
         if message_type == 'show_notification':
             notification_text = None

@@ -2,23 +2,8 @@ from game_services import GameServiceManager
 from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
 from plumbbuddy_proxy import logger
-from plumbbuddy_proxy.api import gateway
-import services
+from plumbbuddy_proxy.api import _attach_save_characteristics
 from sims4.service_manager import Service
-
-def _attach_save_characteristics(ipc_message: dict) -> dict:
-    try:
-        persistence = services.get_persistence_service()
-        account = persistence.get_account_proto_buff()
-        return {
-            **ipc_message,
-            'nucleus_id': account.nucleus_id,
-            'created': account.created,
-            'sim_now': int(services.time_service().sim_now)
-        }
-    except Exception as ex:
-        logger.exception(ex)
-        return ipc_message
 
 class PlumbBuddyProxyService(Service):
     def save(self, *args, **kwargs):

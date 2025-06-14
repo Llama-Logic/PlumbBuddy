@@ -115,10 +115,10 @@ class UTCFormatter(logging.Formatter):
         else:
             return time.strftime("%Y-%m-%d %H:%M:%S", ct)
 
-def Logger(name, root, filename, prefix='', version='N/A', mode='development', **kwargs):
+def Logger(name, root, filename, prefix='', version='N/A', mode='debug', **kwargs):
     path = os.path.join(root, filename)
     handler = logging.FileHandler(path, mode='w')
-    log_mode = logging.DEBUG if mode == 'development' else logging.INFO
+    log_mode = logging.DEBUG if mode == 'debug' else logging.INFO
 
     formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', datefmt = '%Y-%m-%d %H:%M:%S')
 
@@ -128,7 +128,7 @@ def Logger(name, root, filename, prefix='', version='N/A', mode='development', *
     handler.setFormatter(formatter)
 
     logger.info(
-        '{prefix}[{name}] Version: {version}; Mode: {mode}'.format(
+        '{prefix}[{name}] Version: {version}'.format(
             prefix=prefix,
             name=name,
             version=version,

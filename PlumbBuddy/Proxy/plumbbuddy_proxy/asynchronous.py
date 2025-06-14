@@ -43,19 +43,18 @@ class Eventual(Generic[T]):
         self._state = 0
         self._result: Optional[T] = None
         self._fault: Optional[BaseException] = None
-        self._result_callbacks: List[Callable[[Optional[T]], None]] = []
-        self._fault_callbacks: List[Callable[[BaseException], None]] = []
+        self._continuations: List[Callable[[Optional[T], Optional[BaseException]], None]] = []
     
     def _set_result(self, result: Optional[T]):
         if self.is_complete:
             raise Exception('Eventual has already resolved')
         self._state = 1
         self._result = result
-        for callback in self._result_callbacks:
+        for continuation in self._continuations:
             try:
-                callback(result)
+                continuation(result, None)
             except Exception as ex:
-                logger.warning('Naughty script mod gave me a result callback that threw %s; swallowing to protect game stability', ex)
+                logger.warning('Naughty script mod gave me a continuation that threw %s; swallowing to protect game stability', ex)
     
     def _set_fault(self, fault: BaseException):
         if self.is_complete:
@@ -64,11 +63,11 @@ class Eventual(Generic[T]):
             raise Exception('fault cannot be None')
         self._state = 2
         self._fault = fault
-        for callback in self._fault_callbacks:
+        for continuation in self._continuations:
             try:
-                callback(fault)
+                continuation(None, fault)
             except Exception as ex:
-                logger.warning('Naughty script mod gave me a fault callback that threw %s; swallowing to protect game stability', ex)
+                logger.warning('Naughty script mod gave me a continuation that threw %s; swallowing to protect game stability', ex)
 
     @property
     def fault(self) -> Optional[BaseException]:
@@ -77,6 +76,7 @@ class Eventual(Generic[T]):
 
         :returns: The exception that was encountered if one was; otherwise, None
         """
+
         if not self.is_faulted:
             return None
         return self._fault
@@ -88,6 +88,7 @@ class Eventual(Generic[T]):
         
         :returns: True if the result has been resolved; otherwise, False
         """
+
         return self._state == 1
     
     @property
@@ -97,6 +98,7 @@ class Eventual(Generic[T]):
         
         :returns: True if the operation is complete; otherwise, False
         """
+
         return self._state != 0
     
     @property
@@ -106,6 +108,7 @@ class Eventual(Generic[T]):
         
         :returns: True if the operation has faulted; otherwise, False
         """
+
         return self._state == 2
     
     @property
@@ -115,24 +118,31 @@ class Eventual(Generic[T]):
 
         :returns: The result if it has been determined at this point; otherwise, None
         """
+
         if not self.has_result:
             return None
         return self._result
     
-    def then(self, result_callback: Callable[[Optional[T]], None], fault_callback: Callable[[BaseException], None] = None):
+    def then(self, continuation: Callable[[Optional[T], Optional[BaseException]], None] = None):
         """
-        Specifies callbacks to be executed when the operation is eventually complete
+        Specifies a continuation to be called when the operation is eventually complete
         
-        :result_callback: The callback to be invoked when the operation is complete and has a result
-        :fault_callback: (Optional) The callback to be invoked when the operation has faulted
+        :param continuation: The continuation to be invoked when the operation is complete
         """
-        if result_callback is None:
-            raise Exception("result_callback cannot be None")
+
+        if not continuation:
+            raise ValueError("continuation is not optional")
+        if not callable(continuation):
+            raise ValueError('continuation must be callable')
         if not self.is_complete:
-            self._result_callbacks.append(result_callback)
-            if fault_callback is not None:
-                self._fault_callbacks.append(fault_callback)
+            self._continuations.append(continuation)
         elif self.has_result:
-            result_callback(self._result)
-        elif self.is_faulted and fault_callback is not None:
-            fault_callback(self._fault)
+            continuation(self._result, None)
+        elif self.is_faulted:
+            continuation(None, self._fault)
+
+def await_for(eventual: Eventual[T]):
+    def factory(continuation: Callable[[Optional[T], Optional[BaseException]], None]):
+        eventual.then(continuation)
+        return continuation
+    return factory
