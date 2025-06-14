@@ -154,6 +154,24 @@ partial class PlatformFunctions :
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public async Task<bool> ForegroundGameAsync(DirectoryInfo installationDirectory)
+    {
+        if (await GetGameProcessAsync(installationDirectory).ConfigureAwait(false) is not { } gameProcess
+            || gameProcess.HasExited)
+            return false;
+        using var osascriptProcess = Process.Start(new ProcessStartInfo("/usr/bin/osascript", $"-e 'tell application id \"com.ea.mac.thesims4\" to activate'")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true
+        });
+        if (osascriptProcess is not null)
+        {
+            await osascriptProcess.WaitForExitAsync().ConfigureAwait(false);
+            return osascriptProcess.ExitCode is 0;
+        }
+        return false;
+    }
+
     public async Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
         ArgumentNullException.ThrowIfNull(installationDirectory);
