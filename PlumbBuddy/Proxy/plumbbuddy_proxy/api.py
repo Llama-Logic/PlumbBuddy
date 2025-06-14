@@ -36,15 +36,6 @@ def _try_to_foreground_plumbbuddy():
     elif os.name == 'posix' and sys.platform == 'darwin':
         subprocess.run(['/usr/bin/osascript', '-e', 'tell application id "com.llamalogic.plumbbuddy" to activate'])
 
-def _show_notification(text: str, title: str = None):
-    client = services.client_manager().get_first_client()
-    if title is None:
-        title = 'PlumbBuddy Script API'
-    localized_text = lambda **_: LocalizationHelperTuning.get_raw_text(text)
-    localized_title = lambda **_: LocalizationHelperTuning.get_raw_text(title)
-    notification = UiDialogNotification.TunableFactory().default(client.active_sim, text = localized_text, title = localized_title)
-    notification.show_dialog(icon_override = IconInfoData(obj_instance = client.active_sim))
-
 class BridgedUi:
     """
     A PlumbBuddy Runtime Mod Integration Bridged UI
@@ -440,20 +431,6 @@ class Gateway:
             ipc.send(_attach_save_characteristics({
                 'type': 'send_loaded_save_identifiers_response'
             }))
-            return
-        if message_type == 'show_notification':
-            notification_text = None
-            try:
-                notification_text = message['text']
-            except KeyError:
-                pass
-            if notification_text is not None:
-                notification_title = None
-                try:
-                    notification_title = message['notification_title']
-                except KeyError:
-                    pass
-                _show_notification(notification_text, notification_title)
             return
 
     def _reset_bridged_ui_cache(self):

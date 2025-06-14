@@ -30,6 +30,7 @@ public sealed class MultipleModVersionsScan :
         return Task.CompletedTask;
     }
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);

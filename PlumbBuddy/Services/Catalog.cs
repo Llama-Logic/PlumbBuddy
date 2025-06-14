@@ -93,6 +93,7 @@ public class Catalog :
     void QueryManifests() =>
         Task.Run(QueryManifestsAsync);
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task QueryManifestsAsync()
     {
         var userDataFolderPath = settings.UserDataFolderPath;

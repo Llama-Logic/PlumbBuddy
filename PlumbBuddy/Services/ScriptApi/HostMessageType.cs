@@ -10,6 +10,5 @@ public enum HostMessageType
     FocusBridgedUiResponse,
     ForegroundPlumbbuddy,
     RelationalDataStorageQueryResults,
-    SendLoadedSaveIdentifiers,
-    ShowNotification
+    SendLoadedSaveIdentifiers
 }

@@ -239,7 +239,7 @@
          * @returns {Number}
          */
         get executionSeconds() {
-
+            return this.#executionSeconds;
         }
 
         /**
@@ -322,7 +322,7 @@
                 throw new Error('sql must be a string');
             }
             const queryId = generateUUIDv4();
-            serializationSafeParameters = {};
+            const serializationSafeParameters = {};
             if (parameters) {
                 Object.keys(parameters).forEach(key => {
                     const value = parameters[key];

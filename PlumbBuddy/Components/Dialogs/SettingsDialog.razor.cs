@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Components.Dialogs;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class SettingsDialog
 {
     IReadOnlyList<string> defaultCreators = [];
@@ -281,6 +282,7 @@ partial class SettingsDialog
     void SampleModHoundPackagesBatchYield() =>
         _ = Task.Run(SampleModHoundPackagesBatchYieldAsync);
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task SampleModHoundPackagesBatchYieldAsync()
     {
         try

@@ -334,6 +334,7 @@ partial class ManifestEditor
         return false;
     }
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ComposeAsync()
     {
         await StaticDispatcher.DispatchAsync(() =>

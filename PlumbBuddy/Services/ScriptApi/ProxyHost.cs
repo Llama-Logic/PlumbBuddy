@@ -1,5 +1,3 @@
-using Serializer = ProtoBuf.Serializer;
-
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Globalization", "CA1308: Normalize strings to uppercase", Justification = "This is for Python, CA. You have your head up your ass.")]
@@ -35,7 +33,6 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
-    static readonly string[] writeAheadLoggingExtensions = [".wal", ".shm"];
 
     static JsonSerializerOptions AddConverters(JsonSerializerOptions options)
     {
@@ -84,11 +81,9 @@ public partial class ProxyHost :
         cancellationToken = cancellationTokenSource.Token;
         connectedClients = new();
         bridgedUiLoadingLocks = new();
-        fileSystemWatcherLock = new();
         loadedBridgedUis = new();
-        relationalDataStorageConnectionInitializationLocks = new();
+        relationalDataStorageConnectionLocks = new();
         saveSpecificDataStoragePropagationLock = new();
-        ConnectToUserDataFolder();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         listener = new(IPAddress.Loopback, port);
         listener.Start();
@@ -103,8 +98,6 @@ public partial class ProxyHost :
     readonly CancellationTokenSource cancellationTokenSource;
     readonly CancellationToken cancellationToken;
     readonly ConcurrentDictionary<TcpClient, AsyncLock> connectedClients;
-    FileSystemWatcher? fileSystemWatcher;
-    readonly AsyncLock fileSystemWatcherLock;
     bool isBridgedUiDevelopmentModeEnabled;
     bool isClientConnected;
     readonly TcpListener listener;
@@ -112,11 +105,7 @@ public partial class ProxyHost :
     readonly ILogger<ProxyHost> logger;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
-    ulong preSaveCreated;
-    ulong preSaveNucleusId;
-    ulong preSaveSimNow;
-    readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionInitializationLocks;
-    AsyncProducerConsumerQueue<string>? saveAnalysisQueue;
+    readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionLocks;
     ulong saveCreated;
     ulong saveNucleusId;
     ulong saveSimNow;
@@ -156,46 +145,6 @@ public partial class ProxyHost :
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? ProxyConnected;
     public event EventHandler? ProxyDisconnected;
-
-    async Task AnalyzeSavesAsync()
-    {
-        if (this.saveAnalysisQueue is not { } saveAnalysisQueue)
-            return;
-        while (await saveAnalysisQueue.OutputAvailableAsync().ConfigureAwait(false))
-        {
-            var saveFile = new FileInfo(await saveAnalysisQueue.DequeueAsync().ConfigureAwait(false));
-            var savesPath = Path.Combine(settings.UserDataFolderPath, "saves");
-            if (!saveFile.FullName.StartsWith(savesPath, platformFunctions.FileSystemStringComparison))
-                continue;
-            var saveFileLength = saveFile.Length;
-            while (true)
-            {
-                await Task.Delay(1000).ConfigureAwait(false);
-                saveFile.Refresh();
-                if (saveFile.Length == saveFileLength)
-                    break;
-                saveFileLength = saveFile.Length;
-            }
-            var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
-            var savePackageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
-            var saveGameDataKeys = savePackageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
-            if (saveGameDataKeys.Length is <= 0 or >= 2)
-                continue;
-            var saveGameDataKey = saveGameDataKeys[0];
-            var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
-            if (saveGameData.Account is not { } account
-                || account.Created != preSaveCreated
-                || account.NucleusId != preSaveNucleusId)
-                continue;
-            saveCreated = preSaveCreated;
-            saveNucleusId = preSaveNucleusId;
-            saveSimNow = preSaveSimNow;
-            preSaveCreated = default;
-            preSaveNucleusId = default;
-            preSaveSimNow = default;
-            await SnapshotSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
-        }
-    }
 
     async Task BridgedUiRequestResolvedAsync(Guid uniqueId, int denialReason)
     {
@@ -237,32 +186,6 @@ public partial class ProxyHost :
         }
     }
 
-    void ConnectToUserDataFolder()
-    {
-        using var fileSystemWatcherLockHeld = fileSystemWatcherLock.Lock();
-        if (fileSystemWatcher is not null)
-            DisconnectFromUserDataFolder(fileSystemWatcherLockHeld);
-        if (!Directory.Exists(settings.UserDataFolderPath))
-            return;
-        saveAnalysisQueue = new();
-        _ = Task.Run(AnalyzeSavesAsync);
-        fileSystemWatcher = new FileSystemWatcher(settings.UserDataFolderPath)
-        {
-            Filter = "*.save",
-            IncludeSubdirectories = true,
-            InternalBufferSize = 64 * 1024,
-            NotifyFilter =
-                  NotifyFilters.CreationTime
-                | NotifyFilters.DirectoryName
-                | NotifyFilters.FileName
-                | NotifyFilters.LastWrite
-                | NotifyFilters.Size
-        };
-        fileSystemWatcher.Created += HandleFileSystemWatcherCreated;
-        fileSystemWatcher.Error += HandleFileSystemWatcherError;
-        fileSystemWatcher.EnableRaisingEvents = true;
-    }
-
     public void DestroyBridgedUi(Guid uniqueId) =>
         _ = Task.Run(async () => await DestroyBridgedUiAsync(uniqueId).ConfigureAwait(false));
 
@@ -295,29 +218,6 @@ public partial class ProxyHost :
             cachedArchive.Delete();
     }
 
-    void DisconnectFromUserDataFolder(IDisposable? fileSystemWatcherLockHeld = null)
-    {
-        var disposeLockHeld = fileSystemWatcherLockHeld is null;
-        if (disposeLockHeld)
-            fileSystemWatcherLockHeld = fileSystemWatcherLock.Lock();
-        try
-        {
-            saveAnalysisQueue?.CompleteAdding();
-            saveAnalysisQueue = null;
-            if (fileSystemWatcher is null)
-                return;
-            fileSystemWatcher.Created -= HandleFileSystemWatcherCreated;
-            fileSystemWatcher.Error -= HandleFileSystemWatcherError;
-            fileSystemWatcher.Dispose();
-            fileSystemWatcher = null;
-        }
-        finally
-        {
-            if (disposeLockHeld)
-                fileSystemWatcherLockHeld?.Dispose();
-        }
-    }
-
     public void Dispose()
     {
         GC.SuppressFinalize(this);
@@ -330,7 +230,6 @@ public partial class ProxyHost :
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
-            DisconnectFromUserDataFolder();
             cancellationTokenSource.Cancel();
             listener.Dispose();
             cancellationTokenSource.Dispose();
@@ -413,21 +312,10 @@ public partial class ProxyHost :
             Type = nameof(HostMessageType.ForegroundPlumbbuddy).Underscore().ToLowerInvariant()
         });
 
-    void HandleFileSystemWatcherCreated(object sender, FileSystemEventArgs e) =>
-        saveAnalysisQueue?.Enqueue(e.FullPath);
-
-    void HandleFileSystemWatcherError(object sender, ErrorEventArgs e)
-    {
-        logger.LogError(e.GetException(), "saves directory monitoring encountered unexpected unhandled exception");
-        ConnectToUserDataFolder();
-    }
-
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(ISettings.Type))
             IsBridgedUiDevelopmentModeEnabled = false;
-        else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
-            ConnectToUserDataFolder();
     }
 
     async Task InitializeSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
@@ -449,17 +337,7 @@ public partial class ProxyHost :
             .Take(1)
             .Select(t => t.directory)
             .FirstOrDefault();
-        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-        var sqliteWriteAheadLoggingCleanupStopwatch = new Stopwatch();
-        sqliteWriteAheadLoggingCleanupStopwatch.Start();
-        while (sqliteWriteAheadLoggingCleanupStopwatch.Elapsed <= TimeSpan.FromSeconds(10)
-            && saveSpecificFiles.Any(file => writeAheadLoggingExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
-        {
-            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
-            saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-        }
-        sqliteWriteAheadLoggingCleanupStopwatch.Stop();
-        foreach (var file in saveSpecificFiles)
+        foreach (var file in saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
             file.Delete();
         if (restoreDirectory is not null)
             foreach (var file in restoreDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
@@ -512,6 +390,7 @@ public partial class ProxyHost :
         });
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ProcessBridgedUiRequestAsync(BridgedUiRequestMessage requestMessage)
     {
         using var bridgedUiLoadingLockHeld = await bridgedUiLoadingLocks.GetOrAdd(requestMessage.UniqueId, _ => new()).LockAsync().ConfigureAwait(false);
@@ -591,6 +470,7 @@ public partial class ProxyHost :
         PromptPlayerForBridgedUiAuthorization(requestMessage, archive);
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ProcessMessageAsync(JsonDocument message, JsonSerializerOptions jsonSerializerOptions, Guid? fromBridgedUiUniqueId = null)
     {
         var messageRoot = message.RootElement;
@@ -664,9 +544,10 @@ public partial class ProxyHost :
                     }
                     else if (gameServiceEvent is GameServiceEvent.PreSave)
                     {
-                        preSaveCreated = gameServiceEventMessage.Created;
-                        preSaveNucleusId = gameServiceEventMessage.NucleusId;
-                        preSaveSimNow = gameServiceEventMessage.SimNow;
+                        saveCreated = gameServiceEventMessage.Created;
+                        saveNucleusId = gameServiceEventMessage.NucleusId;
+                        saveSimNow = gameServiceEventMessage.SimNow;
+                        await SnapshotSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
                     }
                 }
                 break;
@@ -697,6 +578,7 @@ public partial class ProxyHost :
                     saveCreated = sendLoadedSaveIdentifiersResponseMessage.Created;
                     saveNucleusId = sendLoadedSaveIdentifiersResponseMessage.NucleusId;
                     saveSimNow = sendLoadedSaveIdentifiersResponseMessage.SimNow;
+                    await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
                 }
                 break;
         }
@@ -903,14 +785,7 @@ public partial class ProxyHost :
         }
     }
 
-    public async Task ShowInGameNotificationAsync(string text, string? title = null) =>
-        await SendMessageToProxyAsync(new ShowNotificationMessage
-        {
-            Text = text,
-            Title = title,
-            Type = nameof(HostMessageType.ShowNotification).Underscore().ToLowerInvariant()
-        }).ConfigureAwait(false);
-
+    [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities")]
     async Task SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
@@ -922,26 +797,23 @@ public partial class ProxyHost :
         var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
         if (!saveSpecificDirectory.Exists)
             saveSpecificDirectory.Create();
-        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.sqlite", SearchOption.TopDirectoryOnly);
         if (saveSpecificFiles.Length is 0)
             return;
         var snapshotDirectory = new DirectoryInfo(Path.Combine(saveSpecificDirectory.FullName, saveSimNow.ToString("x16")));
         if (snapshotDirectory.Exists)
-            foreach (var file in snapshotDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
+            foreach (var file in snapshotDirectory.GetFiles("*.sqlite", SearchOption.TopDirectoryOnly))
                 file.Delete();
         else
             snapshotDirectory.Create();
-        var sqliteWriteAheadLoggingCleanupStopwatch = new Stopwatch();
-        sqliteWriteAheadLoggingCleanupStopwatch.Start();
-        while (sqliteWriteAheadLoggingCleanupStopwatch.Elapsed <= TimeSpan.FromSeconds(10)
-            && saveSpecificFiles.Any(file => writeAheadLoggingExtensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
-        {
-            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
-            saveSpecificFiles = saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-        }
-        sqliteWriteAheadLoggingCleanupStopwatch.Stop();
         foreach (var file in saveSpecificFiles)
-            file.CopyTo(Path.Combine(snapshotDirectory.FullName, file.Name));
+        {
+            using var connection = new SqliteConnection($"Data Source={file.FullName}");
+            await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
+            var com = connection.CreateCommand();
+            com.CommandText = $"VACUUM INTO '{Path.Combine(snapshotDirectory.FullName, file.Name).Replace("'", "''", StringComparison.Ordinal)}';";
+            await com.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+        }
         foreach (var invalidatedSnapshotDirectory in saveSpecificDirectory
             .GetDirectories("*.*", SearchOption.TopDirectoryOnly)
             .Select(directory => (directory, simNow: ulong.TryParse(directory.Name, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var simNow) ? simNow : ulong.MaxValue))
@@ -968,37 +840,11 @@ public partial class ProxyHost :
                     saveSpecificDirectory.Create();
                 databaseDirectoryPath = saveSpecificDirectory.FullName;
             }
-            SqliteConnection? connection = null;
-            try
-            {
-                using (var relationalDataStorageConnectionInitializationLockHeld = await relationalDataStorageConnectionInitializationLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false))
-                {
-                    var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
-                    var enableWriteAheadLogging = !databaseFile.Exists;
-                    connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
-                    await connection.OpenAsync(CancellationToken.None);
-                    if (enableWriteAheadLogging)
-                    {
-                        var enableWalCommand = connection.CreateCommand();
-                        enableWalCommand.CommandText = "PRAGMA journal_mode=WAL;";
-                        await enableWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-                    }
-                }
-                await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
-                if (isSaveSpecific)
-                {
-                    var fullCheckpointWalCommand = connection.CreateCommand();
-                    fullCheckpointWalCommand.CommandText = "PRAGMA wal_checkpoint(FULL);";
-                    await fullCheckpointWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-                    var truncateWalCommand = connection.CreateCommand();
-                    truncateWalCommand.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);";
-                    await truncateWalCommand.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-                }
-            }
-            finally
-            {
-                connection?.Dispose();
-            }
+            using var relationalDataStorageConnectionLockHeld = await relationalDataStorageConnectionLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
+            var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
+            using var connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
+            await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
+            await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
         }
         finally
         {

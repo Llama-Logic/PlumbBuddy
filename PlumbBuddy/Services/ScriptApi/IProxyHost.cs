@@ -19,5 +19,4 @@ public interface IProxyHost :
     void DestroyBridgedUi(Guid uniqueId);
     Task ForegroundPlumbBuddyAsync();
     Task ProcessMessageFromBridgedUiAsync(Guid uniqueId, string messageJson);
-    Task ShowInGameNotificationAsync(string text, string? title = null);
 }

@@ -543,6 +543,7 @@ public sealed class Parlay :
     void SaveTranslation() =>
         _ = Task.Run(SaveTranslationAsync);
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     public async Task SaveTranslationAsync()
     {
         var maybeNullOriginalPackageFile = originalPackageFile;

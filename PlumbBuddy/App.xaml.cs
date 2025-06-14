@@ -5,6 +5,7 @@ namespace PlumbBuddy;
 public partial class App :
     Application
 {
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);

@@ -37,6 +37,7 @@ class InterProcessCommunicationClient():
         * `2`: connected
         * `3`: disconnecting
         """
+
         return self._connection_state
     
     @property
@@ -46,6 +47,7 @@ class InterProcessCommunicationClient():
 
         :returns: The Event[int] representing the connection_state_changed event
         """
+
         return self._connection_state_changed
     
     @property
@@ -55,6 +57,7 @@ class InterProcessCommunicationClient():
 
         :returns: True if the IPC client is connected; otherwise, False
         """
+
         return self._connection_state == 2
     
     @property
@@ -64,6 +67,7 @@ class InterProcessCommunicationClient():
 
         :returns: True if the IPC client is disconnected; otherwise, False
         """
+
         return self._connection_state == 0
     
     def _reset_message_queues(self):
@@ -89,8 +93,7 @@ class InterProcessCommunicationClient():
         try:
             while self.is_connected:
                 while not self._messages_to_plumbbuddy.empty():
-                    message = self._messages_to_plumbbuddy.get()
-                    serialized_message = json.dumps(message, separators=(",", ":")).encode()
+                    serialized_message = self._messages_to_plumbbuddy.get()
                     self._socket.sendall(struct.pack(">I", len(serialized_message)) + serialized_message)
                     logger.debug("[IPC Client] sent: %s", message)
                 self._socket.settimeout(0.1)
@@ -120,6 +123,7 @@ class InterProcessCommunicationClient():
         """
         Connects to PlumbBuddy and initialize message queue processing
         """
+
         if not self.is_disconnected:
             return
         
@@ -133,6 +137,7 @@ class InterProcessCommunicationClient():
         """
         Disconnects from PlumbBuddy and shutdown message queue processing
         """
+
         if not self.is_connected:
             return
         
@@ -160,6 +165,7 @@ class InterProcessCommunicationClient():
         
         :returns: The list of messages that were pending
         """
+
         messages: List[Dict] = []
         while not self._messages_from_plumbbuddy.empty():
             messages.append(self._messages_from_plumbbuddy.get())
@@ -172,7 +178,9 @@ class InterProcessCommunicationClient():
 
         :param message: The message to be sent
         """
-        self._messages_to_plumbbuddy.put_nowait(message)
-        logger.debug("[IPC Client] enqueued %s", message)
+
+        serialized_message = json.dumps(message, separators=(",", ":")).encode()
+        self._messages_to_plumbbuddy.put_nowait(serialized_message)
+        logger.debug("[IPC Client] enqueued %s", serialized_message)
 
 ipc = InterProcessCommunicationClient()

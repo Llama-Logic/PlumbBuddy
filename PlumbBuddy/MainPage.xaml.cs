@@ -4,6 +4,7 @@ using Animation = Microsoft.Maui.Controls.Animation;
 namespace PlumbBuddy;
 
 [SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public partial class MainPage :
     ContentPage
 {

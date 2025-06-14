@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Components.Controls;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class ModComponentEditor
 {
     ChipSetField? exclusivitiesField;
@@ -178,6 +179,7 @@ partial class ModComponentEditor
             modComponent.IgnoreIfPackUnavailable = newValue;
     }
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task HandleIntegrateTranslatorsOverridePackageOnClickAsync()
     {
         if (ModComponent?.FileObjectModel is not DataBasePackedFile componentDbpf

@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Services;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public class ModHoundClient :
     IModHoundClient
 {
@@ -312,6 +313,8 @@ public class ModHoundClient :
     public void RequestReport() =>
         _ = Task.Run(RequestReportAsync);
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task RequestReportAsync()
     {
         IDisposable? requestLockHeld = null;

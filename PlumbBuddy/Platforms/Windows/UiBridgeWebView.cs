@@ -4,6 +4,7 @@ using Windows.Storage.Streams;
 
 namespace PlumbBuddy;
 
+[SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
 public partial class UiBridgeWebView
 {
     WebView2 PlatformWebView =>
@@ -27,6 +28,7 @@ public partial class UiBridgeWebView
             }
             var (found, content, contentType) = await GetContentAsync(uri);
             using var contentStream = new ReadOnlyMemoryOfByteStream(content);
+#pragma warning disable CA2000 // Dispose objects before losing scope
             args.Response = found
                 ? sender.Environment.CreateWebResourceResponse
                 (
@@ -41,6 +43,7 @@ public partial class UiBridgeWebView
                     ReasonPhrase: "Not Found",
                     Headers: string.Empty
                 );
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
         finally
         {
