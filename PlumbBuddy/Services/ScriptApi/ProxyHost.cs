@@ -659,6 +659,8 @@ public partial class ProxyHost :
                             var value = reader.GetValue(i);
                             if (value == DBNull.Value)
                                 value = null;
+                            else if (value is IEnumerable<byte> bytes)
+                                value = new { base64 = Convert.ToBase64String(bytes is byte[] bytesArray ? bytesArray : [..bytes]) };
                             record.Add(value);
                         }
                         recordSet.Records.Add(record);

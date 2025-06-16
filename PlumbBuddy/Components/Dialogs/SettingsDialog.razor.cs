@@ -1,3 +1,5 @@
+using PlumbBuddy.Services;
+
 namespace PlumbBuddy.Components.Dialogs;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -9,6 +11,7 @@ partial class SettingsDialog
     ModHoundExcludePackagesMode modHoundExcludePackagesMode;
     IReadOnlyList<string> modHoundPackagesExclusions = [];
     ChipSetField? modHoundPackagesExclusionsChipSetField;
+    ModsDirectoryCatalogerState modsDirectoryCatalogerState;
     decimal originalUiZoom;
     MudTabs? tabs;
     ThemeSelector? themeSelector;
@@ -139,8 +142,17 @@ partial class SettingsDialog
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IModsDirectoryCataloger.State) && ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
-            SampleModHoundPackagesBatchYield();
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
+        {
+            StaticDispatcher.Dispatch(() =>
+            {
+                modsDirectoryCatalogerState = ModsDirectoryCataloger.State;
+                if (modsDirectoryCatalogerState is not ModsDirectoryCatalogerState.Idle)
+                    GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
+            });
+            if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+                SampleModHoundPackagesBatchYield();
+        }
     }
 
     void HandleSetModHoundReportRetentionPeriodDefault() =>
@@ -179,6 +191,7 @@ partial class SettingsDialog
 
     protected override void OnInitialized()
     {
+        modsDirectoryCatalogerState = ModsDirectoryCataloger.State;
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
     }

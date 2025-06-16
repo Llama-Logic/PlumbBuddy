@@ -58,8 +58,8 @@
 						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_OfferPatchDayModUpdatesHelp_Label)]
 					</MudSwitchM3>
 				</MudTooltip>
-				<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
-					<MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.AccessPointNetwork">
+                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Tip)]">
+                    <MudSwitchM3 @bind-Value="@GenerateGlobalManifestPackage" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.AccessPointNetwork" Disabled="@(modsDirectoryCatalogerState is not ModsDirectoryCatalogerState.Idle)">
 						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
 					</MudSwitchM3>
 				</MudTooltip>

@@ -178,7 +178,21 @@
 
         constructor(recordSetMessageExcerpt) {
             this.#fieldNames = Object.freeze(recordSetMessageExcerpt.fieldNames);
-            this.#records = deepFreeze(recordSetMessageExcerpt.records);
+            this.#records = deepFreeze(recordSetMessageExcerpt.records.map(record => record.map(value => {
+                if (typeof value === 'object' || value instanceof Object) {
+                    const base64 = value?.base64;
+                    if (base64) {
+                        const binaryString = atob(base64);
+                        const ii = binaryString.length;
+                        const binary = new Uint8Array(ii);
+                        for (let i = 0; i < ii; ++i) {
+                            binary[i] = binaryString.charCodeAt(i);
+                        }
+                        return binary;
+                    }
+                }
+                return value;
+            })));
         }
 
         /**

@@ -18,13 +18,16 @@ import webbrowser
 
 def _attach_save_characteristics(ipc_message: dict) -> dict:
     try:
-        persistence = services.get_persistence_service()
-        account = persistence.get_account_proto_buff()
+        get_persistence_service = getattr(services, 'get_persistence_service', None)
+        time_service = getattr(services, 'time_service', None)
+        if not callable(get_persistence_service) or not callable(time_service):
+            return ipc_message
+        account = get_persistence_service().get_account_proto_buff()
         return {
             **ipc_message,
             'nucleus_id': account.nucleus_id,
             'created': account.created,
-            'sim_now': int(services.time_service().sim_now)
+            'sim_now': int(time_service().sim_now)
         }
     except Exception as ex:
         logger.exception(ex)
@@ -118,7 +121,12 @@ class RelationalDataStorageQueryRecordSet:
         self._field_names = tuple(record_set_message_excerpt['field_names'])
         records = []
         for record in record_set_message_excerpt['records']:
-            records.append(tuple(record))
+            values = []
+            for value in record:
+                if isinstance(value, dict) and 'base64' in value:
+                    value = base64.b64decode(value['base64'])
+                values.append(value)
+            records.append(tuple(values))
         self._records = tuple(records)
     
     @property
