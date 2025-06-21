@@ -1,3 +1,6 @@
+using ICSharpCode.SharpZipLib.Zip;
+using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
+
 namespace PlumbBuddy.Components.Controls;
 
 partial class ModFileSelector
@@ -115,8 +118,8 @@ partial class ModFileSelector
             {
                 var editableManifests = new Dictionary<ResourceKey, ModFileManifestModel>();
                 manifests = editableManifests;
-                using var zipArchive = ZipFile.OpenRead(modFile.FullName);
-                if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive) is { } scriptModManifest)
+                using var zipFile = new ZipFile(modFile.OpenRead(), false);
+                if (await ModFileManifestModel.GetModFileManifestAsync(zipFile) is { } scriptModManifest)
                     editableManifests.Add(default, scriptModManifest);
             }
             catch

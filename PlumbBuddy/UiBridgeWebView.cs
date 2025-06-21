@@ -3,21 +3,20 @@ namespace PlumbBuddy;
 public partial class UiBridgeWebView :
     WebView
 {
-    static readonly Uri indexUrl = new($"{uriPrefix}index.html", UriKind.Absolute);
 #if WINDOWS
     public const string Scheme = "http";
 #else
     public const string Scheme = "plumbbuddy";
 #endif
-    const string uriPrefix = $"{Scheme}://bridged-ui/";
 
-    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, ICSharpCode.SharpZipLib.Zip.ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId)
+    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, ICSharpCode.SharpZipLib.Zip.ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId, string hostName = "bridged-ui")
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(updateManager);
         ArgumentNullException.ThrowIfNull(proxyHost);
         ArgumentNullException.ThrowIfNull(bridgedUiRootPath);
+        ArgumentNullException.ThrowIfNull(hostName);
         Logger = logger;
         Settings = settings;
         UniqueId = uniqueId;
@@ -27,18 +26,26 @@ public partial class UiBridgeWebView :
         this.proxyHost.BridgedUiMessageSent += HandleProxyHostMessageSent;
         this.scriptModFile = scriptModFile;
         this.bridgedUiRootPath = bridgedUiRootPath;
+        this.hostName = hostName;
     }
 
     readonly string bridgedUiRootPath;
+    readonly string hostName;
     readonly IProxyHost proxyHost;
     readonly ICSharpCode.SharpZipLib.Zip.ZipFile? scriptModFile;
     readonly IUpdateManager updateManager;
+
+    Uri IndexUrl =>
+        new($"{UriPrefix}index.html", UriKind.Absolute);
 
     public ILogger<UiBridgeWebView> Logger { get; }
 
     public ISettings Settings { get; }
 
     public Guid UniqueId { get; }
+
+    string UriPrefix =>
+        $"{Scheme}://{hostName}/";
 
     public void DisconnectHandlers()
     {
@@ -72,7 +79,7 @@ public partial class UiBridgeWebView :
             if (!Uri.TryCreate(bridgedUiRootPath, UriKind.Absolute, out var baseUri))
                 return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
             using var httpClient = new HttpClient { BaseAddress = baseUri };
-            var uriStr = uri.ToString()[uriPrefix.Length..];
+            var uriStr = uri.ToString()[UriPrefix.Length..];
             if (!string.IsNullOrEmpty(uri.Fragment))
                 uriStr = uriStr[..^uri.Fragment.Length];
             using var response = await httpClient.GetAsync(uriStr).ConfigureAwait(false);
@@ -106,9 +113,9 @@ public partial class UiBridgeWebView :
             return (true, echoWriter.WrittenMemory, content.Headers.ContentType?.MediaType ?? "application/octet-stream");
         }
         var entryName = uri.AbsoluteUri.ToString();
-        if (!entryName.StartsWith(uriPrefix, StringComparison.Ordinal))
+        if (!entryName.StartsWith(UriPrefix, StringComparison.Ordinal))
             return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
-        entryName = entryName[uriPrefix.Length..];
+        entryName = entryName[UriPrefix.Length..];
         if (!string.IsNullOrEmpty(uri.Fragment))
             entryName = entryName[..^uri.Fragment.Length];
         if (!string.IsNullOrEmpty(uri.Query))
@@ -184,10 +191,10 @@ public partial class UiBridgeWebView :
         InitializeWebView();
         if (scriptModFile is null)
         {
-            Navigate(new Uri(uriPrefix, UriKind.Absolute));
+            Navigate(new Uri(UriPrefix, UriKind.Absolute));
             return;
         }
-        Navigate(indexUrl);
+        Navigate(IndexUrl);
     }
 
     public void OnMessageFromBridgedUi(string message) =>

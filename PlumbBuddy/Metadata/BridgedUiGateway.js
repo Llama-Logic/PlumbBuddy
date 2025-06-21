@@ -107,6 +107,13 @@
         }
     }
 
+    class InvalidHostNameError extends Error {
+        constructor() {
+            super('The host name you specified is not legal by the DNS standard - use only letters from the Latin alphabet, Arabic numerals, and the dash (-)');
+            this.name = 'InvalidHostNameError';
+        }
+    }
+
     class BridgedUiNotFoundError extends Error {
         constructor() {
             super('The referenced bridged UI is not currently loaded');
@@ -547,6 +554,8 @@
                     fault = new IndexNotFoundError();
                 } else if (denialReason === 3) {
                     fault = new PlayerDeniedRequestError();
+                } else if (denialReason === 4) {
+                    fault = new InvalidHostNameError();
                 } else {
                     fault = new Error('Unknown denial reason')
                 }
@@ -571,9 +580,10 @@
          * @param {String} requestReason the reason the party is making the request, to be presented to the player
          * @param {String} tabName the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
          * @param {String?} tabIconPath a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
-         * @returns {Promise} an promise that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, etc.)
+         * @param {String?} hostName the host name for the simulated web server to use when displaying your bridged UI, which matters to common browser services like local storage and IndexedDB (this will be your UI's uniqueId if ommitted)
+         * @returns {Promise} an promise that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, `InvalidHostNameError`, etc.)
          */
-        requestBridgedUi(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath) {
+        requestBridgedUi(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath = null, hostName = null) {
             if (!uiRoot) {
                 throw new Error('uiRoot is not optional');
             }
@@ -612,6 +622,7 @@
                 requestReason,
                 tabName,
                 tabIconPath,
+                hostName,
             });
             return madePromise.promise;
         }

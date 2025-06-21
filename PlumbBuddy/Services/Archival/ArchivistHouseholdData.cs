@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [ProtoContract]
-sealed class ArchivistNeighborhoodData :
+public sealed class ArchivistHouseholdData :
     IExtensible
 {
     IExtension? extensionData;
@@ -11,10 +11,10 @@ sealed class ArchivistNeighborhoodData :
     IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
         Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 
-    [ProtoMember(1, Name = @"neighborhood_id", DataFormat = DataFormat.FixedSize)]
-    public ulong NeighborhoodId { get; set; }
+    [ProtoMember(2, Name = "household_id", DataFormat = DataFormat.FixedSize, IsRequired = true)]
+    public ulong HouseholdId { get; set; }
 
-    [ProtoMember(3, Name = @"name")]
+    [ProtoMember(3, Name = "name")]
     [DefaultValue("")]
     public string Name { get; set; } = "";
 }

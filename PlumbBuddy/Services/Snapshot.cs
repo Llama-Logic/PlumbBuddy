@@ -1,3 +1,4 @@
+using PlumbBuddy.Services.Archival;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
 using Serializer = ProtoBuf.Serializer;

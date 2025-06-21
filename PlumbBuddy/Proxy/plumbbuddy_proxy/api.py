@@ -4,7 +4,6 @@ from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
 from distributor.shared_messages import IconInfoData
 from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
-from sims4.localization import LocalizationHelperTuning
 from plumbbuddy_proxy import logger
 import os
 from clock import ServerClock
@@ -19,15 +18,37 @@ import webbrowser
 def _attach_save_characteristics(ipc_message: dict) -> dict:
     try:
         get_persistence_service = getattr(services, 'get_persistence_service', None)
-        time_service = getattr(services, 'time_service', None)
-        if not callable(get_persistence_service) or not callable(time_service):
+        get_time_service = getattr(services, 'time_service', None)
+        if not callable(get_persistence_service) or not callable(get_time_service):
             return ipc_message
-        account = get_persistence_service().get_account_proto_buff()
+        persistence_service = get_persistence_service()
+        account = persistence_service.get_account_proto_buff()
+        nucleus_id = getattr(account, 'nucleus_id', None)
+        if nucleus_id is None:
+            return ipc_message
+        created = getattr(account, 'created', None)
+        if created is None:
+            return ipc_message
+        time_service = None
+        try:
+            time_service = get_time_service()
+        except:
+            pass
+        if time_service is None:
+            return ipc_message
+        sim_now = getattr(time_service, 'sim_now', None)
+        if sim_now is None:
+            return ipc_message
+        save_slot = persistence_service.get_save_slot_proto_buff()
+        slot_id = getattr(save_slot, 'slot_id', None)
+        if slot_id is None:
+            return ipc_message
         return {
             **ipc_message,
-            'nucleus_id': account.nucleus_id,
-            'created': account.created,
-            'sim_now': int(time_service().sim_now)
+            'nucleus_id': nucleus_id,
+            'created': created,
+            'sim_now': int(sim_now),
+            'slot_id': slot_id
         }
     except Exception as ex:
         logger.exception(ex)
@@ -295,6 +316,10 @@ class PlayerDeniedRequestError(Exception):
     def __init__(self):
         super().__init__('The player has denied your request to display that bridged UI')
 
+class InvalidHostNameError(Exception):
+    def __init__(self):
+        super().__init__('The host name you specified is not legal by the DNS standard - use only letters from the Latin alphabet, Arabic numerals, and the dash (-)')
+
 class BridgedUiNotFoundError(Exception):
     def __init__(self):
         super().__init__('The referenced bridged UI is not currently loaded')
@@ -403,6 +428,8 @@ class Gateway:
                 fault = IndexNotFoundError()
             elif denial_reason == 3:
                 fault = PlayerDeniedRequestError()
+            elif denial_reason == 4:
+                fault = InvalidHostNameError()
             else:
                 fault = Exception('Unknown denial reason')
             for eventual in eventuals_list:
@@ -505,7 +532,7 @@ class Gateway:
         })
         return eventual
     
-    def request_bridged_ui(self, script_mod: str, ui_root: str, unique_id: UUID, requestor_name: str, request_reason: str, tab_name: str, tab_icon_path: Optional[str] = None) -> Eventual[BridgedUi]:
+    def request_bridged_ui(self, script_mod: str, ui_root: str, unique_id: UUID, requestor_name: str, request_reason: str, tab_name: str, tab_icon_path: Optional[str] = None, host_name: Optional[str] = None) -> Eventual[BridgedUi]:
         """
         Requests a bridged UI from PlumbBuddy
 
@@ -516,7 +543,8 @@ class Gateway:
         :param request_reason: the reason the party is making the request, to be presented to the player
         :param tab_name: the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
         :param tab_icon_path: (optional) a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
-        :returns: an Eventual that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, etc.)
+        :param host_name: (optional) the host name for the simulated web server to use when displaying your bridged UI, which matters to common browser services like local storage and IndexedDB (this will be your UI's `unique_id` if ommitted)
+        :returns: an Eventual that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, `InvalidHostNameError`, etc.)
         """
         if ui_root is None or len(ui_root) == 0:
             raise Exception('ui_root is not optional')
@@ -556,7 +584,8 @@ class Gateway:
             'requestor_name': requestor_name,
             'request_reason': request_reason,
             'tab_name': tab_name,
-            'tab_icon_path': tab_icon_path
+            'tab_icon_path': tab_icon_path,
+            'host_name': host_name
         })
         _try_to_foreground_plumbbuddy()
         return eventual

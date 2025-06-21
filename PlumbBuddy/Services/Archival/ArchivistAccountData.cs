@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [ProtoContract]
-sealed class ArchivistAccountData :
+public sealed class ArchivistAccountData :
     IExtensible
 {
     IExtension? extensionData;

@@ -1,3 +1,6 @@
+using ICSharpCode.SharpZipLib.Zip;
+using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
+
 namespace PlumbBuddy.Components.Controls;
 
 [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
@@ -209,11 +212,11 @@ partial class ManifestEditor
         }
         else if (modFile.Extension.Equals(".ts4script", StringComparison.OrdinalIgnoreCase))
         {
-            ZipArchive zipArchive;
+            ZipFile zipFile;
             try
             {
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                zipArchive = ZipFile.Open(modFile.FullName, ZipArchiveMode.Update);
+                zipFile = new ZipFile(modFile.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None), false);
 #pragma warning restore CA2000 // Dispose objects before losing scope
             }
             catch
@@ -226,9 +229,9 @@ partial class ManifestEditor
                 ).ConfigureAwait(false);
                 return AddFileResult.Unreadable;
             }
-            if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
+            if (await ModFileManifestModel.GetModFileManifestAsync(zipFile).ConfigureAwait(false) is { } manifest)
                 manifests = [manifest];
-            fileObjectModel = zipArchive;
+            fileObjectModel = zipFile;
         }
         else
         {
@@ -392,8 +395,8 @@ partial class ManifestEditor
                     await updateStatusAsync(0, StringLocalizer["ManifestEditor_Composing_Status_RemovingManifests", getComponentRelativePath(component)]).ConfigureAwait(false);
                     if (component.FileObjectModel is DataBasePackedFile dbpf)
                         await ModFileManifestModel.DeleteModFileManifestsAsync(dbpf).ConfigureAwait(false);
-                    else if (component.FileObjectModel is ZipArchive zipArchive)
-                        ModFileManifestModel.DeleteModFileManifests(zipArchive);
+                    else if (component.FileObjectModel is ZipFile zipFile)
+                        ModFileManifestModel.DeleteModFileManifests(zipFile);
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                 }
@@ -446,8 +449,8 @@ partial class ManifestEditor
                             continue;
                         hash = await ModFileManifestModel.GetModFileHashAsync(dbpf, hashResourceKeys).ConfigureAwait(false);
                     }
-                    else if (component.FileObjectModel is ZipArchive zipArchive)
-                        hash = ModFileManifestModel.GetModFileHash(zipArchive);
+                    else if (component.FileObjectModel is ZipFile zipFile)
+                        hash = ModFileManifestModel.GetModFileHash(zipFile);
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                     await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_InitializingManifest", componentRelativePath]).ConfigureAwait(false);
@@ -597,14 +600,14 @@ partial class ManifestEditor
                     if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
                         await updateStatusAsync(4, StringLocalizer["ManifestEditor_Composing_Status_SavingManifest", getComponentRelativePath(component)]).ConfigureAwait(false);
-                        var fileType = component.FileObjectModel is ZipArchive ? ModsDirectoryFileType.ScriptArchive : ModsDirectoryFileType.Package;
+                        var fileType = component.FileObjectModel is ZipFile ? ModsDirectoryFileType.ScriptArchive : ModsDirectoryFileType.Package;
                         if (component.FileObjectModel is DataBasePackedFile dbpf)
                         {
                             await ModFileManifestModel.SetModFileManifestAsync(dbpf, manifest).ConfigureAwait(false);
                             await dbpf.SaveAsync().ConfigureAwait(false);
                         }
-                        else if (component.FileObjectModel is ZipArchive zipArchive)
-                            await ModFileManifestModel.SetModFileManifestAsync(zipArchive, manifest).ConfigureAwait(false);
+                        else if (component.FileObjectModel is ZipFile zipFile)
+                            await ModFileManifestModel.SetModFileManifestAsync(zipFile, manifest).ConfigureAwait(false);
                         else
                             throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                         component.FileObjectModel.Dispose();
@@ -875,8 +878,8 @@ partial class ManifestEditor
                             .Values
                             .OrderBy(manifest => manifest.Name.Length)
                             .ThenBy(manifest => manifest.Name)];
-                    else if (fileObjectModel is ZipArchive zipArchive)
-                        manifests = [(await ModFileManifestModel.GetModFileManifestAsync(zipArchive))!];
+                    else if (fileObjectModel is ZipFile zipFile)
+                        manifests = [(await ModFileManifestModel.GetModFileManifestAsync(zipFile))!];
                     else
                         throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
                     name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;

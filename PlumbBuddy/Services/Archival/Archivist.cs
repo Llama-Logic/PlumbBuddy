@@ -1,6 +1,7 @@
+using System.Threading;
 using Serializer = ProtoBuf.Serializer;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 [SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
@@ -18,9 +19,9 @@ public partial class Archivist :
     private static partial Regex GetChronicleDatabaseFileNamePattern();
 
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
-    private static partial Regex GetSavesDirectoryLegalFilenamePattern();
+    public static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IProxyHost proxyHost, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
@@ -29,6 +30,7 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        ArgumentNullException.ThrowIfNull(proxyHost);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.loggerFactory = loggerFactory;
         this.logger = logger;
@@ -37,6 +39,7 @@ public partial class Archivist :
         this.appLifecycleManager = appLifecycleManager;
         this.settings = settings;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
+        this.proxyHost = proxyHost;
         this.superSnacks = superSnacks;
         chronicleByNucleusIdAndCreated = [];
         chronicles = [];
@@ -67,6 +70,7 @@ public partial class Archivist :
     AsyncProducerConsumerQueue<(string path, bool manuallyAdded)>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
+    readonly IProxyHost proxyHost;
     bool savesFolderScanned;
     string savesFolderPath = string.Empty;
     Chronicle? selectedChronicle;
@@ -640,6 +644,9 @@ public partial class Archivist :
             return;
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
+            DiagnosticStatus = $"Waiting for RMI";
+            await proxyHost.WaitForPendingSaveSpecificRelationalDataStorageEmbedAsync().ConfigureAwait(false);
+            DiagnosticStatus = null;
             var list = new List<(string path, bool manuallyAdded)>();
             var alreadyNomed = new Dictionary<string, bool>();
             list.Add(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));

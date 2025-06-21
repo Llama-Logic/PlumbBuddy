@@ -72,7 +72,7 @@ public partial class MainPage :
     void HandleProxyHostBridgedUiAuthorized(object? sender, BridgedUiAuthorizedEventArgs e) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
-            var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, lifetimeScope.Resolve<IUpdateManager>(), proxyHost, e.Archive, e.UiRoot, e.UniqueId);
+            var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, lifetimeScope.Resolve<IUpdateManager>(), proxyHost, e.Archive, e.UiRoot, e.UniqueId, e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant());
             var tab = new SfTabItem { Content = webView, Header = e.TabName };
             ImageSource? imageSource = null;
             if (e.TabIconPath is { } tabIconPath
@@ -92,11 +92,13 @@ public partial class MainPage :
     void HandleProxyHostBridgedUiDestroyed(object? sender, BridgedUiEventArgs e) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
-            if (tabView.Items.FirstOrDefault(t => t.Content is UiBridgeWebView webView && webView.UniqueId == e.UniqueId) is { } tabForDestroyedBridgedUi)
+            var bridgedUiIndex = tabView.Items.FindIndex(t => t.Content is UiBridgeWebView webView && webView.UniqueId == e.UniqueId);
+            if (bridgedUiIndex >= 1)
             {
-                tabView.Items.Remove(tabForDestroyedBridgedUi);
+                var tabForDestroyedBridgedUi = tabView.Items[bridgedUiIndex];
                 if (tabForDestroyedBridgedUi.Content is UiBridgeWebView uiBridgeWebView)
                     uiBridgeWebView.DisconnectHandlers();
+                tabView.Items.RemoveAt(bridgedUiIndex);
                 await RefreshTabViewAsync();
             }
         });

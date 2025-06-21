@@ -1,4 +1,4 @@
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 public enum ArchivistState
 {

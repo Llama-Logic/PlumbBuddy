@@ -1,3 +1,6 @@
+using ICSharpCode.SharpZipLib.Zip;
+using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -68,13 +71,13 @@ public class ModsDirectoryCataloger :
             }
             else if (fileType is ModsDirectoryFileType.ScriptArchive)
             {
-                ZipArchive? zipArchive = null;
+                ZipFile? zipFile = null;
                 var ioExceptionGraceAttempts = 10;
                 while (true)
                 {
                     try
                     {
-                        zipArchive = ZipFile.OpenRead(fileInfo.FullName);
+                        zipFile = new ZipFile(fileInfo.OpenRead(), false);
                         break;
                     }
                     catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
@@ -90,39 +93,38 @@ public class ModsDirectoryCataloger :
                 }
                 try
                 {
-                    if (zipArchive is not null)
+                    if (zipFile is not null)
                     {
-                        foreach (var entry in zipArchive.Entries)
+                        foreach (var entry in zipFile.Cast<ZipEntry>())
                             modFileHash.ScriptModArchiveEntries.Add(new(modFileHash)
                             {
                                 Comment = entry.Comment,
-                                CompressedLength = entry.CompressedLength,
-                                Crc32 = entry.Crc32,
-                                ExternalAttributes = entry.ExternalAttributes,
-                                FullName = entry.FullName,
-                                IsEncrypted = entry.IsEncrypted,
-                                LastWriteTime = entry.LastWriteTime,
-                                Length = entry.Length,
+                                CompressedLength = entry.CompressedSize,
+                                Crc32 = unchecked((uint)entry.Crc),
+                                ExternalAttributes = entry.ExternalFileAttributes,
+                                FullName = entry.Name,
+                                IsEncrypted = entry.AESKeySize is not 0,
+                                LastWriteTime = entry.DateTime,
+                                Length = entry.Size,
                                 ModFileHash = modFileHash,
                                 Name = entry.Name
                             });
-                        if (await ModFileManifestModel.GetModFileManifestAsync(zipArchive).ConfigureAwait(false) is { } manifest)
+                        if (await ModFileManifestModel.GetModFileManifestAsync(zipFile).ConfigureAwait(false) is { } manifest)
                         {
-                            var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipArchive), manifest, null).ConfigureAwait(false);
+                            var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipFile), manifest, null).ConfigureAwait(false);
                             modFileHash.ModFileManifests.Add(dbManifest);
                         }
                     }
                 }
                 finally
                 {
-                    zipArchive?.Dispose();
+                    (zipFile as IDisposable)?.Dispose();
                 }
             }
             modFileHash.ResourcesAndManifestsCataloged = fileType is not (ModsDirectoryFileType.CorruptPackage or ModsDirectoryFileType.CorruptScriptArchive);
         }
         return (true, fileType);
     }
-
 
     static byte[] GetByteArray(ImmutableArray<byte> immutableByteArray) =>
         GetByteArrays([immutableByteArray]).Single();

@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [ProtoContract]
-sealed class ArchivistGameplayCameraData :
+public sealed class ArchivistGameplayCameraData :
     IExtensible
 {
     IExtension? extensionData;
