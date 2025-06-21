@@ -19,5 +19,5 @@ public interface IProxyHost :
     void DestroyBridgedUi(Guid uniqueId);
     Task ForegroundPlumbBuddyAsync();
     Task ProcessMessageFromBridgedUiAsync(Guid uniqueId, string messageJson);
-    Task WaitForPendingSaveSpecificRelationalDataStorageEmbedAsync();
+    Task WaitForGameToFinishSavingAsync(CancellationToken cancellationToken = default);
 }

@@ -226,6 +226,7 @@
         #errorCode;
         #errorMessage;
         #executionSeconds;
+        #extendedErrorCode;
         #queryId;
         #recordSets;
         #tag;
@@ -234,13 +235,14 @@
             this.#errorCode = responseMessage.errorCode;
             this.#errorMessage = responseMessage.errorMessage;
             this.#executionSeconds = responseMessage.executionSeconds;
+            this.#extendedErrorCode = responseMessage.extendedErrorCode;
             this.#queryId = sanitizeUuid(responseMessage.queryId);
             this.#recordSets = Object.freeze(responseMessage.recordSets.map(recordSet => new RelationalDataStorageQueryRecordSet(recordSet)));
             this.#tag = responseMessage.tag;
         }
 
         /**
-         * Gets the SQLite error code raised by the query; -1 if another type of error occured; otherwise, 0
+         * Gets the SQLite error code raised by the query (see: https://www.sqlite.org/rescode.html); -1 if another type of error occured; otherwise, 0
          * @returns {Number}
          */
         get errorCode() {
@@ -261,6 +263,14 @@
          */
         get executionSeconds() {
             return this.#executionSeconds;
+        }
+
+        /**
+         * Gets the SQLite extended error code raised by the query (see: https://www.sqlite.org/rescode.html#extrc); -1 if another type of error occured; otherwise, 0
+         * @returns {Number}
+         */
+        get extendedErrorCode() {
+            return this.#extendedErrorCode;
         }
 
         /**

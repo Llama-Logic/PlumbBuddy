@@ -88,6 +88,7 @@ public partial class ProxyHost :
         connectedClients = new();
         bridgedUiLoadingLocks = new();
         loadedBridgedUis = new();
+        gameIsSavingManualResetEvent = new(true);
         relationalDataStorageConnectionLocks = new();
         saveSpecificDataStoragePropagationLock = new();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
@@ -113,12 +114,8 @@ public partial class ProxyHost :
     readonly ILogger<ProxyHost> logger;
     AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    TaskCompletionSource? pendingSaveSpecificRelationalDataStorageEmbed;
+    readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
     readonly IPlatformFunctions platformFunctions;
-    ulong? preSaveCreated;
-    ulong? preSaveNucleusId;
-    ulong? preSaveSimNow;
-    ulong? preSaveSlotId;
     readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionLocks;
     ulong saveCreated;
     ulong saveNucleusId;
@@ -209,7 +206,6 @@ public partial class ProxyHost :
         if (fileSystemWatcher is not null
             || !userDataFolder.Exists)
             return;
-        pendingSaveSpecificRelationalDataStorageEmbed = new();
         pathsProcessingQueue = new();
         fileSystemWatcher = new FileSystemWatcher(userDataFolder.FullName)
         {
@@ -675,28 +671,26 @@ public partial class ProxyHost :
                 break;
             case ComponentMessageType.GameServiceEvent:
                 if (TryParseMessage<GameServiceEventMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "game service event", out var gameServiceEventMessage)
-                    && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent)
-                    && gameServiceEvent is GameServiceEvent.Load or GameServiceEvent.PreSave
-                    && gameServiceEventMessage.NucleusId is { } gameServiceEventNucleusId
-                    && gameServiceEventMessage.Created is { } gameServiceEventCreated
-                    && gameServiceEventMessage.SimNow is { } gameServiceEventSimNow
-                    && gameServiceEventMessage.SlotId is { } gameServiceEventSlotId)
+                    && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent))
                 {
-                    if (gameServiceEvent is GameServiceEvent.Load)
+                    if (gameServiceEvent is GameServiceEvent.PreSave)
+                        gameIsSavingManualResetEvent.Reset();
+                    else if (gameServiceEvent is GameServiceEvent.Save)
+                        gameIsSavingManualResetEvent.Set();
+                    if (gameServiceEvent is GameServiceEvent.Load or GameServiceEvent.PreSave
+                        && gameServiceEventMessage.NucleusId is { } gameServiceEventNucleusId
+                        && gameServiceEventMessage.Created is { } gameServiceEventCreated
+                        && gameServiceEventMessage.SimNow is { } gameServiceEventSimNow
+                        && gameServiceEventMessage.SlotId is { } gameServiceEventSlotId)
                     {
                         saveNucleusId = gameServiceEventNucleusId;
                         saveCreated = gameServiceEventCreated;
                         saveSimNow = gameServiceEventSimNow;
                         saveSlotId = gameServiceEventSlotId;
-                        await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
-                    }
-                    else if (gameServiceEvent is GameServiceEvent.PreSave)
-                    {
-                        preSaveNucleusId = gameServiceEventNucleusId;
-                        preSaveCreated = gameServiceEventCreated;
-                        preSaveSimNow = gameServiceEventSimNow;
-                        preSaveSlotId = gameServiceEventSlotId;
-                        ConnectToSavesFolder();
+                        if (gameServiceEvent is GameServiceEvent.Load)
+                            await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+                        else if (gameServiceEvent is GameServiceEvent.PreSave)
+                            ConnectToSavesFolder();
                     }
                 }
                 break;
@@ -838,8 +832,6 @@ public partial class ProxyHost :
                         if (!saveSpecificDataContent.IsEmpty)
                             await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
                         await savePackage.SaveAsync().ConfigureAwait(false);
-                        pendingSaveSpecificRelationalDataStorageEmbed?.SetResult();
-                        pendingSaveSpecificRelationalDataStorageEmbed = null;
                         break;
                     }
                 }
@@ -856,6 +848,7 @@ public partial class ProxyHost :
     {
         var errorCode = 0;
         string? errorMessage = null;
+        var extendedErrorCode = 0;
         var recordSets = new List<RelationalDataStorageQueryRecordSet>();
         var executionStopwatch = new Stopwatch();
         await WithRelationalDataStorageConnectionAsync(queryRelationalDataStorageMessage.UniqueId, queryRelationalDataStorageMessage.IsSaveSpecific, async conn =>
@@ -921,12 +914,14 @@ public partial class ProxyHost :
             }
             catch (SqliteException sqlEx)
             {
-                errorCode = sqlEx.ErrorCode;
+                errorCode = sqlEx.SqliteErrorCode;
+                extendedErrorCode = sqlEx.SqliteExtendedErrorCode;
                 errorMessage = sqlEx.Message;
             }
             catch (Exception ex)
             {
                 errorCode = -1;
+                extendedErrorCode = -1;
                 errorMessage = ex.Message;
             }
             finally
@@ -939,6 +934,7 @@ public partial class ProxyHost :
             ErrorCode = errorCode,
             ErrorMessage = errorMessage,
             ExecutionSeconds = executionStopwatch.Elapsed.TotalSeconds,
+            ExtendedErrorCode = extendedErrorCode,
             IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
             QueryId = queryRelationalDataStorageMessage.QueryId,
             Tag = queryRelationalDataStorageMessage.Tag,
@@ -950,6 +946,7 @@ public partial class ProxyHost :
             ErrorCode = errorCode,
             ErrorMessage = errorMessage,
             ExecutionSeconds = executionStopwatch.Elapsed.TotalSeconds,
+            ExtendedErrorCode = extendedErrorCode,
             IsSaveSpecific = queryRelationalDataStorageMessage.IsSaveSpecific,
             QueryId = queryRelationalDataStorageMessage.QueryId,
             Tag = queryRelationalDataStorageMessage.Tag,
@@ -1043,17 +1040,14 @@ public partial class ProxyHost :
     async Task<(bool cleanExistingResources, ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(ArchivistSaveGameData saveGameData, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(saveGameData);
-        if (preSaveNucleusId is not { } savedNucleusId
-            || preSaveCreated is not { } savedCreated
-            || preSaveSimNow is not { } savedSimNow
-            || preSaveSlotId is not { } savedSlotId
-            || saveGameData.Account is not { } account
-            || account.NucleusId != savedNucleusId
-            || account.Created != savedCreated
+        if (saveGameData.Account is not { } account
+            || account.NucleusId != saveNucleusId
+            || account.Created != saveCreated
             || saveGameData.SaveSlot is not { } saveSlot
-            || saveSlot.SlotId != savedSlotId
+            || saveSlotId != 0
+            && saveSlot.SlotId != saveSlotId
             || saveSlot.GameplayData is not { } gamePlayData
-            || gamePlayData.WorldGameTime < savedSimNow)
+            || gamePlayData.WorldGameTime < saveSimNow)
             return (false, default, ReadOnlyMemory<byte>.Empty);
         DisconnectFromSavesFolder();
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
@@ -1089,7 +1083,7 @@ public partial class ProxyHost :
             }
             await zipOutputStream.PutNextEntryAsync(new ZipEntry(vacuumFile.Name)
             {
-                DateTime = vacuumFile.CreationTimeUtc,
+                DateTime = vacuumFile.CreationTime,
                 Size = vacuumFile.Length
             }, CancellationToken.None).ConfigureAwait(false);
             using var vacuumFileStream = vacuumFile.OpenRead();
@@ -1098,15 +1092,11 @@ public partial class ProxyHost :
         }
         snapshotDirectory.Delete(true);
         await zipOutputStream.FinishAsync(CancellationToken.None).ConfigureAwait(false);
-        preSaveNucleusId = null;
-        preSaveCreated = null;
-        preSaveSimNow = null;
-        preSaveSlotId = null;
         return (true, new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
-    public Task WaitForPendingSaveSpecificRelationalDataStorageEmbedAsync() =>
-        pendingSaveSpecificRelationalDataStorageEmbed?.Task ?? Task.CompletedTask;
+    public Task WaitForGameToFinishSavingAsync(CancellationToken cancellationToken = default) =>
+        gameIsSavingManualResetEvent.WaitAsync(cancellationToken);
 
     async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
     {

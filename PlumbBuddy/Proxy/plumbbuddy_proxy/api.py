@@ -175,6 +175,7 @@ class RelationalDataStorageQueryCompletedEventData:
         self._error_code: int = response_message['error_code']
         self._error_message: str = response_message['error_message']
         self._execution_time = timedelta(response_message['execution_seconds'])
+        self._extended_error_code: int = response_message['extended_error_code']
         self._query_id = UUID(response_message['query_id'])
         record_sets = []
         for response_record_set in response_message['record_sets']:
@@ -185,7 +186,7 @@ class RelationalDataStorageQueryCompletedEventData:
     @property
     def error_code(self) -> int:
         """
-        Gets the SQLite error code raised by the query; -1 if another type of error occured; otherwise, 0
+        Gets the SQLite error code raised by the query (see: https://www.sqlite.org/rescode.html); -1 if another type of error occured; otherwise, 0
         """
 
         return self._error_code
@@ -205,6 +206,14 @@ class RelationalDataStorageQueryCompletedEventData:
         """
 
         return self._execution_time
+    
+    @property
+    def extended_error_code(self) -> int:
+        """
+        Gets the SQLite error code raised by the query (see: https://www.sqlite.org/rescode.html#extrc); -1 if another type of error occured; otherwise, 0
+        """
+
+        return self._extended_error_code
     
     @property
     def query_id(self) -> UUID:

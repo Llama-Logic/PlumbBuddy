@@ -1,6 +1,3 @@
-using ICSharpCode.SharpZipLib.Zip;
-using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
-
 namespace PlumbBuddy.Components.Controls;
 
 partial class ModFileSelector

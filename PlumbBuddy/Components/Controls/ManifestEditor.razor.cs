@@ -1,6 +1,3 @@
-using ICSharpCode.SharpZipLib.Zip;
-using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
-
 namespace PlumbBuddy.Components.Controls;
 
 [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]

@@ -644,9 +644,6 @@ public partial class Archivist :
             return;
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
-            DiagnosticStatus = $"Waiting for RMI";
-            await proxyHost.WaitForPendingSaveSpecificRelationalDataStorageEmbedAsync().ConfigureAwait(false);
-            DiagnosticStatus = null;
             var list = new List<(string path, bool manuallyAdded)>();
             var alreadyNomed = new Dictionary<string, bool>();
             list.Add(await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false));
@@ -724,6 +721,8 @@ public partial class Archivist :
                                 && extensions.Contains(singleSaveFile.Extension)
                                 && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(singleSaveFile.Name)))
                             {
+                                DiagnosticStatus = "Waiting for TS4 to Finish Saving";
+                                await proxyHost.WaitForGameToFinishSavingAsync().ConfigureAwait(false);
                                 DiagnosticStatus = $"Single: {singleSaveFile.Name}";
                                 await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, gameStarted).ConfigureAwait(false);
                             }
@@ -741,6 +740,8 @@ public partial class Archivist :
                                     .OrderBy(file => file.LastWriteTime)
                                     .ToImmutableArray())
                                 {
+                                    DiagnosticStatus = "Waiting for TS4 to Finish Saving";
+                                    await proxyHost.WaitForGameToFinishSavingAsync().ConfigureAwait(false);
                                     DiagnosticStatus = $"Batch: {directoryFileInfo.Name}";
                                     await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, gameStarted).ConfigureAwait(false);
                                     if (!settings.ArchivistEnabled
