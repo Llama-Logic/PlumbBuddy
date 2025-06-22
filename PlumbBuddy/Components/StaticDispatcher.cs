@@ -3,6 +3,10 @@ namespace PlumbBuddy.Components;
 static class StaticDispatcher
 {
     static IDispatcher? dispatcher;
+    static readonly AsyncManualResetEvent dispatcherSetManualResetEvent = new(false);
+
+    public static Task DispatcherSet =>
+        WaitForDispatcherSetAsync();
 
     public static bool IsDispatcherSet =>
         dispatcher is not null;
@@ -13,6 +17,7 @@ static class StaticDispatcher
             throw new InvalidOperationException($"{nameof(RegisterDispatcher)} already called");
         ArgumentNullException.ThrowIfNull(dispatcher);
         StaticDispatcher.dispatcher = dispatcher;
+        dispatcherSetManualResetEvent.Set();
     }
 
     public static void Dispatch(Action action)
@@ -57,4 +62,7 @@ static class StaticDispatcher
             ? await dispatcher.DispatchAsync(asyncFunc)
             : await asyncFunc();
     }
+
+    public static Task WaitForDispatcherSetAsync(CancellationToken cancellationToken = default) =>
+        dispatcherSetManualResetEvent.WaitAsync(cancellationToken);
 }

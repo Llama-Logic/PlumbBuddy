@@ -43,6 +43,9 @@ public partial class ProxyHost :
         return options;
     }
 
+    [GeneratedRegex(@"^N\-(?<nucleusId>[\da-f]{16})\-C\-(?<created>[\da-f]{16})\-W\-(?<simNow>[\da-f]{16})$", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex GetSaveSpecificDataStorageFileSystemContainerPattern();
+
     [GeneratedRegex(@"[\da-f]{64}", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetSha256HashHexPattern();
 
@@ -88,8 +91,10 @@ public partial class ProxyHost :
         connectedClients = new();
         bridgedUiLoadingLocks = new();
         loadedBridgedUis = new();
+        gameIsLoadingManualResetEvent = new(true);
         gameIsSavingManualResetEvent = new(true);
         relationalDataStorageConnectionLocks = new();
+        saveSpecificDataStorageInitializationLock = new();
         saveSpecificDataStoragePropagationLock = new();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         listener = new(IPAddress.Loopback, port);
@@ -109,11 +114,13 @@ public partial class ProxyHost :
     FileSystemWatcher? fileSystemWatcher;
     bool isBridgedUiDevelopmentModeEnabled;
     bool isClientConnected;
+    ulong lastSaveSimNow;
     readonly TcpListener listener;
     readonly ConcurrentDictionary<Guid, ZipFile?> loadedBridgedUis;
     readonly ILogger<ProxyHost> logger;
     AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
+    readonly AsyncManualResetEvent gameIsLoadingManualResetEvent;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
     readonly IPlatformFunctions platformFunctions;
     readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionLocks;
@@ -121,7 +128,13 @@ public partial class ProxyHost :
     ulong saveNucleusId;
     ulong saveSimNow;
     ulong saveSlotId;
+    readonly AsyncLock saveSpecificDataStorageInitializationLock;
     readonly AsyncReaderWriterLock saveSpecificDataStoragePropagationLock;
+    Task<(ResourceKey key, ReadOnlyMemory<byte> content)>? saveSpecificDataStorageSnapshot;
+    ulong saveSpecificDataStorageSnapshotCreated;
+    ulong saveSpecificDataStorageSnapshotNucleusId;
+    ulong saveSpecificDataStorageSnapshotSimNow;
+    ulong saveSpecificDataStorageSnapshotSlotId;
     readonly ISettings settings;
 
     public bool IsBridgedUiDevelopmentModeEnabled
@@ -180,6 +193,7 @@ public partial class ProxyHost :
         if (!File.Exists(path))
             return null;
         var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
         StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
         var cacheDirectory = await tcs.Task.ConfigureAwait(false);
         var cachePath = Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs");
@@ -251,6 +265,7 @@ public partial class ProxyHost :
         if (archive is IDisposable disposableArchive)
             disposableArchive.Dispose();
         var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
         StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
         var cacheDirectory = await tcs.Task.ConfigureAwait(false);
         var cachedArchive = new FileInfo(Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs", $"{uniqueId:n}.ts4script"));
@@ -389,73 +404,114 @@ public partial class ProxyHost :
             IsBridgedUiDevelopmentModeEnabled = false;
     }
 
-    async Task InitializeSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
+    async Task InitializeSaveSpecificRelationalDataStorageAsync()
     {
-        using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
-        if (!savesDirectory.Exists)
+        using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
+        await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
+        var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
+        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
+        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+        var rdsDirectory = Directory.CreateDirectory(Path.Combine(appDataDirectory.FullName, "Relational Data Storage"));
+        var candidateDirectories = rdsDirectory.GetDirectories()
+            .Select(d =>
+            {
+                var match = GetSaveSpecificDataStorageFileSystemContainerPattern().Match(d.Name);
+                if (match.Success
+                    && ulong.TryParse(match.Groups["nucleusId"].Value, NumberStyles.HexNumber, null, out var nucleusId)
+                    && ulong.TryParse(match.Groups["created"].Value, NumberStyles.HexNumber, null, out var created)
+                    && ulong.TryParse(match.Groups["simNow"].Value, NumberStyles.HexNumber, null, out var simNow))
+                    return (nucleusId, created, simNow);
+                return (nucleusId: 0UL, created: 0UL, simNow: 0UL);
+            })
+            .Where(t => t.nucleusId == saveNucleusId && t.created == saveCreated && t.simNow <= saveSimNow);
+        if (candidateDirectories.Any())
+        {
+            (_, _, saveSimNow) = candidateDirectories.OrderByDescending(t => t.simNow).FirstOrDefault();
             return;
-        var candidates = new List<(ulong simNow, DataBasePackedFile savePackage)>();
-        var prefix = $"Slot_{(uint)saveSlotId:x8}.save";
-        static async Task considerCandidateAsync(List<(ulong simNow, DataBasePackedFile savePackage)> candidates, ulong saveNucleusId, ulong saveCreated, ulong saveSlotId, ulong saveSimNow, FileInfo saveFile)
-        {
-            var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
-            var packageKeys = await savePackage.GetKeysAsync(cancellationToken: CancellationToken.None).ConfigureAwait(false);
-            var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
-            if (saveGameDataKeys.Length is <= 0 or >= 2)
-            {
-                await savePackage.DisposeAsync().ConfigureAwait(false);
-                return;
-            }
-            var saveGameDataKey = saveGameDataKeys[0];
-            var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: CancellationToken.None).ConfigureAwait(false));
-            if (saveGameData is null
-                || saveGameData.Account is not { } account
-                || account.NucleusId != saveNucleusId
-                || account.Created != saveCreated
-                || saveGameData.SaveSlot is not { } saveSlot
-                || saveSlot.SlotId != saveSlotId
-                || saveSlot.GameplayData is not { } gamePlayData
-                || gamePlayData.WorldGameTime > saveSimNow)
-            {
-                await savePackage.DisposeAsync().ConfigureAwait(false);
-                return;
-            }
-            candidates.Add((gamePlayData.WorldGameTime, savePackage));
         }
-        foreach (var saveFile in savesDirectory.GetFiles().Where(file => file.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
-            await considerCandidateAsync(candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
-        if (candidates.Count is 0)
+        var content = ReadOnlyMemory<byte>.Empty;
+        if (saveSpecificDataStorageSnapshot is { } memoryResidentSnapshot
+            && saveSpecificDataStorageSnapshotNucleusId == saveNucleusId
+            && saveSpecificDataStorageSnapshotCreated == saveCreated
+            && saveSpecificDataStorageSnapshotSlotId == saveSlotId
+            && saveSpecificDataStorageSnapshotSimNow <= saveSimNow)
+            (_, content) = await memoryResidentSnapshot.ConfigureAwait(false);
+        if (content.IsEmpty)
         {
-            foreach (var saveFile in savesDirectory.GetFiles().Where(file => !file.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+            var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
+            if (!savesDirectory.Exists)
+                return;
+            var candidates = new List<(ulong simNow, DataBasePackedFile savePackage)>();
+            var saveFileNameForSlot = $"Slot_{(uint)saveSlotId:x8}.save";
+            static async Task considerCandidateAsync(List<(ulong simNow, DataBasePackedFile savePackage)> candidates, ulong saveNucleusId, ulong saveCreated, ulong saveSlotId, ulong saveSimNow, FileInfo saveFile)
+            {
+                var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
+                var packageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
+                var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+                if (saveGameDataKeys.Length is <= 0 or >= 2)
+                {
+                    await savePackage.DisposeAsync().ConfigureAwait(false);
+                    return;
+                }
+                var saveGameDataKey = saveGameDataKeys[0];
+                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                if (saveGameData is null
+                    || saveGameData.Account is not { } account
+                    || account.NucleusId != saveNucleusId
+                    || account.Created != saveCreated
+                    || saveGameData.SaveSlot is not { } saveSlot
+                    || saveSlotId is not 0
+                    && saveSlot.SlotId != saveSlotId
+                    || saveSlot.GameplayData is not { } gamePlayData
+                    || gamePlayData.WorldGameTime > saveSimNow)
+                {
+                    await savePackage.DisposeAsync().ConfigureAwait(false);
+                    return;
+                }
+                candidates.Add((gamePlayData.WorldGameTime, savePackage));
+            }
+            foreach (var saveFile in savesDirectory.GetFiles().Where(file => file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
                 await considerCandidateAsync(candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
+            if (candidates.Count is 0)
+            {
+                foreach (var saveFile in savesDirectory.GetFiles().Where(file => !file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
+                    await considerCandidateAsync(candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
+            }
+            if (candidates.Count is 0)
+                return;
+            var orderedCandidates = candidates
+                .OrderByDescending(t => t.simNow);
+            var (simNow, savePackage) = orderedCandidates.First();
+            saveSimNow = simNow;
+            foreach (var (_, losingCandidate) in orderedCandidates.Skip(1))
+                await losingCandidate.DisposeAsync().ConfigureAwait(false);
+            try
+            {
+                var savePackageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
+                var saveSpecificDataKey = savePackageKeys.FirstOrDefault(k => k.Type is ResourceType.SaveSpecificRelationalDataStorage);
+                if (saveSpecificDataKey == default)
+                    return;
+                content = await savePackage.GetAsync(saveSpecificDataKey).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "uncaught exception");
+            }
+            finally
+            {
+                await savePackage.DisposeAsync().ConfigureAwait(false);
+            }
         }
-        if (candidates.Count is 0)
-            return;
-        var orderedCandidates = candidates
-            .OrderByDescending(t => t.simNow)
-            .Select(t => t.savePackage);
-        var savePackage = orderedCandidates.First();
-        foreach (var losingCandidate in orderedCandidates.Skip(1))
-            await losingCandidate.DisposeAsync().ConfigureAwait(false);
         try
         {
-            var tcs = new TaskCompletionSource<DirectoryInfo>();
-            StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
-            var appDataDirectory = await tcs.Task.ConfigureAwait(false);
-            var rdsDirectory = Directory.CreateDirectory(Path.Combine(appDataDirectory.FullName, "Relational Data Storage"));
-            var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsDirectory.FullName, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
-            if (!saveSpecificDirectory.Exists)
-                saveSpecificDirectory.Create();
+            var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsDirectory.FullName, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{saveSimNow:x16}"));
             foreach (var alternateSaveSpecificDirectory in rdsDirectory.GetDirectories().Where(d => d.Name != saveSpecificDirectory.Name))
                 alternateSaveSpecificDirectory.Delete(true);
-            foreach (var file in saveSpecificDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly))
-                file.Delete();
-            var savePackageKeys = await savePackage.GetKeysAsync(cancellationToken: CancellationToken.None).ConfigureAwait(false);
-            var saveSpecificDataKey = savePackageKeys.FirstOrDefault(k => k.Type is ResourceType.SaveSpecificRelationalDataStorage);
-            if (saveSpecificDataKey == default)
+            if (saveSpecificDirectory.Exists)
                 return;
-            using var contentStream = new ReadOnlyMemoryOfByteStream(await savePackage.GetAsync(saveSpecificDataKey, cancellationToken: CancellationToken.None).ConfigureAwait(false));
+            saveSpecificDirectory.Create();
+            using var contentStream = new ReadOnlyMemoryOfByteStream(content);
             using var zipInputStream = new ZipInputStream(contentStream);
             ZipEntry entry;
             while ((entry = zipInputStream.GetNextEntry()) is not null)
@@ -463,16 +519,12 @@ public partial class ProxyHost :
                 if (entry.IsDirectory)
                     continue;
                 using var fileStream = File.Create(Path.Combine(saveSpecificDirectory.FullName, entry.Name));
-                await zipInputStream.CopyToAsync(fileStream, CancellationToken.None).ConfigureAwait(false);
+                await zipInputStream.CopyToAsync(fileStream).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "uncaught exception");
-        }
-        finally
-        {
-            await savePackage.DisposeAsync().ConfigureAwait(false);
         }
     }
 
@@ -673,7 +725,11 @@ public partial class ProxyHost :
                 if (TryParseMessage<GameServiceEventMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "game service event", out var gameServiceEventMessage)
                     && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent))
                 {
-                    if (gameServiceEvent is GameServiceEvent.PreSave)
+                    if (gameServiceEvent is GameServiceEvent.Load)
+                        gameIsLoadingManualResetEvent.Reset();
+                    else if (gameServiceEvent is GameServiceEvent.OnAllHouseholdsAndSimInfosLoaded)
+                        gameIsLoadingManualResetEvent.Set();
+                    else if (gameServiceEvent is GameServiceEvent.PreSave)
                         gameIsSavingManualResetEvent.Reset();
                     else if (gameServiceEvent is GameServiceEvent.Save)
                         gameIsSavingManualResetEvent.Set();
@@ -683,14 +739,24 @@ public partial class ProxyHost :
                         && gameServiceEventMessage.SimNow is { } gameServiceEventSimNow
                         && gameServiceEventMessage.SlotId is { } gameServiceEventSlotId)
                     {
+                        if (gameServiceEvent is GameServiceEvent.PreSave
+                            && saveNucleusId == gameServiceEventNucleusId
+                            && saveCreated == gameServiceEventCreated)
+                            lastSaveSimNow = saveSimNow;
                         saveNucleusId = gameServiceEventNucleusId;
                         saveCreated = gameServiceEventCreated;
                         saveSimNow = gameServiceEventSimNow;
                         saveSlotId = gameServiceEventSlotId;
-                        if (gameServiceEvent is GameServiceEvent.Load)
-                            await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
-                        else if (gameServiceEvent is GameServiceEvent.PreSave)
+                        if (gameServiceEvent is GameServiceEvent.PreSave
+                            && saveSpecificDataStorageSnapshot is null)
+                        {
+                            saveSpecificDataStorageSnapshotNucleusId = saveNucleusId;
+                            saveSpecificDataStorageSnapshotCreated = saveCreated;
+                            saveSpecificDataStorageSnapshotSimNow = saveSimNow;
+                            saveSpecificDataStorageSnapshotSlotId = saveSlotId;
+                            saveSpecificDataStorageSnapshot = Task.Run(async () => await SnapshotSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false));
                             ConnectToSavesFolder();
+                        }
                     }
                 }
                 break;
@@ -719,12 +785,13 @@ public partial class ProxyHost :
                 if (TryParseMessage<SendLoadedSaveIdentifiersResponseMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "send loaded save identifiers response", out var sendLoadedSaveIdentifiersResponseMessage)
                     && sendLoadedSaveIdentifiersResponseMessage.NucleusId is { } requestedNucleusId
                     && sendLoadedSaveIdentifiersResponseMessage.Created is { } requestedCreated
-                    && sendLoadedSaveIdentifiersResponseMessage.SimNow is { } requestedSimNow)
+                    && sendLoadedSaveIdentifiersResponseMessage.SimNow is { } requestedSimNow
+                    && sendLoadedSaveIdentifiersResponseMessage.SlotId is { } requestedSlotId)
                 {
                     saveNucleusId = requestedNucleusId;
                     saveCreated = requestedCreated;
                     saveSimNow = requestedSimNow;
-                    await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+                    saveSlotId = requestedSlotId;
                 }
                 break;
         }
@@ -824,16 +891,26 @@ public partial class ProxyHost :
                     var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
                     if (saveGameData is null)
                         continue;
-                    var (cleanExistingResources, saveSpecificDataKey, saveSpecificDataContent) = await SnapshotSaveSpecificRelationalDataStorageAsync(saveGameData).ConfigureAwait(false);
-                    if (cleanExistingResources)
-                    {
-                        foreach (var key in packageKeys.Where(pk => pk.Type is ResourceType.SaveSpecificRelationalDataStorage))
-                            savePackage.Delete(key);
-                        if (!saveSpecificDataContent.IsEmpty)
-                            await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
-                        await savePackage.SaveAsync().ConfigureAwait(false);
+                    if (saveGameData.Account is not { } account
+                        || account.NucleusId != saveNucleusId
+                        || account.Created != saveCreated
+                        || saveGameData.SaveSlot is not { } saveSlot
+                        || saveSlotId != 0
+                        && saveSlot.SlotId != saveSlotId
+                        || saveSlot.GameplayData is not { } gamePlayData
+                        || gamePlayData.WorldGameTime < saveSimNow)
+                        continue;
+                    if (saveSpecificDataStorageSnapshot is null)
                         break;
-                    }
+                    DisconnectFromSavesFolder();
+                    var (saveSpecificDataKey, saveSpecificDataContent) = await saveSpecificDataStorageSnapshot.ConfigureAwait(false);
+                    saveSpecificDataStorageSnapshot = null;
+                    foreach (var key in packageKeys.Where(pk => pk.Type is ResourceType.SaveSpecificRelationalDataStorage))
+                        savePackage.Delete(key);
+                    if (!saveSpecificDataContent.IsEmpty)
+                        await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
+                    await savePackage.SaveAsync().ConfigureAwait(false);
+                    break;
                 }
             }
             catch (Exception ex)
@@ -1037,62 +1114,56 @@ public partial class ProxyHost :
     }
 
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities")]
-    async Task<(bool cleanExistingResources, ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(ArchivistSaveGameData saveGameData, CancellationToken cancellationToken = default)
+    async Task<(ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(saveGameData);
-        if (saveGameData.Account is not { } account
-            || account.NucleusId != saveNucleusId
-            || account.Created != saveCreated
-            || saveGameData.SaveSlot is not { } saveSlot
-            || saveSlotId != 0
-            && saveSlot.SlotId != saveSlotId
-            || saveSlot.GameplayData is not { } gamePlayData
-            || gamePlayData.WorldGameTime < saveSimNow)
-            return (false, default, ReadOnlyMemory<byte>.Empty);
-        DisconnectFromSavesFolder();
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
         var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
         StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
         var appDataDirectory = await tcs.Task.ConfigureAwait(false);
         var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
         Directory.CreateDirectory(rdsPath);
-        var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
+        var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{lastSaveSimNow:x16}"));
         if (!saveSpecificDirectory.Exists)
-            saveSpecificDirectory.Create();
+            return (default, ReadOnlyMemory<byte>.Empty);
         var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.sqlite", SearchOption.TopDirectoryOnly);
         if (saveSpecificFiles.Length is 0)
-            return (true, default, ReadOnlyMemory<byte>.Empty);
+        {
+            saveSpecificDirectory.Delete(true);
+            return (default, ReadOnlyMemory<byte>.Empty);
+        }
         using var zipFileStream = new ArrayBufferWriterOfByteStream();
         using var zipOutputStream = new ZipOutputStream(zipFileStream) { IsStreamOwner = false };
         zipOutputStream.SetLevel(0);
-        var snapshotDirectory = new DirectoryInfo(Path.Combine(saveSpecificDirectory.FullName, saveSimNow.ToString("x16")));
-        if (snapshotDirectory.Exists)
-            foreach (var file in snapshotDirectory.GetFiles("*.sqlite", SearchOption.TopDirectoryOnly))
-                file.Delete();
-        else
-            snapshotDirectory.Create();
         foreach (var file in saveSpecificFiles)
         {
-            var vacuumFile = new FileInfo(Path.Combine(snapshotDirectory.FullName, file.Name));
-            using (var connection = new SqliteConnection($"Data Source={file.FullName}"))
+            var connectionStringBuilder = new SqliteConnectionStringBuilder
+            {
+                DataSource = file.FullName,
+                Mode = SqliteOpenMode.ReadWrite,
+                Pooling = false
+            };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
                 var com = connection.CreateCommand();
-                com.CommandText = $"VACUUM INTO '{vacuumFile.FullName.Replace("'", "''", StringComparison.Ordinal)}';";
+                com.CommandText = $"VACUUM;";
                 await com.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+                await connection.CloseAsync().ConfigureAwait(false);
             }
-            await zipOutputStream.PutNextEntryAsync(new ZipEntry(vacuumFile.Name)
+            file.Refresh();
+            await zipOutputStream.PutNextEntryAsync(new ZipEntry(file.Name)
             {
-                DateTime = vacuumFile.CreationTime,
-                Size = vacuumFile.Length
+                DateTime = file.LastWriteTime,
+                Size = file.Length
             }, CancellationToken.None).ConfigureAwait(false);
-            using var vacuumFileStream = vacuumFile.OpenRead();
-            await vacuumFileStream.CopyToAsync(zipOutputStream, CancellationToken.None).ConfigureAwait(false);
+            using var fileStream = file.OpenRead();
+            await fileStream.CopyToAsync(zipOutputStream, CancellationToken.None).ConfigureAwait(false);
             await zipOutputStream.CloseEntryAsync(CancellationToken.None).ConfigureAwait(false);
         }
-        snapshotDirectory.Delete(true);
         await zipOutputStream.FinishAsync(CancellationToken.None).ConfigureAwait(false);
-        return (true, new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
+        saveSpecificDirectory.Delete(true);
+        return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
     public Task WaitForGameToFinishSavingAsync(CancellationToken cancellationToken = default) =>
@@ -1102,25 +1173,36 @@ public partial class ProxyHost :
     {
         IDisposable? saveSpecificDataStoragePropagationLockHeld = null;
         if (isSaveSpecific)
+        {
             saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+            await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+        }
         try
         {
             var tcs = new TaskCompletionSource<DirectoryInfo>();
+            await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
             StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
             var appDataDirectory = await tcs.Task.ConfigureAwait(false);
             var databaseDirectoryPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
             if (isSaveSpecific)
             {
-                var saveSpecificDirectory = new DirectoryInfo(Path.Combine(databaseDirectoryPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}"));
+                var saveSpecificDirectory = new DirectoryInfo(Path.Combine(databaseDirectoryPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{saveSimNow:x16}"));
                 if (!saveSpecificDirectory.Exists)
                     saveSpecificDirectory.Create();
                 databaseDirectoryPath = saveSpecificDirectory.FullName;
             }
             using var relationalDataStorageConnectionLockHeld = await relationalDataStorageConnectionLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
             var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
-            using var connection = new SqliteConnection($"Data Source={databaseFile.FullName}");
+            var connectionStringBuilder = new SqliteConnectionStringBuilder
+            {
+                DataSource = databaseFile.FullName,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Pooling = false
+            };
+            using var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
             await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
             await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
+            await connection.CloseAsync().ConfigureAwait(false);
         }
         finally
         {

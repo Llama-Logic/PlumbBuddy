@@ -95,7 +95,7 @@ class InterProcessCommunicationClient():
                 while not self._messages_to_plumbbuddy.empty():
                     serialized_message = self._messages_to_plumbbuddy.get()
                     self._socket.sendall(struct.pack(">I", len(serialized_message)) + serialized_message)
-                    logger.debug("[IPC Client] sent: %s", message)
+                    logger.debug("[IPC Client] sent: %s", serialized_message)
                 self._socket.settimeout(0.1)
                 try:
                     serialized_message_size_bytes = self._socket.recv(4)
