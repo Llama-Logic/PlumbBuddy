@@ -20,6 +20,9 @@ public partial class UiBridgeWebView
         PlatformWebView.LoadRequest(request);
     }
 
+    public partial void Refresh() =>
+        PlatformWebView.Reload();
+
     private partial void SendMessageToBridgedUi(string messageJson) =>
         PlatformWebView.EvaluateJavaScriptAsync($"window.gateway.onMessageFromPlumbBuddy({messageJson});");
 }
