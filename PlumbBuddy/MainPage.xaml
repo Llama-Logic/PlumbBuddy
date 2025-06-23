@@ -96,7 +96,7 @@
                     TextColor="White"
                     ItemTapped="HandleTabViewRadialMenuCloseItemTapped"
                     />
-                <sfrm:SfRadialMenuItem
+                <!--<sfrm:SfRadialMenuItem
                     BackgroundColor="#336"
                     Image="icon_information.png"
                     TextColor="White"
@@ -113,7 +113,7 @@
                             TextColor="White"
                             />
                     </sfrm:SfRadialMenuItem.Items>
-                </sfrm:SfRadialMenuItem>
+                </sfrm:SfRadialMenuItem>-->
                 <sfrm:SfRadialMenuItem
                     BackgroundColor="#050"
                     Image="icon_refresh.png"

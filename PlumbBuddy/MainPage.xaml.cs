@@ -69,6 +69,7 @@ public partial class MainPage :
         ? AppText.DesktopInterface_Loading_HideMainWindow
         : AppText.DesktopInterface_Loading;
 
+    [SuppressMessage("Globalization", "CA1308: Normalize strings to uppercase")]
     void HandleProxyHostBridgedUiAuthorized(object? sender, BridgedUiAuthorizedEventArgs e) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
@@ -184,7 +185,10 @@ public partial class MainPage :
     void HandleTabViewRadialMenuRefreshItemTapped(object sender, Syncfusion.Maui.RadialMenu.ItemTappedEventArgs e)
     {
         if (tabView.Items[tabView.SelectedIndex].Content is UiBridgeWebView uiBridgeWebView)
+        {
+            tabViewRadialMenu.IsOpen = false;
             uiBridgeWebView.Reload();
+        }
     }
 
     void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -231,14 +235,14 @@ public partial class MainPage :
         {
             var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
-            animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
+            animation.Commit(this, "SlideUp", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
             await tcs.Task;
         }
         else if (tabView.TabBarHeight == 80 && tabView.Items.Count is 1)
         {
             var tcs = new TaskCompletionSource();
             using var animation = new Animation(v => tabView.TabBarHeight = v, 80, 0);
-            animation.Commit(this, "Something", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
+            animation.Commit(this, "SlideDown", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
             await tcs.Task;
         }
     }

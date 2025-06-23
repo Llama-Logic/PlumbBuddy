@@ -43,6 +43,22 @@ public partial class ProxyHost :
         return options;
     }
 
+    static async Task<DirectoryInfo> GetAppDataDirectoryAsync()
+    {
+        var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
+        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
+        return await tcs.Task.ConfigureAwait(false);
+    }
+
+    static async Task<DirectoryInfo> GetCacheDirectoryAsync()
+    {
+        var tcs = new TaskCompletionSource<DirectoryInfo>();
+        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
+        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
+        return await tcs.Task.ConfigureAwait(false);
+    }
+
     [GeneratedRegex(@"^N\-(?<nucleusId>[\da-f]{16})\-C\-(?<created>[\da-f]{16})\-W\-(?<simNow>[\da-f]{16})$", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetSaveSpecificDataStorageFileSystemContainerPattern();
 
@@ -93,7 +109,7 @@ public partial class ProxyHost :
         loadedBridgedUis = new();
         gameIsLoadingManualResetEvent = new(true);
         gameIsSavingManualResetEvent = new(true);
-        relationalDataStorageConnectionLocks = new();
+        saveSpecificDataStorageConnectionLocks = new();
         saveSpecificDataStorageInitializationLock = new();
         saveSpecificDataStoragePropagationLock = new();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
@@ -123,7 +139,7 @@ public partial class ProxyHost :
     readonly AsyncManualResetEvent gameIsLoadingManualResetEvent;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
     readonly IPlatformFunctions platformFunctions;
-    readonly ConcurrentDictionary<(Guid uniqueId, bool isSaveSpecific), AsyncLock> relationalDataStorageConnectionLocks;
+    readonly ConcurrentDictionary<Guid, AsyncLock> saveSpecificDataStorageConnectionLocks;
     ulong saveCreated;
     ulong saveNucleusId;
     ulong saveSimNow;
@@ -192,10 +208,7 @@ public partial class ProxyHost :
         var path = Path.Combine(settings.UserDataFolderPath, "Mods", modsDirectoryRelativePath);
         if (!File.Exists(path))
             return null;
-        var tcs = new TaskCompletionSource<DirectoryInfo>();
-        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
-        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
-        var cacheDirectory = await tcs.Task.ConfigureAwait(false);
+        var cacheDirectory = await GetCacheDirectoryAsync().ConfigureAwait(false);
         var cachePath = Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs");
         if (!Directory.Exists(cachePath))
             Directory.CreateDirectory(cachePath);
@@ -264,10 +277,7 @@ public partial class ProxyHost :
         archive?.Close();
         if (archive is IDisposable disposableArchive)
             disposableArchive.Dispose();
-        var tcs = new TaskCompletionSource<DirectoryInfo>();
-        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
-        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
-        var cacheDirectory = await tcs.Task.ConfigureAwait(false);
+        var cacheDirectory = await GetCacheDirectoryAsync().ConfigureAwait(false);
         var cachedArchive = new FileInfo(Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs", $"{uniqueId:n}.ts4script"));
         if (cachedArchive.Exists)
             cachedArchive.Delete();
@@ -300,6 +310,7 @@ public partial class ProxyHost :
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+            DisconnectFromSavesFolder();
             cancellationTokenSource.Cancel();
             listener.Dispose();
             cancellationTokenSource.Dispose();
@@ -408,10 +419,7 @@ public partial class ProxyHost :
     {
         using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
         await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
-        var tcs = new TaskCompletionSource<DirectoryInfo>();
-        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
-        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
-        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+        var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
         var rdsDirectory = Directory.CreateDirectory(Path.Combine(appDataDirectory.FullName, "Relational Data Storage"));
         var candidateDirectories = rdsDirectory.GetDirectories()
             .Select(d =>
@@ -1120,10 +1128,7 @@ public partial class ProxyHost :
     async Task<(ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        var tcs = new TaskCompletionSource<DirectoryInfo>();
-        await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
-        StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
-        var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+        var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
         var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
         Directory.CreateDirectory(rdsPath);
         var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{lastSaveSimNow:x16}"));
@@ -1174,7 +1179,7 @@ public partial class ProxyHost :
 
     async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
     {
-        IDisposable? saveSpecificDataStoragePropagationLockHeld = null;
+        IDisposable? saveSpecificDataStoragePropagationLockHeld = null, dataStorageConnectionLockHeld = null;
         if (isSaveSpecific)
         {
             saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
@@ -1182,10 +1187,7 @@ public partial class ProxyHost :
         }
         try
         {
-            var tcs = new TaskCompletionSource<DirectoryInfo>();
-            await StaticDispatcher.DispatcherSet.ConfigureAwait(false);
-            StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.AppDataDirectory));
-            var appDataDirectory = await tcs.Task.ConfigureAwait(false);
+            var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
             var databaseDirectoryPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
             if (isSaveSpecific)
             {
@@ -1193,22 +1195,29 @@ public partial class ProxyHost :
                 if (!saveSpecificDirectory.Exists)
                     saveSpecificDirectory.Create();
                 databaseDirectoryPath = saveSpecificDirectory.FullName;
+                dataStorageConnectionLockHeld = await saveSpecificDataStorageConnectionLocks.GetOrAdd(uniqueId, _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
             }
-            using var relationalDataStorageConnectionLockHeld = await relationalDataStorageConnectionLocks.GetOrAdd((uniqueId, isSaveSpecific), _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
             var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
             var connectionStringBuilder = new SqliteConnectionStringBuilder
             {
                 DataSource = databaseFile.FullName,
                 Mode = SqliteOpenMode.ReadWriteCreate,
-                Pooling = false
+                Pooling = !isSaveSpecific
             };
             using var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
             await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
+            if (!isSaveSpecific)
+            {
+                var enableWriteAheadLoggingForGlobalDatabases = connection.CreateCommand();
+                enableWriteAheadLoggingForGlobalDatabases.CommandText = "PRAGMA journal_mode=WAL;";
+                await enableWriteAheadLoggingForGlobalDatabases.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
+            }
             await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
             await connection.CloseAsync().ConfigureAwait(false);
         }
         finally
         {
+            dataStorageConnectionLockHeld?.Dispose();
             saveSpecificDataStoragePropagationLockHeld?.Dispose();
         }
     }

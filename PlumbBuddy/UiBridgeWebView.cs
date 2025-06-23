@@ -200,6 +200,8 @@ public partial class UiBridgeWebView :
     public void OnMessageFromBridgedUi(string message) =>
         proxyHost.ProcessMessageFromBridgedUiAsync(UniqueId, message);
 
+    private partial void Refresh();
+
     void SafeSendMessageToBridgedUi(string messageJson) =>
         StaticDispatcher.Dispatch(() => SendMessageToBridgedUi(messageJson));
 
