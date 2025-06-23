@@ -740,6 +740,9 @@ public partial class ProxyHost :
                         && gameServiceEventMessage.SlotId is { } gameServiceEventSlotId)
                     {
                         if (gameServiceEvent is GameServiceEvent.PreSave
+                            && gameServiceEventSlotId is 0)
+                            break; // don't care about scratch saves
+                        if (gameServiceEvent is GameServiceEvent.PreSave
                             && saveNucleusId == gameServiceEventNucleusId
                             && saveCreated == gameServiceEventCreated)
                             lastSaveSimNow = saveSimNow;
@@ -895,8 +898,7 @@ public partial class ProxyHost :
                         || account.NucleusId != saveNucleusId
                         || account.Created != saveCreated
                         || saveGameData.SaveSlot is not { } saveSlot
-                        || saveSlotId != 0
-                        && saveSlot.SlotId != saveSlotId
+                        || saveSlot.SlotId != saveSlotId
                         || saveSlot.GameplayData is not { } gamePlayData
                         || gamePlayData.WorldGameTime < saveSimNow)
                         continue;
@@ -905,10 +907,11 @@ public partial class ProxyHost :
                     DisconnectFromSavesFolder();
                     var (saveSpecificDataKey, saveSpecificDataContent) = await saveSpecificDataStorageSnapshot.ConfigureAwait(false);
                     saveSpecificDataStorageSnapshot = null;
+                    if (saveSpecificDataContent.IsEmpty)
+                        break;
                     foreach (var key in packageKeys.Where(pk => pk.Type is ResourceType.SaveSpecificRelationalDataStorage))
                         savePackage.Delete(key);
-                    if (!saveSpecificDataContent.IsEmpty)
-                        await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
+                    await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
                     await savePackage.SaveAsync().ConfigureAwait(false);
                     break;
                 }
