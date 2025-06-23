@@ -77,7 +77,7 @@ public partial class UiBridgeWebView
     private partial void Navigate(Uri uri) =>
         PlatformWebView.Source = uri;
 
-    private partial void Refresh() =>
+    public partial void Refresh() =>
         PlatformWebView.Reload();
 
     private partial void SendMessageToBridgedUi(string messageJson) =>
