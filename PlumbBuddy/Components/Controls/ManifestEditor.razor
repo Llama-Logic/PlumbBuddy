@@ -472,9 +472,12 @@
 					<div class="flex-grow-1">
 
 					</div>
-					<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
-						<MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" OnClick="LaunchGuideAsync" />
-					</MudTooltip>
+                    @if (!isComposing)
+                    {
+                        <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+                            <MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" OnClick="LaunchGuideAsync" />
+					    </MudTooltip>
+                    }
 				</MudStack>
 			</ActionContent>
         </MudStepperExtended>
