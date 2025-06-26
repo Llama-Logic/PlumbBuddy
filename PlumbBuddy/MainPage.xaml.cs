@@ -32,6 +32,7 @@ public partial class MainPage :
         this.proxyHost = proxyHost;
         this.proxyHost.BridgedUiRequested += HandleProxyHostBridgedUiRequested;
         this.proxyHost.BridgedUiAuthorized += HandleProxyHostBridgedUiAuthorized;
+        this.proxyHost.BridgedUiDomLoaded += HandleProxyHostBridgedUiDomLoaded;
         this.proxyHost.BridgedUiFocusRequested += HandleProxyHostBridgedUiFocusRequested;
         this.proxyHost.BridgedUiDestroyed += HandleProxyHostBridgedUiDestroyed;
         InitializeComponent();
@@ -73,7 +74,19 @@ public partial class MainPage :
     void HandleProxyHostBridgedUiAuthorized(object? sender, BridgedUiAuthorizedEventArgs e) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
-            var webView = new UiBridgeWebView(lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(), settings, lifetimeScope.Resolve<IUpdateManager>(), proxyHost, e.Archive, e.UiRoot, e.UniqueId, e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant());
+            var webView = new UiBridgeWebView
+            (
+                lifetimeScope.Resolve<ILogger<UiBridgeWebView>>(),
+                settings,
+                lifetimeScope.Resolve<IUpdateManager>(),
+                proxyHost,
+                e.Archive,
+                e.UiRoot,
+                e.UniqueId,
+                e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant()
+            ) {
+                Opacity = 0.01
+            };
             var tab = new SfTabItem { Content = webView, Header = e.TabName };
             ImageSource? imageSource = null;
             if (e.TabIconPath is { } tabIconPath
@@ -102,6 +115,13 @@ public partial class MainPage :
                 tabView.Items.RemoveAt(bridgedUiIndex);
                 await RefreshTabViewAsync();
             }
+        });
+
+    void HandleProxyHostBridgedUiDomLoaded(object? sender, BridgedUiEventArgs e) =>
+        _ = StaticDispatcher.DispatchAsync(async () =>
+        {
+            if (tabView.Items.Select(t => t.Content as UiBridgeWebView).FirstOrDefault(webView => webView?.UniqueId == e.UniqueId) is { } webView)
+                await webView.FadeTo(1);
         });
 
     void HandleProxyHostBridgedUiFocusRequested(object? sender, BridgedUiFocusRequestedEventArgs e) =>

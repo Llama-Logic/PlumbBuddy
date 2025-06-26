@@ -7,6 +7,7 @@ public interface IProxyHost :
     event EventHandler<BridgedUiAuthorizedEventArgs>? BridgedUiAuthorized;
     event EventHandler<BridgedUiDataSentEventArgs>? BridgedUiDataSent;
     event EventHandler<BridgedUiEventArgs>? BridgedUiDestroyed;
+    event EventHandler<BridgedUiEventArgs>? BridgedUiDomLoaded;
     event EventHandler<BridgedUiFocusRequestedEventArgs>? BridgedUiFocusRequested;
     event EventHandler<BridgedUiRequestedEventArgs>? BridgedUiRequested;
     event EventHandler<BridgedUiMessageSentEventArgs>? BridgedUiMessageSent;

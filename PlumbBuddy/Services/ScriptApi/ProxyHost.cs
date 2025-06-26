@@ -180,6 +180,7 @@ public partial class ProxyHost :
     public event EventHandler<BridgedUiAuthorizedEventArgs>? BridgedUiAuthorized;
     public event EventHandler<BridgedUiDataSentEventArgs>? BridgedUiDataSent;
     public event EventHandler<BridgedUiEventArgs>? BridgedUiDestroyed;
+    public event EventHandler<BridgedUiEventArgs>? BridgedUiDomLoaded;
     public event EventHandler<BridgedUiFocusRequestedEventArgs>? BridgedUiFocusRequested;
     public event EventHandler<BridgedUiRequestedEventArgs>? BridgedUiRequested;
     public event EventHandler<BridgedUiMessageSentEventArgs>? BridgedUiMessageSent;
@@ -699,6 +700,11 @@ public partial class ProxyHost :
                     UniqueId = announcerUniqueId.ToString("n").ToLowerInvariant(),
                     Announcement = dynamicAnnouncement
                 });
+                break;
+            case ComponentMessageType.BridgedUiDomLoaded:
+                if (fromBridgedUiUniqueId is not { } loaderUniqueId)
+                    return;
+                BridgedUiDomLoaded?.Invoke(this, new BridgedUiEventArgs{ UniqueId = loaderUniqueId });
                 break;
             case ComponentMessageType.BridgedUiLookUp:
                 if (TryParseMessage<BridgedUiLookUpMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "bridged UI look up", out var bridgedUiLookUpMessage))

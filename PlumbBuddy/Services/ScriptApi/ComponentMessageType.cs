@@ -3,6 +3,7 @@ namespace PlumbBuddy.Services.ScriptApi;
 public enum ComponentMessageType
 {
     Announcement,
+    BridgedUiDomLoaded,
     BridgedUiLookUp,
     BridgedUiRequest,
     CloseBridgedUi,

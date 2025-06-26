@@ -660,5 +660,16 @@
         enumerable: true,
     });
 
-    console.info('PlumbBuddy %s Gateway loaded successfully. Use window.gateway to communicate with mods and services. This is bridged UI "%s".', gateway.version, gateway.uniqueId);
+    function loadingFinished() {
+        console.info('PlumbBuddy %s Gateway loaded successfully. Use window.gateway to communicate with mods and services. This is bridged UI "%s".', gateway.version, gateway.uniqueId);
+        sendMessageToPlumbBuddy({
+            type: 'bridgedUiDomLoaded'
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadingFinished);
+    } else {
+        loadingFinished();
+    }
 }());
