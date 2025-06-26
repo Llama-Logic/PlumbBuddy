@@ -283,7 +283,7 @@ class RelationalDataStorage:
 
         :param sql: SQLite query
         :param tag: (optional) a tag to associate with the query, making its results easier to identify by other components
-        :param *args: the parameters to replace instances of '?' with in sql
+        :param parameters: the parameters to replace instances of '?' with in sql
         :returns: the UUID which has been assigned to the query
         """
 
