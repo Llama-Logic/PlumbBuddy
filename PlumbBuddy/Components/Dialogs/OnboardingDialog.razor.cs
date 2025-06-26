@@ -313,12 +313,12 @@ partial class OnboardingDialog
                 Settings.ScanForErrorLogs = false;
                 Settings.ScanForMismatchedInscribedHashes = true;
                 Settings.ScanForMissingBe = false;
-                Settings.ScanForMissingDependency = false;
+                Settings.ScanForMissingDependency = true;
                 Settings.ScanForMissingMccc = false;
                 Settings.ScanForMissingModGuard = false;
                 Settings.ScanForCacheStaleness = false;
                 Settings.ScanForMultipleModVersions = false;
-                Settings.ScanForMutuallyExclusiveMods = false;
+                Settings.ScanForMutuallyExclusiveMods = true;
                 Settings.ScanForShowModsListAtStartupEnabled = false;
                 break;
             default:
