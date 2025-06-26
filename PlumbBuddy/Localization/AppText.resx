@@ -3334,4 +3334,12 @@ More detailed technical information is available in my log.</value>
   <data name="SettingsDialog_UIZoom_Label" xml:space="preserve">
     <value>UI Scale</value>
   </data>
+  <data name="ManifestEditor_Confirm_Warning_InvalidRequiredPackCode" xml:space="preserve">
+    <value>*You specified that your mod requires a pack with the code **{0}**, which is not a valid pack code!* You can go back to the **Requirements** step and fix this, and probably should because if you don't, every player will be told they're missing this impossible pack. To make it easier, consider removing **{0}** from the **Required Packs** list and then switching on **Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes** on the bottom of this window.</value>
+    <comment>This text is in Markdown. {0} = Invalid Pack Code</comment>
+  </data>
+  <data name="ManifestEditor_Confirm_Warning_InvalidIncompatiblePackCode" xml:space="preserve">
+    <value>*You specified that your mod is incompatible with a pack with the code **{0}**, which is not a valid pack code.* You can go back to the **Requirements** step and fix this, and probably should because it will never have any effect as no player will ever have this impossible pack installed. To make it easier, consider removing **{0}** from the **Incompatible Packs** list and then switching on **Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes** on the bottom of this window.</value>
+    <comment>This text is in Markdown. {0} = Invalid Pack Code</comment>
+  </data>
 </root>

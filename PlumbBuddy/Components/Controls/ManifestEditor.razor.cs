@@ -30,6 +30,9 @@ partial class ManifestEditor
     [GeneratedRegex(@"^https?://.*")]
     private static partial Regex GetUrlPattern();
 
+    [GeneratedRegex(@"^(E|F|G|S)P\d{2}$", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex GetValidPackCodePattern();
+
     public static Task WaitForCompositionClearanceAsync(CancellationToken cancellationToken = default) =>
         compositionResetEvent.WaitAsync(cancellationToken);
 
@@ -1282,6 +1285,14 @@ partial class ManifestEditor
                 (string?)MaterialDesignIcons.Normal.CloudSearch,
                 StringLocalizer["ManifestEditor_Confirm_Warning_BlankDownloadPageUrl"].Value
             ));
+        messages.AddRange(requiredPacks
+            .Where(requiredPack => !GetValidPackCodePattern().IsMatch(requiredPack))
+            .Select(invalidRequiredPack =>
+            (
+                Severity.Warning,
+                (string?)MaterialDesignIcons.Normal.CodeNotEqual,
+                StringLocalizer["ManifestEditor_Confirm_Warning_InvalidRequiredPackCode", invalidRequiredPack!].Value
+            )));
         messages.AddRange(requiredMods
             .Select((requiredMod, index) => (requiredMod, index))
             .Where(t => string.IsNullOrWhiteSpace(t.requiredMod.Name))
@@ -1306,6 +1317,14 @@ partial class ManifestEditor
                 (string?)MaterialDesignIcons.Normal.AccountCash,
                 StringLocalizer["ManifestEditor_Confirm_Note_BlankPromoCode"].Value
             ));
+        messages.AddRange(incompatiblePacks
+            .Where(incompatiblePack => !GetValidPackCodePattern().IsMatch(incompatiblePack))
+            .Select(invalidIncompatiblePacks =>
+            (
+                Severity.Normal,
+                (string?)MaterialDesignIcons.Normal.CodeNotEqual,
+                StringLocalizer["ManifestEditor_Confirm_Warning_InvalidIncompatiblePackCode", invalidIncompatiblePacks!].Value
+            )));
 
         confirmationStepMessages = [..messages];
     }

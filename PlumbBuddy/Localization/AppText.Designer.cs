@@ -3170,6 +3170,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to *You specified that your mod is incompatible with a pack with the code **{0}**, which is not a valid pack code.* You can go back to the **Requirements** step and fix this, and probably should because it will never have any effect as no player will ever have this impossible pack installed. To make it easier, consider removing **{0}** from the **Incompatible Packs** list and then switching on **Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes** on the bottom of this window..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_InvalidIncompatiblePackCode {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_InvalidIncompatiblePackCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *You specified that your mod requires a pack with the code **{0}**, which is not a valid pack code!* You can go back to the **Requirements** step and fix this, and probably should because if you don&apos;t, every player will be told they&apos;re missing this impossible pack. To make it easier, consider removing **{0}** from the **Required Packs** list and then switching on **Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes** on the bottom of this window..
+        /// </summary>
+        internal static string ManifestEditor_Confirm_Warning_InvalidRequiredPackCode {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Confirm_Warning_InvalidRequiredPackCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to *You haven&apos;t specified any creators.* Look, I know stepping into the limelight can be a bit daunting... but you deserve recognition for what you&apos;ve done! You can go back to the **Details** step and fill in your own name and the names of anyone who worked with you on this mod..
         /// </summary>
         internal static string ManifestEditor_Confirm_Warning_NoCreators {
