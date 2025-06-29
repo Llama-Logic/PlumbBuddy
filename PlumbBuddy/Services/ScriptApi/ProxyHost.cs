@@ -1,4 +1,3 @@
-using System.Windows.Controls;
 using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
