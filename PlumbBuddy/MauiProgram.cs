@@ -1,4 +1,3 @@
-
 namespace PlumbBuddy;
 
 /// <summary>
@@ -48,8 +47,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
-            .ConfigureSyncfusionToolkit()
-            .ConfigureSyncfusionCore()
+            .UseSharpnadoTabs(loggerEnable: false)
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

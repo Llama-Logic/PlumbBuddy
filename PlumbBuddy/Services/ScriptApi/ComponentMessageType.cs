@@ -10,6 +10,7 @@ public enum ComponentMessageType
     FocusBridgedUi,
     ForegroundGame,
     GameServiceEvent,
+    OpenUrl,
     QueryRelationalDataStorage,
     SendDataToBridgedUi,
     SendLoadedSaveIdentifiersResponse

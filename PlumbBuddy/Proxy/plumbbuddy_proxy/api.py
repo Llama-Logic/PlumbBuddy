@@ -343,6 +343,11 @@ class Gateway:
         self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._reset_bridged_ui_cache()
 
+        self._dispatch_is_connected_changed: Callable[[bool], None] = lambda _: None
+        def set_dispatch_is_connected_changed(dispatch: Callable[[bool], None]):
+            self._dispatch_is_connected_changed = dispatch
+        self._is_connected_changed: Event[bool] = Event(set_dispatch_is_connected_changed)
+
         @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
             if connection_state == 0:
@@ -361,6 +366,9 @@ class Gateway:
                     for bridged_ui_tuple in bridged_uis.values():
                         bridged_ui_tuple[1]['destroyed'](None)
                 self._reset_bridged_ui_cache()
+                self._dispatch_is_connected_changed(False)
+            elif connection_state == 2:
+                self._dispatch_is_connected_changed(True)
 
     def _get_bridged_ui(self, unique_id: UUID):
         try:
@@ -482,6 +490,26 @@ class Gateway:
         self._bridged_ui_look_ups: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
 
+    @property
+    def is_connected() -> bool:
+        """
+        Gets whether PlumbBuddy is currently connected
+
+        :returns: True if PlumbBuddy is connected; otherwise, False
+        """
+
+        return ipc.is_connected
+    
+    @property
+    def is_connected_changed(self) -> Event[bool]:
+        """
+        Gets the event dispatched when is_connected is changed
+
+        :returns: The Event[bool] representing the is_connected_changed event
+        """
+
+        return self._is_connected_changed
+
     def get_relational_data_storage(self, unique_id: UUID, is_save_specific: bool) -> RelationalDataStorage:
         """
         Gets a Relational Data Storage connection
@@ -490,6 +518,7 @@ class Gateway:
         :param is_save_specific: True if the Relational Data Storage instance should be tied to the currently open save game; otherwise, False
         :returns: a Relational Data Storage connection
         """
+
         if unique_id is None:
             raise Exception('unique_id is not optional')
         if not isinstance(unique_id, UUID):
@@ -514,6 +543,7 @@ class Gateway:
         :param unique_id: the UUID for the tab of the bridged UI
         :returns: an Eventual that will resolve with the bridged UI or a fault that it is not currently loaded
         """
+
         if unique_id is None:
             raise Exception('unique_id is not optional')
         if not isinstance(unique_id, UUID):
@@ -555,6 +585,7 @@ class Gateway:
         :param host_name: (optional) the host name for the simulated web server to use when displaying your bridged UI, which matters to common browser services like local storage and IndexedDB (this will be your UI's `unique_id` if ommitted)
         :returns: an Eventual that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, `InvalidHostNameError`, etc.)
         """
+
         if ui_root is None or len(ui_root) == 0:
             raise Exception('ui_root is not optional')
         if unique_id is None:

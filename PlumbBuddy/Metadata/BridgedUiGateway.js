@@ -582,6 +582,20 @@
         }
 
         /**
+         * Requests that PlumbBuddy open a URL in the user's web browser
+         * @param {String} url the url to open
+         */
+        openUrl(url) {
+            if (!url) {
+                throw new Error('url is not optional');
+            }
+            sendMessageToPlumbBuddy({
+                type: 'openUrl',
+                url,
+            });
+        }
+
+        /**
          * Requests a bridged UI from PlumbBuddy
          * @param {String} scriptMod either a Mods folder relative path to the `.ts4script` file containing the bridged UI's files *-or-* the hex of the SHA 256 calculated hash of the `.ts4script` file if it is manifested
          * @param {String} uiRoot the path inside the `.ts4script` file to the root of the bridged UI's files (this is where `index.html` should be located)

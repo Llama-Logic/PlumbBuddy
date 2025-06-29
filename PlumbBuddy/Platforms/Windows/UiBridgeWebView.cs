@@ -7,8 +7,17 @@ namespace PlumbBuddy;
 [SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
 public partial class UiBridgeWebView
 {
-    WebView2 PlatformWebView =>
-        (WebView2)Handler!.PlatformView!;
+    WebView2 PlatformWebView
+    {
+        get
+        {
+            if (Handler is not { } handler)
+                throw new NullReferenceException("Handler is null");
+            if (handler.PlatformView is not { } platformView)
+                throw new NullReferenceException("PlatformView is null");
+            return (WebView2)platformView;
+        }
+    }
 
     async void HandlerCoreWebResourceRequested(CoreWebView2 sender, CoreWebView2WebResourceRequestedEventArgs args)
     {

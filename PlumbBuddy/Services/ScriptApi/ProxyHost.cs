@@ -1,3 +1,4 @@
+using System.Windows.Controls;
 using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
@@ -776,6 +777,11 @@ public partial class ProxyHost :
                         }
                     }
                 }
+                break;
+            case ComponentMessageType.OpenUrl:
+                if (TryParseMessage<OpenUrlMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "open URL", out var openUrlMessage)
+                    && openUrlMessage.Url is { } openUrlMessageUrl)
+                    StaticDispatcher.Dispatch(() => Browser.OpenAsync(openUrlMessageUrl, BrowserLaunchMode.External));
                 break;
             case ComponentMessageType.QueryRelationalDataStorage:
                 if (TryParseMessage<QueryRelationalDataStorageMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "query relational data storage", out var queryRelationalDataStorageMessage))

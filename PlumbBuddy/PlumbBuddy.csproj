@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.9</ApplicationDisplayVersion>
-        <ApplicationVersion>1.5.9</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5.10</ApplicationDisplayVersion>
+        <ApplicationVersion>1.5.10</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -84,7 +84,7 @@
         <PackageReference Include="BlazorMonaco" Version="3.3.0" />
         <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
         <PackageReference Include="BsDiff" Version="1.1.0" />
-        <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.2" />
+        <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.3" />
         <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="CsvHelper" Version="33.1.0" />
@@ -121,9 +121,8 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
         <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Sharpnado.Tabs.Maui" Version="3.2.1" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
-        <PackageReference Include="Syncfusion.Maui.RadialMenu" Version="29.2.11" />
-        <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.5" />
         <PackageReference Include="System.Linq.Async" Version="6.0.3" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="System.Private.Uri" Version="4.3.2" />

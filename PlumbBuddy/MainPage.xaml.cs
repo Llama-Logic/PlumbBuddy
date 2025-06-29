@@ -1,6 +1,3 @@
-using Syncfusion.Maui.Toolkit.TabView;
-using Animation = Microsoft.Maui.Controls.Animation;
-
 namespace PlumbBuddy;
 
 [SuppressMessage("Maintainability", "CA1501: Avoid excessive inheritance")]
@@ -43,6 +40,7 @@ public partial class MainPage :
     readonly IAppLifecycleManager appLifecycleManager;
     readonly ILifetimeScope lifetimeScope;
     readonly IProxyHost proxyHost;
+    int selectedTabIndex;
     readonly ISettings settings;
     bool showFileDropInterface;
 #if WINDOWS
@@ -50,6 +48,18 @@ public partial class MainPage :
 #endif
     readonly IUserInterfaceMessaging userInterfaceMessaging;
     bool webViewShownBefore;
+
+    public int SelectedTabIndex
+    {
+        get => selectedTabIndex;
+        set
+        {
+            if (value == selectedTabIndex)
+                return;
+            selectedTabIndex = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool ShowFileDropInterface
     {
@@ -70,9 +80,12 @@ public partial class MainPage :
         ? AppText.DesktopInterface_Loading_HideMainWindow
         : AppText.DesktopInterface_Loading;
 
+    void HandleCancelFileDropClicked(object sender, EventArgs e) =>
+        userInterfaceMessaging.IsFileDroppingEnabled = false;
+
     [SuppressMessage("Globalization", "CA1308: Normalize strings to uppercase")]
     void HandleProxyHostBridgedUiAuthorized(object? sender, BridgedUiAuthorizedEventArgs e) =>
-        _ = StaticDispatcher.DispatchAsync(async () =>
+        StaticDispatcher.Dispatch(() =>
         {
             var webView = new UiBridgeWebView
             (
@@ -84,56 +97,93 @@ public partial class MainPage :
                 e.UiRoot,
                 e.UniqueId,
                 e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant()
-            ) {
-                Opacity = 0.01
+            );
+            var tab = new BottomTabItem
+            {
+                Label = e.TabName,
+                IsEnabled = false
             };
-            var tab = new SfTabItem { Content = webView, Header = e.TabName };
+            var reloadMenuItem = new MenuFlyoutItem { Text = "Reload" };
+            reloadMenuItem.Clicked += (_, _) => webView.Refresh();
+            var closeMenuItem = new MenuFlyoutItem { Text = "Close" };
+            closeMenuItem.Clicked += async (_, _) =>
+            {
+                if (!await DisplayAlert("UI Bridge Control: Closing", "If you continue, I will forcibly close this bridged UI and inform your mods that I did so.", "OK", "Cancel"))
+                    return;
+                proxyHost.DestroyBridgedUi(e.UniqueId);
+            };
+            FlyoutBase.SetContextFlyout(tab, new MenuFlyout
+            {
+                reloadMenuItem,
+                closeMenuItem
+            });
             ImageSource? imageSource = null;
             if (e.TabIconPath is { } tabIconPath
                 && !string.IsNullOrWhiteSpace(tabIconPath))
             {
                 if (e.Archive?.GetEntry(Path.Combine(e.UiRoot, tabIconPath).Replace("\\", "/", StringComparison.Ordinal)) is { } tabIconEntry)
-                    imageSource = ImageSource.FromStream(() => e.Archive.GetInputStream(tabIconEntry));
+                {
+                    var uiBridgeIconsDirectory = Directory.CreateDirectory(Path.Combine(MauiProgram.CacheDirectory.FullName, "UI Bridge Icons"));
+                    var uiBridgeIconDirectory = Directory.CreateDirectory(Path.Combine(uiBridgeIconsDirectory.FullName, e.UniqueId.ToString("n")));
+                    var uiBridgeIconFile = new FileInfo(Path.Combine(uiBridgeIconDirectory.FullName, tabIconEntry.Name.Split('/').Last()));
+                    if (uiBridgeIconFile.Exists)
+                        uiBridgeIconFile.Delete();
+                    using (var uiBridgeIconFileStream = uiBridgeIconFile.OpenWrite())
+                    {
+                        using var inputStream = e.Archive.GetInputStream(tabIconEntry);
+                        inputStream.CopyTo(uiBridgeIconFileStream);
+                    }
+                    imageSource = ImageSource.FromFile(uiBridgeIconFile.FullName);
+                }
                 if (e.Archive is null && Uri.TryCreate(e.UiRoot, UriKind.Absolute, out var uiRootBaseUrl))
                     imageSource = ImageSource.FromUri(new(uiRootBaseUrl, tabIconPath));
             }
-            tab.ImageSource = imageSource ?? "browser_window.png";
-            tabView.Items.Add(tab);
-            await RefreshTabViewAsync();
-            tabView.SelectedIndex = tabView.Items.Count - 1;
+            tab.IconImageSource = imageSource ?? "browser_window.png";
+            viewSwitcher.Children.Add(webView);
+            tabHostView.Tabs.Add(tab);
+            RefreshTabHostView();
         });
 
     void HandleProxyHostBridgedUiDestroyed(object? sender, BridgedUiEventArgs e) =>
-        _ = StaticDispatcher.DispatchAsync(async () =>
+        StaticDispatcher.Dispatch(() =>
         {
-            var bridgedUiIndex = tabView.Items.FindIndex(t => t.Content is UiBridgeWebView webView && webView.UniqueId == e.UniqueId);
+            var bridgedUiIndex = viewSwitcher.Children.FindIndex(child => child is UiBridgeWebView webView && webView.UniqueId == e.UniqueId);
             if (bridgedUiIndex >= 1)
             {
-                var tabForDestroyedBridgedUi = tabView.Items[bridgedUiIndex];
-                if (tabForDestroyedBridgedUi.Content is UiBridgeWebView uiBridgeWebView)
+                var tabContent = viewSwitcher.Children[bridgedUiIndex];
+                if (tabContent is UiBridgeWebView uiBridgeWebView)
                     uiBridgeWebView.DisconnectHandlers();
-                tabView.Items.RemoveAt(bridgedUiIndex);
-                await RefreshTabViewAsync();
+                SelectedTabIndex = bridgedUiIndex - 1;
+                viewSwitcher.Children.RemoveAt(bridgedUiIndex);
+                tabHostView.Tabs.RemoveAt(bridgedUiIndex);
+                RefreshTabHostView();
             }
         });
 
     void HandleProxyHostBridgedUiDomLoaded(object? sender, BridgedUiEventArgs e) =>
-        _ = StaticDispatcher.DispatchAsync(async () =>
+        StaticDispatcher.Dispatch(() =>
         {
-            if (tabView.Items.Select(t => t.Content as UiBridgeWebView).FirstOrDefault(webView => webView?.UniqueId == e.UniqueId) is { } webView)
-                await webView.FadeTo(1);
+            if (viewSwitcher.Children.Select((tab, index) => (tab, index)).FirstOrDefault(tuple => tuple.tab is UiBridgeWebView webView && webView.UniqueId == e.UniqueId) is { } tabAndIndex)
+            {
+                var (tab, index) = tabAndIndex;
+                if (tab is not null)
+                {
+                    tabHostView.Tabs[index].IsEnabled = true;
+                    SelectedTabIndex = index;
+                }
+            }
         });
 
     void HandleProxyHostBridgedUiFocusRequested(object? sender, BridgedUiFocusRequestedEventArgs e) =>
         StaticDispatcher.Dispatch(() =>
         {
-            if (tabView.Items.Select((tab, index) => (tab, index)).FirstOrDefault(t => t.tab.Content is UiBridgeWebView webView && webView.UniqueId == e.UniqueId) is { } tabToBeFocused)
+            if (viewSwitcher.Children.Select((tab, index) => (tab, index)).FirstOrDefault(tuple => tuple.tab is UiBridgeWebView webView && webView.UniqueId == e.UniqueId) is { } tabToBeFocused)
             {
                 var (_, index) = tabToBeFocused;
                 if (index is <= 0)
                     return;
                 appLifecycleManager.ShowWindow();
-                tabView.SelectedIndex = index;
+                SelectedTabIndex = index;
             }
         });
 
@@ -143,7 +193,7 @@ public partial class MainPage :
             await proxyHost.ForegroundPlumbBuddyAsync();
             if (await DisplayAlert("Bridged UI Requested",
                 $"""
-                {e.RequestorName} is asking for permission to show a bridged UI it wants to call {e.TabName}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game.
+                {e.RequestorName} is asking for permission to show a bridged UI it wants to call {e.TabName}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game. After the UI is launched, you can right or secondary click on its tab to access its controls.
 
                 The reason given is:
                 {e.RequestReason}
@@ -155,13 +205,10 @@ public partial class MainPage :
             e.Deny();
         });
 
-    void HandleCancelFileDropClicked(object sender, EventArgs e) =>
-        userInterfaceMessaging.IsFileDroppingEnabled = false;
-
     void HandleProxyHostPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IProxyHost.IsClientConnected))
-            _ = StaticDispatcher.DispatchAsync(RefreshTabViewAsync);
+            _ = StaticDispatcher.DispatchAsync(RefreshTabHostView);
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -170,45 +217,6 @@ public partial class MainPage :
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
 #endif
-    }
-
-    async void HandleTabViewCenterButtonTapped(object sender, EventArgs e)
-    {
-        if (tabView.Items[tabView.SelectedIndex].Content is UiBridgeWebView)
-        {
-            tabViewRadialMenu.Opacity = 0.01;
-            tabViewRadialMenu.IsVisible = true;
-            await tabViewRadialMenu.FadeTo(1);
-            tabViewRadialMenu.IsOpen = true;
-            return;
-        }
-        await DisplayAlert("UI Bridge Control", "This button only has an effect when a bridged UI is the active tab.", "OK");
-    }
-
-    async void HandleTabViewRadialMenuClosed(object sender, Syncfusion.Maui.RadialMenu.ClosedEventArgs e)
-    {
-        await tabViewRadialMenu.FadeTo(0);
-        tabViewRadialMenu.IsVisible = false;
-    }
-
-    async void HandleTabViewRadialMenuCloseItemTapped(object sender, Syncfusion.Maui.RadialMenu.ItemTappedEventArgs e)
-    {
-        if (!await DisplayAlert("UI Bridge Control: Closing", "If you continue, I will forcibly close this bridged UI and inform your mods that I did so.", "OK", "Cancel"))
-            return;
-        if (tabView.Items[tabView.SelectedIndex].Content is UiBridgeWebView uiBridgeWebView)
-        {
-            tabViewRadialMenu.IsOpen = false;
-            proxyHost.DestroyBridgedUi(uiBridgeWebView.UniqueId);
-        }
-    }
-
-    void HandleTabViewRadialMenuRefreshItemTapped(object sender, Syncfusion.Maui.RadialMenu.ItemTappedEventArgs e)
-    {
-        if (tabView.Items[tabView.SelectedIndex].Content is UiBridgeWebView uiBridgeWebView)
-        {
-            tabViewRadialMenu.IsOpen = false;
-            uiBridgeWebView.Reload();
-        }
     }
 
     void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -248,23 +256,12 @@ public partial class MainPage :
         appLifecycleManager.WindowFirstShown(Window);
     }
 
-    async Task RefreshTabViewAsync()
+    void RefreshTabHostView()
     {
-        tabView.IsCenterButtonEnabled = tabView.Items.Count is > 1;
-        if (tabView.TabBarHeight == 0 && tabView.Items.Count is > 1)
-        {
-            var tcs = new TaskCompletionSource();
-            using var animation = new Animation(v => tabView.TabBarHeight = v, 0, 80);
-            animation.Commit(this, "SlideUp", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
-            await tcs.Task;
-        }
-        else if (tabView.TabBarHeight == 80 && tabView.Items.Count is 1)
-        {
-            var tcs = new TaskCompletionSource();
-            using var animation = new Animation(v => tabView.TabBarHeight = v, 80, 0);
-            animation.Commit(this, "SlideDown", 16, 500, Easing.CubicInOut, (_, _) => tcs.SetResult());
-            await tcs.Task;
-        }
+        if (!tabHostView.IsVisible && tabHostView.Tabs.Count is > 1)
+            tabHostView.IsVisible = true;
+        else if (tabHostView.IsVisible && tabHostView.Tabs.Count is 1)
+            tabHostView.IsVisible = false;
     }
 
     public async Task ShowWebViewAsync()
@@ -281,12 +278,10 @@ public partial class MainPage :
                 appLifecycleManager.ShowWindow();
             });
         }
-        blazorWebView.Opacity = 0.01;
-        tabView.IsVisible = true;
         await Task.Delay(750);
         await Task.WhenAll(pleaseWait.FadeTo(0, 500), blazorWebView.FadeTo(1, 500));
         pleaseWait.IsVisible = false;
-        await RefreshTabViewAsync();
+        RefreshTabHostView();
     }
 
     [RelayCommand]
@@ -369,4 +364,20 @@ public partial class MainPage :
         await Task.CompletedTask;
 #endif
     }
+
+    //async void HandleTabViewSelectionChanged(object sender, TabSelectionChangedEventArgs e)
+    //{
+    //    var selectedTabContent = tabView.Items[tabView.SelectedIndex].Content;
+    //    if (!selectedTabContent.IsVisible)
+    //        selectedTabContent.IsVisible = true;
+    //    if (selectedTabContent is UiBridgeWebView uiBridgeWebView
+    //        && uiBridgeWebView.Opacity != 1)
+    //        await uiBridgeWebView.FadeTo(1);
+    //    await Task.Delay(TimeSpan.FromMilliseconds(tabView.ContentTransitionDuration));
+    //    for (var i = 0; i < tabView.Items.Count; ++i)
+    //        tabView.Items[i].Content.IsVisible = i == tabView.SelectedIndex;
+    //}
+
+    //void HandleTabViewSelectionChanging(object sender, SelectionChangingEventArgs e) =>
+    //    tabView.Items[e.Index].Content.IsVisible = true;
 }

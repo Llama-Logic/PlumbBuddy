@@ -4,8 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:local="clr-namespace:PlumbBuddy"
     xmlns:localization="clr-namespace:PlumbBuddy.Localization"
-    xmlns:sf="http://schemas.syncfusion.com/maui/toolkit"
-    xmlns:sfrm="clr-namespace:Syncfusion.Maui.RadialMenu;assembly=Syncfusion.Maui.RadialMenu"
+    xmlns:tabs="http://sharpnado.com"
     xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     >
@@ -13,99 +12,61 @@
         x:Name="pageContainer"
         >
         <Grid.Resources>
-            <Style TargetType="sf:SfTabItem">
-                <Setter Property="VisualStateManager.VisualStateGroups">
-                    <VisualStateGroupList>
-                        <VisualStateGroup>
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="TextColor" Value="{x:Static local:MainPage.TextColor}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Selected">
-                                <VisualState.Setters>
-                                    <Setter Property="TextColor" Value="{x:Static local:MainPage.TextColor}" />
-                                    <Setter Property="FontAttributes" Value="Bold" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </Setter>
+            <Style TargetType="tabs:BottomTabItem">
+                <Setter Property="FontFamily" Value="OpenSansRegular" />
+                <Setter Property="IconSize" Value="28" />
+                <Setter Property="IsTextVisible" Value="True" />
+                <Setter Property="LabelSize" Value="14" />
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="SelectedTabColor" Value="#00a2ff" />
+                <Setter Property="UnselectedIconColor" Value="LightGray" />
+                <Setter Property="UnselectedLabelColor" Value="Gray" />
             </Style>
         </Grid.Resources>
-        <sf:SfTabView
-            x:Name="tabView"
-            CenterButtonTapped="HandleTabViewCenterButtonTapped"
-            IndicatorPlacement="Top"
-            IndicatorWidthMode="Stretch"
-            IsVisible="False"
-            TabBarHeight="0"
-            TabBarPlacement="Bottom"
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="*"
+            />
+            <RowDefinition
+                Height="Auto"
+            />
+        </Grid.RowDefinitions>
+        <tabs:ViewSwitcher
+            x:Name="viewSwitcher"
+            Animate="True"
+            SelectedIndex="{Binding SelectedTabIndex, Mode=OneWay}"
+        >
+            <BlazorWebView
+                x:Name="blazorWebView"
+                HostPage="wwwroot/index.html"
+                Opacity="0.01"
             >
-            <sf:SfTabView.CenterButtonSettings>
-                <sf:CenterButtonSettings
-                    Height="80"
-                    ImageSize="80"
-                    ImageSource="window_settings.png"
-                    TextColor="{x:Static local:MainPage.TextColor}"
-                    DisplayMode="Image"
-                    />
-            </sf:SfTabView.CenterButtonSettings>
-            <sf:SfTabView.Items>
-                <sf:SfTabItem
-                    Header="PlumbBuddy"
-                    ImageSource="plumbbuddy_logo.png"
-                    >
-                    <sf:SfTabItem.Content>
-                        <BlazorWebView
-                            x:Name="blazorWebView"
-                            HostPage="wwwroot/index.html"
-                            >
-                            <BlazorWebView.RootComponents>
-                                <RootComponent
-                                    Selector="#app"
-                                    ComponentType="{x:Type local:Components.Routes}"
-                                    />
-                            </BlazorWebView.RootComponents>
-                        </BlazorWebView>
-                    </sf:SfTabItem.Content>
-                </sf:SfTabItem>
-            </sf:SfTabView.Items>
-        </sf:SfTabView>
-        <sfrm:SfRadialMenu
-            x:Name="tabViewRadialMenu"
-            CenterButtonBackFontFamily="MauiMaterialAssets"
-            CenterButtonBackFontSize="28"
-            CenterButtonBackgroundColor="#333"
-            CenterButtonBackText="&#xe72d;"
-            CenterButtonFontFamily="MauiMaterialAssets"
-            CenterButtonFontSize="28"
-            CenterButtonText="&#xe719;"
-            CenterButtonTextColor="LightBlue"
-            EnableCenterButtonAnimation="True"
-            EnableRotation="True"
+                <BlazorWebView.RootComponents>
+                    <RootComponent
+                        Selector="#app"
+                        ComponentType="{x:Type local:Components.Routes}"
+                        />
+                </BlazorWebView.RootComponents>
+            </BlazorWebView>
+        </tabs:ViewSwitcher>
+        <tabs:TabHostView
+            x:Name="tabHostView"
+            Grid.Row="1"
+            IsSegmented="False"
             IsVisible="False"
-            RimRadius="200"
-            SelectionColor="#555"
-            Closed="HandleTabViewRadialMenuClosed"
-            >
-            <sfrm:SfRadialMenu.Items>
-                <sfrm:SfRadialMenuItem
-                    BackgroundColor="#440"
-                    Image="icon_close.png"
-                    TextColor="White"
-                    ItemTapped="HandleTabViewRadialMenuCloseItemTapped"
-                    />
-                <sfrm:SfRadialMenuItem
-                    BackgroundColor="#050"
-                    Image="icon_refresh.png"
-                    TextColor="White"
-                    ItemTapped="HandleTabViewRadialMenuRefreshItemTapped"
-                    />
-            </sfrm:SfRadialMenu.Items>
-        </sfrm:SfRadialMenu>
+            SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+            TabType="Fixed"
+        >
+            <tabs:TabHostView.Tabs>
+                <tabs:BottomTabItem
+                    IconImageSource="plumbbuddy_logo.png"
+                    Label="PlumbBuddy"
+                />
+            </tabs:TabHostView.Tabs>
+        </tabs:TabHostView>
         <StackLayout
             x:Name="pleaseWait"
+            Grid.RowSpan="2"
             HorizontalOptions="Center"
             VerticalOptions="Center"
             >
@@ -134,6 +95,7 @@
             </StackLayout>
         </StackLayout>
         <Grid
+            Grid.RowSpan="2"
             IsVisible="{Binding ShowFileDropInterface, Mode=OneWay}"
             >
             <Grid
