@@ -16,6 +16,8 @@ public class AppLifecycleManager :
     public Task UiReleaseSignal =>
         Task.CompletedTask;
 
+    public event EventHandler<UnhandledExceptionEventArgs>? UnhandledException;
+
     public void HideWindow()
     {
     }

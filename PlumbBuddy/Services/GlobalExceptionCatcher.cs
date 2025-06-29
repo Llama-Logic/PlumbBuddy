@@ -3,19 +3,23 @@ namespace PlumbBuddy.Services;
 class GlobalExceptionCatcher :
     IGlobalExceptionCatcher
 {
-    public GlobalExceptionCatcher(ILogger<IGlobalExceptionCatcher> logger, ISuperSnacks superSnacks)
+    public GlobalExceptionCatcher(ILogger<IGlobalExceptionCatcher> logger, IAppLifecycleManager appLifecycleManager, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(superSnacks);
         this.logger = logger;
+        this.appLifecycleManager = appLifecycleManager;
         this.superSnacks = superSnacks;
         AppDomain.CurrentDomain.UnhandledException += HandleCurrentDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += HandleTaskSchedulerUnobservedTaskException;
+        appLifecycleManager.UnhandledException += HandleAppLifecycleManagerUnhandledException;
     }
 
     ~GlobalExceptionCatcher() =>
         Dispose(false);
 
+    readonly IAppLifecycleManager appLifecycleManager;
     readonly ILogger<IGlobalExceptionCatcher> logger;
     readonly ISuperSnacks superSnacks;
 
@@ -33,6 +37,9 @@ class GlobalExceptionCatcher :
             TaskScheduler.UnobservedTaskException -= HandleTaskSchedulerUnobservedTaskException;
         }
     }
+
+    void HandleAppLifecycleManagerUnhandledException(object? sender, AppLifecycleUnhandledExceptionEventArgs e) =>
+        ProcessException(e.Exception, false);
 
     void HandleCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {

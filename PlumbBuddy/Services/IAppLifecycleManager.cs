@@ -3,6 +3,11 @@ namespace PlumbBuddy.Services;
 public interface IAppLifecycleManager
 {
     /// <summary>
+    /// Dispatched when the UI catches an unhandled exception
+    /// </summary>
+    event EventHandler<AppLifecycleUnhandledExceptionEventArgs>? UnhandledException;
+
+    /// <summary>
     /// Gets whether to hide the main window at launch
     /// </summary>
     bool HideMainWindowAtLaunch { get; }

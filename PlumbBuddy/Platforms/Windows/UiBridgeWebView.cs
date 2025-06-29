@@ -81,14 +81,14 @@ public partial class UiBridgeWebView
     }
 
     private partial void InitializeWebView() =>
-        PlatformWebView.CoreWebView2Initialized += HandleCoreWebView2Initialized;
+        StaticDispatcher.Dispatch(() => PlatformWebView.CoreWebView2Initialized += HandleCoreWebView2Initialized);
 
     private partial void Navigate(Uri uri) =>
-        PlatformWebView.Source = uri;
+        StaticDispatcher.Dispatch(() => PlatformWebView.Source = uri);
 
     public partial void Refresh() =>
-        PlatformWebView.Reload();
+        StaticDispatcher.Dispatch(PlatformWebView.Reload);
 
     private partial void SendMessageToBridgedUi(string messageJson) =>
-        PlatformWebView.CoreWebView2.PostWebMessageAsJson(messageJson);
+        StaticDispatcher.Dispatch(() => PlatformWebView.CoreWebView2.PostWebMessageAsJson(messageJson));
 }

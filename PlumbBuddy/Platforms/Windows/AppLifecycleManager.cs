@@ -13,13 +13,14 @@ class AppLifecycleManager :
     IAppLifecycleManager,
     IDisposable
 {
-    public AppLifecycleManager(ExtendedActivationKind extendedActivationKind)
+    public AppLifecycleManager(MauiWinUIApplication app, ExtendedActivationKind extendedActivationKind)
     {
         if (extendedActivationKind is ExtendedActivationKind.StartupTask)
         {
             HideMainWindowAtLaunch = true;
             startupTaskTrap = new(false);
         }
+        app.UnhandledException += HandleAppUnhandledException;
     }
 
     ~AppLifecycleManager() =>
@@ -53,6 +54,8 @@ class AppLifecycleManager :
     public Task UiReleaseSignal =>
         startupTaskTrap?.WaitAsync() ?? Task.CompletedTask;
 
+    public event EventHandler<Services.AppLifecycleUnhandledExceptionEventArgs>? UnhandledException;
+
     public void Dispose()
     {
         Dispose(true);
@@ -76,6 +79,12 @@ class AppLifecycleManager :
         && T.TryParse(valueStr?.ToString(), provider, out var value)
         ? value
         : defaultValue;
+
+    void HandleAppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+        UnhandledException?.Invoke(this, new Services.AppLifecycleUnhandledExceptionEventArgs { Exception = e.Exception });
+    }
 
     void HandleAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs e)
     {

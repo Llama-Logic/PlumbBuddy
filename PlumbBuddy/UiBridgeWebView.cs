@@ -9,7 +9,7 @@ public partial class UiBridgeWebView :
     public const string Scheme = "plumbbuddy";
 #endif
 
-    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, ICSharpCode.SharpZipLib.Zip.ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId, string hostName = "bridged-ui")
+    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId, string hostName = "bridged-ui")
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
@@ -51,13 +51,6 @@ public partial class UiBridgeWebView :
     {
         proxyHost.BridgedUiDataSent -= HandleProxyHostBridgedUiDataSent;
         proxyHost.BridgedUiMessageSent -= HandleProxyHostMessageSent;
-    }
-
-    void HandleProxyHostBridgedUiDataSent(object? sender, BridgedUiDataSentEventArgs e)
-    {
-        if (e.Recipient != UniqueId)
-            return;
-        SafeSendMessageToBridgedUi(e.MessageJson);
     }
 
     public string GetBridgedUiGatewayJavaScript()
@@ -178,8 +171,15 @@ public partial class UiBridgeWebView :
         );
     }
 
+    void HandleProxyHostBridgedUiDataSent(object? sender, BridgedUiDataSentEventArgs e)
+    {
+        if (e.Recipient != UniqueId)
+            return;
+        SendMessageToBridgedUi(e.MessageJson);
+    }
+
     void HandleProxyHostMessageSent(object? sender, BridgedUiMessageSentEventArgs e) =>
-        SafeSendMessageToBridgedUi(e.MessageJson);
+        SendMessageToBridgedUi(e.MessageJson);
 
     private partial void InitializeWebView();
 
@@ -201,9 +201,6 @@ public partial class UiBridgeWebView :
         proxyHost.ProcessMessageFromBridgedUiAsync(UniqueId, message);
 
     public partial void Refresh();
-
-    void SafeSendMessageToBridgedUi(string messageJson) =>
-        StaticDispatcher.Dispatch(() => SendMessageToBridgedUi(messageJson));
 
     private partial void SendMessageToBridgedUi(string messageJson);
 }

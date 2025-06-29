@@ -15,23 +15,26 @@ public partial class MainPage :
             ? Microsoft.Maui.Graphics.Colors.White
             : Microsoft.Maui.Graphics.Colors.Black;
 
-    public MainPage(ILifetimeScope lifetimeScope, ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging, IProxyHost proxyHost)
+    public MainPage(ILifetimeScope lifetimeScope, ISettings settings, IAppLifecycleManager appLifecycleManager, IUserInterfaceMessaging userInterfaceMessaging, IProxyHost proxyHost, ISuperSnacks superSnacks)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         ArgumentNullException.ThrowIfNull(proxyHost);
+        ArgumentNullException.ThrowIfNull(superSnacks);
         this.lifetimeScope = lifetimeScope;
         this.settings = settings;
         this.appLifecycleManager = appLifecycleManager;
         this.userInterfaceMessaging = userInterfaceMessaging;
         this.proxyHost = proxyHost;
+        this.superSnacks = superSnacks;
         this.proxyHost.BridgedUiRequested += HandleProxyHostBridgedUiRequested;
         this.proxyHost.BridgedUiAuthorized += HandleProxyHostBridgedUiAuthorized;
         this.proxyHost.BridgedUiDomLoaded += HandleProxyHostBridgedUiDomLoaded;
         this.proxyHost.BridgedUiFocusRequested += HandleProxyHostBridgedUiFocusRequested;
         this.proxyHost.BridgedUiDestroyed += HandleProxyHostBridgedUiDestroyed;
+        this.superSnacks.RefreshmentsOffered += HandleSuperSnacksRefreshmentsOffered;
         InitializeComponent();
         BindingContext = this;
         ShowFileDropInterface = userInterfaceMessaging.IsFileDroppingEnabled;
@@ -43,6 +46,7 @@ public partial class MainPage :
     int selectedTabIndex;
     readonly ISettings settings;
     bool showFileDropInterface;
+    readonly ISuperSnacks superSnacks;
 #if WINDOWS
     TaskbarIcon? trayIcon;
 #endif
@@ -217,6 +221,16 @@ public partial class MainPage :
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
 #endif
+    }
+
+    async void HandleSuperSnacksRefreshmentsOffered(object? sender, NummyEventArgs e)
+    {
+        await StaticDispatcher.WaitForDispatcherSetAsync().ConfigureAwait(false);
+        StaticDispatcher.Dispatch(() =>
+        {
+            if (SelectedTabIndex != 0)
+                SelectedTabIndex = 0;
+        });
     }
 
     void HandleUserInterfaceMessagingPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -23,7 +23,7 @@ public partial class App :
         if (keyInstance.IsCurrent)
         {
             keyInstance.Activated += HandleInstanceActivated;
-            appLifecycleManager = new(args.Kind);
+            appLifecycleManager = new(this, args.Kind);
             InitializeComponent();
         }
         else

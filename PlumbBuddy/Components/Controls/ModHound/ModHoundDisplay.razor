@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IModHoundClient ModHoundClient
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IDbContextFactory<PbDbContext> PbDbContextFactory
 @inject IPlatformFunctions PlatformFunctions
 @inject ISettings Settings
@@ -33,7 +34,7 @@
 				else
 				{
 					<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-						<MudButton OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
+						<MudButton Disabled="@(Observed(() => ModsDirectoryCataloger.State) is not ModsDirectoryCatalogerState.Idle)" OnClick="ModHoundClient.RequestReport" StartIcon="@MaterialDesignIcons.Normal.CloudRefresh">
 							@(new MarkupString(AppText.ModHoundDisplay_RequestNewReport_Label.Replace(" ", "&nbsp;")))
 						</MudButton>
 						<MudTooltip Arrow Text="@AppText.ModHoundDisplay_ManageSettings_Tip">
