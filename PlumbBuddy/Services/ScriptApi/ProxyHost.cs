@@ -214,7 +214,14 @@ public partial class ProxyHost :
         if (!Directory.Exists(cachePath))
             Directory.CreateDirectory(cachePath);
         cachePath = Path.Combine(cachePath, $"{uniqueId:n}.ts4script");
-        File.Copy(path, cachePath, true);
+        try
+        {
+            File.Copy(path, cachePath, true);
+        }
+        catch (IOException)
+        {
+            // in use already
+        }
         try
         {
 #pragma warning disable CA2000 // Dispose objects before losing scope
@@ -1077,6 +1084,8 @@ public partial class ProxyHost :
                 return;
             if (!isAuthorized)
             {
+                if (archive is IDisposable disposableArchive)
+                    disposableArchive.Dispose();
                 await BridgedUiRequestResolvedAsync(request.UniqueId, BridgedUiRequestResponseMessage.DenialReason_PlayerDeniedRequest).ConfigureAwait(false);
                 return;
             }
