@@ -22,7 +22,7 @@ public partial class UiBridgeWebView
         });
 
     public partial void Refresh() =>
-        StaticDispatcher.Dispatch(PlatformWebView.Reload());
+        StaticDispatcher.Dispatch(() => PlatformWebView.Reload());
 
     private partial void SendMessageToBridgedUi(string messageJson) =>
         StaticDispatcher.Dispatch(() => PlatformWebView.EvaluateJavaScriptAsync($"window.gateway.onMessageFromPlumbBuddy({messageJson});"));
