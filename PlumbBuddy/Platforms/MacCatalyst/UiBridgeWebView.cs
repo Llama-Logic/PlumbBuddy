@@ -5,6 +5,8 @@ namespace PlumbBuddy;
 
 public partial class UiBridgeWebView
 {
+    bool isDisposed;
+
     WKWebView PlatformWebView =>
         (WKWebView)Handler!.PlatformView!;
 
@@ -16,14 +18,37 @@ public partial class UiBridgeWebView
     private partial void Navigate(Uri uri) =>
         StaticDispatcher.Dispatch(() =>
         {
+            if (isDisposed)
+                return;
             using var nsUrl = new NSUrl(uri.ToString());
             using var request = new NSUrlRequest(nsUrl);
             PlatformWebView.LoadRequest(request);
         });
 
     public partial void Refresh() =>
-        StaticDispatcher.Dispatch(() => PlatformWebView.Reload());
+        StaticDispatcher.Dispatch(() =>
+        {
+            if (isDisposed)
+                return;
+            PlatformWebView.Reload();
+        });
 
     private partial void SendMessageToBridgedUi(string messageJson) =>
-        StaticDispatcher.Dispatch(() => PlatformWebView.EvaluateJavaScriptAsync($"window.gateway.onMessageFromPlumbBuddy({messageJson});"));
+        StaticDispatcher.Dispatch(() =>
+        {
+            if (isDisposed)
+                return;
+            PlatformWebView.EvaluateJavaScriptAsync($"window.gateway.onMessageFromPlumbBuddy({messageJson});");
+        });
+
+    private partial void Shutdown() =>
+        StaticDispatcher.Dispatch(() =>
+        {
+            if (isDisposed)
+                return;
+            PlatformWebView.StopLoading();
+            PlatformWebView.RemoveFromSuperview();
+            PlatformWebView.Dispose();
+            isDisposed = true;
+        });
 }
