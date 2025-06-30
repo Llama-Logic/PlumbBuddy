@@ -156,7 +156,7 @@ public partial class MainPage :
             {
                 var tabContent = viewSwitcher.Children[bridgedUiIndex];
                 if (tabContent is UiBridgeWebView uiBridgeWebView)
-                    uiBridgeWebView.DisconnectHandlers();
+                    uiBridgeWebView.Unload();
                 SelectedTabIndex = bridgedUiIndex - 1;
                 viewSwitcher.Children.RemoveAt(bridgedUiIndex);
                 tabHostView.Tabs.RemoveAt(bridgedUiIndex);

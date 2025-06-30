@@ -957,84 +957,93 @@ public partial class ProxyHost :
         var extendedErrorCode = 0;
         var recordSets = new List<RelationalDataStorageQueryRecordSet>();
         var executionStopwatch = new Stopwatch();
-        await WithRelationalDataStorageConnectionAsync(queryRelationalDataStorageMessage.UniqueId, queryRelationalDataStorageMessage.IsSaveSpecific, async conn =>
+        try
         {
-            try
+            await WithRelationalDataStorageConnectionAsync(queryRelationalDataStorageMessage.UniqueId, queryRelationalDataStorageMessage.IsSaveSpecific, async conn =>
             {
-                var com = conn.CreateCommand();
-                com.CommandText = queryRelationalDataStorageMessage.Query;
-                if (queryRelationalDataStorageMessage.Parameters?.Any() ?? false)
-                    foreach (var (key, value) in queryRelationalDataStorageMessage.Parameters)
-                    {
-                        if (value is JsonElement jsonValue)
-                        {
-                            if (jsonValue.ValueKind is JsonValueKind.Null)
-                                com.Parameters.AddWithValue(key, DBNull.Value);
-                            else if (jsonValue.ValueKind is JsonValueKind.False)
-                                com.Parameters.AddWithValue(key, 0);
-                            else if (jsonValue.ValueKind is JsonValueKind.True)
-                                com.Parameters.AddWithValue(key, 1);
-                            else if (jsonValue.ValueKind is JsonValueKind.String)
-                                com.Parameters.AddWithValue(key, jsonValue.GetString());
-                            else if (jsonValue.ValueKind is JsonValueKind.Number)
-                            {
-                                if (jsonValue.TryGetInt64(out var int64))
-                                    com.Parameters.AddWithValue(key, int64);
-                                else if (jsonValue.TryGetDouble(out var dbl))
-                                    com.Parameters.AddWithValue(key, dbl);
-                            }
-                            else if (jsonValue.ValueKind is JsonValueKind.Object
-                                && jsonValue.TryGetProperty("base64", out var base64Property)
-                                && base64Property.ValueKind is JsonValueKind.String
-                                && base64Property.GetString() is { } base64)
-                                com.Parameters.AddWithValue(key, Convert.FromBase64String(base64));
-                            else
-                                throw new NotSupportedException($"unsupported value kind: {jsonValue.ValueKind}");
-                            continue;
-                        }
-                        com.Parameters.AddWithValue(key, value ?? DBNull.Value);
-                    }
-                executionStopwatch.Start();
-                await using var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
-                do
+                try
                 {
-                    var recordSet = new RelationalDataStorageQueryRecordSet();
-                    for (var i = 0; i < reader.FieldCount; ++i)
-                        recordSet.FieldNames.Add(reader.GetName(i));
-                    while (await reader.ReadAsync().ConfigureAwait(false))
-                    {
-                        var record = new List<object?>();
-                        for (var i = 0; i < reader.FieldCount; ++i)
+                    var com = conn.CreateCommand();
+                    com.CommandText = queryRelationalDataStorageMessage.Query;
+                    if (queryRelationalDataStorageMessage.Parameters?.Any() ?? false)
+                        foreach (var (key, value) in queryRelationalDataStorageMessage.Parameters)
                         {
-                            var value = reader.GetValue(i);
-                            if (value == DBNull.Value)
-                                value = null;
-                            else if (value is IEnumerable<byte> bytes)
-                                value = new { base64 = Convert.ToBase64String(bytes is byte[] bytesArray ? bytesArray : [..bytes]) };
-                            record.Add(value);
+                            if (value is JsonElement jsonValue)
+                            {
+                                if (jsonValue.ValueKind is JsonValueKind.Null)
+                                    com.Parameters.AddWithValue(key, DBNull.Value);
+                                else if (jsonValue.ValueKind is JsonValueKind.False)
+                                    com.Parameters.AddWithValue(key, 0);
+                                else if (jsonValue.ValueKind is JsonValueKind.True)
+                                    com.Parameters.AddWithValue(key, 1);
+                                else if (jsonValue.ValueKind is JsonValueKind.String)
+                                    com.Parameters.AddWithValue(key, jsonValue.GetString());
+                                else if (jsonValue.ValueKind is JsonValueKind.Number)
+                                {
+                                    if (jsonValue.TryGetInt64(out var int64))
+                                        com.Parameters.AddWithValue(key, int64);
+                                    else if (jsonValue.TryGetDouble(out var dbl))
+                                        com.Parameters.AddWithValue(key, dbl);
+                                }
+                                else if (jsonValue.ValueKind is JsonValueKind.Object
+                                    && jsonValue.TryGetProperty("base64", out var base64Property)
+                                    && base64Property.ValueKind is JsonValueKind.String
+                                    && base64Property.GetString() is { } base64)
+                                    com.Parameters.AddWithValue(key, Convert.FromBase64String(base64));
+                                else
+                                    throw new NotSupportedException($"unsupported value kind: {jsonValue.ValueKind}");
+                                continue;
+                            }
+                            com.Parameters.AddWithValue(key, value ?? DBNull.Value);
                         }
-                        recordSet.Records.Add(record);
-                    }
-                    recordSets.Add(recordSet);
-                } while (await reader.NextResultAsync().ConfigureAwait(false));
-            }
-            catch (SqliteException sqlEx)
-            {
-                errorCode = sqlEx.SqliteErrorCode;
-                extendedErrorCode = sqlEx.SqliteExtendedErrorCode;
-                errorMessage = sqlEx.Message;
-            }
-            catch (Exception ex)
-            {
-                errorCode = -1;
-                extendedErrorCode = -1;
-                errorMessage = ex.Message;
-            }
-            finally
-            {
-                executionStopwatch.Stop();
-            }
-        }).ConfigureAwait(false);
+                    executionStopwatch.Start();
+                    await using var reader = await com.ExecuteReaderAsync().ConfigureAwait(false);
+                    do
+                    {
+                        var recordSet = new RelationalDataStorageQueryRecordSet();
+                        for (var i = 0; i < reader.FieldCount; ++i)
+                            recordSet.FieldNames.Add(reader.GetName(i));
+                        while (await reader.ReadAsync().ConfigureAwait(false))
+                        {
+                            var record = new List<object?>();
+                            for (var i = 0; i < reader.FieldCount; ++i)
+                            {
+                                var value = reader.GetValue(i);
+                                if (value == DBNull.Value)
+                                    value = null;
+                                else if (value is IEnumerable<byte> bytes)
+                                    value = new { base64 = Convert.ToBase64String(bytes is byte[] bytesArray ? bytesArray : [.. bytes]) };
+                                record.Add(value);
+                            }
+                            recordSet.Records.Add(record);
+                        }
+                        recordSets.Add(recordSet);
+                    } while (await reader.NextResultAsync().ConfigureAwait(false));
+                }
+                catch (SqliteException sqlEx)
+                {
+                    errorCode = sqlEx.SqliteErrorCode;
+                    extendedErrorCode = sqlEx.SqliteExtendedErrorCode;
+                    errorMessage = sqlEx.Message;
+                }
+                finally
+                {
+                    executionStopwatch.Stop();
+                }
+            }, new CancellationToken(queryRelationalDataStorageMessage.IsSaveSpecific)).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            errorCode = -2;
+            extendedErrorCode = -2;
+            errorMessage = "This operation for a save-specific database couldn't be completed immediately, which means it's not available. The player may be at the Main Menu or in Manage Worlds.";
+        }
+        catch (Exception ex)
+        {
+            errorCode = -1;
+            extendedErrorCode = -1;
+            errorMessage = ex.Message;
+        }
         var proxyResults = new RelationalDataStorageQueryResultsMessage
         {
             ErrorCode = errorCode,

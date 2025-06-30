@@ -47,12 +47,6 @@ public partial class UiBridgeWebView :
     string UriPrefix =>
         $"{Scheme}://{hostName}/";
 
-    public void DisconnectHandlers()
-    {
-        proxyHost.BridgedUiDataSent -= HandleProxyHostBridgedUiDataSent;
-        proxyHost.BridgedUiMessageSent -= HandleProxyHostMessageSent;
-    }
-
     public string GetBridgedUiGatewayJavaScript()
     {
         using var customThemesMetadataStream = Assembly.GetExecutingAssembly()
@@ -203,4 +197,13 @@ public partial class UiBridgeWebView :
     public partial void Refresh();
 
     private partial void SendMessageToBridgedUi(string messageJson);
+
+    private partial void Shutdown();
+
+    public void Unload()
+    {
+        proxyHost.BridgedUiDataSent -= HandleProxyHostBridgedUiDataSent;
+        proxyHost.BridgedUiMessageSent -= HandleProxyHostMessageSent;
+        Shutdown();
+    }
 }

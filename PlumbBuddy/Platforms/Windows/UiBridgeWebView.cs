@@ -90,5 +90,8 @@ public partial class UiBridgeWebView
         StaticDispatcher.Dispatch(PlatformWebView.Reload);
 
     private partial void SendMessageToBridgedUi(string messageJson) =>
-        StaticDispatcher.Dispatch(() => PlatformWebView.CoreWebView2.PostWebMessageAsJson(messageJson));
+        StaticDispatcher.Dispatch(() => PlatformWebView.CoreWebView2?.PostWebMessageAsJson(messageJson));
+
+    private partial void Shutdown() =>
+        StaticDispatcher.Dispatch(() => PlatformWebView.Close());
 }
