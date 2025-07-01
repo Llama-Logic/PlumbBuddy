@@ -691,40 +691,93 @@ public partial class ProxyHost :
             {
                 $"""
                 SELECT DISTINCT
-                    mfr.StringTableLocalePrefix Locale,
-                    mfste.SignedKey,
-                    FIRST_VALUE(mfste.Value) OVER (PARTITION BY mfr.StringTableLocalePrefix, mfste.SignedKey ORDER BY mf.Path COLLATE {platformFunctions.FileSystemSQliteCollation}) Value
+                	FIRST_VALUE(mf2.Path) OVER (PARTITION BY mfr2.KeyType, mfr2.KeyGroup, mfr2.KeyFullInstance, sq.Locale, sq.SignedKey ORDER BY mf2.Path COLLATE NOCASE) PackagePath,
+                	mfr2.KeyType,
+                	mfr2.KeyGroup,
+                	mfr2.KeyFullInstance,
+                	sq.Locale,
+                	sq.SignedKey
                 FROM
-                    ModFileStringTableEntries mfste
-                    JOIN ModFileResources mfr ON mfr.Id = mfste.ModFileResourceId
-                    JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
-                    JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
-                WHERE
-                    mfste.SignedKey IN ({string.Join(", ", lookUpLocalizedStringsMessage.LocKeys.Select(locKey => unchecked((int)locKey)))})
+                	(
+                		SELECT DISTINCT
+                			mfr.StringTableLocalePrefix Locale,
+                			mfste.SignedKey,
+                			FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.StringTableLocalePrefix, mfste.SignedKey ORDER BY mf.Path COLLATE NOCASE) ModFileResourceId
+                		FROM
+                			ModFileStringTableEntries mfste
+                			JOIN ModFileResources mfr ON mfr.Id = mfste.ModFileResourceId
+                			JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
+                			JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                		WHERE
+                            mfste.SignedKey IN ({string.Join(", ", lookUpLocalizedStringsMessage.LocKeys.Select(locKey => unchecked((int)locKey)))})
                 """
             };
             if (lookUpLocalizedStringsMessage.Locales.Any())
                 queryParts.Add
                 (
                     $"""
-                        AND mfr.StringTableLocalePrefix IN ({string.Join(", ", lookUpLocalizedStringsMessage.Locales)})
+                                AND mfr.StringTableLocalePrefix IN ({string.Join(", ", lookUpLocalizedStringsMessage.Locales)})
                     """
                 );
             queryParts.Add
             (
                 """
-                    AND mf.Path IS NOT NULL
-                    AND mf.FileType = 1
+                            AND mf.Path IS NOT NULL
+                            AND mf.FileType = 1
+                	) sq
+                	JOIN ModFileResources mfr2 ON mfr2.Id = sq.ModFileResourceId
+                	JOIN ModFileHashes mfh2 ON mfh2.Id = mfr2.ModFileHashId
+                	JOIN ModFiles mf2 ON mf2.ModFileHashId = mfh2.Id
+                ORDER BY
+                	1,
+                	2,
+                	3,
+                	4
                 """
             );
-            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            await foreach (var (locale, signedKey, value) in pbDbContext.Database.SqlQueryRaw<ProcessLookUpLocalizedStringsMessageQueryRecord>(string.Join("\n", queryParts)).AsAsyncEnumerable().ConfigureAwait(false))
-                response.Entries.Add(new LookUpLocalizedModStringsResponseEntry
+            var lastPackagePath = string.Empty;
+            DataBasePackedFile? dbpf = null;
+            ResourceKey lastStblKey = default;
+            StringTableModel? stbl = null;
+            try
+            {
+                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                await foreach (var (packagePath, keyType, keyGroup, keyFullInsance, locale, signedKey) in pbDbContext.Database.SqlQueryRaw<ProcessLookUpLocalizedStringsMessageQueryRecord>(string.Join("\n", queryParts)).AsAsyncEnumerable().ConfigureAwait(false))
                 {
-                    Locale = locale,
-                    LocKey = unchecked((uint)signedKey),
-                    Value = value
-                });
+                    if (lastPackagePath != packagePath)
+                    {
+                        if (dbpf is not null)
+                        {
+                            stbl = null;
+                            await dbpf.DisposeAsync().ConfigureAwait(false);
+                            dbpf = null;
+                        }
+                        var packageFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", packagePath));
+                        if (packageFile.Exists)
+                            dbpf = await DataBasePackedFile.FromPathAsync(Path.Combine(settings.UserDataFolderPath, "Mods", packagePath)).ConfigureAwait(false);
+                        lastPackagePath = packagePath;
+                    }
+                    var stblKey = new ResourceKey(unchecked((ResourceType)(uint)keyType), unchecked((uint)keyGroup), unchecked((ulong)keyFullInsance));
+                    if (dbpf is not null && (stbl is null || stblKey != lastStblKey))
+                    {
+                        stbl = await dbpf!.GetStringTableAsync(stblKey).ConfigureAwait(false);
+                        lastStblKey = stblKey;
+                    }
+                    var locKey = unchecked((uint)signedKey);
+                    if (stbl is not null && stbl[locKey] is { } value && !string.IsNullOrWhiteSpace(value))
+                        response.Entries.Add(new LookUpLocalizedModStringsResponseEntry
+                        {
+                            Locale = locale,
+                            LocKey = locKey,
+                            Value = value
+                        });
+                }
+            }
+            finally
+            {
+                if (dbpf is not null)
+                    await dbpf.DisposeAsync().ConfigureAwait(false);
+            }
         }
         if (fromBridgedUiUniqueId is null)
             await SendMessageToProxyAsync(response).ConfigureAwait(false);
@@ -1311,5 +1364,5 @@ public partial class ProxyHost :
         }
     }
 
-    record ProcessLookUpLocalizedStringsMessageQueryRecord(byte Locale, int SignedKey, string Value);
+    record ProcessLookUpLocalizedStringsMessageQueryRecord(string PackagePath, int KeyType, int KeyGroup, long KeyFullInstance, byte Locale, int SignedKey);
 }

@@ -77,7 +77,7 @@ public class ModsDirectoryCataloger :
                             try
                             {
                                 var stringTable = await dbpf.GetStringTableAsync(modFileResource.Key).ConfigureAwait(false);
-                                foreach (var modFileStringTableEntry in stringTable.KeyHashes.Select(key => new ModFileStringTableEntry(modFileResource) { Key = key, Value = stringTable[key] }))
+                                foreach (var modFileStringTableEntry in stringTable.KeyHashes.Select(key => new ModFileStringTableEntry(modFileResource) { Key = key }))
                                     if (!modFileResource.StringTableEntries.Any(entry => entry.SignedKey == modFileStringTableEntry.SignedKey))
                                         modFileResource.StringTableEntries.Add(modFileStringTableEntry);
                             }

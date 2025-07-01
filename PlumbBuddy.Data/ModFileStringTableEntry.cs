@@ -29,7 +29,4 @@ public class ModFileStringTableEntry(ModFileResource modFileResource)
     /// </summary>
     [Required]
     public int SignedKey { get; set; }
-
-    [Required]
-    public required string Value { get; set; }
 }

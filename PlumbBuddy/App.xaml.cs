@@ -20,6 +20,7 @@ public partial class App :
         try
         {
             pbDbContext.Database.Migrate();
+            pbDbContext.Database.ExecuteSqlRaw("VACUUM");
         }
         catch (SqliteException)
         {
