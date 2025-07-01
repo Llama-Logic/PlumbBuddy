@@ -369,7 +369,7 @@ public partial class SmartSimObserver :
                     }
                 }
             }
-            await ResampleCacheClarityAsync().ConfigureAwait(false);
+            ResampleCacheClarity();
             return true;
         }
         catch (Exception ex)
@@ -926,7 +926,6 @@ public partial class SmartSimObserver :
             await ts4Process.WaitForExitAsync().ConfigureAwait(false);
             IsPerformanceProcessorAffinityInEffect = false;
             ts4Process.Dispose();
-            await ResampleCacheClarityAsync().ConfigureAwait(false);
             modsDirectoryCataloger.WakeUp();
         }
     }
@@ -976,18 +975,8 @@ public partial class SmartSimObserver :
         ConnectToInstallationDirectory();
     }
 
-    void ResampleCacheClarity() =>
-        _ = Task.Run(ResampleCacheClarityAsync);
-
-    async Task ResampleCacheClarityAsync()
+    void ResampleCacheClarity()
     {
-        var saveScratchDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves", "scratch"));
-        if (saveScratchDirectory.Exists
-            && await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath)).ConfigureAwait(false) is null)
-        {
-            settings.CacheStatus = SmartSimCacheStatus.Stale;
-            return;
-        }
         foreach (var cacheComponent in cacheComponents)
             cacheComponent.Refresh();
         var anyCacheComponentsExistOnDisk = cacheComponents.Any(ce => ce is DirectoryInfo dce && dce.Exists ? dce.GetFiles("*.*", SearchOption.AllDirectories).Length > 0 : ce.Exists);
