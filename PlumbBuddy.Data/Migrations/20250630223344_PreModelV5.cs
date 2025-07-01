@@ -14,8 +14,9 @@ namespace PlumbBuddy.Data.Migrations
     public partial class PreModelV5 : Migration
     {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder) =>
-            migrationBuilder.Sql("UPDATE ModFileHash SET ResourcesAndManifestsCataloged = 0;");
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+        }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)

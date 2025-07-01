@@ -616,7 +616,7 @@ partial class ManifestEditor
                             var hash = await ModFileManifestModel.GetFileSha256HashAsync(component.File.FullName).ConfigureAwait(false);
                             using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                             var (modFileHash, _) = await ModsDirectoryCataloger.GetModFileHashAsync(pbDbContext, fileType, hash).ConfigureAwait(false);
-                            await ModsDirectoryCataloger.CatalogResourcesAndManifestsAsync(pbDbContext, component.File, modFileHash, fileType).ConfigureAwait(false);
+                            await ModsDirectoryCataloger.CatalogResourcesAndManifestsAsync(Logger, pbDbContext, component.File, modFileHash, fileType).ConfigureAwait(false);
                             await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
                         }
                     }

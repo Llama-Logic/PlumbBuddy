@@ -25,6 +25,7 @@ public class PbDbContext :
     public DbSet<ModFileManifestResourceKey> ModFileManifestResourceKeys { get; set; }
     public DbSet<ModFileManifest> ModFileManifests { get; set; }
     public DbSet<ModFileManifestRepurposedLanguage> ModFileManifestRepurposedLanguages { get; set; }
+    public DbSet<ModFileStringTableEntry> ModFileStringTableEntries { get; set; }
     public DbSet<ModHoundReport> ModHoundReports { get; set; }
     public DbSet<ModHoundReportIncompatibilityRecord> ModHoundReportIncompatibilityRecords { get; set; }
     public DbSet<ModHoundReportIncompatibilityRecordPart> ModHoundReportIncompatibilityRecordParts { get; set; }

@@ -676,6 +676,62 @@ public partial class ProxyHost :
         PromptPlayerForBridgedUiAuthorization(requestMessage, archive);
     }
 
+    async Task ProcessLookUpLocalizedStringsMessageAsync(LookUpLocalizedModStringsMessage lookUpLocalizedStringsMessage, Guid? fromBridgedUiUniqueId = null)
+    {
+        var response = new LookUpLocalizedModStringsResponseMessage
+        {
+            LookUpId = lookUpLocalizedStringsMessage.LookUpId,
+            Type = fromBridgedUiUniqueId is null
+                ? nameof(HostMessageType.LookUpLocalizedModStringsResponse).Underscore().ToLowerInvariant()
+                : nameof(HostMessageType.LookUpLocalizedModStringsResponse).Camelize()
+        };
+        if (lookUpLocalizedStringsMessage.LocKeys.Any())
+        {
+            var queryParts = new List<string>()
+            {
+                $"""
+                SELECT DISTINCT
+                    mfr.StringTableLocalePrefix Locale,
+                    mfste.SignedKey,
+                    FIRST_VALUE(mfste.Value) OVER (PARTITION BY mfr.StringTableLocalePrefix, mfste.SignedKey ORDER BY mf.Path COLLATE {platformFunctions.FileSystemSQliteCollation}) Value
+                FROM
+                    ModFileStringTableEntries mfste
+                    JOIN ModFileResources mfr ON mfr.Id = mfste.ModFileResourceId
+                    JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
+                    JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                WHERE
+                    mfste.SignedKey IN ({string.Join(", ", lookUpLocalizedStringsMessage.LocKeys.Select(locKey => unchecked((int)locKey)))})
+                """
+            };
+            if (lookUpLocalizedStringsMessage.Locales.Any())
+                queryParts.Add
+                (
+                    $"""
+                        AND mfr.StringTableLocalePrefix IN ({string.Join(", ", lookUpLocalizedStringsMessage.Locales)})
+                    """
+                );
+            queryParts.Add
+            (
+                """
+                    AND mf.Path IS NOT NULL
+                    AND mf.FileType = 1
+                """
+            );
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            await foreach (var (locale, signedKey, value) in pbDbContext.Database.SqlQueryRaw<ProcessLookUpLocalizedStringsMessageQueryRecord>(string.Join("\n", queryParts)).AsAsyncEnumerable().ConfigureAwait(false))
+                response.Entries.Add(new LookUpLocalizedModStringsResponseEntry
+                {
+                    Locale = locale,
+                    LocKey = unchecked((uint)signedKey),
+                    Value = value
+                });
+        }
+        if (fromBridgedUiUniqueId is null)
+            await SendMessageToProxyAsync(response).ConfigureAwait(false);
+        else
+            SendMessageToBridgedUis(response);
+    }
+
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ProcessMessageAsync(JsonDocument message, JsonSerializerOptions jsonSerializerOptions, Guid? fromBridgedUiUniqueId = null)
     {
@@ -783,6 +839,10 @@ public partial class ProxyHost :
                         }
                     }
                 }
+                break;
+            case ComponentMessageType.LookUpLocalizedModStrings:
+                if (TryParseMessage<LookUpLocalizedModStringsMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "look up localized strings", out var lookUpLocalizedStringsMessage))
+                    _ = Task.Run(async () => await ProcessLookUpLocalizedStringsMessageAsync(lookUpLocalizedStringsMessage, fromBridgedUiUniqueId).ConfigureAwait(false));
                 break;
             case ComponentMessageType.OpenUrl:
                 if (TryParseMessage<OpenUrlMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "open URL", out var openUrlMessage)
@@ -1250,4 +1310,6 @@ public partial class ProxyHost :
             saveSpecificDataStoragePropagationLockHeld?.Dispose();
         }
     }
+
+    record ProcessLookUpLocalizedStringsMessageQueryRecord(byte Locale, int SignedKey, string Value);
 }

@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Data;
 
+[Index(nameof(ModFileHashId), nameof(KeyType), nameof(KeyGroup), nameof(KeyFullInstance), IsUnique = true)]
 public class ModFileResource(ModFileHash modFileHash)
 {
     ModFileResource() :
@@ -48,5 +49,9 @@ public class ModFileResource(ModFileHash modFileHash)
     [Required]
     public long KeyFullInstance { get; set; }
 
+    public LocaleFullInstancePrefix StringTableLocalePrefix { get; set; }
+
     public ICollection<TopologySnapshot> TopologySnapshots { get; } = [];
+
+    public ICollection<ModFileStringTableEntry> StringTableEntries { get; } = [];
 }

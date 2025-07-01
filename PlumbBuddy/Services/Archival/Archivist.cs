@@ -341,24 +341,37 @@ public partial class Archivist :
         DataBasePackedFile? package = null;
         try
         {
-            DiagnosticStatus = $"{fileInfo.Name} / Wait";
-            fileInfo.Refresh();
-            var length = fileInfo.Length;
-            while (gameStarted is not null
-                && fileInfo.LastWriteTime > gameStarted)
+            var wasLive = false;
+            ImmutableArray<byte> fileHash;
+            while (true)
             {
-                await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
+                DiagnosticStatus = $"{fileInfo.Name} / Wait";
                 fileInfo.Refresh();
-                var newLength = fileInfo.Length;
-                if (length == newLength)
+                var length = fileInfo.Length;
+                while (gameStarted is not null
+                    && fileInfo.LastWriteTime > gameStarted)
+                {
+                    await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
+                    fileInfo.Refresh();
+                    var newLength = fileInfo.Length;
+                    if (length == newLength)
+                        break;
+                    length = newLength;
+                }
+                wasLive = isInSavesDirectory
+                    && gameStarted is not null
+                    && fileInfo.LastWriteTime > gameStarted;
+                DiagnosticStatus = $"{fileInfo.Name} / SHA256 Package";
+                try
+                {
+                    fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
                     break;
-                length = newLength;
+                }
+                catch (IOException)
+                {
+                    await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
+                }
             }
-            var wasLive = isInSavesDirectory
-                && gameStarted is not null
-                && fileInfo.LastWriteTime > gameStarted;
-            DiagnosticStatus = $"{fileInfo.Name} / SHA256 Package";
-            var fileHash = await ModFileManifestModel.GetFileSha256HashAsync(fileInfo.FullName).ConfigureAwait(false);
             using (var chroniclesLockHeldForLoadCheck = await chroniclesLock.LockAsync().ConfigureAwait(false))
                 if (chronicles.Any(c => c.Snapshots.Any(s => s.OriginalPackageSha256.SequenceEqual(fileHash) || s.EnhancedPackageSha256.SequenceEqual(fileHash))))
                     return;

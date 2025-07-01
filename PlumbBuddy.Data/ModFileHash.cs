@@ -23,4 +23,6 @@ public class ModFileHash
     public ICollection<ModFileManifest> ModFileManifests { get; } = [];
 
     public required bool IsCorrupt { get; set; }
+
+    public bool StringTablesCataloged { get; set; }
 }
