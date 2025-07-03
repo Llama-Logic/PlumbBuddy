@@ -65,7 +65,7 @@ public partial class MainPage :
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-#if WIDNOWSX
+#if WINDOWS
         if (e.PropertyName is nameof(ISettings.ShowSystemTrayIcon))
             StaticDispatcher.Dispatch(UpdateTrayIconVisibility);
 #endif
@@ -81,6 +81,9 @@ public partial class MainPage :
     {
         settings.PropertyChanged += HandleSettingsPropertyChanged;
         userInterfaceMessaging.PropertyChanged += HandleUserInterfaceMessagingPropertyChanged;
+#if WINDOWS
+        UpdateTrayIconVisibility();
+#endif
     }
 
     protected override void OnDisappearing()
