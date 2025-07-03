@@ -114,7 +114,11 @@ partial class PlatformFunctions :
         GetThumbsDotDbPattern()
     ];
 
-    public string FileSystemSQliteCollation { get; } = "NOCASE";
+    public string FileSystemSQliteCollation =>
+        "NOCASE";
+
+    public StringComparer FileSystemStringComparer =>
+        StringComparer.OrdinalIgnoreCase;
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.OrdinalIgnoreCase;
@@ -220,8 +224,14 @@ partial class PlatformFunctions :
         var gameHwnd = new HWND(gameMainWindowHandle);
         if (PInvoke.IsIconic(gameHwnd))
             PInvoke.ShowWindow(gameHwnd, SHOW_WINDOW_CMD.SW_RESTORE);
-        return PInvoke.SetForegroundWindow(gameHwnd);        
+        return PInvoke.SetForegroundWindow(gameHwnd);
     }
+
+    public DirectoryInfo GetClientDirectory(DirectoryInfo installationDirectory) =>
+        new(Path.Combine(installationDirectory.FullName, "Data", "Client"));
+
+    public DirectoryInfo GetDeltaDirectory(DirectoryInfo installationDirectory) =>
+        new(Path.Combine(installationDirectory.FullName, "Delta"));
 
     public Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
@@ -241,6 +251,9 @@ partial class PlatformFunctions :
             return Task.FromResult<Process?>(null);
         }
     }
+
+    public DirectoryInfo GetPacksDirectory(DirectoryInfo installationDirectory) =>
+        installationDirectory;
 
     public Task<string> GetTimezoneIanaNameAsync() =>
         Task.FromResult(TZConvert.WindowsToIana(TimeZoneInfo.Local.Id));

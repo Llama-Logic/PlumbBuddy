@@ -35,7 +35,7 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IGameResourceCataloger gameResourceCataloger, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -43,6 +43,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(gameResourceCataloger);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
@@ -54,6 +55,7 @@ public partial class SmartSimObserver :
         this.platformFunctions = platformFunctions;
         this.appLifecycleManager = appLifecycleManager;
         this.settings = settings;
+        this.gameResourceCataloger = gameResourceCataloger;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.steam = steam;
         this.superSnacks = superSnacks;
@@ -92,6 +94,7 @@ public partial class SmartSimObserver :
     readonly AsyncLock fresheningTaskLock;
     readonly AsyncLock gameProcessOptimizationLock;
     Version? gameVersion;
+    readonly IGameResourceCataloger gameResourceCataloger;
     ImmutableArray<byte> integrationPackageLastSha256 = ImmutableArray<byte>.Empty;
     ImmutableArray<byte> integrationScriptModLastSha256 = ImmutableArray<byte>.Empty;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
@@ -1056,6 +1059,7 @@ public partial class SmartSimObserver :
 
     async Task ResampleInstalledPackCodesAsync()
     {
+        gameResourceCataloger.ScanSoon();
         var enqueuedResamplingPacksTaskLockPotentiallyHeld = await enqueuedResamplingPacksTaskLock.LockAsync(new CancellationToken(true)).ConfigureAwait(false);
         if (enqueuedResamplingPacksTaskLockPotentiallyHeld is null)
             return;

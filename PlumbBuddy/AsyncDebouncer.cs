@@ -15,21 +15,22 @@ class AsyncDebouncer
     CancellationTokenSource? performanceCancellationTokenSource;
     readonly AsyncLock schedulingLock;
 
-    public void Execute()
+    public bool Execute()
     {
         try
         {
             using var schedulingLockHeld = schedulingLock.Lock(new CancellationToken(true));
             if (schedulingLockHeld is null)
-                return;
+                return false;
             performanceCancellationTokenSource?.Cancel();
             performanceCancellationTokenSource?.Dispose();
             performanceCancellationTokenSource = new();
             _ = Task.Run(async () => await PerformActionAsync(performanceCancellationTokenSource.Token).ConfigureAwait(false));
+            return true;
         }
         catch (OperationCanceledException)
         {
-            return;
+            return true;
         }
     }
 

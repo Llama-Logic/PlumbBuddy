@@ -6,6 +6,7 @@ public interface IPlatformFunctions :
     IReadOnlyList<Regex> DiscardableDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> DiscardableFileNamePatterns { get; }
     string FileSystemSQliteCollation { get; }
+    StringComparer FileSystemStringComparer { get; }
     StringComparison FileSystemStringComparison { get; }
     IReadOnlyList<Regex> ForeignDirectoryNamePatterns { get; }
     IReadOnlyList<Regex> ForeignFileNamePatterns { get; }
@@ -30,7 +31,10 @@ public interface IPlatformFunctions :
     int ProgressValue { get; set; }
 
     Task<bool> ForegroundGameAsync(DirectoryInfo installationDirectory);
+    DirectoryInfo GetClientDirectory(DirectoryInfo installationDirectory);
+    DirectoryInfo GetDeltaDirectory(DirectoryInfo installationDirectory);
     Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory);
+    DirectoryInfo GetPacksDirectory(DirectoryInfo installationDirectory);
     Task<string> GetTimezoneIanaNameAsync();
     Task<Version?> GetTS4InstallationVersionAsync();
     Task<bool> SendLocalNotificationAsync(string caption, string text);

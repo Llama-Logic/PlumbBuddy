@@ -133,40 +133,6 @@ class BridgedUi:
             'data': data
         })
 
-class ModStringTableEntry:
-    """
-    An entry from a mod's string table
-    """
-
-    def __init__(self, locale: int, loc_key: int, value: str):
-        self._locale = locale
-        self._loc_key = loc_key
-        self._value = value
-    
-    @property
-    def locale(self) -> int:
-        """
-        Gets the integer identifying the locale of the origin string table (hint: this is the first byte of the STBL's full instance)
-        """
-
-        return self._locale
-    
-    @property
-    def loc_key(self) -> int:
-        """
-        Gets the LOCKEY for the entry (typically the FNV 32 hash of the value) expressed as an int
-        """
-
-        return self._loc_key
-    
-    @property
-    def value(self) -> str:
-        """
-        Gets the value of the entry (the actual text with no token replacements)
-        """
-
-        return self._value
-
 class RelationalDataStorageQueryRecordSet:
     """
     A PlumbBuddy Runtime Mod Integration Relational Data Storage Query Record Set
@@ -343,6 +309,40 @@ class RelationalDataStorage:
         })
         return query_id
 
+class StringTableEntry:
+    """
+    An entry from a string table
+    """
+
+    def __init__(self, locale: int, loc_key: int, value: str):
+        self._locale = locale
+        self._loc_key = loc_key
+        self._value = value
+    
+    @property
+    def locale(self) -> int:
+        """
+        Gets the integer identifying the locale of the origin string table (hint: this is the first byte of the STBL's full instance)
+        """
+
+        return self._locale
+    
+    @property
+    def loc_key(self) -> int:
+        """
+        Gets the LOCKEY for the entry (typically the FNV 32 hash of the value) expressed as an int
+        """
+
+        return self._loc_key
+    
+    @property
+    def value(self) -> str:
+        """
+        Gets the value of the entry (the actual text with no token replacements)
+        """
+
+        return self._value
+
 class PlumbBuddyNotConnectedError(Exception):
     def __init__(self):
         super().__init__('PlumbBuddy is either not running or having some sort of connection problem')
@@ -376,7 +376,7 @@ class Gateway:
         self._global_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._reset_bridged_ui_cache()
-        self._reset_look_up_mod_string_table_entries_cache()
+        self._reset_look_up_string_table_entries_cache()
 
         self._dispatch_is_connected_changed: Callable[[bool], None] = lambda _: None
         def set_dispatch_is_connected_changed(dispatch: Callable[[bool], None]):
@@ -401,7 +401,7 @@ class Gateway:
                     for bridged_ui_tuple in bridged_uis.values():
                         bridged_ui_tuple[1]['destroyed'](None)
                 self._reset_bridged_ui_cache()
-                self._reset_look_up_mod_string_table_entries_cache()
+                self._reset_look_up_string_table_entries_cache()
                 self._dispatch_is_connected_changed(False)
             elif connection_state == 2:
                 self._dispatch_is_connected_changed(True)
@@ -505,15 +505,15 @@ class Gateway:
         if message_type == 'foreground_plumbbuddy':
             _try_to_foreground_plumbbuddy()
             return
-        if message_type == 'look_up_localized_mod_strings_response':
-            eventual: Eventual[Sequence[ModStringTableEntry]] = None
+        if message_type == 'look_up_localized_strings_response':
+            eventual: Eventual[Sequence[StringTableEntry]] = None
             try:
-                eventual = self._look_up_mod_string_table_entries_requests.pop(UUID(message['look_up_id']))
+                eventual = self._look_up_string_table_entries_requests.pop(UUID(message['look_up_id']))
             except KeyError:
                 return
-            entries: List[ModStringTableEntry] = [];
+            entries: List[StringTableEntry] = [];
             for message_entry in message['entries']:
-                entries.append(ModStringTableEntry(message_entry['locale'], message_entry['loc_key'], message_entry['value']))
+                entries.append(StringTableEntry(message_entry['locale'], message_entry['loc_key'], message_entry['value']))
             eventual._set_result(entries)
             return
         if message_type == 'relational_data_storage_query_results':
@@ -537,8 +537,8 @@ class Gateway:
         self._bridged_ui_look_ups: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
     
-    def _reset_look_up_mod_string_table_entries_cache(self):
-        self._look_up_mod_string_table_entries_requests: Dict[UUID, Eventual[Sequence[ModStringTableEntry]]]
+    def _reset_look_up_string_table_entries_cache(self):
+        self._look_up_string_table_entries_requests: Dict[UUID, Eventual[Sequence[StringTableEntry]]]
 
     @property
     def is_connected() -> bool:
@@ -621,9 +621,9 @@ class Gateway:
         })
         return eventual
     
-    def look_up_mod_string_table_entries(self, loc_keys: Sequence[int], locales: Optional[Sequence[int]]) -> Eventual[Sequence[ModStringTableEntry]]:
+    def look_up_string_table_entries(self, loc_keys: Sequence[int], locales: Optional[Sequence[int]]) -> Eventual[Sequence[StringTableEntry]]:
         """
-        Requests mod string table entries which have been loaded by the game
+        Requests string table entries which have been loaded by the game
 
         :param loc_keys: a sequence of LOCKEYs for the entries desired, expressed as ints
         :param locales: (optional) a sequence of locales for the entries desired, expressed as ints (hint: these ints are the first byte of the STBL's full instance) -- if omitted, all locales will be included
@@ -634,12 +634,12 @@ class Gateway:
         message = {
             'loc_keys': loc_keys,
             'look_up_id': str(look_up_id),
-            'type': 'look_up_localized_mod_strings'
+            'type': 'look_up_localized_strings'
         }
         if locales is not None and len(locales) > 0:
             message['locales'] = locales
-        eventual = Eventual[Sequence[ModStringTableEntry]]()
-        self._reset_look_up_mod_string_table_entries_cache[look_up_id] = eventual
+        eventual = Eventual[Sequence[StringTableEntry]]()
+        self._reset_look_up_string_table_entries_cache[look_up_id] = eventual
         ipc.send(message)
         return eventual
     

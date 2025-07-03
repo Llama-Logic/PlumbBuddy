@@ -1,6 +1,6 @@
 namespace PlumbBuddy.Services.ScriptApi;
 
-public class LookUpLocalizedModStringsMessage
+public class LookUpLocalizedStringsMessage
 {
     public IList<byte> Locales { get; } = [];
     public IList<uint> LocKeys { get; } = [];

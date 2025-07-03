@@ -1,4 +1,5 @@
 @inherits ReactiveComponentBase
+@inject IGameResourceCataloger GameResourceCataloger
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
@@ -6,19 +7,26 @@
 @if (Observed(() => Settings.Type) is not UserType.Casual && Observed(() => SmartSimObserver.GameVersion) is { } gameVersion)
 {
 	gameVersion = new Version(gameVersion.Major, gameVersion.Minor, gameVersion.Build);
-	<MudTooltip Arrow="true">
+	<MudTooltip Arrow Color="@(Observed(() => GameResourceCataloger.IsBusy) ? Color.Primary : Color.Default)">
 		<ChildContent>
-			<MudChip T="Version" Icon="@MaterialDesignIcons.Normal.TimelineCheck" Value="@gameVersion" />
+            <MudChip T="Version" Color="@(Observed(() => GameResourceCataloger.IsBusy) ? Color.Primary : Color.Default)" Icon="@(Observed(() => GameResourceCataloger.IsBusy) ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" Value="@gameVersion" />
 		</ChildContent>
 		<TooltipContent>
-			<MudStack Row="true">
-				<MudIcon Icon="@MaterialDesignIcons.Normal.TimelineCheck" />
+			<MudStack Row>
+                <MudIcon Icon="@(Observed(() => GameResourceCataloger.IsBusy) ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" />
 				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_GameVersion_Tip_Caption)]</MudTextM3>
 			</MudStack>
 			<MudDivider />
 			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
 				@MarkupLocalizer[nameof(AppText.HUD_GameVersion_Tip_Description)]
 			</MudTextM3>
+            @if (Observed(() => GameResourceCataloger.IsBusy))
+            {
+			    <MudDivider />
+			    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+				    I am currently cataloging your installed game resources.
+			    </MudTextM3>
+            }
 		</TooltipContent>
 	</MudTooltip>
 }

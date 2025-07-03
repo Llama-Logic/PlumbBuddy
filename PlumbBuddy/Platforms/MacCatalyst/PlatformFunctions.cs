@@ -79,7 +79,11 @@ partial class PlatformFunctions :
         GetDotLocalizedPattern()
     ];
 
-    public string FileSystemSQliteCollation { get; } = "BINARY";
+    public string FileSystemSQliteCollation =>
+        "BINARY";
+
+    public StringComparer FileSystemStringComparer =>
+        StringComparer.Ordinal;
 
     public StringComparison FileSystemStringComparison =>
         StringComparison.Ordinal;
@@ -172,6 +176,12 @@ partial class PlatformFunctions :
         return false;
     }
 
+    public DirectoryInfo GetClientDirectory(DirectoryInfo installationDirectory) =>
+        new(Path.Combine(installationDirectory.FullName, "Contents", "Data", "Client"));
+
+    public DirectoryInfo GetDeltaDirectory(DirectoryInfo installationDirectory) =>
+        new(Path.Combine(installationDirectory.FullName, "Contents", "Delta"));
+
     public async Task<Process?> GetGameProcessAsync(DirectoryInfo installationDirectory)
     {
         ArgumentNullException.ThrowIfNull(installationDirectory);
@@ -203,6 +213,9 @@ partial class PlatformFunctions :
         }
         return null;
     }
+
+    public DirectoryInfo GetPacksDirectory(DirectoryInfo installationDirectory) =>
+        new(Path.Combine(installationDirectory.Parent!.FullName, "The Sims 4 Packs"));
 
     public async Task<string> GetTimezoneIanaNameAsync()
     {

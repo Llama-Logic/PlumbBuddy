@@ -1,5 +1,3 @@
-using PlumbBuddy.Services.ScriptApi;
-
 namespace PlumbBuddy.Services;
 
 static class Configuration
@@ -12,6 +10,7 @@ static class Configuration
         services.AddSingleton<IPublicCatalogs, PublicCatalogs>();
         services.AddSingleton<IMarkupLocalizer, MarkupLocalizer>();
         services.AddSingleton(typeof(IMarkupLocalizer<>), typeof(MarkupLocalizer<>));
+        services.AddSingleton<IGameResourceCataloger, GameResourceCataloger>();
         services.AddSingleton<IModsDirectoryCataloger, ModsDirectoryCataloger>();
         services.AddSingleton<ISmartSimObserver, SmartSimObserver>();
         services.AddSingleton<ISuperSnacks, SuperSnacks>();

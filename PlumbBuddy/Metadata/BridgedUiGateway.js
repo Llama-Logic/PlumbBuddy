@@ -177,42 +177,6 @@
     }
 
     /**
-     * An entry from a mod's string table
-     */
-    class ModStringTableEntry {
-        #locale;
-        #locKey;
-        #value;
-
-        constructor(lookUpResponseMessageExcerpt) {
-            this.#locale = lookUpResponseMessageExcerpt.locale;
-            this.#locKey = lookUpResponseMessageExcerpt.locKey;
-            this.#value = lookUpResponseMessageExcerpt.value;
-        }
-
-        /**
-         * Gets the integer identifying the locale of the origin string table (hint: this is the first byte of the STBL's full instance)
-         */
-        get locale() {
-            return this.#locale;
-        }
-
-        /**
-         * Gets the LOCKEY for the entry (typically the FNV 32 hash of the value) expressed as an int
-         */
-        get locKey() {
-            return this.#locKey;
-        }
-
-        /**
-         * Gets the value of the entry (the actual text with no token replacements)
-         */
-        get value() {
-            return this.#value;
-        }
-    }
-
-    /**
      * A PlumbBuddy Runtime Mod Integration Relational Data Storage Query Record Set
      */
     class RelationalDataStorageQueryRecordSet {
@@ -417,11 +381,47 @@
         }
     }
 
+    /**
+     * An entry from a string table
+     */
+    class StringTableEntry {
+        #locale;
+        #locKey;
+        #value;
+
+        constructor(lookUpResponseMessageExcerpt) {
+            this.#locale = lookUpResponseMessageExcerpt.locale;
+            this.#locKey = lookUpResponseMessageExcerpt.locKey;
+            this.#value = lookUpResponseMessageExcerpt.value;
+        }
+
+        /**
+         * Gets the integer identifying the locale of the origin string table (hint: this is the first byte of the STBL's full instance)
+         */
+        get locale() {
+            return this.#locale;
+        }
+
+        /**
+         * Gets the LOCKEY for the entry (typically the FNV 32 hash of the value) expressed as an int
+         */
+        get locKey() {
+            return this.#locKey;
+        }
+
+        /**
+         * Gets the value of the entry (the actual text with no token replacements)
+         */
+        get value() {
+            return this.#value;
+        }
+    }
+
     const bridgedUis = [];
     const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
-    const promisedModStringTableEntriesLookUps = {};
+    const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
 
@@ -525,23 +525,23 @@
         }
 
         /**
-         * Requests mod string table entries which have been loaded by the game
+         * Requests string table entries which have been loaded by the game
          * @param {Array<Number>} locKeys a sequence of LOCKEYs for the entries desired, expressed as integers
          * @param {Array<Number>} locales (optional) a sequence of locales for the entries desired, expressed as integers (hint: these integers are the first byte of the STBL's full instance) -- if omitted, all locales will be included
          * @returns {Promise} a promise that will resolve when any entries matching the look up request have been found or a fault indicating why the look up failed
          */
-        lookUpModStringTableEntries(locKeys, locales) {
+        lookUpStringTableEntries(locKeys, locales) {
             const lookUpId = generateUUIDv4();
             const message = {
                 locKeys,
                 lookUpId,
-                type: 'lookUpLocalizedModStrings',
+                type: 'lookUpLocalizedStrings',
             };
             if (locales && Array.isArray(locales) && locales.length) {
                 message.locales = locales;
             }
             const madePromise = makePromise();
-            promisedModStringTableEntriesLookUps[lookUpId] = madePromise;
+            promisedStringTableEntriesLookUps[lookUpId] = madePromise;
             sendMessageToPlumbBuddy(message);
             return madePromise.promise;
         }
@@ -629,14 +629,14 @@
                     fault = new Error('Unknown denial reason')
                 }
                 promisedBridgedUi.reject(fault);
-            } else if (message.type === 'lookUpLocalizedModStringsResponse') {
+            } else if (message.type === 'lookUpLocalizedStringsResponse') {
                 const lookUpId = sanitizeUuid(message.lookUpId);
-                const promisedLookUp = promisedModStringTableEntriesLookUps[lookUpId];
+                const promisedLookUp = promisedStringTableEntriesLookUps[lookUpId];
                 if (!promisedLookUp) {
                     return;
                 }
-                delete promisedModStringTableEntriesLookUps[lookUpId];
-                promisedLookUp.resolve(message.entries.map(entryMessageExcerpt => new ModStringTableEntry(entryMessageExcerpt)));
+                delete promisedStringTableEntriesLookUps[lookUpId];
+                promisedLookUp.resolve(message.entries.map(entryMessageExcerpt => new StringTableEntry(entryMessageExcerpt)));
             } else if (message.type === 'relationalDataStorageQueryResults') {
                 const uniqueId = sanitizeUuid(message.uniqueId);
                 const dataStores = message.isSaveSpecific ? saveSpecificRelationalDataStores : globalRelationalDataStores;

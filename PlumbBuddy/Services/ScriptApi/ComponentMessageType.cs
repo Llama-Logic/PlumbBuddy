@@ -10,7 +10,7 @@ public enum ComponentMessageType
     FocusBridgedUi,
     ForegroundGame,
     GameServiceEvent,
-    LookUpLocalizedModStrings,
+    LookUpLocalizedStrings,
     OpenUrl,
     QueryRelationalDataStorage,
     SendDataToBridgedUi,
