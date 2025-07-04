@@ -20,7 +20,7 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
-    static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
+    static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
     const int port = 7342;
     static readonly JsonSerializerOptions proxyJsonSerializerOptions = AddConverters(new()
     {
@@ -109,6 +109,7 @@ public partial class ProxyHost :
         loadedBridgedUis = new();
         gameIsLoadingManualResetEvent = new(true);
         gameIsSavingManualResetEvent = new(true);
+        reserveSavesAccessManualResetEvent = new(true);
         saveSpecificDataStorageConnectionLocks = new();
         saveSpecificDataStorageInitializationLock = new();
         saveSpecificDataStoragePropagationLock = new();
@@ -139,6 +140,7 @@ public partial class ProxyHost :
     readonly AsyncManualResetEvent gameIsLoadingManualResetEvent;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
     readonly IPlatformFunctions platformFunctions;
+    readonly AsyncManualResetEvent reserveSavesAccessManualResetEvent;
     readonly ConcurrentDictionary<Guid, AsyncLock> saveSpecificDataStorageConnectionLocks;
     ulong saveCreated;
     ulong saveNucleusId;
@@ -242,9 +244,9 @@ public partial class ProxyHost :
             || !userDataFolder.Exists)
             return;
         pathsProcessingQueue = new();
-        fileSystemWatcher = new FileSystemWatcher(userDataFolder.FullName)
+        fileSystemWatcher = new FileSystemWatcher(Path.Combine(userDataFolder.FullName, "saves"), "*.save")
         {
-            IncludeSubdirectories = true,
+            IncludeSubdirectories = false,
             InternalBufferSize = 64 * 1024,
             NotifyFilter =
                   NotifyFilters.CreationTime
@@ -426,6 +428,7 @@ public partial class ProxyHost :
     async Task InitializeSaveSpecificRelationalDataStorageAsync()
     {
         using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
+        await reserveSavesAccessManualResetEvent.WaitAsync().ConfigureAwait(false);
         await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
         var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
         var rdsDirectory = Directory.CreateDirectory(Path.Combine(appDataDirectory.FullName, "Relational Data Storage"));
@@ -453,70 +456,68 @@ public partial class ProxyHost :
             && saveSpecificDataStorageSnapshotSlotId == saveSlotId
             && saveSpecificDataStorageSnapshotSimNow <= saveSimNow)
             (_, content) = await memoryResidentSnapshot.ConfigureAwait(false);
+        var packagesToDispose = new List<DataBasePackedFile>();
         if (content.IsEmpty)
         {
-            var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
-            if (!savesDirectory.Exists)
-                return;
-            var candidates = new List<(ulong simNow, DataBasePackedFile savePackage)>();
-            var saveFileNameForSlot = $"Slot_{(uint)saveSlotId:x8}.save";
-            static async Task considerCandidateAsync(List<(ulong simNow, DataBasePackedFile savePackage)> candidates, ulong saveNucleusId, ulong saveCreated, ulong saveSlotId, ulong saveSimNow, FileInfo saveFile)
-            {
-                var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
-                var packageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
-                var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
-                if (saveGameDataKeys.Length is <= 0 or >= 2)
-                {
-                    await savePackage.DisposeAsync().ConfigureAwait(false);
-                    return;
-                }
-                var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
-                if (saveGameData is null
-                    || saveGameData.Account is not { } account
-                    || account.NucleusId != saveNucleusId
-                    || account.Created != saveCreated
-                    || saveGameData.SaveSlot is not { } saveSlot
-                    || saveSlotId is not 0
-                    && saveSlot.SlotId != saveSlotId
-                    || saveSlot.GameplayData is not { } gamePlayData
-                    || gamePlayData.WorldGameTime > saveSimNow)
-                {
-                    await savePackage.DisposeAsync().ConfigureAwait(false);
-                    return;
-                }
-                candidates.Add((gamePlayData.WorldGameTime, savePackage));
-            }
-            foreach (var saveFile in savesDirectory.GetFiles().Where(file => file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
-                await considerCandidateAsync(candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
-            if (candidates.Count is 0)
-            {
-                foreach (var saveFile in savesDirectory.GetFiles().Where(file => !file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
-                    await considerCandidateAsync(candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
-            }
-            if (candidates.Count is 0)
-                return;
-            var orderedCandidates = candidates
-                .OrderByDescending(t => t.simNow);
-            var (simNow, savePackage) = orderedCandidates.First();
-            saveSimNow = simNow;
-            foreach (var (_, losingCandidate) in orderedCandidates.Skip(1))
-                await losingCandidate.DisposeAsync().ConfigureAwait(false);
             try
             {
-                var savePackageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
-                var saveSpecificDataKey = savePackageKeys.FirstOrDefault(k => k.Type is ResourceType.SaveSpecificRelationalDataStorage);
-                if (saveSpecificDataKey == default)
+                var savesDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"));
+                if (!savesDirectory.Exists)
                     return;
-                content = await savePackage.GetAsync(saveSpecificDataKey).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "uncaught exception");
+                var candidates = new List<(ulong simNow, DataBasePackedFile savePackage)>();
+                var saveFileNameForSlot = $"Slot_{(uint)saveSlotId:x8}.save";
+                static async Task considerCandidateAsync(List<DataBasePackedFile> packagesToDispose, List<(ulong simNow, DataBasePackedFile savePackage)> candidates, ulong saveNucleusId, ulong saveCreated, ulong saveSlotId, ulong saveSimNow, FileInfo saveFile)
+                {
+                    var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName).ConfigureAwait(false);
+                    packagesToDispose.Add(savePackage);
+                    var packageKeys = await savePackage.GetKeysAsync(cancellationToken: CancellationToken.None).ConfigureAwait(false);
+                    var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+                    if (saveGameDataKeys.Length is <= 0 or >= 2)
+                        return;
+                    var saveGameDataKey = saveGameDataKeys[0];
+                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                    if (saveGameData is null
+                        || saveGameData.Account is not { } account
+                        || account.NucleusId != saveNucleusId
+                        || account.Created != saveCreated
+                        || saveGameData.SaveSlot is not { } saveSlot
+                        || saveSlotId is not 0
+                        && saveSlot.SlotId != saveSlotId
+                        || saveSlot.GameplayData is not { } gamePlayData
+                        || gamePlayData.WorldGameTime > saveSimNow)
+                        return;
+                    candidates.Add((gamePlayData.WorldGameTime, savePackage));
+                }
+                foreach (var saveFile in savesDirectory.GetFiles("*.save", SearchOption.TopDirectoryOnly).Where(file => file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
+                    await considerCandidateAsync(packagesToDispose, candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
+                if (candidates.Count is 0)
+                {
+                    foreach (var saveFile in savesDirectory.GetFiles("*.save", SearchOption.TopDirectoryOnly).Where(file => !file.Name.Equals(saveFileNameForSlot, StringComparison.OrdinalIgnoreCase)))
+                        await considerCandidateAsync(packagesToDispose, candidates, saveNucleusId, saveCreated, saveSlotId, saveSimNow, saveFile).ConfigureAwait(false);
+                }
+                if (candidates.Count is 0)
+                    return;
+                var orderedCandidates = candidates
+                    .OrderByDescending(t => t.simNow);
+                var (simNow, savePackage) = orderedCandidates.First();
+                saveSimNow = simNow;
+                try
+                {
+                    var savePackageKeys = await savePackage.GetKeysAsync().ConfigureAwait(false);
+                    var saveSpecificDataKey = savePackageKeys.FirstOrDefault(k => k.Type is ResourceType.SaveSpecificRelationalDataStorage);
+                    if (saveSpecificDataKey == default)
+                        return;
+                    content = await savePackage.GetAsync(saveSpecificDataKey).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "uncaught exception");
+                }
             }
             finally
             {
-                await savePackage.DisposeAsync().ConfigureAwait(false);
+                foreach (var packageToDispose in packagesToDispose)
+                    await packageToDispose.DisposeAsync().ConfigureAwait(false);
             }
         }
         try
@@ -784,7 +785,7 @@ public partial class ProxyHost :
             }
             catch (Exception ex)
             {
-                ex.ToString();
+                logger.LogError(ex, "unhandled exception");
             }
             finally
             {
@@ -873,7 +874,10 @@ public partial class ProxyHost :
                     else if (gameServiceEvent is GameServiceEvent.OnAllHouseholdsAndSimInfosLoaded)
                         gameIsLoadingManualResetEvent.Set();
                     else if (gameServiceEvent is GameServiceEvent.PreSave)
+                    {
                         gameIsSavingManualResetEvent.Reset();
+                        reserveSavesAccessManualResetEvent.Reset();
+                    }
                     else if (gameServiceEvent is GameServiceEvent.Save)
                         gameIsSavingManualResetEvent.Set();
                     if (gameServiceEvent is GameServiceEvent.Load or GameServiceEvent.PreSave
@@ -973,6 +977,8 @@ public partial class ProxyHost :
     {
         if (this.pathsProcessingQueue is not { } pathsProcessingQueue)
             return;
+        await gameIsSavingManualResetEvent.WaitAsync().ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
             var alreadyNomed = new OrderedHashSet<string>
@@ -1005,39 +1011,20 @@ public partial class ProxyHost :
             var nomNom = new Queue<string>(alreadyNomed);
             try
             {
-                var savesDirectoryPath = Path.GetFullPath(Path.Combine(settings.UserDataFolderPath, "saves"));
                 while (nomNom.TryDequeue(out var path))
                 {
-                    FileSystemInfo? fileSystemInfo = File.Exists(path)
-                        ? new FileInfo(path)
-                        : Directory.Exists(path)
-                        ? new DirectoryInfo(path)
-                        : null;
-                    if (fileSystemInfo is null)
-                        continue;
-                    var isInSavesDirectory = savesDirectoryPath == Path.GetFullPath(fileSystemInfo is FileInfo fileInfo
-                        ? fileInfo.Directory!.FullName
-                        : fileSystemInfo is DirectoryInfo directoryInfo
-                        ? directoryInfo.FullName
-                        : string.Empty);
-                    if (!isInSavesDirectory)
-                        continue;
-                    var savesDirectoryInfo = new DirectoryInfo(savesDirectoryPath);
-                    var singleSaveFile = new FileInfo(path);
-                    if (!singleSaveFile.Exists
-                        || !singleSaveFile.Extension.Equals(".save", StringComparison.OrdinalIgnoreCase))
-                        continue;
-                    var length = singleSaveFile.Length;
-                    while (singleSaveFile.LastWriteTime > gameStarted)
+                    var saveFile = new FileInfo(path);
+                    var length = saveFile.Length;
+                    while (saveFile.LastWriteTime > gameStarted)
                     {
-                        await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
-                        singleSaveFile.Refresh();
-                        var newLength = singleSaveFile.Length;
+                        await Task.Delay(oneSecond).ConfigureAwait(false);
+                        saveFile.Refresh();
+                        var newLength = saveFile.Length;
                         if (length == newLength)
                             break;
                         length = newLength;
                     }
-                    using var savePackage = await DataBasePackedFile.FromPathAsync(singleSaveFile.FullName, forReadOnly: false).ConfigureAwait(false);
+                    using var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName, forReadOnly: false).ConfigureAwait(false);
                     var packageKeys = await savePackage.GetKeysAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
                     var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
                     if (saveGameDataKeys.Length is <= 0 or >= 2)
@@ -1054,18 +1041,25 @@ public partial class ProxyHost :
                         || saveSlot.GameplayData is not { } gamePlayData
                         || gamePlayData.WorldGameTime < saveSimNow)
                         continue;
-                    if (saveSpecificDataStorageSnapshot is null)
+                    try
+                    {
+                        if (saveSpecificDataStorageSnapshot is null)
+                            break;
+                        DisconnectFromSavesFolder();
+                        var (saveSpecificDataKey, saveSpecificDataContent) = await saveSpecificDataStorageSnapshot.ConfigureAwait(false);
+                        saveSpecificDataStorageSnapshot = null;
+                        if (saveSpecificDataContent.IsEmpty)
+                            break;
+                        foreach (var key in packageKeys.Where(pk => pk.Type is ResourceType.SaveSpecificRelationalDataStorage))
+                            savePackage.Delete(key);
+                        await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
+                        await savePackage.SaveAsync().ConfigureAwait(false);
                         break;
-                    DisconnectFromSavesFolder();
-                    var (saveSpecificDataKey, saveSpecificDataContent) = await saveSpecificDataStorageSnapshot.ConfigureAwait(false);
-                    saveSpecificDataStorageSnapshot = null;
-                    if (saveSpecificDataContent.IsEmpty)
-                        break;
-                    foreach (var key in packageKeys.Where(pk => pk.Type is ResourceType.SaveSpecificRelationalDataStorage))
-                        savePackage.Delete(key);
-                    await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
-                    await savePackage.SaveAsync().ConfigureAwait(false);
-                    break;
+                    }
+                    finally
+                    {
+                        reserveSavesAccessManualResetEvent.Set();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1162,7 +1156,7 @@ public partial class ProxyHost :
         {
             errorCode = -2;
             extendedErrorCode = -2;
-            errorMessage = "This operation for a save-specific database couldn't be completed immediately, which means it's not available. The player may be at the Main Menu or in Manage Worlds.";
+            errorMessage = "This operation for a save-specific database couldn't be completed immediately, which means it's not available. The player may be at the Main Menu or in Manage Worlds, or the game is currently being saved.";
         }
         catch (Exception ex)
         {
@@ -1329,8 +1323,8 @@ public partial class ProxyHost :
         return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
-    public Task WaitForGameToFinishSavingAsync(CancellationToken cancellationToken = default) =>
-        gameIsSavingManualResetEvent.WaitAsync(cancellationToken);
+    public Task WaitForSavesAccessAsync(CancellationToken cancellationToken = default) =>
+        reserveSavesAccessManualResetEvent.WaitAsync(cancellationToken);
 
     async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
     {

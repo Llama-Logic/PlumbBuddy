@@ -735,7 +735,7 @@ public partial class Archivist :
                                 && (!isInSavesDirectory || GetSavesDirectoryLegalFilenamePattern().IsMatch(singleSaveFile.Name)))
                             {
                                 DiagnosticStatus = "Waiting for TS4 to Finish Saving";
-                                await proxyHost.WaitForGameToFinishSavingAsync().ConfigureAwait(false);
+                                await proxyHost.WaitForSavesAccessAsync().ConfigureAwait(false);
                                 DiagnosticStatus = $"Single: {singleSaveFile.Name}";
                                 await ProcessDequeuedFileAsync(new FileInfo(path), isInSavesDirectory, gameStarted).ConfigureAwait(false);
                             }
@@ -754,7 +754,7 @@ public partial class Archivist :
                                     .ToImmutableArray())
                                 {
                                     DiagnosticStatus = "Waiting for TS4 to Finish Saving";
-                                    await proxyHost.WaitForGameToFinishSavingAsync().ConfigureAwait(false);
+                                    await proxyHost.WaitForSavesAccessAsync().ConfigureAwait(false);
                                     DiagnosticStatus = $"Batch: {directoryFileInfo.Name}";
                                     await ProcessDequeuedFileAsync(directoryFileInfo, isInSavesDirectory, gameStarted).ConfigureAwait(false);
                                     if (!settings.ArchivistEnabled
