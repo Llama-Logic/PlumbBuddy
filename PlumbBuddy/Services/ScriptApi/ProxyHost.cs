@@ -1,4 +1,5 @@
 using Serializer = ProtoBuf.Serializer;
+using SQLitePCL;
 
 namespace PlumbBuddy.Services;
 
@@ -142,6 +143,7 @@ public partial class ProxyHost :
     readonly IPlatformFunctions platformFunctions;
     readonly AsyncManualResetEvent reserveSavesAccessManualResetEvent;
     readonly ConcurrentDictionary<Guid, AsyncLock> saveSpecificDataStorageConnectionLocks;
+    ConcurrentDictionary<Guid, SqliteConnection>? saveSpecificDataStorageConnections;
     ulong saveCreated;
     ulong saveNucleusId;
     ulong saveSimNow;
@@ -428,27 +430,11 @@ public partial class ProxyHost :
     async Task InitializeSaveSpecificRelationalDataStorageAsync()
     {
         using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
+        if (saveSpecificDataStorageConnections is not null)
+            return;
+        saveSpecificDataStorageConnections = new();
         await reserveSavesAccessManualResetEvent.WaitAsync().ConfigureAwait(false);
         await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
-        var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
-        var rdsDirectory = Directory.CreateDirectory(Path.Combine(appDataDirectory.FullName, "Relational Data Storage"));
-        var candidateDirectories = rdsDirectory.GetDirectories()
-            .Select(d =>
-            {
-                var match = GetSaveSpecificDataStorageFileSystemContainerPattern().Match(d.Name);
-                if (match.Success
-                    && ulong.TryParse(match.Groups["nucleusId"].Value, NumberStyles.HexNumber, null, out var nucleusId)
-                    && ulong.TryParse(match.Groups["created"].Value, NumberStyles.HexNumber, null, out var created)
-                    && ulong.TryParse(match.Groups["simNow"].Value, NumberStyles.HexNumber, null, out var simNow))
-                    return (nucleusId, created, simNow);
-                return (nucleusId: 0UL, created: 0UL, simNow: 0UL);
-            })
-            .Where(t => t.nucleusId == saveNucleusId && t.created == saveCreated && t.simNow <= saveSimNow);
-        if (candidateDirectories.Any())
-        {
-            (_, _, saveSimNow) = candidateDirectories.OrderByDescending(t => t.simNow).FirstOrDefault();
-            return;
-        }
         var content = ReadOnlyMemory<byte>.Empty;
         if (saveSpecificDataStorageSnapshot is { } memoryResidentSnapshot
             && saveSpecificDataStorageSnapshotNucleusId == saveNucleusId
@@ -522,12 +508,6 @@ public partial class ProxyHost :
         }
         try
         {
-            var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsDirectory.FullName, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{saveSimNow:x16}"));
-            foreach (var alternateSaveSpecificDirectory in rdsDirectory.GetDirectories().Where(d => d.Name != saveSpecificDirectory.Name))
-                alternateSaveSpecificDirectory.Delete(true);
-            if (saveSpecificDirectory.Exists)
-                return;
-            saveSpecificDirectory.Create();
             using var contentStream = new ReadOnlyMemoryOfByteStream(content);
             using var zipInputStream = new ZipInputStream(contentStream);
             ZipEntry entry;
@@ -535,8 +515,30 @@ public partial class ProxyHost :
             {
                 if (entry.IsDirectory)
                     continue;
-                using var fileStream = File.Create(Path.Combine(saveSpecificDirectory.FullName, entry.Name));
-                await zipInputStream.CopyToAsync(fileStream).ConfigureAwait(false);
+                var entryNameParts = entry.Name.Split('.');
+                if (entryNameParts.Length is <= 1)
+                    continue;
+                if (!Guid.TryParse(string.Join('.', entryNameParts.Take(entryNameParts.Length - 1)), out var uniqueId))
+                    continue;
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                var connection = new SqliteConnection("Data Source=:memory:");
+#pragma warning restore CA2000 // Dispose objects before losing scope
+                byte[] serializedDatabase;
+                using (var serializedDatabaseStream = new MemoryStream())
+                {
+                    await zipInputStream.CopyToAsync(serializedDatabaseStream).ConfigureAwait(false);
+                    serializedDatabase = serializedDatabaseStream.ToArray();
+                }
+                var serializedDatabaseSize = serializedDatabase.Length;
+                var rawSerializedDatabase = raw.sqlite3_malloc64(serializedDatabaseSize);
+                Marshal.Copy(serializedDatabase, 0, rawSerializedDatabase, serializedDatabaseSize);
+                await connection.OpenAsync().ConfigureAwait(false);
+                if (raw.sqlite3_deserialize(connection.Handle, "main", rawSerializedDatabase, serializedDatabaseSize, serializedDatabaseSize, raw.SQLITE_DESERIALIZE_FREEONCLOSE | raw.SQLITE_DESERIALIZE_RESIZEABLE) is not raw.SQLITE_OK)
+                {
+                    await connection.DisposeAsync().ConfigureAwait(false);
+                    continue;
+                }
+                saveSpecificDataStorageConnections.AddOrUpdate(uniqueId, connection, (_, _) => connection);
             }
         }
         catch (Exception ex)
@@ -1277,49 +1279,29 @@ public partial class ProxyHost :
     async Task<(ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
-        var rdsPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
-        Directory.CreateDirectory(rdsPath);
-        var saveSpecificDirectory = new DirectoryInfo(Path.Combine(rdsPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{lastSaveSimNow:x16}"));
-        if (!saveSpecificDirectory.Exists)
+        if (saveSpecificDataStorageConnections!.Count is 0)
             return (default, ReadOnlyMemory<byte>.Empty);
-        var saveSpecificFiles = saveSpecificDirectory.GetFiles("*.sqlite", SearchOption.TopDirectoryOnly);
-        if (saveSpecificFiles.Length is 0)
-        {
-            saveSpecificDirectory.Delete(true);
-            return (default, ReadOnlyMemory<byte>.Empty);
-        }
         using var zipFileStream = new ArrayBufferWriterOfByteStream();
         using var zipOutputStream = new ZipOutputStream(zipFileStream) { IsStreamOwner = false };
         zipOutputStream.SetLevel(0);
-        foreach (var file in saveSpecificFiles)
+        foreach (var (uniqueId, connection) in saveSpecificDataStorageConnections)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder
+            var rawSerializedDatabase = raw.sqlite3_serialize(connection.Handle, "main", out var serializedDatabaseSize, 0);
+            var serializedDatabase = ArrayPool<byte>.Shared.Rent((int)serializedDatabaseSize);
+            Marshal.Copy(rawSerializedDatabase, serializedDatabase, 0, (int)serializedDatabaseSize);
+            raw.sqlite3_free(rawSerializedDatabase);
+            await zipOutputStream.PutNextEntryAsync(new ZipEntry($"{uniqueId:n}.sqlite")
             {
-                DataSource = file.FullName,
-                Mode = SqliteOpenMode.ReadWrite,
-                Pooling = false
-            };
-            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            {
-                await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
-                var com = connection.CreateCommand();
-                com.CommandText = $"VACUUM;";
-                await com.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-                await connection.CloseAsync().ConfigureAwait(false);
-            }
-            file.Refresh();
-            await zipOutputStream.PutNextEntryAsync(new ZipEntry(file.Name)
-            {
-                DateTime = file.LastWriteTime,
-                Size = file.Length
+                DateTime = DateTime.Now,
+                Size = serializedDatabaseSize
             }, CancellationToken.None).ConfigureAwait(false);
-            using var fileStream = file.OpenRead();
-            await fileStream.CopyToAsync(zipOutputStream, CancellationToken.None).ConfigureAwait(false);
+            ReadOnlyMemory<byte> serializedDatabaseMemory = serializedDatabase;
+            await zipOutputStream.WriteAsync(serializedDatabaseMemory[..(int)serializedDatabaseSize], CancellationToken.None).ConfigureAwait(false);
             await zipOutputStream.CloseEntryAsync(CancellationToken.None).ConfigureAwait(false);
+            ArrayPool<byte>.Shared.Return(serializedDatabase);
         }
         await zipOutputStream.FinishAsync(CancellationToken.None).ConfigureAwait(false);
-        saveSpecificDirectory.Delete(true);
+        saveSpecificDataStorageConnections = null;
         return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
@@ -1328,47 +1310,36 @@ public partial class ProxyHost :
 
     async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
     {
-        IDisposable? saveSpecificDataStoragePropagationLockHeld = null, dataStorageConnectionLockHeld = null;
         if (isSaveSpecific)
         {
-            saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
+            using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
             await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
+            using var dataStorageConnectionLockHeld = await saveSpecificDataStorageConnectionLocks.GetOrAdd(uniqueId, _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
+            var saveSpecificConnection = saveSpecificDataStorageConnections!.GetOrAdd(uniqueId, _ => new SqliteConnection("Data Source=:memory:"));
+            if (saveSpecificConnection.State is not ConnectionState.Open)
+                await saveSpecificConnection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
+            await withSqliteConnectionAsyncAction(saveSpecificConnection).ConfigureAwait(false);
+            return;
         }
-        try
+        var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
+        var databaseDirectoryPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
+        var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
+        var connectionStringBuilder = new SqliteConnectionStringBuilder
         {
-            var appDataDirectory = await GetAppDataDirectoryAsync().ConfigureAwait(false);
-            var databaseDirectoryPath = Path.Combine(appDataDirectory.FullName, "Relational Data Storage");
-            if (isSaveSpecific)
-            {
-                var saveSpecificDirectory = new DirectoryInfo(Path.Combine(databaseDirectoryPath, $"N-{saveNucleusId:x16}-C-{saveCreated:x16}-W-{saveSimNow:x16}"));
-                if (!saveSpecificDirectory.Exists)
-                    saveSpecificDirectory.Create();
-                databaseDirectoryPath = saveSpecificDirectory.FullName;
-                dataStorageConnectionLockHeld = await saveSpecificDataStorageConnectionLocks.GetOrAdd(uniqueId, _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
-            }
-            var databaseFile = new FileInfo(Path.Combine(databaseDirectoryPath, $"{uniqueId:n}.sqlite"));
-            var connectionStringBuilder = new SqliteConnectionStringBuilder
-            {
-                DataSource = databaseFile.FullName,
-                Mode = SqliteOpenMode.ReadWriteCreate,
-                Pooling = !isSaveSpecific
-            };
-            using var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
-            await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
-            if (!isSaveSpecific)
-            {
-                var enableWriteAheadLoggingForGlobalDatabases = connection.CreateCommand();
-                enableWriteAheadLoggingForGlobalDatabases.CommandText = "PRAGMA journal_mode=WAL;";
-                await enableWriteAheadLoggingForGlobalDatabases.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
-            }
-            await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
-            await connection.CloseAsync().ConfigureAwait(false);
-        }
-        finally
+            DataSource = databaseFile.FullName,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Pooling = !isSaveSpecific
+        };
+        using var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
+        await connection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
+        if (!isSaveSpecific)
         {
-            dataStorageConnectionLockHeld?.Dispose();
-            saveSpecificDataStoragePropagationLockHeld?.Dispose();
+            var enableWriteAheadLoggingForGlobalDatabases = connection.CreateCommand();
+            enableWriteAheadLoggingForGlobalDatabases.CommandText = "PRAGMA journal_mode=WAL;";
+            await enableWriteAheadLoggingForGlobalDatabases.ExecuteNonQueryAsync(CancellationToken.None).ConfigureAwait(false);
         }
+        await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
+        await connection.CloseAsync().ConfigureAwait(false);
     }
 
     record ProcessLookUpLocalizedStringsMessageQueryRecord(int SignedKey, byte Locale, string PackagePath, int KeyType, int KeyGroup, long KeyFullInstance);
