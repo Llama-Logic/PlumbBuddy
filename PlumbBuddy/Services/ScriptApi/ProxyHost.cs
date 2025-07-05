@@ -112,6 +112,7 @@ public partial class ProxyHost :
         gameIsSavingManualResetEvent = new(true);
         reserveSavesAccessManualResetEvent = new(true);
         saveSpecificDataStorageConnectionLocks = new();
+        saveSpecificDataStorageConnections = new();
         saveSpecificDataStorageInitializationLock = new();
         saveSpecificDataStoragePropagationLock = new();
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
@@ -140,10 +141,11 @@ public partial class ProxyHost :
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly AsyncManualResetEvent gameIsLoadingManualResetEvent;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
+    bool pendingSaveSpecificDataStorageInitialization;
     readonly IPlatformFunctions platformFunctions;
     readonly AsyncManualResetEvent reserveSavesAccessManualResetEvent;
     readonly ConcurrentDictionary<Guid, AsyncLock> saveSpecificDataStorageConnectionLocks;
-    ConcurrentDictionary<Guid, SqliteConnection>? saveSpecificDataStorageConnections;
+    readonly ConcurrentDictionary<Guid, SqliteConnection> saveSpecificDataStorageConnections;
     ulong saveCreated;
     ulong saveNucleusId;
     ulong saveSimNow;
@@ -430,9 +432,8 @@ public partial class ProxyHost :
     async Task InitializeSaveSpecificRelationalDataStorageAsync()
     {
         using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
-        if (saveSpecificDataStorageConnections is not null)
+        if (!pendingSaveSpecificDataStorageInitialization)
             return;
-        saveSpecificDataStorageConnections = new();
         await reserveSavesAccessManualResetEvent.WaitAsync().ConfigureAwait(false);
         await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
         var content = ReadOnlyMemory<byte>.Empty;
@@ -872,7 +873,10 @@ public partial class ProxyHost :
                     && Enum.TryParse<GameServiceEvent>(gameServiceEventMessage.Event.Pascalize(), out var gameServiceEvent))
                 {
                     if (gameServiceEvent is GameServiceEvent.Load)
+                    {
                         gameIsLoadingManualResetEvent.Reset();
+                        _ = Task.Run(async () => await ResetSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false));
+                    }
                     else if (gameServiceEvent is GameServiceEvent.OnAllHouseholdsAndSimInfosLoaded)
                         gameIsLoadingManualResetEvent.Set();
                     else if (gameServiceEvent is GameServiceEvent.PreSave)
@@ -1234,6 +1238,15 @@ public partial class ProxyHost :
         });
     }
 
+    async Task ResetSaveSpecificRelationalDataStorageAsync()
+    {
+        using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
+        foreach (var uniqueId in saveSpecificDataStorageConnections.Keys)
+            if (saveSpecificDataStorageConnections.TryRemove(uniqueId, out var connection))
+                await connection.DisposeAsync().ConfigureAwait(false);
+        pendingSaveSpecificDataStorageInitialization = true;
+    }
+
     void SendMessageToBridgedUis(object message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
@@ -1279,7 +1292,7 @@ public partial class ProxyHost :
     async Task<(ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
-        if (saveSpecificDataStorageConnections!.Count is 0)
+        if (saveSpecificDataStorageConnections.IsEmpty)
             return (default, ReadOnlyMemory<byte>.Empty);
         using var zipFileStream = new ArrayBufferWriterOfByteStream();
         using var zipOutputStream = new ZipOutputStream(zipFileStream) { IsStreamOwner = false };
@@ -1301,7 +1314,6 @@ public partial class ProxyHost :
             ArrayPool<byte>.Shared.Return(serializedDatabase);
         }
         await zipOutputStream.FinishAsync(CancellationToken.None).ConfigureAwait(false);
-        saveSpecificDataStorageConnections = null;
         return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
@@ -1315,7 +1327,7 @@ public partial class ProxyHost :
             using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
             await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
             using var dataStorageConnectionLockHeld = await saveSpecificDataStorageConnectionLocks.GetOrAdd(uniqueId, _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
-            var saveSpecificConnection = saveSpecificDataStorageConnections!.GetOrAdd(uniqueId, _ => new SqliteConnection("Data Source=:memory:"));
+            var saveSpecificConnection = saveSpecificDataStorageConnections.GetOrAdd(uniqueId, _ => new SqliteConnection("Data Source=:memory:"));
             if (saveSpecificConnection.State is not ConnectionState.Open)
                 await saveSpecificConnection.OpenAsync(CancellationToken.None).ConfigureAwait(false);
             await withSqliteConnectionAsyncAction(saveSpecificConnection).ConfigureAwait(false);
