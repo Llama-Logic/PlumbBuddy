@@ -108,9 +108,9 @@ public partial class ProxyHost :
         connectedClients = new();
         bridgedUiLoadingLocks = new();
         loadedBridgedUis = new();
-        gameIsLoadingManualResetEvent = new(true);
         gameIsSavingManualResetEvent = new(true);
         reserveSavesAccessManualResetEvent = new(true);
+        gameServicesRunningManualResetEvent = new(false);
         saveSpecificDataStorageConnectionLocks = new();
         saveSpecificDataStorageConnections = new();
         saveSpecificDataStorageInitializationLock = new();
@@ -140,8 +140,8 @@ public partial class ProxyHost :
     readonly ILogger<ProxyHost> logger;
     AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
-    readonly AsyncManualResetEvent gameIsLoadingManualResetEvent;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
+    readonly AsyncManualResetEvent gameServicesRunningManualResetEvent;
     bool pendingSaveSpecificDataStorageInitialization;
     readonly IPlatformFunctions platformFunctions;
     readonly AsyncManualResetEvent reserveSavesAccessManualResetEvent;
@@ -405,7 +405,7 @@ public partial class ProxyHost :
                 DisconnectFromSavesFolder();
                 gameIsSavingManualResetEvent.Set();
                 reserveSavesAccessManualResetEvent.Set();
-                gameIsLoadingManualResetEvent.Set();
+                gameServicesRunningManualResetEvent.Reset();
                 foreach (var loadedBridgedUiUniqueId in loadedBridgedUis.Keys)
                     await DestroyBridgedUiAsync(loadedBridgedUiUniqueId).ConfigureAwait(false);
             }
@@ -447,7 +447,6 @@ public partial class ProxyHost :
             return;
         pendingSaveSpecificDataStorageInitialization = false;
         await reserveSavesAccessManualResetEvent.WaitAsync().ConfigureAwait(false);
-        await gameIsLoadingManualResetEvent.WaitAsync().ConfigureAwait(false);
         var content = ReadOnlyMemory<byte>.Empty;
         if (saveSpecificDataStorageSnapshot is { } memoryResidentSnapshot
             && saveSpecificDataStorageSnapshotNucleusId == saveNucleusId
@@ -888,18 +887,17 @@ public partial class ProxyHost :
                     {
                         gameIsSavingManualResetEvent.Set();
                         reserveSavesAccessManualResetEvent.Set();
-                        gameIsLoadingManualResetEvent.Reset();
                         _ = Task.Run(ResetSaveSpecificRelationalDataStorageAsync);
+                        gameServicesRunningManualResetEvent.Set();
                     }
-                    else if (gameServiceEvent is GameServiceEvent.OnAllHouseholdsAndSimInfosLoaded)
-                        gameIsLoadingManualResetEvent.Set();
                     else if (gameServiceEvent is GameServiceEvent.PreSave)
                     {
-                        gameIsLoadingManualResetEvent.Set();
                         gameIsSavingManualResetEvent.Reset();
                     }
                     else if (gameServiceEvent is GameServiceEvent.Save)
                         gameIsSavingManualResetEvent.Set();
+                    else if (gameServiceEvent is GameServiceEvent.Stop)
+                        gameServicesRunningManualResetEvent.Reset();
                     if (gameServiceEvent is GameServiceEvent.Load or GameServiceEvent.PreSave
                         && gameServiceEventMessage.NucleusId is { } gameServiceEventNucleusId
                         && gameServiceEventMessage.Created is { } gameServiceEventCreated
@@ -963,6 +961,7 @@ public partial class ProxyHost :
                     saveCreated = requestedCreated;
                     saveSimNow = requestedSimNow;
                     saveSlotId = requestedSlotId;
+                    gameServicesRunningManualResetEvent.Set();
                 }
                 break;
         }
@@ -1209,7 +1208,7 @@ public partial class ProxyHost :
         {
             errorCode = -2;
             extendedErrorCode = -2;
-            errorMessage = "This operation for a save-specific database couldn't be completed immediately, which means it's not available. The player may be at the Main Menu or in Manage Worlds, or the game is currently being saved.";
+            errorMessage = "Your query is very important to us, but the player is currently in the Main Menu, Manage Worlds, or CAS. Please try your query again later.";
         }
         catch (Exception ex)
         {
@@ -1371,6 +1370,7 @@ public partial class ProxyHost :
     {
         if (isSaveSpecific)
         {
+            await gameServicesRunningManualResetEvent.WaitAsync(new(true));
             using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.ReaderLockAsync(cancellationToken).ConfigureAwait(false);
             await InitializeSaveSpecificRelationalDataStorageAsync().ConfigureAwait(false);
             using var dataStorageConnectionLockHeld = await saveSpecificDataStorageConnectionLocks.GetOrAdd(uniqueId, _ => new()).LockAsync(CancellationToken.None).ConfigureAwait(false);
