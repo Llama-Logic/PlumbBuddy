@@ -21,7 +21,7 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
-    static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
+    static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
     const int port = 7342;
     static readonly JsonSerializerOptions proxyJsonSerializerOptions = AddConverters(new()
     {
@@ -989,6 +989,7 @@ public partial class ProxyHost :
     {
         if (this.pathsProcessingQueue is not { } pathsProcessingQueue)
             return;
+        reserveSavesAccessManualResetEvent.Reset();
         saveSpecificDataStorageProcessingIdentifiersDenyList.Clear();
         foreach (var backupFile in new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"))
             .GetFiles("*.*", SearchOption.TopDirectoryOnly)
@@ -1016,6 +1017,9 @@ public partial class ProxyHost :
                 logger.LogError(ex, "unhandled exception while processing {Path} for deny list scan", backupFile.FullName);
             }
         }
+        reserveSavesAccessManualResetEvent.Set();
+        var filesProcessedInCycle = new HashSet<string>(platformFunctions.FileSystemStringComparer);
+        var gameWasSaving = false;
         Process? gameProcess = null;
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
@@ -1029,15 +1033,23 @@ public partial class ProxyHost :
                     await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
                     continue;
                 }
+                if (!gameWasSaving)
+                    gameWasSaving = gameIsSavingManualResetEvent.IsSet;
                 path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
+                if (!filesProcessedInCycle.Add(path))
+                    continue;
                 var file = new FileInfo(path);
+                var isBackupSaveFile = GetBackupSaveFileExtensionPattern().IsMatch(file.Extension);
+                var isSaveFile = file.Extension.Equals(".save", StringComparison.OrdinalIgnoreCase);
+                if (!isBackupSaveFile && !isSaveFile)
+                    continue;
                 if (!file.Exists)
                     continue;
-                await Task.WhenAll(gameIsSavingManualResetEvent.WaitAsync(), Task.Delay(oneSecond)).ConfigureAwait(false);
+                await Task.WhenAll(gameIsSavingManualResetEvent.WaitAsync(), Task.Delay(oneQuarterSecond)).ConfigureAwait(false);
                 var length = file.Length;
                 while (true)
                 {
-                    await Task.Delay(oneSecond).ConfigureAwait(false);
+                    await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
                     file.Refresh();
                     var newLength = file.Length;
                     if (length == newLength)
@@ -1045,10 +1057,6 @@ public partial class ProxyHost :
                     length = newLength;
                 }
                 if (file.LastWriteTime < gameProcess.StartTime)
-                    continue;
-                var isBackupSaveFile = GetBackupSaveFileExtensionPattern().IsMatch(file.Extension);
-                var isSaveFile = file.Extension.Equals(".save", StringComparison.OrdinalIgnoreCase);
-                if (!isBackupSaveFile && !isSaveFile)
                     continue;
                 using var savePackage = await DataBasePackedFile.FromPathAsync(file.FullName, forReadOnly: false).ConfigureAwait(false);
                 var packageKeys = await savePackage.GetKeysAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -1073,7 +1081,8 @@ public partial class ProxyHost :
                     saveSpecificDataStorageProcessingIdentifiersDenyList.AddOrUpdate((account.NucleusId, account.Created, gamePlayData.WorldGameTime), true, (_, _) => true);
                     continue;
                 }
-                if (saveSpecificDataStorageProcessingIdentifiersDenyList.ContainsKey((account.NucleusId, account.Created, gamePlayData.WorldGameTime)))
+                if (!gameWasSaving
+                    && saveSpecificDataStorageProcessingIdentifiersDenyList.ContainsKey((account.NucleusId, account.Created, gamePlayData.WorldGameTime)))
                     continue;
                 if (saveSpecificDataStorageSnapshot is null)
                     continue;
@@ -1103,7 +1112,11 @@ public partial class ProxyHost :
                 {
                 }
                 if (!outputAvailable)
+                {
+                    filesProcessedInCycle.Clear();
+                    gameWasSaving = false;
                     reserveSavesAccessManualResetEvent.Set();
+                }
             }
         }
         saveSpecificDataStorageProcessingIdentifiersDenyList.Clear();
@@ -1327,7 +1340,7 @@ public partial class ProxyHost :
     {
         using var saveSpecificDataStoragePropagationLockHeld = await saveSpecificDataStoragePropagationLock.WriterLockAsync(cancellationToken).ConfigureAwait(false);
         if (saveSpecificDataStorageConnections.IsEmpty)
-            return (default, ReadOnlyMemory<byte>.Empty);
+            return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), ReadOnlyMemory<byte>.Empty);
         using var zipFileStream = new ArrayBufferWriterOfByteStream();
         using var zipOutputStream = new ZipOutputStream(zipFileStream) { IsStreamOwner = false };
         zipOutputStream.SetLevel(0);
