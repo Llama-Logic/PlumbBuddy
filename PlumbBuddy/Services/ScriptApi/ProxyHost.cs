@@ -21,7 +21,7 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
-    static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
+    static readonly TimeSpan oneSecond = TimeSpan.FromSeconds(1);
     const int port = 7342;
     static readonly JsonSerializerOptions proxyJsonSerializerOptions = AddConverters(new()
     {
@@ -59,6 +59,9 @@ public partial class ProxyHost :
         StaticDispatcher.Dispatch(() => tcs.SetResult(MauiProgram.CacheDirectory));
         return await tcs.Task.ConfigureAwait(false);
     }
+
+    [GeneratedRegex(@"^\.ver\d$", RegexOptions.IgnoreCase)]
+    private static partial Regex GetBackupSaveFileExtensionPattern();
 
     [GeneratedRegex(@"[\da-f]{64}", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetSha256HashHexPattern();
@@ -111,6 +114,7 @@ public partial class ProxyHost :
         saveSpecificDataStorageConnectionLocks = new();
         saveSpecificDataStorageConnections = new();
         saveSpecificDataStorageInitializationLock = new();
+        saveSpecificDataStorageProcessingIdentifiersDenyList = new();
         saveSpecificDataStoragePropagationLock = new();
         pendingSaveSpecificDataStorageInitialization = true;
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
@@ -148,6 +152,7 @@ public partial class ProxyHost :
     ulong saveSimNow;
     ulong saveSlotId;
     readonly AsyncLock saveSpecificDataStorageInitializationLock;
+    readonly ConcurrentDictionary<(ulong nucleusId, ulong created, ulong simNow), bool> saveSpecificDataStorageProcessingIdentifiersDenyList;
     readonly AsyncReaderWriterLock saveSpecificDataStoragePropagationLock;
     Task<(ResourceKey key, ReadOnlyMemory<byte> content)>? saveSpecificDataStorageSnapshot;
     ulong saveSpecificDataStorageSnapshotCreated;
@@ -245,7 +250,8 @@ public partial class ProxyHost :
             || !userDataFolder.Exists)
             return;
         pathsProcessingQueue = new();
-        fileSystemWatcher = new FileSystemWatcher(Path.Combine(userDataFolder.FullName, "saves"), "*.save")
+        var savesFolder = Directory.CreateDirectory(Path.Combine(userDataFolder.FullName, "saves"));
+        fileSystemWatcher = new FileSystemWatcher(savesFolder.FullName)
         {
             IncludeSubdirectories = false,
             InternalBufferSize = 64 * 1024,
@@ -891,7 +897,6 @@ public partial class ProxyHost :
                     {
                         gameIsLoadingManualResetEvent.Set();
                         gameIsSavingManualResetEvent.Reset();
-                        reserveSavesAccessManualResetEvent.Reset();
                     }
                     else if (gameServiceEvent is GameServiceEvent.Save)
                         gameIsSavingManualResetEvent.Set();
@@ -984,9 +989,38 @@ public partial class ProxyHost :
     {
         if (this.pathsProcessingQueue is not { } pathsProcessingQueue)
             return;
+        saveSpecificDataStorageProcessingIdentifiersDenyList.Clear();
+        foreach (var backupFile in new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves"))
+            .GetFiles("*.*", SearchOption.TopDirectoryOnly)
+            .Where(file => GetBackupSaveFileExtensionPattern().IsMatch(file.Extension)))
+        {
+            try
+            {
+                using var savePackage = await DataBasePackedFile.FromPathAsync(backupFile.FullName).ConfigureAwait(false);
+                var packageKeys = await savePackage.GetKeysAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
+                if (saveGameDataKeys.Length is <= 0 or >= 2)
+                    continue;
+                var saveGameDataKey = saveGameDataKeys[0];
+                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
+                if (saveGameData is null)
+                    continue;
+                if (saveGameData.Account is not { } account
+                    || saveGameData.SaveSlot is not { } saveSlot
+                    || saveSlot.GameplayData is not { } gamePlayData)
+                    continue;
+                saveSpecificDataStorageProcessingIdentifiersDenyList.AddOrUpdate((account.NucleusId, account.Created, gamePlayData.WorldGameTime), true, (_, _) => true);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "unhandled exception while processing {Path} for deny list scan", backupFile.FullName);
+            }
+        }
         Process? gameProcess = null;
         while (await pathsProcessingQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
+            reserveSavesAccessManualResetEvent.Reset();
+            string? path = null;
             try
             {
                 gameProcess ??= await platformFunctions.GetGameProcessAsync(new DirectoryInfo(settings.InstallationFolderPath));
@@ -995,24 +1029,28 @@ public partial class ProxyHost :
                     await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
                     continue;
                 }
-                var path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
-                var saveFile = new FileInfo(path);
-                if (!saveFile.Exists)
+                path = await pathsProcessingQueue.DequeueAsync().ConfigureAwait(false);
+                var file = new FileInfo(path);
+                if (!file.Exists)
                     continue;
-                await gameIsSavingManualResetEvent.WaitAsync().ConfigureAwait(false);
-                var length = saveFile.Length;
+                await Task.WhenAll(gameIsSavingManualResetEvent.WaitAsync(), Task.Delay(oneSecond)).ConfigureAwait(false);
+                var length = file.Length;
                 while (true)
                 {
-                    await Task.Delay(oneQuarterSecond).ConfigureAwait(false);
-                    saveFile.Refresh();
-                    var newLength = saveFile.Length;
+                    await Task.Delay(oneSecond).ConfigureAwait(false);
+                    file.Refresh();
+                    var newLength = file.Length;
                     if (length == newLength)
                         break;
                     length = newLength;
                 }
-                if (saveFile.LastWriteTime < gameProcess.StartTime)
+                if (file.LastWriteTime < gameProcess.StartTime)
                     continue;
-                using var savePackage = await DataBasePackedFile.FromPathAsync(saveFile.FullName, forReadOnly: false).ConfigureAwait(false);
+                var isBackupSaveFile = GetBackupSaveFileExtensionPattern().IsMatch(file.Extension);
+                var isSaveFile = file.Extension.Equals(".save", StringComparison.OrdinalIgnoreCase);
+                if (!isBackupSaveFile && !isSaveFile)
+                    continue;
+                using var savePackage = await DataBasePackedFile.FromPathAsync(file.FullName, forReadOnly: false).ConfigureAwait(false);
                 var packageKeys = await savePackage.GetKeysAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
                 var saveGameDataKeys = packageKeys.Where(k => k.Type is ResourceType.SaveGameData).ToImmutableArray();
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
@@ -1030,6 +1068,13 @@ public partial class ProxyHost :
                     || saveSlot.GameplayData is not { } gamePlayData
                     || gamePlayData.WorldGameTime > saveSpecificDataStorageSnapshotSimNow)
                     continue;
+                if (isBackupSaveFile)
+                {
+                    saveSpecificDataStorageProcessingIdentifiersDenyList.AddOrUpdate((account.NucleusId, account.Created, gamePlayData.WorldGameTime), true, (_, _) => true);
+                    continue;
+                }
+                if (saveSpecificDataStorageProcessingIdentifiersDenyList.ContainsKey((account.NucleusId, account.Created, gamePlayData.WorldGameTime)))
+                    continue;
                 if (saveSpecificDataStorageSnapshot is null)
                     continue;
                 var (saveSpecificDataKey, saveSpecificDataContent) = await saveSpecificDataStorageSnapshot.ConfigureAwait(false);
@@ -1042,6 +1087,10 @@ public partial class ProxyHost :
                     savePackage.Delete(key);
                 await savePackage.SetAsync(saveSpecificDataKey, saveSpecificDataContent, CompressionMode.ForceZLib).ConfigureAwait(false);
                 await savePackage.SaveAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "unhandled exception while processing {Path}", path);
             }
             finally
             {
@@ -1057,6 +1106,7 @@ public partial class ProxyHost :
                     reserveSavesAccessManualResetEvent.Set();
             }
         }
+        saveSpecificDataStorageProcessingIdentifiersDenyList.Clear();
     }
 
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities", Justification = "That's on modders. We give them parameters.")]
