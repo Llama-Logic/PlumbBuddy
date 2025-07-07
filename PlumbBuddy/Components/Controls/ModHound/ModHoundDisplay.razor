@@ -125,7 +125,7 @@
 			var searchText = Observed(() => ModHoundClient.SearchText);
 			if (displayedReportSection is IModHoundClient.SectionOutdated or IModHoundClient.SectionDuplicates or IModHoundClient.SectionBrokenObsolete or IModHoundClient.SectionUnknownStatus or IModHoundClient.SectionUpToDate)
 			{
-				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportRecord" @ref="@recordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadRecordsAsync">
 					<ToolBarContent>
 						<MudStack Spacing="0" Style="width: 80%;">
 							<MudTextM3 Typo="TypoM3.Title">
@@ -370,7 +370,7 @@
 			}
 			else if (displayedReportSection is IModHoundClient.SectionNotTracked)
 			{
-				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync" Virtualize>
+				<MudTable T="ModHoundReportNotTrackedRecord" @ref="@notTrackedRecordsTable" Breakpoint="Breakpoint.Sm" Class="rounded my-0 break-words" Dense FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 347px)" Hover Outlined ServerData="LoadNotTrackedRecordsAsync">
 					<ToolBarContent>
 						<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
 							@StringLocalizer[nameof(AppText.ModHoundDisplay_SectionMenu_NotTracked_Label)]
