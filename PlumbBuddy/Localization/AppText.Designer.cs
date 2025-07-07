@@ -1665,6 +1665,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I am currently cataloging your installed game resources..
+        /// </summary>
+        internal static string HUD_GameResourceCataloger_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_GameResourceCataloger_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game Version.
         /// </summary>
         internal static string HUD_GameVersion_Tip_Caption {
@@ -1706,6 +1715,24 @@ namespace PlumbBuddy.Localization {
         internal static string HUD_Packages_Tip_Description_ModsDisabled {
             get {
                 return ResourceManager.GetString("HUD_Packages_Tip_Description_ModsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connected to The Sims 4.
+        /// </summary>
+        internal static string HUD_ProxyStatus_Tip_Caption {
+            get {
+                return ResourceManager.GetString("HUD_ProxyStatus_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I&apos;m currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt; and &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they&apos;ve made, I&apos;ll explain and get your permission first..
+        /// </summary>
+        internal static string HUD_ProxyStatus_Tip_Description {
+            get {
+                return ResourceManager.GetString("HUD_ProxyStatus_Tip_Description", resourceCulture);
             }
         }
         
@@ -1931,6 +1958,33 @@ namespace PlumbBuddy.Localization {
         internal static string MainLayout_ClearCache_Tip_Stale {
             get {
                 return ResourceManager.GetString("MainLayout_ClearCache_Tip_Stale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI Bridge Dev Mode.
+        /// </summary>
+        internal static string MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Caption {
+            get {
+                return ResourceManager.GetString("MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When this is on, the guards preventing script mods from leaving the Mods folder or providing a custom URL with the &lt;code&gt;ui_root&lt;/code&gt; parameter are disabled, making it easier to work on a bridged UI since it need not be continuously repacked to see changes. Native web view sandboxing restrictions are still active..
+        /// </summary>
+        internal static string MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description {
+            get {
+                return ResourceManager.GetString("MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;em&gt;&lt;strong&gt;Warning&lt;/strong&gt;: Do not turn this on unless you&apos;re actively developing a bridged UI, &lt;strong&gt;even if instructed to do so by a mod&lt;/strong&gt;. Under normal circumstances, these guards protect you from mallicious activity.&lt;/em&gt;.
+        /// </summary>
+        internal static string MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description_Warning {
+            get {
+                return ResourceManager.GetString("MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description_Warning", resourceCulture);
             }
         }
         
@@ -8495,6 +8549,51 @@ namespace PlumbBuddy.Localization {
         internal static string Tooltip_GuideLink_ModHealthScan {
             get {
                 return ResourceManager.GetString("Tooltip_GuideLink_ModHealthScan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you continue, I will forcibly close this bridged UI and inform your mods that I did so..
+        /// </summary>
+        internal static string UIBridge_Confirmation_Closing_Message {
+            get {
+                return ResourceManager.GetString("UIBridge_Confirmation_Closing_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI Bridge Control: Closing.
+        /// </summary>
+        internal static string UIBridge_Confirmation_Closing_Title {
+            get {
+                return ResourceManager.GetString("UIBridge_Confirmation_Closing_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch the UI.
+        /// </summary>
+        internal static string UIBridge_Confirmation_Request_LaunchUI {
+            get {
+                return ResourceManager.GetString("UIBridge_Confirmation_Request_LaunchUI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is asking for permission to show a bridged UI it wants to call {1}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game. After the UI is launched, you can right or secondary click on its tab to access its controls..
+        /// </summary>
+        internal static string UIBridge_Confirmation_Request_Message {
+            get {
+                return ResourceManager.GetString("UIBridge_Confirmation_Request_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bridged UI Requested.
+        /// </summary>
+        internal static string UIBridge_Confirmation_Request_Title {
+            get {
+                return ResourceManager.GetString("UIBridge_Confirmation_Request_Title", resourceCulture);
             }
         }
         

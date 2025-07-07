@@ -337,6 +337,7 @@ partial class ManifestEditor
         return false;
     }
 
+    [SuppressMessage("Maintainability", "CA1505: Avoid unmaintainable code")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ComposeAsync()
     {

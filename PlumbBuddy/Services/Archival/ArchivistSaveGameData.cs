@@ -18,11 +18,14 @@ public sealed class ArchivistSaveGameData :
     public ArchivistAccountData? Account { get; set; }
 
     [ProtoMember(4, Name = "neighborhoods")]
+    [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
     public List<ArchivistNeighborhoodData> Neighborhoods { get; } = [];
 
     [ProtoMember(5, Name = "households")]
+    [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
     public List<ArchivistHouseholdData> Households { get; } = [];
 
     [ProtoMember(7, Name = "zones")]
+    [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
     public List<ArchivistZoneData> Zones { get; } = [];
 }

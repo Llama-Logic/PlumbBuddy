@@ -1,6 +1,8 @@
 namespace PlumbBuddy.Services;
 
-public sealed class Parlay :
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
+[SuppressMessage("Maintainability", "CA1724: Type names should not match namespaces")]
+public sealed partial class Parlay :
     IParlay
 {
     static readonly ImmutableArray<CultureInfo> maxisLocales =

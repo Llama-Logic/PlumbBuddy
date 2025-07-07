@@ -4,6 +4,7 @@ using SQLitePCL;
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Globalization", "CA1308: Normalize strings to uppercase", Justification = "This is for Python, CA. You have your head up your ass.")]
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public partial class ProxyHost :
     IProxyHost
 {
@@ -440,6 +441,7 @@ public partial class ProxyHost :
             IsBridgedUiDevelopmentModeEnabled = false;
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task InitializeSaveSpecificRelationalDataStorageAsync()
     {
         using var saveSpecificDataStorageInitializationLockHeld = await saveSpecificDataStorageInitializationLock.LockAsync().ConfigureAwait(false);
@@ -1121,6 +1123,7 @@ public partial class ProxyHost :
         saveSpecificDataStorageProcessingIdentifiersDenyList.Clear();
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities", Justification = "That's on modders. We give them parameters.")]
     async Task ProcessQueryRelationalDataStorageMessageAsync(QueryRelationalDataStorageMessage queryRelationalDataStorageMessage)
     {

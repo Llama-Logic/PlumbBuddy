@@ -51,6 +51,8 @@ partial class ModHoundDisplay
                 "FileType" => recordsInScope.OrderBy(mhrr => mhrr.FileType),
                 _ => throw new Exception("Unsupported sort configuration")
             };
+        else
+            recordsInScope = recordsInScope.OrderBy(mhrr => mhrr.Id);
         if (ModHoundClient.SearchText is { } searchText
             && !string.IsNullOrWhiteSpace(searchText))
         {
@@ -100,6 +102,8 @@ partial class ModHoundDisplay
                 "DateOfInstalledFile" => recordsInScope.OrderBy(mhrr => mhrr.DateOfInstalledFile),
                 _ => throw new Exception("Unsupported sort configuration")
             };
+        else
+            recordsInScope = recordsInScope.OrderBy(mhrr => mhrr.Id);
         if (ModHoundClient.SearchText is { } searchText
             && !string.IsNullOrWhiteSpace(searchText))
         {

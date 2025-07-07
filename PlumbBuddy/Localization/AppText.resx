@@ -3342,4 +3342,38 @@ More detailed technical information is available in my log.</value>
     <value>*You specified that your mod is incompatible with a pack with the code **{0}**, which is not a valid pack code.* You can go back to the **Requirements** step and fix this, and probably should because it will never have any effect as no player will ever have this impossible pack installed. To make it easier, consider removing **{0}** from the **Incompatible Packs** list and then switching on **Use PlumbBuddy.app Public Pack Catalog when entering Pack Codes** on the bottom of this window.</value>
     <comment>This text is in Markdown. {0} = Invalid Pack Code</comment>
   </data>
+  <data name="HUD_GameResourceCataloger_Tip_Description" xml:space="preserve">
+    <value>I am currently cataloging your installed game resources.</value>
+  </data>
+  <data name="HUD_ProxyStatus_Tip_Caption" xml:space="preserve">
+    <value>Connected to The Sims 4</value>
+  </data>
+  <data name="HUD_ProxyStatus_Tip_Description" xml:space="preserve">
+    <value>I'm currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt; and &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they've made, I'll explain and get your permission first.</value>
+  </data>
+  <data name="MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Caption" xml:space="preserve">
+    <value>UI Bridge Dev Mode</value>
+  </data>
+  <data name="MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description" xml:space="preserve">
+    <value>When this is on, the guards preventing script mods from leaving the Mods folder or providing a custom URL with the &lt;code&gt;ui_root&lt;/code&gt; parameter are disabled, making it easier to work on a bridged UI since it need not be continuously repacked to see changes. Native web view sandboxing restrictions are still active.</value>
+  </data>
+  <data name="MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description_Warning" xml:space="preserve">
+    <value>&lt;em&gt;&lt;strong&gt;Warning&lt;/strong&gt;: Do not turn this on unless you're actively developing a bridged UI, &lt;strong&gt;even if instructed to do so by a mod&lt;/strong&gt;. Under normal circumstances, these guards protect you from mallicious activity.&lt;/em&gt;</value>
+  </data>
+  <data name="UIBridge_Confirmation_Closing_Title" xml:space="preserve">
+    <value>UI Bridge Control: Closing</value>
+  </data>
+  <data name="UIBridge_Confirmation_Closing_Message" xml:space="preserve">
+    <value>If you continue, I will forcibly close this bridged UI and inform your mods that I did so.</value>
+  </data>
+  <data name="UIBridge_Confirmation_Request_Title" xml:space="preserve">
+    <value>Bridged UI Requested</value>
+  </data>
+  <data name="UIBridge_Confirmation_Request_Message" xml:space="preserve">
+    <value>{0} is asking for permission to show a bridged UI it wants to call {1}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game. After the UI is launched, you can right or secondary click on its tab to access its controls.</value>
+    <comment>{0} = Requestor Name; {1} = Tab Name; {2} = Request Reason</comment>
+  </data>
+  <data name="UIBridge_Confirmation_Request_LaunchUI" xml:space="preserve">
+    <value>Launch the UI</value>
+  </data>
 </root>

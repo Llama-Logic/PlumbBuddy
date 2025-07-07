@@ -314,6 +314,7 @@ public class ModHoundClient :
         _ = Task.Run(RequestReportAsync);
 
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+    [SuppressMessage("Maintainability", "CA1505: Avoid unmaintainable code")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task RequestReportAsync()
     {
@@ -446,8 +447,9 @@ public class ModHoundClient :
             var cookieContainer = new CookieContainer();
             using var httpClientHandler = new HttpClientHandler
             {
+                CheckCertificateRevocationList = true,
                 CookieContainer = cookieContainer,
-                UseCookies = true,
+                UseCookies = true
             };
             using var httpClient = new HttpClient(httpClientHandler) { BaseAddress = baseAddress };
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(platformFunctions.UserAgent);

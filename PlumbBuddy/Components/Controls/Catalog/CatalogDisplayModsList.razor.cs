@@ -23,6 +23,7 @@ partial class CatalogDisplayModsList
             StaticDispatcher.Dispatch(() => modsFolderPath = Path.Combine(Settings.UserDataFolderPath));
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     bool IncludeMod(KeyValuePair<CatalogModKey, IReadOnlyList<CatalogModValue>> kv)
     {
         var modsSearchText = Catalog.ModsSearchText;

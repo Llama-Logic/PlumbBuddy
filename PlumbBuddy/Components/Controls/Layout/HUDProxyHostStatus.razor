@@ -13,11 +13,13 @@
 		<TooltipContent>
 			<MudStack Row>
 				<MudIcon Icon="@MaterialDesignIcons.Normal.AccessPointNetwork" />
-				<MudTextM3 Typo="TypoM3.Title">Connected to The Sims 4</MudTextM3>
+				<MudTextM3 Typo="TypoM3.Title">
+                    @MarkupLocalizer[nameof(AppText.HUD_ProxyStatus_Tip_Caption)]
+                </MudTextM3>
 			</MudStack>
 			<MudDivider />
 			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                I'm currently connected to The Sims 4 and standing by to offer <strong>Runtime Mod Integration</strong> services to your mods, such as <strong>UI Bridge</strong> and <strong>Relational Data Storage</strong>, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they've made, I'll explain and get your permission first.
+                @MarkupLocalizer[nameof(AppText.HUD_ProxyStatus_Tip_Description)]
 			</MudTextM3>
 		</TooltipContent>
 	</MudTooltip>

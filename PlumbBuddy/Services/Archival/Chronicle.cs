@@ -5,7 +5,7 @@ using Image = SixLabors.ImageSharp.Image;
 using ResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
 using ResizeOptions = SixLabors.ImageSharp.Processing.ResizeOptions;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
 public class Chronicle :
@@ -169,7 +169,6 @@ public class Chronicle :
             PickerTitle = AppText.Archivist_SelectCustomThumbnail_Caption,
             FileTypes = FilePickerFileType.Images
         }).ConfigureAwait(false) is { } fileResult)
-        {
             try
             {
                 using var fileStream = await fileResult.OpenReadAsync().ConfigureAwait(false);
@@ -179,7 +178,6 @@ public class Chronicle :
             {
                 await dialogService.ShowErrorDialogAsync(AppText.Archivist_SelectCustomThumbnail_Failed, $"{ex.GetType().Name}: {ex.Message}").ConfigureAwait(false);
             }
-        }
     }
 
     public async Task ClearThumbnailAsync()

@@ -7,6 +7,7 @@
 @inject IJSRuntime JSRuntime
 @inject ILifetimeScope LifetimeScope
 @inject ILogger<MainLayout> Logger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IProxyHost ProxyHost
 @inject ISettings Settings
 @inject ISnackbar Snackbar
@@ -58,20 +59,17 @@
 						<TooltipContent>
 							<MudStack Row>
 								<MudIcon Icon="@(Observed(() => ProxyHost.IsBridgedUiDevelopmentModeEnabled) ? MaterialDesignIcons.Normal.FolderSwap : MaterialDesignIcons.Normal.FolderLock)" />
-								<MudTextM3 Typo="TypoM3.Title">UI Bridge Dev Mode</MudTextM3>
+								<MudTextM3 Typo="TypoM3.Title">
+                                    @MarkupLocalizer[nameof(AppText.MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Caption)]
+                                </MudTextM3>
 							</MudStack>
 							<MudDivider />
 							<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-								When this is on, the guards preventing script mods from leaving the Mods folder or providing a custom URL with the <code>ui_root</code> parameter are disabled, making it easier to work on a bridged UI since it need not be continuously repacked to see changes.
-								Native web view sandboxing restrictions are still active.
+                                @MarkupLocalizer[nameof(AppText.MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description)]
 							</MudTextM3>
 							<MudDivider />
 							<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-								<em>
-									<strong>Warning</strong>:
-									Do not turn this on unless you're actively developing a bridged UI, <strong>even if instructed to do so by a mod</strong>.
-									Under normal circumstances, these guards protect you from mallicious activity.
-								</em>
+                                @MarkupLocalizer[nameof(AppText.MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Description_Warning)]
 							</MudTextM3>
 						</TooltipContent>
 					</MudTooltip>

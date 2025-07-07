@@ -112,7 +112,7 @@ public partial class MainPage :
             var closeMenuItem = new MenuFlyoutItem { Text = "Close" };
             closeMenuItem.Clicked += async (_, _) =>
             {
-                if (!await DisplayAlert("UI Bridge Control: Closing", "If you continue, I will forcibly close this bridged UI and inform your mods that I did so.", "OK", "Cancel"))
+                if (!await DisplayAlert(AppText.UIBridge_Confirmation_Closing_Title, AppText.UIBridge_Confirmation_Closing_Message, AppText.Common_Ok, AppText.Common_Cancel))
                     return;
                 proxyHost.DestroyBridgedUi(e.UniqueId);
             };
@@ -195,13 +195,7 @@ public partial class MainPage :
         _ = StaticDispatcher.DispatchAsync(async () =>
         {
             await proxyHost.ForegroundPlumbBuddyAsync();
-            if (await DisplayAlert("Bridged UI Requested",
-                $"""
-                {e.RequestorName} is asking for permission to show a bridged UI it wants to call {e.TabName}. If you allow this UI to be launched, it will be shown in my window and will be able to talk to mods in your game. After the UI is launched, you can right or secondary click on its tab to access its controls.
-
-                The reason given is:
-                {e.RequestReason}
-                """, "Launch the UI", "Cancel"))
+            if (await DisplayAlert(AppText.UIBridge_Confirmation_Request_Title, string.Format(AppText.UIBridge_Confirmation_Request_Message, e.RequestorName, e.TabName, e.RequestReason), AppText.UIBridge_Confirmation_Request_LaunchUI, AppText.Common_Cancel))
             {
                 e.Authorize();
                 return;
@@ -378,20 +372,4 @@ public partial class MainPage :
         await Task.CompletedTask;
 #endif
     }
-
-    //async void HandleTabViewSelectionChanged(object sender, TabSelectionChangedEventArgs e)
-    //{
-    //    var selectedTabContent = tabView.Items[tabView.SelectedIndex].Content;
-    //    if (!selectedTabContent.IsVisible)
-    //        selectedTabContent.IsVisible = true;
-    //    if (selectedTabContent is UiBridgeWebView uiBridgeWebView
-    //        && uiBridgeWebView.Opacity != 1)
-    //        await uiBridgeWebView.FadeTo(1);
-    //    await Task.Delay(TimeSpan.FromMilliseconds(tabView.ContentTransitionDuration));
-    //    for (var i = 0; i < tabView.Items.Count; ++i)
-    //        tabView.Items[i].Content.IsVisible = i == tabView.SelectedIndex;
-    //}
-
-    //void HandleTabViewSelectionChanging(object sender, SelectionChangingEventArgs e) =>
-    //    tabView.Items[e.Index].Content.IsVisible = true;
 }

@@ -1,9 +1,8 @@
-using PlumbBuddy.Services.Archival;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
 using Serializer = ProtoBuf.Serializer;
 
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Archival;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 public class Snapshot :
@@ -95,11 +94,11 @@ public class Snapshot :
                                 contentStream.ToArray().AsMemory(),
                                 compressionType switch
                                 {
-                                    SavePackageResourceCompressionType.None => LlamaLogic.Packages.CompressionMode.ForceOff,
-                                    SavePackageResourceCompressionType.Deleted => LlamaLogic.Packages.CompressionMode.SetDeletedFlag,
-                                    SavePackageResourceCompressionType.Internal => LlamaLogic.Packages.CompressionMode.ForceInternal,
-                                    SavePackageResourceCompressionType.Streamable => LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable,
-                                    SavePackageResourceCompressionType.ZLIB => LlamaLogic.Packages.CompressionMode.ForceZLib,
+                                    SavePackageResourceCompressionType.None => CompressionMode.ForceOff,
+                                    SavePackageResourceCompressionType.Deleted => CompressionMode.SetDeletedFlag,
+                                    SavePackageResourceCompressionType.Internal => CompressionMode.ForceInternal,
+                                    SavePackageResourceCompressionType.Streamable => CompressionMode.CallerSuppliedStreamable,
+                                    SavePackageResourceCompressionType.ZLIB => CompressionMode.ForceZLib,
                                     _ => throw new NotSupportedException("unsupported DBPF compression")
                                 }
                             ).ConfigureAwait(false);

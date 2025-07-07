@@ -1,6 +1,7 @@
 namespace PlumbBuddy.Services;
 
-public class Catalog :
+[SuppressMessage("Maintainability", "CA1724: Type names should not match namespaces")]
+public partial class Catalog :
     ICatalog
 {
     public Catalog(ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger)

@@ -46,6 +46,7 @@ public partial class GameResourceCataloger :
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ScanAsync()
     {
         try
