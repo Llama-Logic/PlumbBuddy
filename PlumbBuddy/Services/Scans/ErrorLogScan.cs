@@ -99,11 +99,18 @@ public sealed class ErrorLogScan :
                 else
                 {
                     await dialogService.ShowInfoDialogAsync(AppText.Scan_ErrorLog_Delete_Failure_Caption, AppText.Scan_ErrorLog_Delete_Failure_Text);
-                    using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                    await pbDbContext.FilesOfInterest
-                        .Where(foi => foi.Path == userDataRelativePath)
-                        .ExecuteDeleteAsync().ConfigureAwait(false);
-                    smartSimObserver.Scan();
+                    try
+                    {
+                        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                        await pbDbContext.FilesOfInterest
+                            .Where(foi => foi.Path == userDataRelativePath)
+                            .ExecuteDeleteAsync().ConfigureAwait(false);
+                        smartSimObserver.Scan();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "unhandled exception when attempting to remove a file of interest because it's no longer on disk: {Path}", userDataRelativePath);
+                    }
                 }
             }
         }
