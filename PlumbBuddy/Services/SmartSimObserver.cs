@@ -438,17 +438,25 @@ public partial class SmartSimObserver :
                 if (installationDirectoryWatcher is null)
                 {
                     ResampleGameVersion();
-                    installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
+                    try
                     {
-                        IncludeSubdirectories = true,
-                        InternalBufferSize = 64 * 1024,
-                        NotifyFilter =
-                              NotifyFilters.CreationTime
-                            | NotifyFilters.DirectoryName
-                            | NotifyFilters.FileName
-                            | NotifyFilters.LastWrite
-                            | NotifyFilters.Size
-                    };
+                        installationDirectoryWatcher = new FileSystemWatcher(settings.InstallationFolderPath)
+                        {
+                            IncludeSubdirectories = true,
+                            InternalBufferSize = 64 * 1024,
+                            NotifyFilter =
+                                  NotifyFilters.CreationTime
+                                | NotifyFilters.DirectoryName
+                                | NotifyFilters.FileName
+                                | NotifyFilters.LastWrite
+                                | NotifyFilters.Size
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "unhandled exception when initializing game installation monitoring at {Path}", settings.InstallationFolderPath);
+                        return;
+                    }
                     installationDirectoryWatcher.Changed += InstallationDirectoryFileSystemEntryChangedHandler;
                     installationDirectoryWatcher.Created += InstallationDirectoryFileSystemEntryCreatedHandler;
                     installationDirectoryWatcher.Deleted += InstallationDirectoryFileSystemEntryDeletedHandler;
