@@ -3,7 +3,7 @@ namespace PlumbBuddy.Services;
 public interface IGameResourceCataloger :
     INotifyPropertyChanged
 {
-    bool IsBusy { get; }
+    int PackageExaminationsRemaining { get; }
 
     void ScanSoon();
 }

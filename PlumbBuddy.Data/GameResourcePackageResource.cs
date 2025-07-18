@@ -1,9 +1,9 @@
 namespace PlumbBuddy.Data;
 
-[Index(nameof(GameStringsPackageId), nameof(KeyType), nameof(KeyGroup), nameof(KeyFullInstance), IsUnique = true)]
-public class GameStringsPackageResource(GameStringsPackage gameStringsPackage)
+[Index(nameof(GameResourcePackageId), nameof(KeyType), nameof(KeyGroup), nameof(KeyFullInstance), IsUnique = true)]
+public class GameResourcePackageResource(GameResourcePackage gameResourcePackage)
 {
-    GameStringsPackageResource() :
+    GameResourcePackageResource() :
         this(null!)
     {
     }
@@ -11,10 +11,10 @@ public class GameStringsPackageResource(GameStringsPackage gameStringsPackage)
     [Key]
     public long Id { get; set; }
 
-    public long GameStringsPackageId { get; set; }
+    public long GameResourcePackageId { get; set; }
 
-    [ForeignKey(nameof(GameStringsPackageId))]
-    public GameStringsPackage GameStringsPackage { get; set; } = gameStringsPackage;
+    [ForeignKey(nameof(GameResourcePackageId))]
+    public GameResourcePackage GameResourcePackage { get; set; } = gameResourcePackage;
 
     [NotMapped]
     public ResourceKey Key

@@ -7,24 +7,25 @@
 @if (Observed(() => Settings.Type) is not UserType.Casual && Observed(() => SmartSimObserver.GameVersion) is { } gameVersion)
 {
 	gameVersion = new Version(gameVersion.Major, gameVersion.Minor, gameVersion.Build);
-	<MudTooltip Arrow Color="@(Observed(() => GameResourceCataloger.IsBusy) ? Color.Primary : Color.Default)">
+    <MudTooltip Arrow Color="@(Observed(() => GameResourceCataloger.PackageExaminationsRemaining) is not 0 ? Color.Primary : Color.Default)">
 		<ChildContent>
-            <MudChip T="Version" Color="@(Observed(() => GameResourceCataloger.IsBusy) ? Color.Primary : Color.Default)" Icon="@(Observed(() => GameResourceCataloger.IsBusy) ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" Value="@gameVersion" />
+            <MudChip T="Version" Color="@(Observed(() => GameResourceCataloger.PackageExaminationsRemaining) is not 0 ? Color.Primary : Color.Default)" Icon="@(Observed(() => GameResourceCataloger.PackageExaminationsRemaining) is not 0 ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" Value="@gameVersion" Class="@(Observed(()=> GameResourceCataloger.PackageExaminationsRemaining) is not 0 ? "plumbbuddy-is-thinking" : string.Empty)" />
 		</ChildContent>
 		<TooltipContent>
 			<MudStack Row>
-                <MudIcon Icon="@(Observed(() => GameResourceCataloger.IsBusy) ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" />
+                <MudIcon Icon="@(Observed(() => GameResourceCataloger.PackageExaminationsRemaining) is not 0 ? MaterialDesignIcons.Normal.DataMatrixScan : MaterialDesignIcons.Normal.TimelineCheck)" />
 				<MudTextM3 Typo="TypoM3.Title">@MarkupLocalizer[nameof(AppText.HUD_GameVersion_Tip_Caption)]</MudTextM3>
 			</MudStack>
 			<MudDivider />
 			<MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
 				@MarkupLocalizer[nameof(AppText.HUD_GameVersion_Tip_Description)]
 			</MudTextM3>
-            @if (Observed(() => GameResourceCataloger.IsBusy))
+            @if (Observed(() => GameResourceCataloger.PackageExaminationsRemaining) is not 0)
             {
+                var packageExaminationsRemaining = Observed(() => GameResourceCataloger.PackageExaminationsRemaining);
 			    <MudDivider />
 			    <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                    @MarkupLocalizer[nameof(AppText.HUD_GameResourceCataloger_Tip_Description)]
+                    @MarkupLocalizer[nameof(AppText.HUD_GameResourceCataloger_Tip_Description), packageExaminationsRemaining is < 0 ? "?" : packageExaminationsRemaining.ToString("n0")]
 			    </MudTextM3>
             }
 		</TooltipContent>

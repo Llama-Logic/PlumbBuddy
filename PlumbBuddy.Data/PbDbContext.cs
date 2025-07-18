@@ -15,8 +15,8 @@ public class PbDbContext :
 
     public DbSet<ElectronicArtsPromoCode> ElectronicArtsPromoCodes { get; set; }
     public DbSet<FileOfInterest> FilesOfInterest { get; set; }
-    public DbSet<GameStringsPackageResource> GameStringsPackageResources { get; set; }
-    public DbSet<GameStringsPackage> GameStringsPackages { get; set; }
+    public DbSet<GameResourcePackage> GameResourcePackages { get; set; }
+    public DbSet<GameResourcePackageResource> GameResourcePackageResources { get; set; }
     public DbSet<GameStringTableEntry> GameStringTableEntries { get; set; }
     public DbSet<ModCreator> ModCreators { get; set; }
     public DbSet<ModExclusivity> ModExclusivities { get; set; }
@@ -76,13 +76,13 @@ public class PbDbContext :
                 : new Uri(maybeNullUriStr, UriKind.Absolute)
         );
 
-        modelBuilder.Entity<GameStringsPackage>()
+        modelBuilder.Entity<GameResourcePackage>()
             .Property(e => e.Creation)
             .HasConversion(dtoConverter);
-        modelBuilder.Entity<GameStringsPackage>()
+        modelBuilder.Entity<GameResourcePackage>()
             .Property(e => e.LastWrite)
             .HasConversion(dtoConverter);
-        modelBuilder.Entity<GameStringsPackage>()
+        modelBuilder.Entity<GameResourcePackage>()
             .Property(e => e.Sha256)
             .HasMaxLength(32)
             .IsFixedLength(true);

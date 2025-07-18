@@ -2,7 +2,7 @@ namespace PlumbBuddy.Data;
 
 [Index(nameof(Path), nameof(Creation), nameof(LastWrite), nameof(Size))]
 [Index(nameof(Path), IsUnique = true)]
-public class GameStringsPackage
+public class GameResourcePackage
 {
     [Key]
     public long Id { get; set; }
@@ -23,5 +23,5 @@ public class GameStringsPackage
 
     public bool IsDelta { get; set; }
 
-    public ICollection<GameStringsPackageResource> Resources { get; } = [];
+    public ICollection<GameResourcePackageResource> Resources { get; } = [];
 }

@@ -1665,7 +1665,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I am currently cataloging your installed game resources..
+        ///   Looks up a localized string similar to I am currently cataloging your installed game resources so I can provide them to bridged UIs if they ask. I currently have &lt;strong&gt;{0}&lt;/strong&gt; game packages remaining examine. I tend to look at the biggest game package files first, so do not be alarmed if this &lt;em&gt;appears&lt;/em&gt; to be taking a long time. This only needs to be done again for new or altered game files, such as when you install an update, pack, or kit. Feel free to still play the game. I will slow down and pause this process if you do..
         /// </summary>
         internal static string HUD_GameResourceCataloger_Tip_Description {
             get {

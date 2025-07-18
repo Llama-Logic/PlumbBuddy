@@ -2,6 +2,8 @@ namespace PlumbBuddy;
 
 static partial class Extensions
 {
+    static readonly long secondTicks = TimeSpan.FromSeconds(1).Ticks;
+
     [GeneratedRegex(@"[^\da-f]", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex GetNonHexStringCharacterPattern();
 
@@ -36,6 +38,12 @@ static partial class Extensions
             throw new ArgumentException("not a valid hex string", nameof(hex));
         return sequence;
     }
+
+    public static DateTime TrimSeconds(this DateTime dt) =>
+        new(dt.Ticks - dt.Ticks % secondTicks, dt.Kind);
+
+    public static DateTimeOffset TrimSeconds(this DateTimeOffset dto) =>
+        new(dto.Ticks - dto.Ticks % secondTicks, dto.Offset);
 
     public static bool TryToByteSequence(this string hex, [NotNullWhen(true)] out IEnumerable<byte>? sequence)
     {

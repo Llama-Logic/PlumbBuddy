@@ -726,17 +726,17 @@ public partial class ProxyHost :
                 		AND mf.FileType = 1
                 	UNION
                 	SELECT
-                		gsp.IsDelta Classification,
-                		gsp.Path PackagePath,
-                		gspr.StringTableLocalePrefix Locale,
-                		gspr.KeyType,
-                		gspr.KeyGroup,
-                		gspr.KeyFullInstance,
+                		grp.IsDelta Classification,
+                		grp.Path PackagePath,
+                		grpr.StringTableLocalePrefix Locale,
+                		grpr.KeyType,
+                		grpr.KeyGroup,
+                		grpr.KeyFullInstance,
                 		gste.SignedKey
                 	FROM
-                		GameStringsPackages gsp
-                		JOIN GameStringsPackageResources gspr ON gspr.GameStringsPackageId = gsp.Id
-                		JOIN GameStringTableEntries gste ON gste.GameStringsPackageResourceId = gspr.Id
+                		GameResourcePackages grp
+                		JOIN GameResourcePackageResources grpr ON grpr.GameResourcePackageId = grp.Id
+                		JOIN GameStringTableEntries gste ON gste.GameResourcePackageResourceId = grpr.Id
                 	ORDER BY
                 		1 DESC,
                 		2 COLLATE {platformFunctions.FileSystemSQliteCollation}	

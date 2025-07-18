@@ -3343,7 +3343,8 @@ More detailed technical information is available in my log.</value>
     <comment>This text is in Markdown. {0} = Invalid Pack Code</comment>
   </data>
   <data name="HUD_GameResourceCataloger_Tip_Description" xml:space="preserve">
-    <value>I am currently cataloging your installed game resources.</value>
+    <value>I am currently cataloging your installed game resources so I can provide them to bridged UIs if they ask. I currently have &lt;strong&gt;{0}&lt;/strong&gt; game packages remaining examine. I tend to look at the biggest game package files first, so do not be alarmed if this &lt;em&gt;appears&lt;/em&gt; to be taking a long time. This only needs to be done again for new or altered game files, such as when you install an update, pack, or kit. Feel free to still play the game. I will slow down and pause this process if you do.</value>
+    <comment>{0} = The number of packages left to examine</comment>
   </data>
   <data name="HUD_ProxyStatus_Tip_Caption" xml:space="preserve">
     <value>Connected to The Sims 4</value>
