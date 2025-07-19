@@ -6,7 +6,9 @@ public static class Yaml
     static TBuilder ConfigureBuilder<TBuilder>(TBuilder builder)
         where TBuilder : BuilderSkeleton<TBuilder> => builder
             .WithTypeConverter(new YamlHashHexConverter())
+            .WithTypeConverter(new YamlResourceKeyConverter())
             .WithTypeConverter(new YamlUriConverter())
+            .WithTypeConverter(new YamlVersionConverter())
             .WithNamingConvention(UnderscoredNamingConvention.Instance);
 
     public static IDeserializer CreateYamlDeserializer() =>

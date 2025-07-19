@@ -133,6 +133,9 @@ public sealed class ManifestedModFileScaffolding :
     [YamlMember(Order = 5, DefaultValuesHandling = DefaultValuesHandling.OmitEmptyCollections, Description = "these are pointers to the other mod files which are a part of your mod")]
     public Collection<ManifestedModFileScaffoldingReferencedModFile> OtherModComponents { get; private set; } = [];
 
+    [YamlMember(Order = 6, DefaultValuesHandling = DefaultValuesHandling.OmitNull, Description = "this is the full contents of this mod file's manifest at the last time it was written")]
+    public ModFileManifestModel? Manifest { get; set; }
+
     public async Task CommitForAsync(FileInfo modFile, ISettings settings)
     {
         ArgumentNullException.ThrowIfNull(modFile);

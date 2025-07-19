@@ -243,6 +243,12 @@ partial class ManifestEditor
             ).ConfigureAwait(false);
             return AddFileResult.Unrecognized;
         }
+        if (await ManifestedModFileScaffolding.TryLoadForAsync(modFile, Settings) is { } scaffolding
+            && scaffolding.Manifest is { } scaffoldingManifest)
+        {
+            manifests = manifests.Add(scaffoldingManifest);
+            manifestResourceName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.TuningName))?.TuningName ?? $"llamalogic:manifest_{Guid.NewGuid():n}";
+        }
         var componentName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name;
         var component = new ModComponent
         (
@@ -652,7 +658,8 @@ partial class ManifestEditor
                             ModName = (name ?? string.Empty).Trim(),
                             IsRequired = component.IsRequired,
                             ComponentName = (component.Name ?? string.Empty).Trim(),
-                            HashingLevel = hashingLevel
+                            HashingLevel = hashingLevel,
+                            Manifest = manifest
                         };
                         foreach (var otherComponent in components.Except([component]))
                         {
@@ -870,6 +877,7 @@ partial class ManifestEditor
             var selectStepFileAddResult = await AddFileAsync(selectStepFile);
             if (selectStepFileAddResult is AddFileResult.Succeeded or AddFileResult.SucceededManifested)
             {
+                var scaffolding = await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings);
                 if (selectStepFileAddResult is AddFileResult.SucceededManifested)
                 {
                     ImmutableArray<ModFileManifestModel> manifests;
@@ -878,9 +886,9 @@ partial class ManifestEditor
                         manifests = [..(await ModFileManifestModel.GetModFileManifestsAsync(dbpf))
                             .Values
                             .OrderBy(manifest => manifest.Name.Length)
-                            .ThenBy(manifest => manifest.Name)];
+                            .ThenBy(manifest => manifest.Name).Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
                     else if (fileObjectModel is ZipFile zipFile)
-                        manifests = [(await ModFileManifestModel.GetModFileManifestAsync(zipFile))!];
+                        manifests = [..new ModFileManifestModel[] { (await ModFileManifestModel.GetModFileManifestAsync(zipFile))! }.Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
                     else
                         throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
                     name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
@@ -932,7 +940,7 @@ partial class ManifestEditor
                         version = semVerPatternMatch.Value;
                     }
                 }
-                if (await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings) is { } scaffolding)
+                if (scaffolding is not null)
                 {
                     components[0].IsRequired = scaffolding.IsRequired;
                     components[0].Name = string.IsNullOrWhiteSpace(scaffolding.ComponentName)
