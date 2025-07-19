@@ -24,6 +24,7 @@ public partial class UiBridgeWebView :
         this.proxyHost = proxyHost;
         this.proxyHost.BridgedUiDataSent += HandleProxyHostBridgedUiDataSent;
         this.proxyHost.BridgedUiMessageSent += HandleProxyHostMessageSent;
+        this.proxyHost.SpecificBridgedUiMessageSent += HandleProxyHostSpecificBridgedUiMessageSent;
         this.scriptModFile = scriptModFile;
         this.bridgedUiRootPath = bridgedUiRootPath;
         this.hostName = hostName;
@@ -107,7 +108,35 @@ public partial class UiBridgeWebView :
             entryName = entryName[..^uri.Fragment.Length];
         if (!string.IsNullOrEmpty(uri.Query))
             entryName = entryName[..^uri.Query.Length];
-        if (scriptModFile.GetEntry(Path.Combine(bridgedUiRootPath, entryName).Replace("\\", "/", StringComparison.Ordinal)) is not { } entry)
+        if (entryName.StartsWith("game-environment/", StringComparison.OrdinalIgnoreCase))
+        {
+            entryName = entryName["game-environment/".Length..];
+            if (entryName.StartsWith("screenshots/", StringComparison.OrdinalIgnoreCase))
+            {
+                entryName = entryName["screenshots/".Length..];
+                var screenshot = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Screenshots", Uri.UnescapeDataString(entryName)));
+                if (!screenshot.Extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
+                    return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
+                if (!screenshot.Exists)
+                    screenshot = new(Path.Combine(Settings.UserDataFolderPath, "Screenshots", Uri.UnescapeDataString(entryName).Replace((char)32, (char)160)));
+                if (!screenshot.Exists)
+                    return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
+                using var screenshotStream = new ArrayBufferWriterOfByteStream();
+                try
+                {
+                    using (var screenshotFileStream = screenshot.OpenRead())
+                        await screenshotFileStream.CopyToAsync(screenshotStream).ConfigureAwait(false);
+                    return (true, screenshotStream.WrittenMemory, "image/png");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "unhandled exception while loading screenshot");
+                    return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
+                }
+            }
+            return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
+        }
+        if (scriptModFile.GetEntry(Path.Combine(bridgedUiRootPath, Uri.UnescapeDataString(entryName)).Replace("\\", "/", StringComparison.Ordinal)) is not { } entry)
             return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
         var writer = new ArrayBufferWriter<byte>();
         using (var entryStream = scriptModFile.GetInputStream(entry))
@@ -175,6 +204,13 @@ public partial class UiBridgeWebView :
     void HandleProxyHostMessageSent(object? sender, BridgedUiMessageSentEventArgs e) =>
         SendMessageToBridgedUi(e.MessageJson);
 
+    void HandleProxyHostSpecificBridgedUiMessageSent(object? sender, SpecificBridgedUiMessageSentEventArgs e)
+    {
+        if (e.UniqueId != UniqueId)
+            return;
+        SendMessageToBridgedUi(e.MessageJson);
+    }
+
     private partial void InitializeWebView();
 
     private partial void Navigate(Uri uri);
@@ -204,6 +240,7 @@ public partial class UiBridgeWebView :
     {
         proxyHost.BridgedUiDataSent -= HandleProxyHostBridgedUiDataSent;
         proxyHost.BridgedUiMessageSent -= HandleProxyHostMessageSent;
+        proxyHost.SpecificBridgedUiMessageSent -= HandleProxyHostSpecificBridgedUiMessageSent;
         Shutdown();
     }
 }

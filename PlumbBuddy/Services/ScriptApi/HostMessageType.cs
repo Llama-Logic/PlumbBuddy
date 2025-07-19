@@ -9,7 +9,9 @@ public enum HostMessageType
     BridgedUiRequestResponse,
     FocusBridgedUiResponse,
     ForegroundPlumbbuddy,
+    ListScreenshotsResponse,
     LookUpLocalizedStringsResponse,
     RelationalDataStorageQueryResults,
+    ScreenshotsChanged,
     SendLoadedSaveIdentifiers
 }

@@ -13,12 +13,14 @@ public interface IProxyHost :
     event EventHandler<BridgedUiMessageSentEventArgs>? BridgedUiMessageSent;
     event EventHandler? ProxyConnected;
     event EventHandler? ProxyDisconnected;
+    event EventHandler<SpecificBridgedUiMessageSentEventArgs>? SpecificBridgedUiMessageSent;
 
     bool IsBridgedUiDevelopmentModeEnabled { get; set; }
     bool IsClientConnected { get; }
 
     void DestroyBridgedUi(Guid uniqueId);
     Task ForegroundPlumbBuddyAsync();
+    Task NotifyScreenshotsChangedAsync();
     Task ProcessMessageFromBridgedUiAsync(Guid uniqueId, string messageJson);
     Task WaitForSavesAccessAsync(CancellationToken cancellationToken = default);
 }

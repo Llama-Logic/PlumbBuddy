@@ -1,5 +1,6 @@
-using Serializer = ProtoBuf.Serializer;
+using AngleSharp.Io;
 using SQLitePCL;
+using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services;
 
@@ -196,6 +197,7 @@ public partial class ProxyHost :
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? ProxyConnected;
     public event EventHandler? ProxyDisconnected;
+    public event EventHandler<SpecificBridgedUiMessageSentEventArgs>? SpecificBridgedUiMessageSent;
 
     async Task BridgedUiRequestResolvedAsync(Guid uniqueId, int denialReason)
     {
@@ -583,6 +585,18 @@ public partial class ProxyHost :
         }
     }
 
+    public async Task NotifyScreenshotsChangedAsync()
+    {
+        await SendMessageToProxyAsync(new HostMessageBase
+        {
+            Type = nameof(HostMessageType.ScreenshotsChanged).Underscore().ToLowerInvariant()
+        }).ConfigureAwait(false);
+        SendMessageToBridgedUis(new HostMessageBase
+        {
+            Type = nameof(HostMessageType.ScreenshotsChanged).Camelize()
+        });
+    }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 
@@ -921,6 +935,33 @@ public partial class ProxyHost :
                         }
                     }
                 }
+                break;
+            case ComponentMessageType.ListScreenshots when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotsList:
+                var listScreenshotsResponseMessage = new ListScreenshotsResponseMessage()
+                {
+                    Type = nameof(HostMessageType.ListScreenshotsResponse).Camelize()
+                };
+                var screenshotsFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots"));
+                if (screenshotsFolder.Exists)
+                    foreach (var pngFile in screenshotsFolder.GetFiles("*.png", SearchOption.TopDirectoryOnly))
+                        listScreenshotsResponseMessage.Screenshots.Add(new()
+                        {
+                            Attributes = pngFile.Attributes,
+                            CreationTime = pngFile.CreationTime,
+                            CreationTimeUtc = pngFile.CreationTimeUtc,
+                            LastAccessTime = pngFile.LastAccessTime,
+                            LastAccessTimeUtc = pngFile.LastAccessTimeUtc,
+                            LastWriteTime = pngFile.LastWriteTime,
+                            LastWriteTimeUtc = pngFile.LastWriteTimeUtc,
+                            Name = pngFile.Name,
+                            Size = pngFile.Length,
+                            UnixFileMode = pngFile.UnixFileMode
+                        });
+                SpecificBridgedUiMessageSent?.Invoke(this, new()
+                {
+                    UniqueId = bridgedUiRequestingScreenshotsList,
+                    MessageJson = JsonSerializer.Serialize(listScreenshotsResponseMessage, bridgedUiJsonSerializerOptions)
+                });
                 break;
             case ComponentMessageType.LookUpLocalizedStrings:
                 if (TryParseMessage<LookUpLocalizedStringsMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "look up localized strings", out var lookUpLocalizedStringsMessage))

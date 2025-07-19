@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.24</ApplicationDisplayVersion>
-        <ApplicationVersion>1.5.24</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5.25</ApplicationDisplayVersion>
+        <ApplicationVersion>1.5.25</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

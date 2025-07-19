@@ -35,7 +35,7 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IGameResourceCataloger gameResourceCataloger, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IGameResourceCataloger gameResourceCataloger, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs, IProxyHost proxyHost)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -49,6 +49,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         ArgumentNullException.ThrowIfNull(publicCatalogs);
+        ArgumentNullException.ThrowIfNull(proxyHost);
         this.lifetimeScope = lifetimeScope.BeginLifetimeScope(ConfigureLifetimeScope);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
@@ -62,6 +63,7 @@ public partial class SmartSimObserver :
         this.blazorFramework = blazorFramework;
         this.publicCatalogs = publicCatalogs;
         this.platformFunctions.PerformanceProcessorAffinity.ToString();
+        this.proxyHost = proxyHost;
         enqueuedScanningTaskLock = new();
         enqueuedResamplingPacksTaskLock = new();
         enqueuedFresheningTaskLock = new();
@@ -114,6 +116,7 @@ public partial class SmartSimObserver :
     FileSystemWatcher? packsDirectoryWatcher;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
+    readonly IProxyHost proxyHost;
     readonly IPublicCatalogs publicCatalogs;
     readonly ISettings settings;
     readonly AsyncDebouncer resampleGameVersionDebouncer;
@@ -941,6 +944,16 @@ public partial class SmartSimObserver :
         }
     }
 
+    bool NotifyProxyHostOfScreenshotChangesIfTheyChanged(string relativePath)
+    {
+        if (relativePath.StartsWith($"Screenshots{Path.DirectorySeparatorChar}"))
+        {
+            _ = Task.Run(async () => await proxyHost.NotifyScreenshotsChangedAsync().ConfigureAwait(false));
+            return true;
+        }
+        return false;
+    }
+
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
         PropertyChanged?.Invoke(this, e);
 
@@ -1234,6 +1247,8 @@ public partial class SmartSimObserver :
             return;
         if (integrationWasOverwritten)
             FreshenIntegration();
+        if (NotifyProxyHostOfScreenshotChangesIfTheyChanged(relativePath))
+            return;
     }
 
     void UserDataDirectoryFileSystemEntryCreatedHandler(object sender, FileSystemEventArgs e)
@@ -1276,6 +1291,8 @@ public partial class SmartSimObserver :
             return;
         if (integrationWasOverwritten)
             FreshenIntegration();
+        if (NotifyProxyHostOfScreenshotChangesIfTheyChanged(relativePath))
+            return;
     }
 
     void UserDataDirectoryFileSystemEntryDeletedHandler(object sender, FileSystemEventArgs e)
@@ -1308,6 +1325,8 @@ public partial class SmartSimObserver :
             return;
         if (integrationWasDeleted)
             FreshenIntegration();
+        if (NotifyProxyHostOfScreenshotChangesIfTheyChanged(relativePath))
+            return;
     }
 
     void UserDataDirectoryFileSystemEntryRenamedHandler(object sender, RenamedEventArgs e)
@@ -1353,6 +1372,8 @@ public partial class SmartSimObserver :
             return;
         if (integrationWasRenamed || integrationWasOverwritten)
             FreshenIntegration();
+        if (NotifyProxyHostOfScreenshotChangesIfTheyChanged(oldRelativePath) || NotifyProxyHostOfScreenshotChangesIfTheyChanged(relativePath))
+            return;
     }
 
     void UserDataDirectoryWatcherErrorHandler(object sender, ErrorEventArgs e)

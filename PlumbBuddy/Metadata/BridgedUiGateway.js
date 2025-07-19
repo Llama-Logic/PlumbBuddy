@@ -421,15 +421,18 @@
     const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
+    let promisedScreenshotList = null;
     const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
+    let dispatchScreenshotsChanged = null;
 
     /**
      * The PlumbBuddy Runtime Mod Integration Gateway
      */
     class Gateway {
         #dataReceived;
+        #screenshotsChanged;
         #uniqueId = sanitizeUuid('__UNIQUE_ID__');
         #version = '__PB_VERSION__';
 
@@ -438,10 +441,15 @@
                 throw new Error('Gateway has already been initialized for you. Use window.gateway.')
             }
             this.#dataReceived = new Event(dispatch => dispatchDataReceived = dispatch);
+            this.#screenshotsChanged = new Event(dispatch => dispatchScreenshotsChanged = dispatch);
         }
 
         get dataReceived() {
             return this.#dataReceived;
+        }
+
+        get screenshotsChanged() {
+            return this.#screenshotsChanged;
         }
 
         get uniqueId() {
@@ -500,7 +508,7 @@
         /**
          * Attempts to look up a loaded bridged UI
          * @param {String} uniqueId the UUID for the tab of the bridged UI
-         * @returns {Promise} an promise that will resolve with the bridged UI or a fault that it is not currently loaded
+         * @returns {Promise} a promise that will resolve with the bridged UI or a fault that it is not currently loaded
          */
         lookUpBridgedUi(uniqueId) {
             uniqueId = sanitizeUuid(uniqueId);
@@ -522,6 +530,22 @@
                 uniqueId,
             });
             return madePromise.promise;
+        }
+
+        /**
+         * Requests a list of the screenshots currently in the player's Screenshots folder
+         * @returns {Promise} a promise that will resolve with the list of screenshots currently in the player's Screenshots folder
+         */
+        listScreenshots() {
+            if (promisedScreenshotList) {
+                return promisedScreenshotList.promise;
+            }
+            const madePromise = makePromise();
+            promisedScreenshotList = madePromise;
+            sendMessageToPlumbBuddy({
+                type: 'listScreenshots'
+            });
+            return promisedScreenshotList.promise;
         }
 
         /**
@@ -629,6 +653,12 @@
                     fault = new Error('Unknown denial reason')
                 }
                 promisedBridgedUi.reject(fault);
+            } else if (message.type === 'listScreenshotsResponse') {
+                if (!promisedScreenshotList) {
+                    return;
+                }
+                promisedScreenshotList.resolve(message.screenshots);
+                promisedScreenshotList = null;
             } else if (message.type === 'lookUpLocalizedStringsResponse') {
                 const lookUpId = sanitizeUuid(message.lookUpId);
                 const promisedLookUp = promisedStringTableEntriesLookUps[lookUpId];
@@ -645,6 +675,8 @@
                     return;
                 }
                 dataStoreRecord.dispatches.queryCompleted(new RelationalDataStorageQueryCompletedEventData(message));
+            } else if (message.type === 'screenshotsChanged') {
+                dispatchScreenshotsChanged();
             }
         }
 
