@@ -888,7 +888,7 @@ partial class ManifestEditor
                             .OrderBy(manifest => manifest.Name.Length)
                             .ThenBy(manifest => manifest.Name).Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
                     else if (fileObjectModel is ZipFile zipFile)
-                        manifests = [..new ModFileManifestModel[] { (await ModFileManifestModel.GetModFileManifestAsync(zipFile))! }.Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
+                        manifests = [..Enumerable.Empty<ModFileManifestModel>().Concat(await ModFileManifestModel.GetModFileManifestAsync(zipFile) is { } scriptFileManifest ? [scriptFileManifest] : []).Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
                     else
                         throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
                     name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
