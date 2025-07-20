@@ -704,6 +704,7 @@
          * @param {String} tabName the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
          * @param {String?} tabIconPath a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
          * @param {String?} hostName the host name for the simulated web server to use when displaying your bridged UI, which matters to common browser services like local storage and IndexedDB (this will be your UI's uniqueId if ommitted)
+         * @param {Array?} layers a sequence of objects, each expected to contain `script_mod` and `ui_root` keys with values like the parameters of this function, which will indicate that contents of multiple bridged UIs are to be layered, one on top of another, for purposes of reusing JavaScript logic and assets
          * @returns {Promise} an promise that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, `InvalidHostNameError`, etc.)
          */
         requestBridgedUi(scriptMod, uiRoot, uniqueId, requestorName, requestReason, tabName, tabIconPath = null, hostName = null) {
@@ -746,6 +747,7 @@
                 tabName,
                 tabIconPath,
                 hostName,
+                layers,
             });
             return madePromise.promise;
         }

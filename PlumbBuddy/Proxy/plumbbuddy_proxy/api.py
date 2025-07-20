@@ -643,7 +643,7 @@ class Gateway:
         ipc.send(message)
         return eventual
     
-    def request_bridged_ui(self, script_mod: str, ui_root: str, unique_id: UUID, requestor_name: str, request_reason: str, tab_name: str, tab_icon_path: Optional[str] = None, host_name: Optional[str] = None) -> Eventual[BridgedUi]:
+    def request_bridged_ui(self, script_mod: str, ui_root: str, unique_id: UUID, requestor_name: str, request_reason: str, tab_name: str, tab_icon_path: Optional[str] = None, host_name: Optional[str] = None, layers: Optional[Sequence[dict]] = None) -> Eventual[BridgedUi]:
         """
         Requests a bridged UI from PlumbBuddy
 
@@ -655,6 +655,7 @@ class Gateway:
         :param tab_name: the name of the tab for the bridged UI in PlumbBuddy's interface if the request is approved
         :param tab_icon_path: (optional) a path to an icon to be displayed on the bridged UI's tab in PlumbBuddy's interface, inside the `.ts4script` file, relative to `ui_root`
         :param host_name: (optional) the host name for the simulated web server to use when displaying your bridged UI, which matters to common browser services like local storage and IndexedDB (this will be your UI's `unique_id` if ommitted)
+        :param layers: (optional) a sequence of dictionaries, each expected to contain `script_mod` and `ui_root` keys with values like the parameters of this function, which will indicate that contents of multiple bridged UIs are to be layered, one on top of another, for purposes of reusing JavaScript logic and assets
         :returns: an Eventual that will resolve with the bridged UI or a fault indicating why your request was denied (e.g. `ScriptModNotFoundError`, `IndexNotFoundError`, `PlayerDeniedRequestError`, `InvalidHostNameError`, etc.)
         """
 
@@ -697,7 +698,8 @@ class Gateway:
             'request_reason': request_reason,
             'tab_name': tab_name,
             'tab_icon_path': tab_icon_path,
-            'host_name': host_name
+            'host_name': host_name,
+            'layers': layers
         })
         _try_to_foreground_plumbbuddy()
         return eventual

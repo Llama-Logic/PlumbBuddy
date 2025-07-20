@@ -73,7 +73,6 @@ public class ModsDirectoryCataloger :
                     if (!modFileHash.StringTablesCataloged)
                         foreach (var modFileResource in modFileHash.Resources.Where(resource => resource.Key.Type is ResourceType.StringTable))
                         {
-                            modFileResource.StringTableLocalePrefix = (LocaleFullInstancePrefix)((modFileResource.Key.FullInstance & 0xFF00000000000000) >> 56);
                             try
                             {
                                 var stringTable = await dbpf.GetStringTableAsync(modFileResource.Key).ConfigureAwait(false);

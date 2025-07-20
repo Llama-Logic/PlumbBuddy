@@ -9,14 +9,16 @@ public partial class UiBridgeWebView :
     public const string Scheme = "plumbbuddy";
 #endif
 
-    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId, string hostName = "bridged-ui")
+    public UiBridgeWebView(ILogger<UiBridgeWebView> logger, ISettings settings, IUpdateManager updateManager, IProxyHost proxyHost, IGameResourceCataloger gameResourceCataloger, ZipFile? scriptModFile, string bridgedUiRootPath, Guid uniqueId, string hostName, IReadOnlyList<(ZipFile? archive, string uiRoot)> layers)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(updateManager);
         ArgumentNullException.ThrowIfNull(proxyHost);
+        ArgumentNullException.ThrowIfNull(gameResourceCataloger);
         ArgumentNullException.ThrowIfNull(bridgedUiRootPath);
         ArgumentNullException.ThrowIfNull(hostName);
+        ArgumentNullException.ThrowIfNull(layers);
         Logger = logger;
         Settings = settings;
         UniqueId = uniqueId;
@@ -25,15 +27,15 @@ public partial class UiBridgeWebView :
         this.proxyHost.BridgedUiDataSent += HandleProxyHostBridgedUiDataSent;
         this.proxyHost.BridgedUiMessageSent += HandleProxyHostMessageSent;
         this.proxyHost.SpecificBridgedUiMessageSent += HandleProxyHostSpecificBridgedUiMessageSent;
-        this.scriptModFile = scriptModFile;
-        this.bridgedUiRootPath = bridgedUiRootPath;
+        this.gameResourceCataloger = gameResourceCataloger;
         this.hostName = hostName;
+        this.layers = layers.Append((scriptModFile, bridgedUiRootPath)).Reverse().ToList().AsReadOnly();
     }
 
-    readonly string bridgedUiRootPath;
+    readonly IGameResourceCataloger gameResourceCataloger;
     readonly string hostName;
+    readonly IReadOnlyList<(ZipFile? archive, string uiRoot)> layers;
     readonly IProxyHost proxyHost;
-    readonly ICSharpCode.SharpZipLib.Zip.ZipFile? scriptModFile;
     readonly IUpdateManager updateManager;
 
     Uri IndexUrl =>
@@ -59,50 +61,11 @@ public partial class UiBridgeWebView :
             .Replace("__UNIQUE_ID__", UniqueId.ToString(), StringComparison.Ordinal);
     }
 
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public async ValueTask<(bool found, ReadOnlyMemory<byte> content, string contentType)> GetContentAsync(Uri uri)
     {
         ArgumentNullException.ThrowIfNull(uri);
-        if (scriptModFile is null)
-        {
-            if (!Uri.TryCreate(bridgedUiRootPath, UriKind.Absolute, out var baseUri))
-                return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
-            using var httpClient = new HttpClient { BaseAddress = baseUri };
-            var uriStr = uri.ToString()[UriPrefix.Length..];
-            if (!string.IsNullOrEmpty(uri.Fragment))
-                uriStr = uriStr[..^uri.Fragment.Length];
-            using var response = await httpClient.GetAsync(uriStr).ConfigureAwait(false);
-            try
-            {
-                response.EnsureSuccessStatusCode();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWarning(ex, "remote server did not return a successful status code when retrieving {UriStr}", uriStr);
-                return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
-            }
-            var content = response.Content;
-            using var responseStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-            var echoWriter = new ArrayBufferWriter<byte>();
-            var rentedArray = ArrayPool<byte>.Shared.Rent(4096);
-            try
-            {
-                Memory<byte> buffer = rentedArray;
-                var bytesRead = await responseStream.ReadAsync(buffer).ConfigureAwait(false);
-                while (bytesRead > 0)
-                {
-                    echoWriter.Write(buffer.Span[..bytesRead]);
-                    bytesRead = await responseStream.ReadAsync(buffer).ConfigureAwait(false);
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(rentedArray);
-            }
-            return (true, echoWriter.WrittenMemory, content.Headers.ContentType?.MediaType ?? "application/octet-stream");
-        }
         var entryName = uri.AbsoluteUri.ToString();
-        if (!entryName.StartsWith(UriPrefix, StringComparison.Ordinal))
-            return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
         entryName = entryName[UriPrefix.Length..];
         if (!string.IsNullOrEmpty(uri.Fragment))
             entryName = entryName[..^uri.Fragment.Length];
@@ -111,6 +74,12 @@ public partial class UiBridgeWebView :
         if (entryName.StartsWith("game-environment/", StringComparison.OrdinalIgnoreCase))
         {
             entryName = entryName["game-environment/".Length..];
+            if (entryName.StartsWith("resources/", StringComparison.OrdinalIgnoreCase))
+            {
+                entryName = entryName["resources/".Length..];
+                var resource = await gameResourceCataloger.GetRawResourceAsync(Uri.UnescapeDataString(entryName)).ConfigureAwait(false);
+                return (!resource.IsEmpty, resource, resource.IsEmpty ? string.Empty : "application/octet-stream");
+            }
             if (entryName.StartsWith("screenshots/", StringComparison.OrdinalIgnoreCase))
             {
                 entryName = entryName["screenshots/".Length..];
@@ -136,62 +105,99 @@ public partial class UiBridgeWebView :
             }
             return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
         }
-        if (scriptModFile.GetEntry(Path.Combine(bridgedUiRootPath, Uri.UnescapeDataString(entryName)).Replace("\\", "/", StringComparison.Ordinal)) is not { } entry)
-            return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
-        var writer = new ArrayBufferWriter<byte>();
-        using (var entryStream = scriptModFile.GetInputStream(entry))
+        foreach (var (scriptModFile, bridgedUiRootPath) in layers)
         {
-            var rentedArray = ArrayPool<byte>.Shared.Rent(4096);
-            try
+            if (scriptModFile is null)
             {
-                Memory<byte> buffer = rentedArray;
-                var bytesRead = await entryStream.ReadAsync(buffer).ConfigureAwait(false);
-                while (bytesRead > 0)
+                if (!Uri.TryCreate(bridgedUiRootPath, UriKind.Absolute, out var baseUri))
+                    continue;
+                using var httpClient = new HttpClient { BaseAddress = baseUri };
+                var uriStr = uri.ToString()[UriPrefix.Length..];
+                if (!string.IsNullOrEmpty(uri.Fragment))
+                    uriStr = uriStr[..^uri.Fragment.Length];
+                using var response = await httpClient.GetAsync(uriStr).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                    continue;
+                var content = response.Content;
+                using var responseStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+                var echoWriter = new ArrayBufferWriter<byte>();
+                var rentedArray = ArrayPool<byte>.Shared.Rent(4096);
+                try
                 {
-                    writer.Write(buffer.Span[..bytesRead]);
-                    bytesRead = await entryStream.ReadAsync(buffer).ConfigureAwait(false);
+                    Memory<byte> buffer = rentedArray;
+                    var bytesRead = await responseStream.ReadAsync(buffer).ConfigureAwait(false);
+                    while (bytesRead > 0)
+                    {
+                        echoWriter.Write(buffer.Span[..bytesRead]);
+                        bytesRead = await responseStream.ReadAsync(buffer).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(rentedArray);
+                }
+                return (true, echoWriter.WrittenMemory, content.Headers.ContentType?.MediaType ?? "application/octet-stream");
+            }
+            if (!uri.AbsoluteUri.ToString().StartsWith(UriPrefix, StringComparison.Ordinal))
+                continue;
+            if (scriptModFile.GetEntry(Path.Combine(bridgedUiRootPath, Uri.UnescapeDataString(entryName)).Replace("\\", "/", StringComparison.Ordinal)) is not { } entry)
+                continue;
+            var writer = new ArrayBufferWriter<byte>();
+            using (var entryStream = scriptModFile.GetInputStream(entry))
+            {
+                var rentedArray = ArrayPool<byte>.Shared.Rent(4096);
+                try
+                {
+                    Memory<byte> buffer = rentedArray;
+                    var bytesRead = await entryStream.ReadAsync(buffer).ConfigureAwait(false);
+                    while (bytesRead > 0)
+                    {
+                        writer.Write(buffer.Span[..bytesRead]);
+                        bytesRead = await entryStream.ReadAsync(buffer).ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "encountered unexpected unhandled exception while attempting to unpack {Entry} for bridged UI {UniqueId}", entryName, UniqueId);
+                    continue;
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(rentedArray);
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "encountered unexpected unhandled exception while attempting to unpack {Entry} for bridged UI {UniqueId}", entryName, UniqueId);
-                return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(rentedArray);
-            }
+            return
+            (
+                true,
+                writer.WrittenMemory,
+                Path.GetExtension(entryName).ToUpperInvariant() switch
+                {
+                    ".CSS" => "text/css",
+                    ".GIF" => "image/gif",
+                    ".HTM" or ".HTML" => "text/html",
+                    ".ICO" => "image/x-icon",
+                    ".JPG" or ".JPEG" => "image/jpeg",
+                    ".JS" or ".MJS" => "text/javascript",
+                    ".JSON" or ".MAP" => "application/json",
+                    ".MP3" => "audio/mp3",
+                    ".MP4" => "video/mp4",
+                    ".OGG" => "audio/ogg",
+                    ".OTF" => "font/otf",
+                    ".PNG" => "image/png",
+                    ".SVG" => "image/svg+xml",
+                    ".TTF" => "font/ttf",
+                    ".TXT" => "text/plain",
+                    ".WASM" => "application/wasm",
+                    ".WAV" => "audio/wav",
+                    ".WEBP" => "image/webp",
+                    ".WOFF" => "font/woff",
+                    ".WOFF2" => "font/woff2",
+                    ".XML" => "text/xml",
+                    _ => "application/octet-stream"
+                }
+            );
         }
-        return
-        (
-            true,
-            writer.WrittenMemory,
-            Path.GetExtension(entryName).ToUpperInvariant() switch
-            {
-                ".CSS" => "text/css",
-                ".GIF" => "image/gif",
-                ".HTM" or ".HTML" => "text/html",
-                ".ICO" => "image/x-icon",
-                ".JPG" or ".JPEG" => "image/jpeg",
-                ".JS" or ".MJS" => "text/javascript",
-                ".JSON" or ".MAP" => "application/json",
-                ".MP3" => "audio/mp3",
-                ".MP4" => "video/mp4",
-                ".OGG" => "audio/ogg",
-                ".OTF" => "font/otf",
-                ".PNG" => "image/png",
-                ".SVG" => "image/svg+xml",
-                ".TTF" => "font/ttf",
-                ".TXT" => "text/plain",
-                ".WASM" => "application/wasm",
-                ".WAV" => "audio/wav",
-                ".WEBP" => "image/webp",
-                ".WOFF" => "font/woff",
-                ".WOFF2" => "font/woff2",
-                ".XML" => "text/xml",
-                _ => "application/octet-stream"
-            }
-        );
+        return (false, ReadOnlyMemory<byte>.Empty, string.Empty);
     }
 
     void HandleProxyHostBridgedUiDataSent(object? sender, BridgedUiDataSentEventArgs e)
@@ -219,7 +225,7 @@ public partial class UiBridgeWebView :
     {
         base.OnHandlerChanged();
         InitializeWebView();
-        if (scriptModFile is null)
+        if (layers[0].archive is null)
         {
             Navigate(new Uri(UriPrefix, UriKind.Absolute));
             return;

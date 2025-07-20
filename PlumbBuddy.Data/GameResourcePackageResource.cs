@@ -49,7 +49,5 @@ public class GameResourcePackageResource(GameResourcePackage gameResourcePackage
     [Required]
     public long KeyFullInstance { get; set; }
 
-    public LocaleFullInstancePrefix StringTableLocalePrefix { get; set; }
-
     public ICollection<GameStringTableEntry> StringTableEntries { get; } = [];
 }

@@ -49,8 +49,6 @@ public class ModFileResource(ModFileHash modFileHash)
     [Required]
     public long KeyFullInstance { get; set; }
 
-    public LocaleFullInstancePrefix StringTableLocalePrefix { get; set; }
-
     public ICollection<TopologySnapshot> TopologySnapshots { get; } = [];
 
     public ICollection<ModFileStringTableEntry> StringTableEntries { get; } = [];

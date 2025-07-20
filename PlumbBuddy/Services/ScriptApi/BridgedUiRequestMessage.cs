@@ -3,6 +3,7 @@ namespace PlumbBuddy.Services.ScriptApi;
 public class BridgedUiRequestMessage
 {
     public string? HostName { get; set; }
+    public IList<BridgedUiRequestMessageLayer>? Layers { get; set; }
     public required string RequestorName { get; set; }
     public required string RequestReason { get; set; }
     public string? ScriptMod { get; set; }

@@ -1,4 +1,3 @@
-using AngleSharp.Io;
 using SQLitePCL;
 using Serializer = ProtoBuf.Serializer;
 
@@ -9,6 +8,8 @@ namespace PlumbBuddy.Services;
 public partial class ProxyHost :
     IProxyHost
 {
+    record ProcessLookUpLocalizedStringsMessageQueryRecord(int SignedKey, byte Locale, string PackagePath, int KeyType, int KeyGroup, long KeyFullInstance);
+
     static readonly JsonSerializerOptions bridgedUiJsonSerializerOptions = AddConverters(new()
     {
         AllowOutOfOrderMetadataProperties = true,
@@ -24,6 +25,7 @@ public partial class ProxyHost :
         WriteIndented = false
     });
     static readonly TimeSpan oneQuarterSecond = TimeSpan.FromSeconds(0.25);
+    static readonly ReadOnlyMemory<byte> pngSignature = new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
     const int port = 7342;
     static readonly JsonSerializerOptions proxyJsonSerializerOptions = AddConverters(new()
     {
@@ -39,6 +41,7 @@ public partial class ProxyHost :
         RespectRequiredConstructorParameters = true,
         WriteIndented = false
     });
+    static readonly ReadOnlyMemory<byte> screenshotPngCustomChunkType = new byte[] { 0x70, 0x72, 0x4f, 0x50 }; // prOP
 
     static JsonSerializerOptions AddConverters(JsonSerializerOptions options)
     {
@@ -93,18 +96,20 @@ public partial class ProxyHost :
         }
     }
 
-    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager)
+    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IGameResourceCataloger gameResourceCataloger)
     {
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
+        ArgumentNullException.ThrowIfNull(gameResourceCataloger);
         this.platformFunctions = platformFunctions;
         this.logger = logger;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.appLifecycleManager = appLifecycleManager;
+        this.gameResourceCataloger = gameResourceCataloger;
         cancellationTokenSource = new();
         cancellationToken = cancellationTokenSource.Token;
         connectedClients = new();
@@ -135,10 +140,11 @@ public partial class ProxyHost :
     readonly ConcurrentDictionary<TcpClient, AsyncLock> connectedClients;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
+    readonly IGameResourceCataloger gameResourceCataloger;
     bool isBridgedUiDevelopmentModeEnabled;
     bool isClientConnected;
     readonly TcpListener listener;
-    readonly ConcurrentDictionary<Guid, ZipFile?> loadedBridgedUis;
+    readonly ConcurrentDictionary<Guid, IReadOnlyList<ZipFile>> loadedBridgedUis;
     readonly ILogger<ProxyHost> logger;
     AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
@@ -215,7 +221,7 @@ public partial class ProxyHost :
         });
     }
 
-    async Task<ZipFile?> CacheScriptModAsync(string modsDirectoryRelativePath, Guid uniqueId)
+    async Task<ZipFile?> CacheScriptModAsync(string modsDirectoryRelativePath, Guid uniqueId, int layerIndex)
     {
         var path = Path.Combine(settings.UserDataFolderPath, "Mods", modsDirectoryRelativePath);
         if (!File.Exists(path))
@@ -224,7 +230,7 @@ public partial class ProxyHost :
         var cachePath = Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs");
         if (!Directory.Exists(cachePath))
             Directory.CreateDirectory(cachePath);
-        cachePath = Path.Combine(cachePath, $"{uniqueId:n}.ts4script");
+        cachePath = Path.Combine(cachePath, $"{uniqueId:n}-{layerIndex}.ts4script");
         try
         {
             File.Copy(path, cachePath, true);
@@ -280,7 +286,7 @@ public partial class ProxyHost :
     async Task DestroyBridgedUiAsync(Guid uniqueId)
     {
         using var bridgedUiLoadingLockHeld = await bridgedUiLoadingLocks.GetOrAdd(uniqueId, _ => new()).LockAsync().ConfigureAwait(false);
-        if (!loadedBridgedUis.TryRemove(uniqueId, out var archive))
+        if (!loadedBridgedUis.TryRemove(uniqueId, out var archives))
             return;
         logger.LogDebug("I now take from bridged UI {UniqueId} its power, in the name of CodeBleu, and Scumbumbo before. I, PlumbBuddy, CAST YOU OFF!", uniqueId);
         BridgedUiDestroyed?.Invoke(this, new() { UniqueId = uniqueId });
@@ -294,12 +300,18 @@ public partial class ProxyHost :
             Type = nameof(HostMessageType.BridgedUiDestroyed).Camelize(),
             UniqueId = uniqueId
         });
-        archive?.Close();
-        if (archive is IDisposable disposableArchive)
-            disposableArchive.Dispose();
+        foreach (var achive in archives)
+        {
+            achive.Close();
+            if (achive is IDisposable disposableArchive)
+                disposableArchive.Dispose();
+        }
         var cacheDirectory = await GetCacheDirectoryAsync().ConfigureAwait(false);
-        var cachedArchive = new FileInfo(Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs", $"{uniqueId:n}.ts4script"));
-        if (cachedArchive.Exists)
+        var uiBridgeTabIconDirectory = new DirectoryInfo(Path.Combine(cacheDirectory.FullName, "UI Bridge Icons", $"{uniqueId:n}"));
+        if (uiBridgeTabIconDirectory.Exists)
+            uiBridgeTabIconDirectory.Delete(true);
+        var uiBridgeTabsDirectory = new DirectoryInfo(Path.Combine(cacheDirectory.FullName, "UI Bridge Tabs"));
+        foreach (var cachedArchive in uiBridgeTabsDirectory.GetFiles($"{uniqueId:n}-*.ts4script"))
             cachedArchive.Delete();
     }
 
@@ -563,6 +575,71 @@ public partial class ProxyHost :
         }
     }
 
+    async Task<(int denialReason, ZipFile? archive)> InitializeUiLayerAsync(string? scriptMod, string uiRoot, Guid uniqueId, int layerIndex)
+    {
+        if (isBridgedUiDevelopmentModeEnabled
+            && (Directory.Exists(uiRoot)
+            || Uri.TryCreate(uiRoot, UriKind.Absolute, out _)))
+            return (BridgedUiRequestResponseMessage.DenialReason_None, null);
+        if (scriptMod?.StartsWith(settings.UserDataFolderPath) ?? false)
+            scriptMod = scriptMod[settings.UserDataFolderPath.Length..];
+        if (scriptMod?.StartsWith(Path.DirectorySeparatorChar) ?? false)
+            scriptMod = scriptMod[1..];
+        if (scriptMod?.StartsWith($"Mods{Path.DirectorySeparatorChar}") ?? false)
+            scriptMod = scriptMod[5..];
+        if (scriptMod?.IndexOf(".ts4script", StringComparison.OrdinalIgnoreCase) is { } extensionIndex
+            && extensionIndex >= 0)
+            scriptMod = scriptMod[..(extensionIndex + 10)];
+        if (scriptMod is not null
+            && File.Exists(scriptMod))
+        {
+            // nice try escaping from the Mods folder, but nope
+            return (BridgedUiRequestResponseMessage.DenialReason_ScriptModNotFound, null);
+        }
+        if (scriptMod is not null
+            && GetSha256HashHexPattern().Match(scriptMod) is { } scriptModManifestHashHexMatch
+            && scriptModManifestHashHexMatch.Success)
+        {
+            var scriptModManifestHash = scriptModManifestHashHexMatch.Value.ToByteSequence().ToArray();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            if (await pbDbContext.ModFiles.Where
+                (
+                    mf =>
+                           mf.FileType == ModsDirectoryFileType.ScriptArchive
+                        && mf.ModFileHash.ModFileManifests.Any
+                        (
+                            mfm =>
+                                   mfm.CalculatedModFileManifestHash.Sha256 == scriptModManifestHash
+                                || mfm.SubsumedHashes.Any(sh => sh.Sha256 == scriptModManifestHash)
+                        )
+                )
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false) is { } manifestedScriptMod)
+                scriptMod = manifestedScriptMod.Path;
+        }
+        ZipFile? archive = null;
+#pragma warning disable CA2000 // Dispose objects before losing scope
+        try
+        {
+            archive = !string.IsNullOrWhiteSpace(scriptMod)
+                ? await CacheScriptModAsync(scriptMod, uniqueId, layerIndex).ConfigureAwait(false)
+                : null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "failed to cache script mod while preparing bridged UI {UniqueId}, Layer {LayerIndex} from {Path}", uniqueId, layerIndex, scriptMod);
+        }
+#pragma warning restore CA2000 // Dispose objects before losing scope
+        if (archive is null)
+            return (BridgedUiRequestResponseMessage.DenialReason_ScriptModNotFound, null);
+        if (layerIndex is 0 && archive.GetEntry(Path.Combine([.. new string[] { uiRoot, "index.html" }.Where(segment => !string.IsNullOrWhiteSpace(segment))]).Replace("\\", "/", StringComparison.Ordinal)) is null)
+        {
+            ((IDisposable)archive).Dispose();
+            return (BridgedUiRequestResponseMessage.DenialReason_IndexNotFound, null);
+        }
+        return (BridgedUiRequestResponseMessage.DenialReason_None, archive);
+    }
+
     async Task ListenAsync()
     {
         try
@@ -636,75 +713,24 @@ public partial class ProxyHost :
             await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_None).ConfigureAwait(false);
             return;
         }
-        if (isBridgedUiDevelopmentModeEnabled
-            && (Directory.Exists(requestMessage.UiRoot)
-            || Uri.TryCreate(requestMessage.UiRoot, UriKind.Absolute, out _)))
+        var layers = new List<(ZipFile? archive, string uiRoot)>();
+        var layerIndex = requestMessage.Layers?.Count ?? 0;
+        foreach (var requestedLayer in requestMessage.Layers ?? Enumerable.Empty<BridgedUiRequestMessageLayer>())
         {
-            PromptPlayerForBridgedUiAuthorization(requestMessage);
+            var (layerDenialReason, layerArchive) = await InitializeUiLayerAsync(requestedLayer.ScriptMod, requestedLayer.UiRoot, requestMessage.UniqueId, layerIndex--).ConfigureAwait(false);
+            if (layerDenialReason != BridgedUiRequestResponseMessage.DenialReason_None)
+            {
+                await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, layerDenialReason).ConfigureAwait(false);
+                return;
+            }
+        }
+        var (denialReason, archive) = await InitializeUiLayerAsync(requestMessage.ScriptMod, requestMessage.UiRoot, requestMessage.UniqueId, 0).ConfigureAwait(false);
+        if (denialReason != BridgedUiRequestResponseMessage.DenialReason_None)
+        {
+            await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, denialReason).ConfigureAwait(false);
             return;
         }
-        var scriptMod = requestMessage.ScriptMod;
-        if (scriptMod?.StartsWith(settings.UserDataFolderPath) ?? false)
-            scriptMod = scriptMod[settings.UserDataFolderPath.Length..];
-        if (scriptMod?.StartsWith(Path.DirectorySeparatorChar) ?? false)
-            scriptMod = scriptMod[1..];
-        if (scriptMod?.StartsWith($"Mods{Path.DirectorySeparatorChar}") ?? false)
-            scriptMod = scriptMod[5..];
-        if (scriptMod?.IndexOf(".ts4script", StringComparison.OrdinalIgnoreCase) is { } extensionIndex
-            && extensionIndex >= 0)
-            scriptMod = scriptMod[..(extensionIndex + 10)];
-        if (scriptMod is not null
-            && File.Exists(scriptMod))
-        {
-            // nice try escaping from the Mods folder, but nope
-            await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_ScriptModNotFound).ConfigureAwait(false);
-            return;
-        }
-        if (scriptMod is not null
-            && GetSha256HashHexPattern().Match(scriptMod) is { } scriptModManifestHashHexMatch
-            && scriptModManifestHashHexMatch.Success)
-        {
-            var scriptModManifestHash = scriptModManifestHashHexMatch.Value.ToByteSequence().ToArray();
-            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            if (await pbDbContext.ModFiles.Where
-                (
-                    mf =>
-                           mf.FileType == ModsDirectoryFileType.ScriptArchive
-                        && mf.ModFileHash.ModFileManifests.Any
-                        (
-                            mfm =>
-                                   mfm.CalculatedModFileManifestHash.Sha256 == scriptModManifestHash
-                                || mfm.SubsumedHashes.Any(sh => sh.Sha256 == scriptModManifestHash)
-                        )
-                )
-                .FirstOrDefaultAsync()
-                .ConfigureAwait(false) is { } manifestedScriptMod)
-                scriptMod = manifestedScriptMod.Path;
-        }
-        ZipFile? archive = null;
-#pragma warning disable CA2000 // Dispose objects before losing scope
-        try
-        {
-            archive = !string.IsNullOrWhiteSpace(scriptMod)
-                ? await CacheScriptModAsync(scriptMod, requestMessage.UniqueId).ConfigureAwait(false)
-                : null;
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "failed to cache script mod while preparing bridged UI {UniqueId} from {Path}", requestMessage.UniqueId, scriptMod);
-        }
-#pragma warning restore CA2000 // Dispose objects before losing scope
-        if (archive is null)
-        {
-            await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_ScriptModNotFound).ConfigureAwait(false);
-            return;
-        }
-        if (archive.GetEntry(Path.Combine([..new string[] { requestMessage.UiRoot, "index.html" }.Where(segment => !string.IsNullOrWhiteSpace(segment))]).Replace("\\", "/", StringComparison.Ordinal)) is null)
-        {
-            await BridgedUiRequestResolvedAsync(requestMessage.UniqueId, BridgedUiRequestResponseMessage.DenialReason_IndexNotFound).ConfigureAwait(false);
-            return;
-        }
-        PromptPlayerForBridgedUiAuthorization(requestMessage, archive);
+        PromptPlayerForBridgedUiAuthorization(requestMessage, archive, layers.AsReadOnly());
     }
 
     async Task ProcessLookUpLocalizedStringsMessageAsync(LookUpLocalizedStringsMessage lookUpLocalizedStringsMessage, Guid? fromBridgedUiUniqueId = null)
@@ -716,113 +742,13 @@ public partial class ProxyHost :
                 ? nameof(HostMessageType.LookUpLocalizedStringsResponse).Underscore().ToLowerInvariant()
                 : nameof(HostMessageType.LookUpLocalizedStringsResponse).Camelize()
         };
-        if (lookUpLocalizedStringsMessage.LocKeys.Any())
-        {
-            var queryParts = new List<string>()
+        foreach (var (locale, locKey, value) in await gameResourceCataloger.GetLocalizedStringsAsync(lookUpLocalizedStringsMessage.LocKeys, lookUpLocalizedStringsMessage.Locales).ConfigureAwait(false))
+            response.Entries.Add(new()
             {
-                $"""
-                WITH AllStringTableEntries AS (
-                	SELECT
-                		2 Classification,
-                		mf.Path PackagePath,
-                		mfr.StringTableLocalePrefix Locale,
-                		mfr.KeyType,
-                		mfr.KeyGroup,
-                		mfr.KeyFullInstance,
-                		mfste.SignedKey
-                	FROM
-                		ModFileStringTableEntries mfste
-                		JOIN ModFileResources mfr ON mfr.Id = mfste.ModFileResourceId
-                		JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
-                		JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
-                	WHERE
-                		mf.Path IS NOT NULL
-                		AND mf.FileType = 1
-                	UNION
-                	SELECT
-                		grp.IsDelta Classification,
-                		grp.Path PackagePath,
-                		grpr.StringTableLocalePrefix Locale,
-                		grpr.KeyType,
-                		grpr.KeyGroup,
-                		grpr.KeyFullInstance,
-                		gste.SignedKey
-                	FROM
-                		GameResourcePackages grp
-                		JOIN GameResourcePackageResources grpr ON grpr.GameResourcePackageId = grp.Id
-                		JOIN GameStringTableEntries gste ON gste.GameResourcePackageResourceId = grpr.Id
-                	ORDER BY
-                		1 DESC,
-                		2 COLLATE {platformFunctions.FileSystemSQliteCollation}	
-                )
-                SELECT DISTINCT
-                	SignedKey,
-                	Locale,
-                	FIRST_VALUE(PackagePath) OVER (PARTITION BY Locale, SignedKey) PackagePath,
-                	FIRST_VALUE(KeyType) OVER (PARTITION BY Locale, SignedKey) KeyType,
-                	FIRST_VALUE(KeyGroup) OVER (PARTITION BY Locale, SignedKey) KeyGroup,
-                	FIRST_VALUE(KeyFullInstance) OVER (PARTITION BY Locale, SignedKey) KeyFullInstance
-                FROM
-                	AllStringTableEntries
-                WHERE
-                    SignedKey IN ({string.Join(", ", lookUpLocalizedStringsMessage.LocKeys.Select(locKey => unchecked((int)locKey)))})
-                """
-            };
-            if (lookUpLocalizedStringsMessage.Locales.Any())
-                queryParts.Add
-                (
-                    $"""
-                        AND Locale IN ({string.Join(", ", lookUpLocalizedStringsMessage.Locales)})
-                    """
-                );
-            var lastPackagePath = string.Empty;
-            DataBasePackedFile? dbpf = null;
-            ResourceKey lastStblKey = default;
-            StringTableModel? stbl = null;
-            try
-            {
-                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                await foreach (var (signedKey, locale, packagePath, keyType, keyGroup, keyFullInsance) in pbDbContext.Database.SqlQueryRaw<ProcessLookUpLocalizedStringsMessageQueryRecord>(string.Join("\n", queryParts)).AsAsyncEnumerable().ConfigureAwait(false))
-                {
-                    if (lastPackagePath != packagePath)
-                    {
-                        if (dbpf is not null)
-                        {
-                            stbl = null;
-                            await dbpf.DisposeAsync().ConfigureAwait(false);
-                            dbpf = null;
-                        }
-                        var packageFile = new FileInfo(File.Exists(packagePath) ? packagePath : Path.Combine(settings.UserDataFolderPath, "Mods", packagePath));
-                        if (packageFile.Exists)
-                            dbpf = await DataBasePackedFile.FromPathAsync(Path.Combine(settings.UserDataFolderPath, "Mods", packagePath)).ConfigureAwait(false);
-                        lastPackagePath = packagePath;
-                    }
-                    var stblKey = new ResourceKey(unchecked((ResourceType)(uint)keyType), unchecked((uint)keyGroup), unchecked((ulong)keyFullInsance));
-                    if (dbpf is not null && (stbl is null || stblKey != lastStblKey))
-                    {
-                        stbl = await dbpf!.GetStringTableAsync(stblKey).ConfigureAwait(false);
-                        lastStblKey = stblKey;
-                    }
-                    var locKey = unchecked((uint)signedKey);
-                    if (stbl is not null && stbl[locKey] is { } value && !string.IsNullOrWhiteSpace(value))
-                        response.Entries.Add(new LookUpLocalizedStringsResponseEntry
-                        {
-                            Locale = locale,
-                            LocKey = locKey,
-                            Value = value
-                        });
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "unhandled exception");
-            }
-            finally
-            {
-                if (dbpf is not null)
-                    await dbpf.DisposeAsync().ConfigureAwait(false);
-            }
-        }
+                Locale = locale,
+                LocKey = locKey,
+                Value = value
+            });
         if (fromBridgedUiUniqueId is null)
             await SendMessageToProxyAsync(response).ConfigureAwait(false);
         else
@@ -944,7 +870,8 @@ public partial class ProxyHost :
                 var screenshotsFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots"));
                 if (screenshotsFolder.Exists)
                     foreach (var pngFile in screenshotsFolder.GetFiles("*.png", SearchOption.TopDirectoryOnly))
-                        listScreenshotsResponseMessage.Screenshots.Add(new()
+                    {
+                        var screenshot = new ListScreenshotsResponseMessageScreenshot
                         {
                             Attributes = pngFile.Attributes,
                             CreationTime = pngFile.CreationTime,
@@ -956,7 +883,77 @@ public partial class ProxyHost :
                             Name = pngFile.Name,
                             Size = pngFile.Length,
                             UnixFileMode = pngFile.UnixFileMode
-                        });
+                        };
+                        using (var pngFileStream = pngFile.OpenRead())
+                        {
+                            var signatureArray = ArrayPool<byte>.Shared.Rent(8);
+                            var uintArray = ArrayPool<byte>.Shared.Rent(4);
+                            var ushortArray = ArrayPool<byte>.Shared.Rent(2);
+                            try
+                            {
+                                Memory<byte> signatureMemory = signatureArray;
+                                Memory<byte> uintMemory = uintArray;
+                                Memory<byte> ushortMemory = ushortArray;
+                                await pngFileStream.ReadExactlyAsync(signatureMemory[..8]).ConfigureAwait(false);
+                                if (signatureMemory[..8].Span.SequenceEqual(pngSignature.Span))
+                                    while (pngFileStream.Position < pngFileStream.Length)
+                                    {
+                                        await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
+                                        var chunkLength = MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
+                                        chunkLength = BinaryPrimitives.ReverseEndianness(chunkLength);
+                                        await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
+                                        if (!uintMemory.Span[..4].SequenceEqual(screenshotPngCustomChunkType.Span))
+                                        {
+                                            pngFileStream.Seek(chunkLength + 4, SeekOrigin.Current);
+                                            continue;
+                                        }
+                                        await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
+                                        screenshot.MetadataVersion = MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
+                                        await pngFileStream.ReadExactlyAsync(ushortMemory[..2]).ConfigureAwait(false);
+                                        var keyValuePairs = MemoryMarshal.Read<ushort>(ushortMemory.Span[..2]);
+                                        while (keyValuePairs-- > 0)
+                                        {
+                                            string key, value;
+                                            await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
+                                            var keyLength = (int)MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
+                                            var keyArray = ArrayPool<byte>.Shared.Rent(keyLength);
+                                            try
+                                            {
+                                                Memory<byte> keyMemory = keyArray;
+                                                await pngFileStream.ReadExactlyAsync(keyMemory[..keyLength]).ConfigureAwait(false);
+                                                key = Encoding.UTF8.GetString(keyMemory.Span[..keyLength]);
+                                            }
+                                            finally
+                                            {
+                                                ArrayPool<byte>.Shared.Return(keyArray);
+                                            }
+                                            await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
+                                            var valueLength = (int)MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
+                                            var valueArray = ArrayPool<byte>.Shared.Rent(valueLength);
+                                            try
+                                            {
+                                                Memory<byte> valueMemory = valueArray;
+                                                await pngFileStream.ReadExactlyAsync(valueMemory[..valueLength]).ConfigureAwait(false);
+                                                value = Encoding.UTF8.GetString(valueMemory.Span[..valueLength]);
+                                            }
+                                            finally
+                                            {
+                                                ArrayPool<byte>.Shared.Return(valueArray);
+                                            }
+                                            screenshot.Metadata.Add(key, value);
+                                        }
+                                        break;
+                                    }
+                            }
+                            finally
+                            {
+                                ArrayPool<byte>.Shared.Return(signatureArray);
+                                ArrayPool<byte>.Shared.Return(uintArray);
+                                ArrayPool<byte>.Shared.Return(ushortArray);
+                            }
+                        }
+                        listScreenshotsResponseMessage.Screenshots.Add(screenshot);
+                    }
                 SpecificBridgedUiMessageSent?.Invoke(this, new()
                 {
                     UniqueId = bridgedUiRequestingScreenshotsList,
@@ -1293,7 +1290,7 @@ public partial class ProxyHost :
         SendMessageToBridgedUis(bridgedUiResults);
     }
 
-    void PromptPlayerForBridgedUiAuthorization(BridgedUiRequestMessage request, ZipFile? archive = null)
+    void PromptPlayerForBridgedUiAuthorization(BridgedUiRequestMessage request, ZipFile? archive, IReadOnlyList<(ZipFile? archive, string uiRoot)> layers)
     {
         var playerResponseTaskCompletionSource = new TaskCompletionSource<bool>();
         BridgedUiRequested?.Invoke(this, new(playerResponseTaskCompletionSource)
@@ -1314,12 +1311,13 @@ public partial class ProxyHost :
                 await BridgedUiRequestResolvedAsync(request.UniqueId, BridgedUiRequestResponseMessage.DenialReason_PlayerDeniedRequest).ConfigureAwait(false);
                 return;
             }
-            loadedBridgedUis.AddOrUpdate(request.UniqueId, archive, (k, v) => v);
+            loadedBridgedUis.AddOrUpdate(request.UniqueId, layers.Select(t => t.archive).Where(archive => archive is not null).Cast<ZipFile>().Concat(archive is null ? [] : [archive]).ToList().AsReadOnly(), (k, v) => v);
             await BridgedUiRequestResolvedAsync(request.UniqueId, BridgedUiRequestResponseMessage.DenialReason_None).ConfigureAwait(false);
             BridgedUiAuthorized?.Invoke(this, new()
             {
                 Archive = archive,
                 HostName = request.HostName,
+                Layers = layers,
                 TabIconPath = request.TabIconPath,
                 TabName = request.TabName,
                 UiRoot = request.UiRoot,
@@ -1444,6 +1442,4 @@ public partial class ProxyHost :
         await withSqliteConnectionAsyncAction(connection).ConfigureAwait(false);
         await connection.CloseAsync().ConfigureAwait(false);
     }
-
-    record ProcessLookUpLocalizedStringsMessageQueryRecord(int SignedKey, byte Locale, string PackagePath, int KeyType, int KeyGroup, long KeyFullInstance);
 }

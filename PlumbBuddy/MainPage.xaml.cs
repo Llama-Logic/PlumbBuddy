@@ -97,10 +97,12 @@ public partial class MainPage :
                 settings,
                 lifetimeScope.Resolve<IUpdateManager>(),
                 proxyHost,
+                lifetimeScope.Resolve<IGameResourceCataloger>(),
                 e.Archive,
                 e.UiRoot,
                 e.UniqueId,
-                e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant()
+                e.HostName ?? e.UniqueId.ToString("n").ToLowerInvariant(),
+                e.Layers
             );
             var tab = new BottomTabItem
             {
