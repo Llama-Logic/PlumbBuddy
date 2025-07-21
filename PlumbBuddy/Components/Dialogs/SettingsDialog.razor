@@ -79,19 +79,6 @@
 						</MudSwitchM3>
 					</MudTooltip>
 				}
-				@if (Type is UserType.Creator)
-				{
-					<MudTooltip Arrow Color="Color.Tertiary" Text="@AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip">
-						<MudSwitchM3 @bind-Value="@AutomaticallyCatalogOnComposition" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.FileSign">
-							@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label)]
-						</MudSwitchM3>
-					</MudTooltip>
-					<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip)">
-						<MudSwitchM3 @bind-Value="@AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest" Color="Color.Tertiary" ThumbIcon="@MaterialDesignIcons.Normal.AutoMode">
-							@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label)]
-						</MudSwitchM3>
-					</MudTooltip>
-				}
 			</MudStack>
 		</MudTabPanel>
 		<MudTabPanel Text="@StringLocalizer[nameof(AppText.OnboardingDialog_Theme_Label)]" Icon="@MaterialDesignIcons.Normal.ThemeLightDark">

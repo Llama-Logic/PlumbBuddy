@@ -3,6 +3,7 @@ namespace PlumbBuddy.Services.ScriptApi;
 public class BridgedUiRequestMessage
 {
     public string? HostName { get; set; }
+    [SuppressMessage("Usage", "CA2227: Collection properties should be read only")]
     public IList<BridgedUiRequestMessageLayer>? Layers { get; set; }
     public required string RequestorName { get; set; }
     public required string RequestReason { get; set; }

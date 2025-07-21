@@ -6,9 +6,7 @@ public interface ISettings :
     string ArchiveFolderPath { get; set; }
     bool ArchivistEnabled { get; set; }
     bool ArchivistAutoIngestSaves { get; set; }
-    bool AutomaticallyCatalogOnComposition { get; set; }
     bool AutomaticallyCheckForUpdates { get; set; }
-    bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
     string DefaultCreatorsList { get; set; }
     bool DevToolsUnlocked { get; set; }

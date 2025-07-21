@@ -47,18 +47,6 @@ class Settings :
         }
     }
 
-    public bool AutomaticallyCatalogOnComposition
-    {
-        get => preferences.Get(nameof(AutomaticallyCatalogOnComposition), true);
-        set
-        {
-            if (AutomaticallyCatalogOnComposition == value)
-                return;
-            preferences.Set(nameof(AutomaticallyCatalogOnComposition), value);
-            OnPropertyChanged();
-        }
-    }
-
     public bool AutomaticallyCheckForUpdates
     {
         get => preferences.Get(nameof(AutomaticallyCheckForUpdates), false);
@@ -67,18 +55,6 @@ class Settings :
             if (AutomaticallyCheckForUpdates == value)
                 return;
             preferences.Set(nameof(AutomaticallyCheckForUpdates), value);
-            OnPropertyChanged();
-        }
-    }
-
-    public bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest
-    {
-        get => preferences.Get(nameof(AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest), true);
-        set
-        {
-            if (AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest == value)
-                return;
-            preferences.Set(nameof(AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest), value);
             OnPropertyChanged();
         }
     }

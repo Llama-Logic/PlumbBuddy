@@ -22,11 +22,7 @@ partial class SettingsDialog
 
     string ArchiveFolderPath { get; set; } = string.Empty;
 
-    bool AutomaticallyCatalogOnComposition { get; set; }
-
     bool AutomaticallyCheckForUpdates { get; set; }
-
-    bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest { get; set; }
 
     string DownloadsFolderPath { get; set; } = string.Empty;
 
@@ -201,9 +197,7 @@ partial class SettingsDialog
     {
         await base.OnParametersSetAsync();
         originalUiZoom = Settings.UiZoom;
-        AutomaticallyCatalogOnComposition = Settings.AutomaticallyCatalogOnComposition;
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
-        AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
         ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
         modHoundExcludePackagesMode = Settings.ModHoundExcludePackagesMode;
@@ -255,9 +249,7 @@ partial class SettingsDialog
         if (modHoundPackagesExclusionsChipSetField is not null)
             await modHoundPackagesExclusionsChipSetField.CommitPendingEntryIfEmptyAsync();
         Settings.ArchiveFolderPath = ArchiveFolderPath;
-        Settings.AutomaticallyCatalogOnComposition = AutomaticallyCatalogOnComposition;
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
-        Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;

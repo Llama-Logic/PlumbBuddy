@@ -3281,18 +3281,6 @@ The missing key hashes are:
   <data name="SettingsDialog_ModHound_PackagesExcluded_Label" xml:space="preserve">
     <value>Packages Excluded</value>
   </data>
-  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip" xml:space="preserve">
-    <value>This ensures there's a record of mods you manifest in my database even if you're not manifesting them from within your own Mods folder.</value>
-  </data>
-  <data name="OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label" xml:space="preserve">
-    <value>Automatically catalog mod manifests when composition succeeds</value>
-  </data>
-  <data name="OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip" xml:space="preserve">
-    <value>If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I'll assume it's a new version of the same mod and incoporate the previous versions' hashes to preserve referential backward compatibility.</value>
-  </data>
-  <data name="OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label" xml:space="preserve">
-    <value>Automatically subsume identically credited single-file mods when initializing a manifest</value>
-  </data>
   <data name="ModHoundClient_Snack_Error_RequestServiceTimeoutExceeded" xml:space="preserve">
     <value>I cancelled your Mod Hound report request because it had been running for {0}. It may be that Mod Hound is experiencing service availability issues at the moment. Please try your request again later.</value>
     <comment>{0} = The amount of time the request had been running</comment>

@@ -575,6 +575,7 @@ public partial class ProxyHost :
         }
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task<(int denialReason, ZipFile? archive)> InitializeUiLayerAsync(string? scriptMod, string uiRoot, Guid uniqueId, int layerIndex)
     {
         if (isBridgedUiDevelopmentModeEnabled

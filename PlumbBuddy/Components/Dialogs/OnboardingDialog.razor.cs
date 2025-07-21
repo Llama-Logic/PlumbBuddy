@@ -16,22 +16,10 @@ partial class OnboardingDialog
         set => Settings.ArchiveFolderPath = value;
     }
 
-    bool AutomaticallyCatalogOnComposition
-    {
-        get => Settings.AutomaticallyCatalogOnComposition;
-        set => Settings.AutomaticallyCatalogOnComposition = value;
-    }
-
     bool AutomaticallyCheckForUpdates
     {
         get => Settings.AutomaticallyCheckForUpdates;
         set => Settings.AutomaticallyCheckForUpdates = value;
-    }
-
-    bool AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest
-    {
-        get => Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest;
-        set => Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest = value;
     }
 
     string DownloadsFolderPath

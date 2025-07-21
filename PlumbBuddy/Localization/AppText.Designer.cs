@@ -5211,24 +5211,6 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Automatically catalog mod manifests when composition succeeds.
-        /// </summary>
-        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label {
-            get {
-                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Label", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This ensures there&apos;s a record of mods you manifest in my database even if you&apos;re not manifesting them from within your own Mods folder..
-        /// </summary>
-        internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip {
-            get {
-                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCatalogOnComposition_Tip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Automatically check for updates.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label {
@@ -5243,26 +5225,6 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip {
             get {
                 return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Tip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Automatically subsume identically credited single-file mods when initializing a manifest.
-        /// </summary>
-        internal static string OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Label {
-            get {
-                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileMods" +
-                        "WhenInitializingAManifest_Label", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to If you happen to create a new manifest for a single-file mod with the exact same name and list of creators, I&apos;ll assume it&apos;s a new version of the same mod and incoporate the previous versions&apos; hashes to preserve referential backward compatibility..
-        /// </summary>
-        internal static string OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest_Tip {
-            get {
-                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AutomaticallySubsumeIdenticallyCreditedSingleFileMods" +
-                        "WhenInitializingAManifest_Tip", resourceCulture);
             }
         }
         

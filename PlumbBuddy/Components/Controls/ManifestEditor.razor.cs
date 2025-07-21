@@ -515,31 +515,6 @@ partial class ManifestEditor
                     addTransformedCollectionElements(model.Translators, component.Translators, t => new ModFileManifestModelTranslator { Name = t.name, Culture = t.language });
                     componentManifests.Add(component, model);
                 }
-                if (Settings.AutomaticallySubsumeIdenticallyCreditedSingleFileModsWhenInitializingAManifest
-                    && components.Count is 1
-                    && components[0] is { } singleComponent
-                    && !singleComponent.IsManifestPreExisting
-                    && componentManifests[singleComponent] is { } manifest)
-                {
-                    var subsumedHashes = new HashSet<ImmutableArray<byte>>(manifest.SubsumedHashes, ImmutableArrayEqualityComparer<byte>.Default);
-                    var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                    await foreach (var dbManifest in pbDbContext.ModFileManifests
-                        .Where(mfm => mfm.Name == manifest.Name)
-                        .Include(mfm => mfm.Creators)
-                        .Include(mfm => mfm.CalculatedModFileManifestHash)
-                        .Include(mfm => mfm.SubsumedHashes)
-                        .AsAsyncEnumerable()
-                        .ConfigureAwait(false))
-                    {
-                        if (dbManifest.Creators.Any(c => !manifest.Creators.Contains(c.Name)))
-                            continue;
-                        subsumedHashes.Add([..dbManifest.CalculatedModFileManifestHash.Sha256]);
-                        subsumedHashes.UnionWith(dbManifest.SubsumedHashes.Select(sh => sh.Sha256.ToImmutableArray()));
-                    }
-                    subsumedHashes.Remove(manifest.Hash);
-                    manifest.SubsumedHashes.Clear();
-                    manifest.SubsumedHashes.UnionWith(subsumedHashes);
-                }
             }
             catch (Exception ex)
             {
@@ -618,14 +593,6 @@ partial class ManifestEditor
                         else
                             throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                         component.FileObjectModel.Dispose();
-                        if (Settings.AutomaticallyCatalogOnComposition)
-                        {
-                            var hash = await ModFileManifestModel.GetFileSha256HashAsync(component.File.FullName).ConfigureAwait(false);
-                            using var pbDbContext = await PbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                            var (modFileHash, _) = await ModsDirectoryCataloger.GetModFileHashAsync(pbDbContext, fileType, hash).ConfigureAwait(false);
-                            await ModsDirectoryCataloger.CatalogResourcesAndManifestsAsync(Logger, pbDbContext, component.File, modFileHash, fileType).ConfigureAwait(false);
-                            await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-                        }
                     }
                 if (versionEnabled && !string.IsNullOrWhiteSpace(version) && !string.IsNullOrEmpty(originalVersion))
                     foreach (var component in components)
