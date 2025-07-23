@@ -10,7 +10,10 @@ public partial class GameResourceCataloger :
     [GeneratedRegex(@"^[EFGS]P\d{2}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetPackDirectoryNamePattern();
 
-    static readonly ImmutableHashSet<ResourceType> typesCataloged = [ResourceType.StringTable];
+    static readonly ImmutableDictionary<ResourceType, ResourceFileType?> resourceFileTypeByResourceType = Enum
+        .GetValues<ResourceType>()
+        .ToImmutableDictionary(resourceType => resourceType, resourceType => typeof(ResourceType).GetMember(resourceType.ToString()).FirstOrDefault()?.GetCustomAttribute<ResourceFileTypeAttribute>()?.ResourceFileType);
+    static readonly ImmutableHashSet<ResourceType> typesCataloged = [ResourceType.DSTImage, ResourceType.StringTable];
 
     public GameResourceCataloger(ILogger<GameResourceCataloger> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger)
     {
@@ -48,6 +51,14 @@ public partial class GameResourceCataloger :
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public async Task<ReadOnlyMemory<byte>> GetDirectDrawSurfaceAsPngAsync(ResourceKey key)
+    {
+        if (resourceFileTypeByResourceType.TryGetValue(key.Type, out var resourceFileType)
+            && resourceFileType is ResourceFileType.DirectDrawSurfaceAsPortableNetworkGraphic)
+            key = new(ResourceType.DSTImage, key.Group, key.FullInstance);
+        return await DirectDrawSurface.GetPngDataFromDiffuseSurfaceTextureDataAsync(await GetRawResourceAsync(key).ConfigureAwait(false)).ConfigureAwait(false);
+    }
 
     public async Task<IReadOnlyList<(byte locale, uint locKey, string value)>> GetLocalizedStringsAsync(IEnumerable<uint> locKeys, IEnumerable<byte> locales)
     {
@@ -239,11 +250,11 @@ public partial class GameResourceCataloger :
             PackageExaminationsRemaining = -1;
             var installationDirectory = new DirectoryInfo(settings.InstallationFolderPath);
             var resourcePackagesOnDisk = new Dictionary<string, (FileInfo file, bool isDelta)>(platformFunctions.FileSystemStringComparer);
-            foreach (var clientPackageFile in platformFunctions.GetClientDirectory(installationDirectory).GetFiles("Strings_*.package", SearchOption.TopDirectoryOnly))
+            foreach (var clientPackageFile in platformFunctions.GetClientDirectory(installationDirectory).GetFiles("*.package", SearchOption.TopDirectoryOnly))
                 resourcePackagesOnDisk.Add(clientPackageFile.FullName, (clientPackageFile, clientPackageFile.Name.Contains("Delta", StringComparison.OrdinalIgnoreCase)));
-            foreach (var deltaPackageFile in platformFunctions.GetDeltaDirectory(installationDirectory).GetFiles("Strings_*.package", SearchOption.AllDirectories))
+            foreach (var deltaPackageFile in platformFunctions.GetDeltaDirectory(installationDirectory).GetFiles("*.package", SearchOption.AllDirectories))
                 resourcePackagesOnDisk.Add(deltaPackageFile.FullName, (deltaPackageFile, true));
-            foreach (var packDirectory in platformFunctions.GetPacksDirectory(installationDirectory).GetDirectories("Strings_*.*", SearchOption.TopDirectoryOnly))
+            foreach (var packDirectory in platformFunctions.GetPacksDirectory(installationDirectory).GetDirectories("*.*", SearchOption.TopDirectoryOnly))
                 if (GetPackDirectoryNamePattern().IsMatch(packDirectory.Name))
                     foreach (var packPackageFile in packDirectory.GetFiles("*.package", SearchOption.TopDirectoryOnly))
                         resourcePackagesOnDisk.Add(packPackageFile.FullName, (packPackageFile, false));
@@ -263,18 +274,15 @@ public partial class GameResourceCataloger :
                 await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
                 var connection = new SqliteConnection(pbDbConnectionString);
                 await connection.OpenAsync().ConfigureAwait(false);
-                using var tx = (SqliteTransaction)await connection.BeginTransactionAsync().ConfigureAwait(false);
                 try
                 {
                     var packageId = 0L;
                     var packageCreated = DateTimeOffset.MinValue;
                     var packageLastWrite = DateTimeOffset.MinValue;
                     var packageSize = 0L;
-                    byte[]? packageSha256 = null;
                     using (var getGameResourcePackageCommand = connection.CreateCommand())
                     {
-                        getGameResourcePackageCommand.Transaction = tx;
-                        getGameResourcePackageCommand.CommandText = "SELECT Id, Creation, LastWrite, Size, Sha256 FROM GameResourcePackages WHERE Path = @path";
+                        getGameResourcePackageCommand.CommandText = "SELECT Id, Creation, LastWrite, Size FROM GameResourcePackages WHERE Path = @path";
                         getGameResourcePackageCommand.Parameters.AddWithValue("@path", file.FullName);
                         using var reader = await getGameResourcePackageCommand.ExecuteReaderAsync().ConfigureAwait(false);
                         if (await reader.ReadAsync().ConfigureAwait(false))
@@ -283,46 +291,30 @@ public partial class GameResourceCataloger :
                             packageCreated = DateTimeOffset.FromUnixTimeSeconds(reader.GetInt64(1));
                             packageLastWrite = DateTimeOffset.FromUnixTimeSeconds(reader.GetInt64(2));
                             packageSize = reader.GetInt64(3);
-                            packageSha256 = (byte[])reader.GetValue(4);
                         }
                     }
-                    AsyncLazy<ImmutableArray<byte>> sha256 = new(() => ModFileManifestModel.GetFileSha256HashAsync(file.FullName));
                     if (packageId is not 0)
                     {
                         if (packageCreated == file.CreationTimeUtc.TrimSeconds()
                             && packageLastWrite == file.LastWriteTimeUtc.TrimSeconds()
                             && packageSize == file.Length)
                             return;
-                        var wasFileContentsUnchanged = packageSha256 is not null && (await sha256.Task).SequenceEqual(packageSha256);
                         using var updatePackageCommand = connection.CreateCommand();
-                        updatePackageCommand.Transaction = tx;
-                        if (wasFileContentsUnchanged)
-                            updatePackageCommand.CommandText = "UPDATE GameResourcePackages SET Creation = @creation, LastWrite = @lastWrite, Size = @size WHERE Id = @id";
-                        else
-                        {
-                            updatePackageCommand.CommandText = "UPDATE GameResourcePackages SET Creation = @creation, LastWrite = @lastWrite, Size = @size, Sha256 = @sha256 WHERE Id = @id";
-                            var sha256ImmutableArray = await sha256.Task.ConfigureAwait(false);
-                            updatePackageCommand.Parameters.AddWithValue("@sha256", Unsafe.As<ImmutableArray<byte>, byte[]>(ref sha256ImmutableArray));
-                        }
+                        updatePackageCommand.CommandText = "UPDATE GameResourcePackages SET Creation = @creation, LastWrite = @lastWrite, Size = @size WHERE Id = @id";
                         updatePackageCommand.Parameters.AddWithValue("@creation", ((DateTimeOffset)file.CreationTimeUtc).ToUnixTimeSeconds());
                         updatePackageCommand.Parameters.AddWithValue("@lastWrite", ((DateTimeOffset)file.LastWriteTimeUtc).ToUnixTimeSeconds());
                         updatePackageCommand.Parameters.AddWithValue("@size", file.Length);
                         updatePackageCommand.Parameters.AddWithValue("@id", packageId);
                         await updatePackageCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
-                        if (wasFileContentsUnchanged)
-                            return;
                     }
                     else
                     {
-                        var sha256ImmutableArray = await sha256.Task.ConfigureAwait(false);
                         using var insertCommand = connection.CreateCommand();
-                        insertCommand.Transaction = tx;
-                        insertCommand.CommandText = "INSERT INTO GameResourcePackages (Creation, IsDelta, LastWrite, Path, Sha256, Size) VALUES (@creation, @isDelta, @lastWrite, @path, @sha256, @size); SELECT last_insert_rowid();";
+                        insertCommand.CommandText = "INSERT INTO GameResourcePackages (Creation, IsDelta, LastWrite, Path, Size) VALUES (@creation, @isDelta, @lastWrite, @path, @size); SELECT last_insert_rowid();";
                         insertCommand.Parameters.AddWithValue("@creation", ((DateTimeOffset)file.CreationTimeUtc).ToUnixTimeSeconds());
                         insertCommand.Parameters.AddWithValue("@isDelta", isDelta);
                         insertCommand.Parameters.AddWithValue("@lastWrite", ((DateTimeOffset)file.LastWriteTimeUtc).ToUnixTimeSeconds());
                         insertCommand.Parameters.AddWithValue("@path", file.FullName);
-                        insertCommand.Parameters.AddWithValue("@sha256", Unsafe.As<ImmutableArray<byte>, byte[]>(ref sha256ImmutableArray));
                         insertCommand.Parameters.AddWithValue("@size", file.Length);
                         if (await insertCommand.ExecuteScalarAsync().ConfigureAwait(false) is long nonNullLastInsertId)
                             packageId = nonNullLastInsertId;
@@ -332,7 +324,6 @@ public partial class GameResourceCataloger :
                     var catalogedResources = new Dictionary<ResourceKey, long>();
                     using (var getExistingResourceCommand = connection.CreateCommand())
                     {
-                        getExistingResourceCommand.Transaction = tx;
                         getExistingResourceCommand.CommandText = "SELECT KeyType, KeyGroup, KeyFullInstance, Id FROM GameResourcePackageResources WHERE GameResourcePackageId = @gameResourcePackageId";
                         getExistingResourceCommand.Parameters.AddWithValue("@gameResourcePackageId", packageId);
                         using var reader = await getExistingResourceCommand.ExecuteReaderAsync().ConfigureAwait(false);
@@ -346,7 +337,6 @@ public partial class GameResourceCataloger :
                         foreach (var noLongerExistingKeysChunk in noLongerExistingKeys.Chunk(800))
                         {
                             using var deleteResourcesCommand = connection.CreateCommand();
-                            deleteResourcesCommand.Transaction = tx;
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
                             deleteResourcesCommand.CommandText = $"DELETE FROM GameResourcePackageResources WHERE Id IN ({string.Join(", ", noLongerExistingKeysChunk.Select((key, index) =>
                             {
@@ -357,10 +347,9 @@ public partial class GameResourceCataloger :
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
                             await deleteResourcesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
                         }
-                    foreach (var resourceKeysChunk in resourceKeys.Chunk(160))
+                    foreach (var resourceKeysChunk in resourceKeys.Chunk(200))
                     {
                         using var replaceIntoCommand = connection.CreateCommand();
-                        replaceIntoCommand.Transaction = tx;
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
                         replaceIntoCommand.CommandText = $"INSERT INTO GameResourcePackageResources (GameResourcePackageId, KeyType, KeyGroup, KeyFullInstance) VALUES {string.Join(", ", resourceKeysChunk.Select((key, index) =>
                         {
@@ -379,8 +368,7 @@ public partial class GameResourceCataloger :
                         var stlbResourceId = 0L;
                         using (var getStblResourceIdCommand = connection.CreateCommand())
                         {
-                            getStblResourceIdCommand.CommandText = "SELECT Id From GameResourcePackageResources WHERE GameResourcePackageId = @gameResourcePackageId AND KeyType = @keyType AND KeyGroup = @keyGroup AND KeyFullInstance = @keyFullInstance";
-                            getStblResourceIdCommand.Transaction = tx;
+                            getStblResourceIdCommand.CommandText = "SELECT Id FROM GameResourcePackageResources WHERE GameResourcePackageId = @gameResourcePackageId AND KeyType = @keyType AND KeyGroup = @keyGroup AND KeyFullInstance = @keyFullInstance";
                             getStblResourceIdCommand.Parameters.AddWithValue("@gameResourcePackageId", packageId);
                             getStblResourceIdCommand.Parameters.AddWithValue("@keyType", unchecked((int)(uint)stblResourceKey.Type));
                             getStblResourceIdCommand.Parameters.AddWithValue("@keyGroup", unchecked((int)stblResourceKey.Group));
@@ -393,23 +381,21 @@ public partial class GameResourceCataloger :
                         var keys = stbl.KeyHashes.ToImmutableHashSet();
                         foreach (var keyHashesChunk in stbl.KeyHashes.Chunk(400))
                         {
-                            using var replaceIntoCommand = connection.CreateCommand();
-                            replaceIntoCommand.Transaction = tx;
+                            using var insertIntoCommand = connection.CreateCommand();
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-                            replaceIntoCommand.CommandText = $"INSERT INTO GameStringTableEntries (GameResourcePackageResourceId, SignedKey) VALUES {string.Join(", ", keyHashesChunk.Select((key, index) =>
+                            insertIntoCommand.CommandText = $"INSERT INTO GameStringTableEntries (GameResourcePackageResourceId, SignedKey) VALUES {string.Join(", ", keyHashesChunk.Select((key, index) =>
                             {
-                                replaceIntoCommand.Parameters.AddWithValue($"@r{index}", stlbResourceId);
-                                replaceIntoCommand.Parameters.AddWithValue($"@k{index}", unchecked((int)key));
+                                insertIntoCommand.Parameters.AddWithValue($"@r{index}", stlbResourceId);
+                                insertIntoCommand.Parameters.AddWithValue($"@k{index}", unchecked((int)key));
                                 return $"(@r{index}, @k{index})";
                             }))} ON CONFLICT DO NOTHING";
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
-                            await replaceIntoCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+                            await insertIntoCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
                         }
                     }
                 }
                 finally
                 {
-                    await tx.CommitAsync().ConfigureAwait(false);
                     Interlocked.Decrement(ref packageExaminationsRemaining);
                     OnPropertyChanged(nameof(PackageExaminationsRemaining));
                     semaphore.Release();

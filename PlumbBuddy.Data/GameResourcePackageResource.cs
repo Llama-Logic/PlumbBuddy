@@ -1,6 +1,7 @@
 namespace PlumbBuddy.Data;
 
 [Index(nameof(GameResourcePackageId), nameof(KeyType), nameof(KeyGroup), nameof(KeyFullInstance), IsUnique = true)]
+[Index(nameof(GameResourcePackageId))]
 public class GameResourcePackageResource(GameResourcePackage gameResourcePackage)
 {
     GameResourcePackageResource() :

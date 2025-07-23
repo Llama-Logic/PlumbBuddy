@@ -82,10 +82,6 @@ public class PbDbContext :
         modelBuilder.Entity<GameResourcePackage>()
             .Property(e => e.LastWrite)
             .HasConversion(dtoConverter);
-        modelBuilder.Entity<GameResourcePackage>()
-            .Property(e => e.Sha256)
-            .HasMaxLength(32)
-            .IsFixedLength(true);
         modelBuilder.Entity<ModFileHash>()
             .Property(e => e.Sha256)
             .HasMaxLength(32)

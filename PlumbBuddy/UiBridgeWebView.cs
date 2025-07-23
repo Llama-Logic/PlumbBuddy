@@ -74,6 +74,12 @@ public partial class UiBridgeWebView :
         if (entryName.StartsWith("game-environment/", StringComparison.OrdinalIgnoreCase))
         {
             entryName = entryName["game-environment/".Length..];
+            if (entryName.StartsWith("direct-draw-surfaces/", StringComparison.OrdinalIgnoreCase))
+            {
+                entryName = entryName["direct-draw-surfaces/".Length..];
+                var ddsAsPng = await gameResourceCataloger.GetDirectDrawSurfaceAsPngAsync(Uri.UnescapeDataString(entryName)).ConfigureAwait(false);
+                return (!ddsAsPng.IsEmpty, ddsAsPng, ddsAsPng.IsEmpty ? string.Empty : "image/png");
+            }
             if (entryName.StartsWith("resources/", StringComparison.OrdinalIgnoreCase))
             {
                 entryName = entryName["resources/".Length..];

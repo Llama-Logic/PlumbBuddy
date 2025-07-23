@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="LlamaLogic.Packages" Version="3.0.3" />
+        <PackageReference Include="LlamaLogic.Packages" Version="3.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
             <PrivateAssets>all</PrivateAssets>
@@ -15,10 +15,6 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
         <PackageReference Include="YamlDotNet" Version="16.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\LlamaLogic\LlamaLogic.Packages\LlamaLogic.Packages.csproj" />
     </ItemGroup>
 
 </Project>

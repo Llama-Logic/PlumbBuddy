@@ -5,16 +5,18 @@ namespace PlumbBuddy.Services;
 public sealed class UpdateManager :
     IUpdateManager
 {
-    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, ISettings settings, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public UpdateManager(ILogger<UpdateManager> logger, IPlatformFunctions platformFunctions, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         this.logger = logger;
         this.platformFunctions = platformFunctions;
         this.settings = settings;
+        this.pbDbContextFactory = pbDbContextFactory;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
         var mauiVersion = AppInfo.Version;
@@ -63,6 +65,18 @@ public sealed class UpdateManager :
                     this.logger.LogInformation("The existing Mods Directory Cataloger database has been deleted so that it will be rebuilt.");
                     superSnacks.OfferRefreshments(new MarkupString("Apologies for the inconvenience, but new features have been added which have invalidated my scan of your Mods folder, so I need to scan it again."), Severity.Info, options => options.Icon = MaterialDesignIcons.Normal.CogRefresh);
                 }
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 5 } or { Major: 1, Minor: 5, Build: < 30 })
+                    _ = Task.Run(async () =>
+                    {
+                        using var pbDbContext = await this.pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                        await pbDbContext.GameResourcePackages.ExecuteUpdateAsync
+                        (
+                            setters => setters
+                            .SetProperty(grp => grp.Creation, default(DateTimeOffset))
+                            .SetProperty(grp => grp.LastWrite, default(DateTimeOffset))
+                            .SetProperty(grp => grp.Size, default(long))
+                        ).ConfigureAwait(false);
+                    });
             }
             else
                 logger.LogInformation("This is the first time this installation is starting.");
@@ -73,6 +87,7 @@ public sealed class UpdateManager :
 
     readonly IBlazorFramework blazorFramework;
     readonly ILogger<UpdateManager> logger;
+    readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly ISettings settings;
     readonly ISuperSnacks superSnacks;
