@@ -3365,4 +3365,38 @@ More detailed technical information is available in my log.</value>
   <data name="UIBridge_Confirmation_Request_LaunchUI" xml:space="preserve">
     <value>Launch the UI</value>
   </data>
+  <data name="ManifestEditor_Requirements_AddRecommendedPack_Label" xml:space="preserve">
+    <value>Add Recommended Pack</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RemoveRecommendedPack_Label" xml:space="preserve">
+    <value>Remove Recommended Pack</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RecommendedPack_PackCode_Label" xml:space="preserve">
+    <value>Pack Code</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RecommendedPack_Pack_Label" xml:space="preserve">
+    <value>Pack</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RecommendedPack_Reason_Label" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ManifestEditor_Requirements_RecommendedPack_Reason_HelperText" xml:space="preserve">
+    <value>Tell the player while you're recommending this pack. What functionality will your mod offer if they install it?</value>
+  </data>
+  <data name="CatalogDisplay_RecommendedPack_Tip" xml:space="preserve">
+    <value>{0} has additional features which will be enabled if you install {1}.</value>
+    <comment>{0} = Mod Name; {1} = Recommended Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_RecommendedPack_Tip_CreatorReason" xml:space="preserve">
+    <value>According to {0}, if you were to install {1}, {2} will be enhanced:</value>
+    <comment>{0} = Creator Name; {1} = Recommended Pack Code; {2} = Mod Name</comment>
+  </data>
+  <data name="CatalogDisplay_RecommendedPack_Tip_Installed" xml:space="preserve">
+    <value>{0} has additional features which are enabled because you have installed {1}.</value>
+    <comment>{0} = Mod Name; {1} = Recommended Pack Code</comment>
+  </data>
+  <data name="CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason" xml:space="preserve">
+    <value>According to {0}, because you have installed {1}, {2} has been enhanced:</value>
+    <comment>{0} = Creator Name; {1} = Recommended Pack Code; {2} = Mod Name</comment>
+  </data>
 </root>

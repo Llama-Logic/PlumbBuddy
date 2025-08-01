@@ -837,6 +837,42 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} has additional features which will be enabled if you install {1}..
+        /// </summary>
+        internal static string CatalogDisplay_RecommendedPack_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RecommendedPack_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to According to {0}, if you were to install {1}, {2} will be enhanced:.
+        /// </summary>
+        internal static string CatalogDisplay_RecommendedPack_Tip_CreatorReason {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RecommendedPack_Tip_CreatorReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has additional features which are enabled because you have installed {1}..
+        /// </summary>
+        internal static string CatalogDisplay_RecommendedPack_Tip_Installed {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RecommendedPack_Tip_Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to According to {0}, because you have installed {1}, {2} has been enhanced:.
+        /// </summary>
+        internal static string CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} requires that {1} is installed. You do have {1} installed. This message is for information only. You do not need to make any changes..
         /// </summary>
         internal static string CatalogDisplay_RequiredPack_Installed_Tip {
@@ -3846,6 +3882,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Recommended Pack.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_AddRecommendedPack_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_AddRecommendedPack_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Required Mod....
         /// </summary>
         internal static string ManifestEditor_Requirements_AddRequiredMod_Label {
@@ -3943,6 +3988,51 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Requirements_PromoCode_Label {
             get {
                 return ResourceManager.GetString("ManifestEditor_Requirements_PromoCode_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pack.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RecommendedPack_Pack_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RecommendedPack_Pack_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pack Code.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RecommendedPack_PackCode_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RecommendedPack_PackCode_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tell the player while you&apos;re recommending this pack. What functionality will your mod offer if they install it?.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RecommendedPack_Reason_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RecommendedPack_Reason_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reason.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RecommendedPack_Reason_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RecommendedPack_Reason_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Recommended Pack.
+        /// </summary>
+        internal static string ManifestEditor_Requirements_RemoveRecommendedPack_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Requirements_RemoveRecommendedPack_Label", resourceCulture);
             }
         }
         

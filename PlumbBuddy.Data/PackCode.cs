@@ -9,6 +9,8 @@ public class PackCode
     [Required]
     public required string Code { get; set; }
 
+    public ICollection<RecommendedPack> RecommendedPacks { get; } = [];
+
     [InverseProperty(nameof(ModFileManifest.RequiredPacks))]
     public ICollection<ModFileManifest> RequiredByMods { get; } = [];
 

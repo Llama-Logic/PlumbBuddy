@@ -208,6 +208,128 @@ down-in-simsland:
       dark: Parlay.jpg
       light: Parlay.jpg
 
+# This is a unique key for your theme and should be in kebab case. see: https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
+frequently-basic:
+
+  # This will be displayed in the UI
+  display_name: Frequently Basic
+
+  # This is in Markdown, so it can include a link to your website or Patreon feed. see: https://www.markdownguide.org/
+  description: |
+    Find me on [Patreon](https://www.patreon.com/FrequentlyBasic)!
+
+  # This is how rounded the corners of surfaces are (minimum: 0px; maximum: 25px)
+  default_border_radius: 4px
+
+  # This must be Roboto, Montserrat, Segoe UI, or Ubuntu (unless you want to provide us with a font)
+  font: Montserrat
+  
+  # COLOR PALETTES
+  # Any of the colors from the palette may be ommitted if you are comfortable with the value from the factory-default theme
+  # Colors are represented in 32-bit hex RGBA: #RRGGBBAA
+
+  # If this palette is present, PlumbBuddy will say your theme supports Light mode
+  palette_light:
+    Black: '#272c34ff'
+    White: '#ffffffff'
+    Primary: '#272729ff'
+    PrimaryContrastText: '#ffffffff'
+    Secondary: '#272729ff'
+    SecondaryContrastText: '#ffffffff'
+    Tertiary: '#272729ff'
+    TertiaryContrastText: '#ffffffff'
+    Info: '#53848dff'
+    InfoContrastText: '#ffffffff'
+    Success: '#75aa71ff'
+    SuccessContrastText: '#ffffffff'
+    Warning: '#e28a4bff'
+    WarningContrastText: '#ffffffff'
+    Error: '#a13030ff'
+    ErrorContrastText: '#ffffffff'
+    Dark: '#424242ff'
+    DarkContrastText: '#ffffffff'
+    TextPrimary: '#424242ff'
+    TextSecondary: '#424242ff'
+    TextDisabled: '#aeb0b0ff'
+    ActionDefault: '#2d2d31ff'
+    ActionDisabled: '#a2a2a8ff'
+    ActionDisabledBackground: '#e5e4eaff'
+    Background: '#e0e0e0ff'
+    BackgroundGray: '#f5f5f5ff'
+    Surface: '#bec7aeff'
+    DrawerBackground: '#d7d6ddff'
+    DrawerText: '#424242ff'
+    DrawerIcon: '#e6e5e9ff'
+    AppbarBackground: '#5e5e5fff'
+    AppbarText: '#f1f1f1ff'
+    LinesDefault: '#2d2c2fff'
+    LinesInputs: '#39393bff'
+    TableLines: '#e0e0e0ff'
+    TableStriped: '#272c3405'
+    TableHover: '#272c3410'
+    Divider: '#4b4a4fff'
+    DividerLight: '#c9c8d0ff'
+    Skeleton: '#0000001c'
+
+  # If this palette is present, PlumbBuddy will say your theme supports Dark mode
+  palette_dark:
+    Black: '#27272fff'
+    White: '#ffffffff'
+    Primary: '#7b7a85ff'
+    PrimaryContrastText: '#ffffffff'
+    Secondary: '#7b7a85ff'
+    SecondaryContrastText: '#ffffffff'
+    Tertiary: '#737a56ff'
+    TertiaryContrastText: '#ffffffff'
+    Info: '#afd2d7ff'
+    InfoContrastText: '#ffffffff'
+    Success: '#428056ff'
+    SuccessContrastText: '#ffffffff'
+    Warning: '#c88155ff'
+    WarningContrastText: '#ffffffff'
+    Error: '#b35c5cff'
+    ErrorContrastText: '#ffffffff'
+    Dark: '#282828ff'
+    DarkContrastText: '#ffffffff'
+    TextPrimary: '#e1dfecff'
+    TextSecondary: '#a0a680ff'
+    TextDisabled: '#706f74ff'
+    ActionDefault: '#ebeaf4ff'
+    ActionDisabled: '#868688ff'
+    ActionDisabledBackground: '#040404ff'
+    Background: '#040404ff'
+    BackgroundGray: '#27272fff'
+    Surface: '#424244ff'
+    DrawerBackground: '#535356ff'
+    DrawerText: '#e1e1edff'
+    DrawerIcon: '#adadafff'
+    AppbarBackground: '#1a1a1eff'
+    AppbarText: '#7e7d84ff'
+    LinesDefault: '#8e8c6d'
+    LinesInputs: '#a5a27f'
+    TableLines: '#ffffff1f'
+    TableStriped: '#ffffff33'
+    TableHover: '#272c3410'
+    Divider: '#6f6f72ff'
+    DividerLight: '#666668ff'
+    Skeleton: '#ffffff1c'
+  backgrounded_tabs:
+    mod-health:
+      dark: null
+      light: null
+    catalog:
+      dark: null
+      light: null
+    manifest-editor:
+      dark: null
+      light: null
+    archivist:
+      dark: null
+      light: null
+    parlay:
+      dark: null
+      light: null
+
 helen-the-hunter:
   display_name: Helen the Hunter
   description: |

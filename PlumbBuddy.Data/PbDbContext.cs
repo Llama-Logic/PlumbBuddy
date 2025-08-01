@@ -38,6 +38,7 @@ public class PbDbContext :
     public DbSet<ModHoundReportNotTrackedRecord> ModHoundReportNotTrackedRecords { get; set; }
     public DbSet<ModHoundReportRecord> ModHoundReportRecords { get; set; }
     public DbSet<PackCode> PackCodes { get; set; }
+    public DbSet<RecommendedPack> RecommendedPacks { get; set; }
     public DbSet<RequiredMod> RequiredMods { get; set; }
     public DbSet<RequirementIdentifier> RequirementIdentifiers { get; set; }
     public DbSet<ScriptModArchiveEntry> ScriptModArchiveEntries { get; set; }

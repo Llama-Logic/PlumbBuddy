@@ -1,3 +1,6 @@
+using PlumbBuddy.Data;
+using WinRT.PlumbBuddyGenericHelpers;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -253,6 +256,25 @@ public class ModsDirectoryCataloger :
                 ActualLocale = repurposedLanguage.ActualLocale,
                 GameLocale = repurposedLanguage.GameLocale
             });
+        foreach (var recommendedPack in modFileManifestModel.RecommendedPacks.Where(rp => !string.IsNullOrWhiteSpace(rp.PackCode)))
+            modFileManifest.RecommendedPacks.Add
+            (
+                new Data.RecommendedPack
+                (
+                    modFileManifest,
+                    await TransformNormalizedEntity
+                    (
+                        pbDbContext,
+                        pbDbContext => pbDbContext.PackCodes,
+                        nameof(PackCode.Code),
+                        packCode => pc => pc.Code == packCode,
+                        recommendedPack.PackCode
+                    ).ConfigureAwait(false)
+                )
+                {
+                    Reason = recommendedPack.Reason
+                }
+            );
         foreach (var requiredMod in modFileManifestModel.RequiredMods)
         {
             var modFileManifestRequiredMod = new RequiredMod(modFileManifest)

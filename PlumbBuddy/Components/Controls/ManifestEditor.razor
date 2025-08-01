@@ -1,4 +1,4 @@
-@implements IDisposable
+@inherits ReactiveComponentBase
 @inject IDialogService DialogService
 @inject IDispatcher Dispatcher
 @inject IFolderPicker FolderPicker
@@ -199,7 +199,7 @@
 										}
 									</MudItem>
 									<MudItem xs="8">
-										<MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_Label)]" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_HelperText)]" Disabled="@(requiredPacks.Count == 0)" />
+										<MudTextField @bind-Value="@electronicArtsPromoCode" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_Label)]" Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.Store" AdornmentColor="Color.Tertiary" HelperText="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_PromoCode_HelperText)]" Disabled="@(requiredPacks.Count + recommendedPacks.Count == 0)" />
 									</MudItem>
 									<MudItem xs="8">
 										@if (PublicCatalogs.PackCatalog is { } packCatalog)
@@ -214,8 +214,9 @@
 									<MudFlexBreak />
 									<MudItem>
 										<MudStack Row>
-											<MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
-											<MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_SelectModFileFromCatalog)">
+                                            <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.BagPersonalPlus" OnClick="HandleAddRecommendedPack">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRecommendedPack_Label)]</MudButton>
+                                            <MudButton Color="Color.Tertiary" Variant="Variant.Filled" StartIcon="@MaterialDesignIcons.Normal.PuzzlePlus" OnClick="HandleAddRequiredModOnClickedAsync">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_AddRequiredMod_Label)]</MudButton>
+                                            <MudTooltip Arrow Color="Color.Tertiary" Text="@(AppText.Common_SelectModFileFromCatalog)">
 												<MudIconButton Color="Color.Tertiary" Variant="Variant.Filled" Icon="@MaterialDesignIcons.Normal.BookSearch" OnClick="HandleAddCatalogedRequiredModOnClickedAsync" />
 											</MudTooltip>
 											@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
@@ -237,20 +238,50 @@
 									<MudFlexBreak />
 									<MudItem xs="8">
 										<MudExpansionPanels MultiExpansion>
-											@foreach (var requiredMod in requiredMods)
+                                            @foreach (var recommendedPack in recommendedPacks)
 											{
-												<MudExpansionPanel Text="@requiredMod.Name" Icon="@MaterialDesignIcons.Normal.PuzzleCheck">
+												<MudExpansionPanel Text="@Observed(() => recommendedPack.PackCode)" Icon="@MaterialDesignIcons.Normal.BagPersonal">
 													<ChildContent>
-														<MudStack Class="align-center">
-															<ModRequirementEditor ModRequirement="@requiredMod" />
-															<MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_RemoveRequirement_Label)]</MudButton>
-														</MudStack>
-													</ChildContent>
+                                                        <MudStack Class="align-center">
+                                                            <MudGrid Justify="Justify.Center" Spacing="4">
+                                                                <MudItem xs="12">
+                                                                    @if (PublicCatalogs.PackCatalog is { } packCatalog)
+                                                                    {
+                                                                        <MudSelectExtended @bind-Value="@Binding(() => recommendedPack.PackPair).Value" ItemCollection="@(packCatalog.OrderBy(kv => kv.Value.EnglishName).Cast<KeyValuePair<string, PackDescription>?>().ToList())" ToStringFunc="@(mnkv => mnkv is { } kv ? $"{kv.Value.EnglishName} ({kv.Key})" : string.Empty)" Variant="Variant.Filled" Color="Color.Tertiary" AnchorOrigin="Origin.BottomCenter" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" SearchBox SearchBoxAutoFocus SearchBoxClearable Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RecommendedPack_Pack_Label)]" Placeholder="@StringLocalizer[nameof(AppText.ManifestComponentEditor_IgnoreIfPackAvailable_Selector_Placeholder)]" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <MudTextField @bind-Value="@Binding(() => recommendedPack.PackCode).Value" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.BagPersonal" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RecommendedPack_PackCode_Label)]" Immediate />
+                                                                    }
+                                                                </MudItem>
+                                                                <MudItem xs="12">
+                                                                    <MudTextField @bind-Value="@Binding(() => recommendedPack.Reason).Value" Lines="3" Variant="Variant.Filled" Adornment="Adornment.Start" AdornmentColor="Color.Tertiary" AdornmentIcon="@MaterialDesignIcons.Normal.ImageText" Label="@StringLocalizer[nameof(AppText.ManifestEditor_Requirements_RecommendedPack_Reason_Label)]" HelperText="@(AppText.ManifestEditor_Requirements_RecommendedPack_Reason_HelperText)" Immediate />
+                                                                </MudItem>
+                                                            </MudGrid>
+                                                            <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.BagPersonalOff" OnClick="@(async () => HandleRemoveRecommendedPackOnClicked(recommendedPack))">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_RemoveRecommendedPack_Label)]</MudButton>
+                                                        </MudStack>
+                                                    </ChildContent>
 												</MudExpansionPanel>
 											}
 										</MudExpansionPanels>
 									</MudItem>
-								</MudGrid>
+                                    <MudFlexBreak />
+                                    <MudItem xs="8">
+                                        <MudExpansionPanels MultiExpansion>
+                                       @foreach (var requiredMod in requiredMods)
+                                            {
+                                                <MudExpansionPanel Text="@requiredMod.Name" Icon="@MaterialDesignIcons.Normal.PuzzleCheck">
+                                                    <ChildContent>
+                                                        <MudStack Class="align-center">
+                                                            <ModRequirementEditor ModRequirement="@requiredMod" />
+                                                            <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@MaterialDesignIcons.Normal.PuzzleRemove" OnClick="@(async () => await HandleRemoveRequiredModOnClickedAsync(requiredMod))">@MarkupLocalizer[nameof(AppText.ManifestEditor_Requirements_RemoveRequirement_Label)]</MudButton>
+                                                        </MudStack>
+                                                    </ChildContent>
+                                                </MudExpansionPanel>
+                                            }
+                                        </MudExpansionPanels>
+                                    </MudItem>
+                                </MudGrid>
 							</MudForm>
 						</div>
 					</ChildContent>

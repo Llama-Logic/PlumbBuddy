@@ -112,19 +112,22 @@ public partial class Catalog :
             .Include(mfm => mfm.Features)
             .Include(mfm => mfm.HashResourceKeys)
             .Include(mfm => mfm.IncompatiblePacks)
-            .Include(mfm => mfm.CalculatedModFileManifestHash!)
-                .ThenInclude(mfmh => mfmh.Dependents!)
-            .Include(mfm => mfm.RequiredMods!)
+            .Include(mfm => mfm.CalculatedModFileManifestHash)
+                .ThenInclude(mfmh => mfmh.Dependents)
+            .Include(mfm => mfm.RecommendedPacks)
+                .ThenInclude(rp => rp.PackCode)
+            .Include(mfm => mfm.RequiredMods)
                 .ThenInclude(rm => rm.Creators)
-            .Include(mfm => mfm.RequiredMods!)
-                .ThenInclude(rm => rm.Hashes!)
+            .Include(mfm => mfm.RequiredMods)
+                .ThenInclude(rm => rm.Hashes)
                     .ThenInclude(mfmh => mfmh.ManifestsByCalculation)
-            .Include(mfm => mfm.RequiredMods!)
+            .Include(mfm => mfm.RequiredMods)
                 .ThenInclude(rm => rm.RequiredFeatures)
-            .Include(mfm => mfm.RequiredMods!)
+            .Include(mfm => mfm.RequiredMods)
                 .ThenInclude(rm => rm.RequirementIdentifier)
             .Include(mfm => mfm.RequiredPacks)
             .Include(mfm => mfm.SubsumedHashes)
+                .ThenInclude(sh => sh.Dependents)
             .Include(mfm => mfm.Translators)
             .ToListAsync()
             .ConfigureAwait(false))
@@ -140,7 +143,7 @@ public partial class Catalog :
                 activeManifest.ToModel(),
                 activeManifest.ModFileHash.ModFiles.Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path))).ToList().AsReadOnly(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new CatalogModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList().AsReadOnly(),
-                (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new CatalogModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList().AsReadOnly()
+                (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Concat(activeManifest.SubsumedHashes.SelectMany(sh => sh.Dependents) ?? []).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new CatalogModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList().AsReadOnly()
             ));
         }
         Mods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<CatalogModValue>)kv.Value.AsReadOnly());

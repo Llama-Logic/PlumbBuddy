@@ -116,6 +116,8 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
 
     public Uri? TranslationSubmissionUrl { get; set; }
 
+    public ICollection<RecommendedPack> RecommendedPacks { get; } = [];
+
     public ICollection<ModFileManifestRepurposedLanguage> RepurposedLanguages { get; } = [];
 
     public ICollection<ModFileManifestTranslator> Translators { get; } = [];
@@ -156,6 +158,11 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
         addCollectionElements(Features, model.Features, entity => entity.Name);
         addHashSetElements(HashResourceKeys, model.HashResourceKeys, entity => new ResourceKey(unchecked((ResourceType)(uint)entity.KeyType), unchecked((uint)entity.KeyGroup), unchecked((ulong)entity.KeyFullInstance)));
         addCollectionElements(IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
+        addCollectionElements(RecommendedPacks, model.RecommendedPacks, entity => new ModFileManifestModelRecommendedPack
+        {
+            PackCode = entity.PackCode.Code,
+            Reason = entity.Reason
+        });
         addCollectionElements(RepurposedLanguages, model.RepurposedLanguages, entity => new ModFileManifestModelRepurposedLanguage
         {
             ActualLocale = entity.ActualLocale,

@@ -70,6 +70,7 @@ partial class ManifestEditor
     ModComponentEditor? modComponentEditor;
     string name = string.Empty;
     string originalVersion = string.Empty;
+    readonly List<RecommendedPack> recommendedPacks = [];
     readonly List<ModRequirement> requiredMods = [];
     IReadOnlyList<string> requiredPacks = [];
     ChipSetField? requiredPacksChipSetField;
@@ -508,6 +509,12 @@ partial class ManifestEditor
                         return model;
                     });
                     addCollectionElements(model.RequiredPacks, requiredPacks);
+                    addTransformedCollectionElements(model.RecommendedPacks, recommendedPacks, recommendedPack =>
+                        new ModFileManifestModelRecommendedPack
+                        {
+                            PackCode = recommendedPack.PackCode,
+                            Reason = recommendedPack.Reason
+                        });
                     var hexHash = hash.ToHexString();
                     if (!component.SubsumedHashes.Contains(hexHash, StringComparer.OrdinalIgnoreCase))
                         filesWithAlteredManifests.Add(component.File);
@@ -680,24 +687,28 @@ partial class ManifestEditor
         batchTaskCompletionSource?.SetResult(filesWithAlteredManifests.ToImmutableArray());
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        foreach (var component in components)
+        if (disposing)
         {
-            component.PropertyChanged -= HandleComponentPropertyChanged;
-            try
+            foreach (var component in components)
             {
-                component.Dispose();
+                component.PropertyChanged -= HandleComponentPropertyChanged;
+                try
+                {
+                    component.Dispose();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // 🤷‍♂️
+                }
             }
-            catch (ObjectDisposedException)
-            {
-                // 🤷‍♂️
-            }
+            Settings.PropertyChanged -= HandleSettingsPropertyChanged;
+            PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
+            UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
+            RequestToRemainAlive = false;
         }
-        Settings.PropertyChanged -= HandleSettingsPropertyChanged;
-        PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
-        UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
-        RequestToRemainAlive = false;
+        base.Dispose(disposing);
     }
 
     async Task HandleAddCatalogedRequiredModOnClickedAsync()
@@ -715,6 +726,9 @@ partial class ManifestEditor
             return;
         await AddSelectedFilesAsync(modFiles);
     }
+
+    void HandleAddRecommendedPack() =>
+        recommendedPacks.Add(new RecommendedPack(PublicCatalogs, "EP01", string.Empty));
 
     async Task HandleAddRequiredModOnClickedAsync()
     {
@@ -865,6 +879,7 @@ partial class ManifestEditor
                     url = manifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
                     requiredPacks = manifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     requiredPacksChipSetField?.Refresh();
+                    recommendedPacks.AddRange(manifests.SelectMany(manifest => manifest.RecommendedPacks).DistinctBy(recommendedPack => recommendedPack.PackCode).Select(recommendedPack => new RecommendedPack(PublicCatalogs, recommendedPack.PackCode, recommendedPack.Reason)));
                     electronicArtsPromoCode = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.ElectronicArtsPromoCode))?.ElectronicArtsPromoCode ?? string.Empty;
                     incompatiblePacks = manifests.SelectMany(manifest => manifest.IncompatiblePacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     incompatibleChipSetField?.Refresh();
@@ -1079,6 +1094,12 @@ partial class ManifestEditor
         }
     }
 
+    void HandleRemoveRecommendedPackOnClicked(RecommendedPack recommendedPack)
+    {
+        recommendedPacks.Remove(recommendedPack);
+        StateHasChanged();
+    }
+
     async Task HandleRemoveRequiredModOnClickedAsync(ModRequirement requiredMod)
     {
         if (!await DialogService.ShowCautionDialogAsync
@@ -1286,7 +1307,7 @@ partial class ManifestEditor
                 (string?)MaterialDesignIcons.Normal.TagSearch,
                 StringLocalizer["ManifestEditor_Confirm_Warning_BlankRequiredModDownloadPageUrl", requiredMod.Name!].Value
             )));
-        if (requiredPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
+        if (requiredPacks.Count + recommendedPacks.Count is > 0 && string.IsNullOrWhiteSpace(electronicArtsPromoCode))
             messages.Add
             ((
                 Severity.Normal,
@@ -1338,6 +1359,7 @@ partial class ManifestEditor
         requiredMods.Clear();
         await (incompatibleChipSetField?.ClearAsync() ?? Task.CompletedTask);
         electronicArtsPromoCode = string.Empty;
+        recommendedPacks.Clear();
         await (requiredPacksChipSetField?.ClearAsync() ?? Task.CompletedTask);
         await (requirementsStepForm?.ResetAsync() ?? Task.CompletedTask);
         url = string.Empty;
