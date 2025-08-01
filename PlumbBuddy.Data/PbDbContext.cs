@@ -50,7 +50,7 @@ public class PbDbContext :
     {
         base.OnConfiguring(optionsBuilder);
         ArgumentNullException.ThrowIfNull(optionsBuilder);
-        optionsBuilder.AddInterceptors(new SQLiteWalConnectionInterceptor());
+        optionsBuilder.AddInterceptors(new SQLiteWalConnectionInterceptor(), new SQLiteBusyTimeoutConnectionInterceptor(TimeSpan.FromSeconds(5)));
     }
 
     /// <inheritdoc/>

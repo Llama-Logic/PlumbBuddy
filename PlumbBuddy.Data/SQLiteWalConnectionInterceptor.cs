@@ -7,7 +7,7 @@ public sealed class SQLiteWalConnectionInterceptor :
     {
         ArgumentNullException.ThrowIfNull(connection);
         var pragmaCommand = connection.CreateCommand();
-        pragmaCommand.CommandText = "PRAGMA journal_mode=WAL;";
+        pragmaCommand.CommandText = "PRAGMA journal_mode = WAL;";
         return pragmaCommand;
     }
 

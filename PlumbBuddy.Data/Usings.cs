@@ -1,5 +1,6 @@
 global using LlamaLogic.Packages;
 global using LlamaLogic.Packages.Models.ModFileManifest;
+global using Microsoft.Data.Sqlite;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Design;
 global using Microsoft.EntityFrameworkCore.Diagnostics;
