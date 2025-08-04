@@ -18,8 +18,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.33</ApplicationDisplayVersion>
-        <ApplicationVersion>1.5.33</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5.34</ApplicationDisplayVersion>
+        <ApplicationVersion>1.5.34</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -209,6 +209,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\img\custom-themes\frequently-basic\" />
+      <Folder Include="wwwroot\img\custom-themes\vampishly\" />
     </ItemGroup>
 
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">

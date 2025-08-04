@@ -599,3 +599,98 @@ sim-realist:
     parlay:
       dark: parlay.jpg
       light: parlay.jpg
+
+# This is a unique key for your theme and should be in kebab case. see: https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
+vampishly:
+
+  # This will be displayed in the UI
+  display_name: Vampishly
+
+  # This is in Markdown, so it can include a link to your website or Patreon feed. see: https://www.markdownguide.org/
+  description: |
+    Visit my [notion](https://midnighthollow.notion.site/main)!
+
+  # This is how rounded the corners of surfaces are (minimum: 0px; maximum: 25px)
+  default_border_radius: 4px
+
+  # This must be Roboto, Montserrat, Segoe UI, or Ubuntu (unless you want to provide us with a font)
+  font: Roboto
+  
+  # COLOR PALETTES
+  # Any of the colors from the palette may be ommitted if you are comfortable with the value from the factory-default theme
+  # Colors are represented in 32-bit hex RGBA: #RRGGBBAA
+
+  # If this palette is present, PlumbBuddy will say your theme supports Dark mode
+  palette_dark:
+    Black: '#27272fff'
+    White: '#ffffffff'
+    Primary: '#752faaff'
+    PrimaryContrastText: '#d6b0f3ff'
+    Secondary: '#7e2ee1ff'
+    SecondaryContrastText: '#ffffffff'
+    Tertiary: '#c087f7ff'
+    TertiaryContrastText: '#ffffffff'
+    Info: '#3299ffff'
+    InfoContrastText: '#ffffffff'
+    Success: '#0bba83ff'
+    SuccessContrastText: '#ffffffff'
+    Warning: '#d98806ff'
+    WarningContrastText: '#ffffffff'
+    Error: '#f64e62ff'
+    ErrorContrastText: '#ffffffff'
+    Dark: '#27272fff'
+    DarkContrastText: '#ffffffff'
+    TextPrimary: '#d6b0f3ff'
+    TextSecondary: '#bc8de0ff'
+    TextDisabled: '#ffffff33'
+    ActionDefault: '#adadb1ff'
+    ActionDisabled: '#ffffff3f'
+    ActionDisabledBackground: '#ffffff1f'
+    Background: '#27163a'
+    BackgroundGray: '#27163a'
+    Surface: '#27163a'
+    DrawerBackground: '#27163a'
+    DrawerText: '#d6b0f3ff'
+    DrawerIcon: '#c087f7ff'
+    AppbarBackground: '#27163a'
+    AppbarText: '#d6b0f3ff'
+    LinesDefault: '#d6b0f3ff'
+    LinesInputs: '#ffffff4d'
+    TableLines: '#d6b0f3ff'
+    TableStriped: '#ffffff33'
+    TableHover: '#c087f7ff'
+    Divider: '#d6b0f3ff'
+    DividerLight: '#752faaff'
+    Skeleton: '#ffffff1c'
+
+  backgrounded_tabs:
+    mod-health:
+      dark: background.jpg
+      light: background.jpg
+      position: center
+      repeat: repeat
+      size: auto
+    catalog:
+      dark: background.jpg
+      light: background.jpg
+      position: center
+      repeat: repeat
+      size: auto
+    manifest-editor:
+      dark: background.jpg
+      light: background.jpg
+      position: center
+      repeat: repeat
+      size: auto
+    archivist:
+      dark: background.jpg
+      light: background.jpg
+      position: center
+      repeat: repeat
+      size: auto
+    parlay:
+      dark: background.jpg
+      light: background.jpg
+      position: center
+      repeat: repeat
+      size: auto
