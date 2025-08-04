@@ -873,12 +873,6 @@ public class ModsDirectoryCataloger :
             // if this happens we really don't care because whatever enqueued paths are next will clear it up
             return;
         }
-        catch (DbUpdateException efCoreEx) when (efCoreEx.InnerException is SqliteException sqliteEx && sqliteEx.SqliteErrorCode is 19)
-        {
-            // two threads tried to manipulate shared resources concurrently and it caused an issue, just reprocess this mod file
-            Catalog(path);
-            return;
-        }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", path);
