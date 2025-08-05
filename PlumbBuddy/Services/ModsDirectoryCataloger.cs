@@ -438,6 +438,7 @@ public class ModsDirectoryCataloger :
         busyManualResetEvent = new(true);
         idleManualResetEvent = new(true);
         pathsProcessingQueue = new();
+        uniqueIndexConstraintViolationStrikes = new();
         Task.Run(UpdateAggregatePropertiesAsync);
         Task.Run(ProcessPathsQueueAsync);
     }
@@ -460,6 +461,7 @@ public class ModsDirectoryCataloger :
     int scriptArchiveCount;
     ModsDirectoryCatalogerState state;
     readonly ISuperSnacks superSnacks;
+    readonly ConcurrentDictionary<string, ImmutableArray<DbUpdateException>> uniqueIndexConstraintViolationStrikes;
 
     public TimeSpan? EstimatedStateTimeRemaining
     {
@@ -873,10 +875,24 @@ public class ModsDirectoryCataloger :
             // if this happens we really don't care because whatever enqueued paths are next will clear it up
             return;
         }
+        catch (DbUpdateException efCoreEx) when
+        (
+            efCoreEx.InnerException is SqliteException sqliteEx
+            && sqliteEx.SqliteErrorCode is 19
+            && uniqueIndexConstraintViolationStrikes.AddOrUpdate(path, _ => [efCoreEx], (_, array) => array.Add(efCoreEx)).Length is < 3
+        )
+        {
+            // two threads probably tried to manipulate shared resources concurrently and it caused an issue, just reprocess this mod file
+            Catalog(path);
+            return;
+        }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "unexpected exception encountered while processing {FilePath}", path);
-            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModsDirectoryCataloger_Warning_CannotReadModFile, path, ex.GetType().Name, ex.Message)), Severity.Warning, options =>
+            var processEx = ex;
+            if (uniqueIndexConstraintViolationStrikes.TryGetValue(path, out var strikes))
+                processEx = new AggregateException("UNIQUE INDEX constraint violation strike threshold exceeded", strikes);
+            logger.LogWarning(processEx, "unexpected exception encountered while processing {FilePath}", path);
+            superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.ModsDirectoryCataloger_Warning_CannotReadModFile, path, processEx.GetType().Name, processEx.Message)), Severity.Warning, options =>
             {
                 options.Icon = MaterialDesignIcons.Normal.PackageVariantRemove;
                 options.RequireInteraction = true;
