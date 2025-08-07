@@ -27,8 +27,9 @@ public class ModsDirectoryCataloger :
 #pragma warning restore CA2000 // Dispose objects before losing scope
                     break;
                 }
-                catch (IOException) when (--ioExceptionGraceAttempts is >= 0)
+                catch (IOException ioEx) when (--ioExceptionGraceAttempts is >= 0)
                 {
+                    logger.LogWarning(ioEx, "unhnalded exception when trying to open {Path} for read; {GraceAttempts} grace attempt(s) remain", fileInfo.FullName, ioExceptionGraceAttempts);
                     await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                 }
                 catch
