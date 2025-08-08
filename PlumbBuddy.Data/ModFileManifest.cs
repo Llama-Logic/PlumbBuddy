@@ -36,6 +36,8 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
 
     public ICollection<ModFileManifestResourceKey> HashResourceKeys { get; } = [];
 
+    public ICollection<ModFileExcludedEntry> ExcludedEntries { get; } = [];
+
     public long CalculatedModFileManifestHashId { get; set; }
 
     [ForeignKey(nameof(CalculatedModFileManifestHashId))]
@@ -157,6 +159,7 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
         addCollectionElements(Exclusivities, model.Exclusivities, entity => entity.Name);
         addCollectionElements(Features, model.Features, entity => entity.Name);
         addHashSetElements(HashResourceKeys, model.HashResourceKeys, entity => new ResourceKey(unchecked((ResourceType)(uint)entity.KeyType), unchecked((uint)entity.KeyGroup), unchecked((ulong)entity.KeyFullInstance)));
+        addHashSetElements(ExcludedEntries, model.ExcludedEntries, entity => entity.Name);
         addCollectionElements(IncompatiblePacks, model.IncompatiblePacks, entity => entity.Code);
         addCollectionElements(RecommendedPacks, model.RecommendedPacks, entity => new ModFileManifestModelRecommendedPack
         {
@@ -172,8 +175,8 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
         {
             var requiredMod = new ModFileManifestModelRequiredMod
             {
-                IgnoreIfHashAvailable = (entity.IgnoreIfHashAvailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
-                IgnoreIfHashUnavailable = (entity.IgnoreIfHashUnavailable?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+                IgnoreIfHashAvailable = [..entity.IgnoreIfHashAvailable?.Sha256 ?? Enumerable.Empty<byte>()],
+                IgnoreIfHashUnavailable = [..entity.IgnoreIfHashUnavailable?.Sha256 ?? Enumerable.Empty<byte>()],
                 IgnoreIfPackAvailable = entity.IgnoreIfPackAvailable?.Code,
                 IgnoreIfPackUnavailable = entity.IgnoreIfPackUnavailable?.Code,
                 Name = entity.Name,

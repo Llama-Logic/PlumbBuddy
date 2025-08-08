@@ -21,6 +21,7 @@ public class PbDbContext :
     public DbSet<ModCreator> ModCreators { get; set; }
     public DbSet<ModExclusivity> ModExclusivities { get; set; }
     public DbSet<ModFeature> ModFeatures { get; set; }
+    public DbSet<ModFileExcludedEntry> ModFileExcludedEntries { get; set; }
     public DbSet<ModFileHash> ModFileHashes { get; set; }
     public DbSet<ModFileResource> ModFileResources { get; set; }
     public DbSet<ModFile> ModFiles { get; set; }

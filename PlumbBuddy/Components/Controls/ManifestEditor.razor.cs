@@ -268,7 +268,8 @@ partial class ManifestEditor
             manifests.FirstOrDefault(manifest => manifest.TranslationSubmissionUrl is not null)?.TranslationSubmissionUrl?.ToString(),
             string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.Translators.Where(translator => !string.IsNullOrWhiteSpace(translator.Name)).Select(translator => $"{translator.Name}{Environment.NewLine}{translator.Language}")).Distinct()),
             componentName == name ? null : componentName,
-            string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.SubsumedHashes.Concat([manifest.Hash])).Select(hash => hash.ToHexString()).Distinct(StringComparer.OrdinalIgnoreCase))
+            string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.SubsumedHashes.Concat([manifest.Hash])).Select(hash => hash.ToHexString()).Distinct(StringComparer.OrdinalIgnoreCase)),
+            string.Join(Environment.NewLine, manifests.SelectMany(manifest => manifest.ExcludedEntries).Distinct(StringComparer.Ordinal))
         );
         component.PropertyChanged += HandleComponentPropertyChanged;
         components.Add(component);
@@ -458,7 +459,7 @@ partial class ManifestEditor
                         hash = await ModFileManifestModel.GetModFileHashAsync(dbpf, hashResourceKeys).ConfigureAwait(false);
                     }
                     else if (component.FileObjectModel is ZipFile zipFile)
-                        hash = ModFileManifestModel.GetModFileHash(zipFile);
+                        hash = ModFileManifestModel.GetModFileHash(zipFile, [..component.ExcludedEntries.Distinct(StringComparer.Ordinal)]);
                     else
                         throw new NotSupportedException($"Unsupported component file object model type {component?.GetType().FullName}");
                     await updateStatusAsync(1, StringLocalizer["ManifestEditor_Composing_Status_InitializingManifest", componentRelativePath]).ConfigureAwait(false);
@@ -483,6 +484,7 @@ partial class ManifestEditor
                         Version = versionEnabled && !string.IsNullOrWhiteSpace(version) ? version : null
                     };
                     addCollectionElements(model.Creators, creators);
+                    addCollectionElements(model.ExcludedEntries, component.ExcludedEntries);
                     addCollectionElements(model.Exclusivities, component.Exclusivities);
                     addCollectionElements(model.Features, features);
                     if (hashResourceKeys is not null)

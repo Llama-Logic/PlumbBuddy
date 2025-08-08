@@ -105,7 +105,7 @@ public class ModsDirectoryCataloger :
                         });
                     if (await ModFileManifestModel.GetModFileManifestAsync(zipFile).ConfigureAwait(false) is { } manifest)
                     {
-                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipFile), manifest, null).ConfigureAwait(false);
+                        var dbManifest = await TransformModFileManifestModelAsync(pbDbContext, modFileHash, ModFileManifestModel.GetModFileHash(zipFile, manifest.ExcludedEntries), manifest, null).ConfigureAwait(false);
                         modFileHash.ModFileManifests.Add(dbManifest);
                     }
                 }
@@ -164,6 +164,7 @@ public class ModsDirectoryCataloger :
         };
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     public static async Task<ModFileManifest> TransformModFileManifestModelAsync(PbDbContext pbDbContext, ModFileHash modFileHash, ImmutableArray<byte> calculatedModFileManifestHash, ModFileManifestModel modFileManifestModel, ResourceKey? key)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
@@ -219,6 +220,9 @@ public class ModsDirectoryCataloger :
             modFileManifestModel.Creators
         ).ConfigureAwait(false))
             modFileManifest.Creators.Add(creator);
+        foreach (var excludedEntry in modFileManifestModel.ExcludedEntries)
+            if (excludedEntry is { } nonNullExcludedEntry)
+                modFileManifest.ExcludedEntries.Add(new ModFileExcludedEntry(modFileManifest) { Name = nonNullExcludedEntry });
         await foreach (var exclusivity in TransformNormalizedEntitySequence
         (
             pbDbContext,

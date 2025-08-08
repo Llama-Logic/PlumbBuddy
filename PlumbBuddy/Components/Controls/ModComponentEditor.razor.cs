@@ -3,9 +3,17 @@ namespace PlumbBuddy.Components.Controls;
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class ModComponentEditor
 {
+#pragma warning disable CS0649
+#pragma warning disable IDE0044
+    ChipSetField? excludedEntriesField;
+#pragma warning restore IDE0044
+#pragma warning restore CS0649
     ChipSetField? exclusivitiesField;
     ModComponent? lastModComponent;
     ChipSetField? subsumedHashesField;
+
+    [Parameter]
+    public IReadOnlyList<string> ExcludedEntries { get; set; } = [];
 
     [Parameter]
     public IReadOnlyList<string> Exclusivities { get; set; } = [];
@@ -79,6 +87,8 @@ partial class ModComponentEditor
     {
         if (ModComponent is not null)
         {
+            if (excludedEntriesField is not null)
+                await excludedEntriesField.CommitPendingEntryIfEmptyAsync();
             if (exclusivitiesField is not null)
                 await exclusivitiesField.CommitPendingEntryIfEmptyAsync();
             if (subsumedHashesField is not null)
@@ -142,6 +152,13 @@ partial class ModComponentEditor
         var hash = await ModFileSelector.GetADroppedModFileManifestHashAsync(UserInterfaceMessaging, pbDbContext, DialogService);
         if (!hash.IsDefaultOrEmpty)
             HandleIgnoreIfHashUnavailableChanged(hash.ToHexString());
+    }
+
+    void HandleExcludedEntriesChanged(IReadOnlyList<string> newValue)
+    {
+        ExcludedEntries = newValue;
+        if (ModComponent is { } modComponent)
+            modComponent.ExcludedEntries = newValue;
     }
 
     void HandleExclusivitiesChanged(IReadOnlyList<string> newValue)
@@ -372,6 +389,7 @@ partial class ModComponentEditor
         lastModComponent = ModComponent;
         await SetParametersAsync(ParameterView.FromDictionary(new Dictionary<string, object?>
         {
+            { nameof(ExcludedEntries), (lastModComponent?.ExcludedEntries ?? []).ToList().AsReadOnly() },
             { nameof(Exclusivities), (lastModComponent?.Exclusivities ?? []).ToList().AsReadOnly() },
             { nameof(File), lastModComponent?.File },
             { nameof(IgnoreIfPackAvailable), lastModComponent?.IgnoreIfPackAvailable },

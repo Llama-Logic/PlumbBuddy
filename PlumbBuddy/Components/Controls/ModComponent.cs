@@ -1,10 +1,14 @@
 namespace PlumbBuddy.Components.Controls;
 
 [SuppressMessage("Design", "CA1054: URI-like parameters should not be strings")]
-public class ModComponent(bool isManifestPreExisting, FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? messageToTranslators, string? translationSubmissionUrl, string translators, string? name, string subsumedHashes) :
+public partial class ModComponent(bool isManifestPreExisting, FileInfo file, IDisposable fileObjectModel, string? manifestResourceName, bool isRequired, string? requirementIdentifier, string? ignoreIfPackAvailable, string? ignoreIfPackUnavailable, string? ignoreIfHashAvailable, string? ignoreIfHashUnavailable, string exclusivities, string? messageToTranslators, string? translationSubmissionUrl, string translators, string? name, string subsumedHashes, string excludedEntries) :
     IDisposable,
     INotifyPropertyChanged
 {
+    ~ModComponent() =>
+        Dispose(false);
+
+    string excludedEntries = excludedEntries;
     string exclusivities = exclusivities;
     FileInfo file = file;
     string? ignoreIfHashAvailable = ignoreIfHashAvailable;
@@ -19,6 +23,16 @@ public class ModComponent(bool isManifestPreExisting, FileInfo file, IDisposable
     string subsumedHashes = subsumedHashes;
     string? translationSubmissionUrl = translationSubmissionUrl;
     string translators = translators;
+
+    public IReadOnlyList<string> ExcludedEntries
+    {
+        get => excludedEntries.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        set
+        {
+            excludedEntries = string.Join(Environment.NewLine, value);
+            OnPropertyChanged();
+        }
+    }
 
     public IReadOnlyList<string> Exclusivities
     {
@@ -201,8 +215,17 @@ public class ModComponent(bool isManifestPreExisting, FileInfo file, IDisposable
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public void Dispose() =>
-        FileObjectModel.Dispose();
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        Dispose(true);
+    }
+
+    void Dispose(bool disposing)
+    {
+        if (disposing)
+            FileObjectModel.Dispose();
+    }
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
