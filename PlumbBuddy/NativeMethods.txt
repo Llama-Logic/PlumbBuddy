@@ -2,6 +2,9 @@ AllowSetForegroundWindow
 GetSystemCpuSetInformation
 GetWindowPlacement
 IsIconic
+PostThreadMessage
 SetForegroundWindow
 SetWindowPlacement
 ShowWindow
+
+WM_QUIT

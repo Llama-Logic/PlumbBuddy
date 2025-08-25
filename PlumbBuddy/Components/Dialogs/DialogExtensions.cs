@@ -159,6 +159,17 @@ static class DialogExtensions
             NoHeader = false
         })).Result;
 
+    public static Task ShowPackSelectorDialogAsync(this IDialogService dialogService) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<PackSelectorDialog>("Pack Selector", new DialogParameters<PackSelectorDialog>(), new DialogOptions
+            {
+                BackdropClick = false,
+                CloseOnEscapeKey = false,
+                MaxWidth = MaxWidth.Medium
+            });
+        });
+
     public static Task<bool?> ShowQuestionDialogAsync(this IDialogService dialogService, string caption, string text, bool userCanCancel = false, bool big = false) =>
         StaticDispatcher.DispatchAsync(async () =>
         {

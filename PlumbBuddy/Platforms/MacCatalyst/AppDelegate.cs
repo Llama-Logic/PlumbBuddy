@@ -14,7 +14,7 @@ public class AppDelegate :
         builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<UiBridgeWebView, UiBridgeWebViewHandler>());
         builder.Services.AddSingleton<IAppLifecycleManager>(Program.AppLifecycleManager);
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
-        builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
+        builder.Services.AddSingleton<IElectronicArtsApp, Platforms.MacCatalyst.ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
     }
 }

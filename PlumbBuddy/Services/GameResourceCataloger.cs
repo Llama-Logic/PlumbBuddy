@@ -168,6 +168,49 @@ public partial class GameResourceCataloger :
         return result.AsReadOnly();
     }
 
+    async Task<ReadOnlyMemory<byte>> GetPackIconAsync(string packCode, bool owned)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packCode);
+        return await GetDirectDrawSurfaceAsPngAsync
+        (
+            new
+            (
+                ResourceType.DSTImage,
+                0,
+                Fnv64.GetHash($"mainmenu_pack_{packCode}_{(!owned ? "un" : string.Empty)}owned")
+            )
+        );
+    }
+
+    async Task<ReadOnlyMemory<byte>> GetPackIconAsync(string packCode, int size)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packCode);
+        return await GetDirectDrawSurfaceAsPngAsync
+        (
+            new
+            (
+                ResourceType.DSTImage,
+                0,
+                Fnv64.GetHash($"icon_pack_{packCode}_{size}")
+            )
+        );
+    }
+
+    public Task<ReadOnlyMemory<byte>> GetPackIcon128Async(string packCode) =>
+        GetPackIconAsync(packCode, 128);
+
+    public Task<ReadOnlyMemory<byte>> GetPackIcon32Async(string packCode) =>
+        GetPackIconAsync(packCode, 32);
+
+    public Task<ReadOnlyMemory<byte>> GetPackIcon64Async(string packCode) =>
+        GetPackIconAsync(packCode, 64);
+
+    public Task<ReadOnlyMemory<byte>> GetPackIconOwnedAsync(string packCode) =>
+        GetPackIconAsync(packCode, true);
+
+    public Task<ReadOnlyMemory<byte>> GetPackIconUnownedAsync(string packCode) =>
+        GetPackIconAsync(packCode, false);
+
     public async Task<ReadOnlyMemory<byte>> GetRawResourceAsync(ResourceKey key)
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);

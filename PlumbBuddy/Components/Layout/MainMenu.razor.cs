@@ -8,6 +8,16 @@ partial class MainMenu
     [Parameter]
     public EventCallback CloseDrawer { get; set; }
 
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            GameResourceCataloger.PropertyChanged -= HandleGameResourceCatalogerPropertyChanged;
+            ModsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+        }
+    }
+
     async Task HandleAskForHelpOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
@@ -39,6 +49,19 @@ partial class MainMenu
     Task HandleCloseMenuOnClickAsync() =>
         CloseDrawer.InvokeAsync();
 
+    void HandleGameResourceCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IGameResourceCataloger.PackageExaminationsRemaining)
+            && GameResourceCataloger.PackageExaminationsRemaining is 0)
+            StaticDispatcher.Dispatch(StateHasChanged);
+    }
+
+    void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
+            StaticDispatcher.Dispatch(StateHasChanged);
+    }
+
     async Task HandleOpenDownloadsFolderOnClickAsync()
     {
         await CloseDrawer.InvokeAsync();
@@ -61,6 +84,12 @@ partial class MainMenu
     {
         await CloseDrawer.InvokeAsync();
         PlatformFunctions.ViewDirectory(MauiProgram.AppDataDirectory);
+    }
+
+    async Task HandlePackSelectorOnClickAsync()
+    {
+        await CloseDrawer.InvokeAsync();
+        await DialogService.ShowPackSelectorDialogAsync();
     }
 
     async Task HandleReonboardOnClickAsync()
@@ -131,5 +160,12 @@ partial class MainMenu
                 Snackbar.Add(AppText.MainMenu_DevTools_Snack_InversionOfControlChange, Severity.Warning, options => options.Icon = MaterialDesignIcons.Normal.RestartAlert);
             }
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GameResourceCataloger.PropertyChanged += HandleGameResourceCatalogerPropertyChanged;
+        ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
     }
 }

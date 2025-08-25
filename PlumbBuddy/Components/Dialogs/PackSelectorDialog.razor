@@ -1,0 +1,103 @@
+@inherits ReactiveComponentBase
+@inject IElectronicArtsApp ElectronicArtsApp
+@inject IGameResourceCataloger GameResourceCataloger
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IPublicCatalogs PublicCatalogs
+@inject ISettings Settings
+@inject ISmartSimObserver SmartSimObserver
+@inject ISteam Steam
+
+<MudDialog Class="primary-dialog">
+    <TitleContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@MaterialDesignIcons.Normal.BagPersonal" Color="Color.Primary" />
+            <MudTextM3 Typo="TypoM3.Title" Color="Color.Primary">Pack Selector</MudTextM3>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudAlert Severity="Severity.Warning">
+            <strong>Disabling a pack will stop all parts of that pack from loading in your game.</strong><br /><br />
+            If you load an existing save where you used that pack, everything from it will vanish—all hair, clothes, traits, furniture, and the world if one is added.
+            You should be <em>very careful</em> and only load a save where you used a pack that is now disabled if you're sure that's what you want.
+            If you save like that, items from the pack will stay missing even if you enable the pack again and the only way to get them back will be to by going back to a previous save.<br /><br />
+            If you plan to disable a pack, remove all mods that require it from your Mods folder and clear your cache before you load the game again.
+        </MudAlert>
+        @if (isLoading)
+        {
+            <MudProgressLinear Color="Color.Info" Indeterminate />
+            <MudAlert Icon="@MaterialDesignIcons.Outline.FolderMultiple" Severity="Severity.Info">
+                I am examining The Sims 4 DLC you have installed. One moment...
+            </MudAlert>
+        }
+        @if (isApplying)
+        {
+            <MudProgressLinear Color="Color.Success" Indeterminate />
+            <MudAlert Icon="@MaterialDesignIcons.Outline.ContentSaveCog" Severity="Severity.Success">
+                I am applying your changes. One moment...
+            </MudAlert>
+        }
+        @if (PackGroups.Count is > 0)
+        {
+            <MudGrid Justify="Justify.Center" Spacing="2">
+                <MudItem>
+                    <MudCheckBox T="bool?" Color="Color.Primary" Disabled="@isApplying" TriState Value="@AllPacks" ValueChanged="@((Action<bool?>)(isChecked => AllGroupsValueChangedHandler(isChecked)))">
+                        Select all Packs &amp; Kits
+                    </MudCheckBox>
+                </MudItem>
+            </MudGrid>
+        }
+        @foreach(var packGroup in PackGroups)
+        {
+            <MudTextM3 Align="Align.Center" Class="mt-8" Typo="TypoM3.Title">
+                @packGroup.Name
+            </MudTextM3>
+            @if (packGroup.Packs.Count is > 1)
+            {
+                <MudGrid Justify="Justify.Center" Spacing="2">
+                    <MudItem>
+                        <MudCheckBox T="bool?" Color="Color.Primary" Disabled="@isApplying" TriState Value="@packGroup.IsChecked" ValueChanged="@((Action<bool?>)(isChecked => GroupValueChangedHandler(packGroup, isChecked)))">
+                            Select all @packGroup.Name
+                        </MudCheckBox>
+                    </MudItem>
+                </MudGrid>
+            }
+            <MudGrid Spacing="2">
+                @foreach (var pack in packGroup.Packs)
+                {
+                    <MudItem xs="12" md="@(UsePublicPackCatalog ? 4 : 3)">
+                        <MudSwitchM3 Color="Color.Primary" Disabled="@isApplying" ThumbIcon="@MaterialDesignIcons.Normal.BagPersonal" ThumbOffIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Value="@pack.IsChecked" ValueChanged="@((Action<bool>)(isChecked => ValueChangedHandler(pack.Code, isChecked)))">
+                            <MudStack AlignItems="AlignItems.Center" Class="ga-1" Row>
+                                <MudImage Height="32" Src="@pack.Icon" Width="32" />
+                                @pack.Name
+                            </MudStack>
+                        </MudSwitchM3>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudTooltip Text="Switching this on will connect to the PlumbBuddy.app web site, allowing us to show you pack and kit names rather than their codes. This feature requires an Internet connection." Color="Color.Primary" Placement="Placement.Top" Arrow>
+            <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Disabled="@(isLoading || isApplying)" Label="Use PlumbBuddy.app Public Pack Catalog to Display Pack and Kit Names" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+        </MudTooltip>
+        <MudSpacer />
+        <MudButton Disabled="@isApplying" OnClick="CancelOnClickHandler">
+            @MarkupLocalizer[nameof(AppText.Common_Cancel)]
+        </MudButton>
+        @{
+            var okTip = "Click here to close the game's launcher and apply your changes.";
+            if (isLoading)
+                okTip = "Hold on a moment, I'm looking at your DLC.";
+            else if (isLoading)
+                okTip = "Your changes are being applied.";
+            else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+                okTip = "You need to close The Sims 4 before you can do this.";
+        }
+        <MudTooltip Arrow Color="Color.Primary" Text="@okTip">
+            <MudButton Color="Color.Primary" Disabled="@(isLoading || isApplying || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" OnClick="OkOnClickHandlerAsync">
+                @MarkupLocalizer[nameof(AppText.Common_Ok)]
+            </MudButton>
+        </MudTooltip>
+    </DialogActions>
+</MudDialog>

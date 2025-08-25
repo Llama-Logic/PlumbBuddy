@@ -44,7 +44,7 @@ public partial class App :
     {
         builder.Services.AddSingleton<IAppLifecycleManager>(appLifecycleManager!);
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
-        builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
+        builder.Services.AddSingleton<IElectronicArtsApp, Platforms.Windows.ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
     }
 
