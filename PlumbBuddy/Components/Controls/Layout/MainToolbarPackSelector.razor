@@ -6,7 +6,7 @@
 
 <MudTooltip Arrow="true">
     <ChildContent>
-        <MudIconButton Disabled="@(Observed(() => ModsDirectoryCataloger.State) is not ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping || GameResourceCataloger.PackageExaminationsRemaining is not 0)" Icon="@MaterialDesignIcons.Normal.BagPersonal" Color="Color.Info" OnClick="@(() => DialogService.ShowPackSelectorDialogAsync())" />
+        <MudIconButton Disabled="@packSelectorLocked" Icon="@MaterialDesignIcons.Normal.BagPersonal" Color="Color.Info" OnClick="@(() => DialogService.ShowPackSelectorDialogAsync())" />
     </ChildContent>
     <TooltipContent>
         <MudStack Row="true">
@@ -19,7 +19,7 @@
         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
             Select which packs the game should load.
         </MudTextM3>
-        @if (Observed(() => ModsDirectoryCataloger.State) is not ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping || GameResourceCataloger.PackageExaminationsRemaining is not 0)
+        @if (packSelectorLocked)
         {
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">

@@ -52,12 +52,15 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
 
     async Task<bool> GetIsElectronicArtsAppRunningAsync()
     {
-        using var osascriptProcess = Process.Start(new ProcessStartInfo("/usr/bin/osascript", $"-e 'tell application id \"{eaAppBundleId}\" to return (running as integer)'")
+        var psi = new ProcessStartInfo("/usr/bin/osascript")
         {
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true
-        });
+        };
+        psi.ArgumentList.Add("-e");
+        psi.ArgumentList.Add($"tell application id \"{eaAppBundleId}\" to return (running as integer)");
+        using var osascriptProcess = Process.Start(psi);
         if (osascriptProcess is null)
             return false;
         var output = await osascriptProcess.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
@@ -94,16 +97,22 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
     {
         if (!await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false))
             return false;
-        using var osascriptProcess = Process.Start(new ProcessStartInfo("/usr/bin/osascript", $"-e 'tell application id \"{eaAppBundleId}\" to quit'")
+        var psi = new ProcessStartInfo("/usr/bin/osascript")
         {
             UseShellExecute = false,
             CreateNoWindow = true
-        });
+        };
+        psi.ArgumentList.Add("-e");
+        psi.ArgumentList.Add($"tell application id \"{eaAppBundleId}\" to quit");
+        using var osascriptProcess = Process.Start(psi);
         if (osascriptProcess is null)
             return false;
         await osascriptProcess.WaitForExitAsync().ConfigureAwait(false);
-        while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false))
-            await Task.Delay(500).ConfigureAwait(false);
+        do
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        }
+        while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false));
         return true;
     }
 }

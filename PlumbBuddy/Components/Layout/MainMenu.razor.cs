@@ -4,6 +4,7 @@ partial class MainMenu
 {
     int devToolsUnlockProgress = 10;
     bool devToolsUnlockProgressBadgeVisible = false;
+    bool packSelectorLocked = false;
 
     [Parameter]
     public EventCallback CloseDrawer { get; set; }
@@ -53,13 +54,13 @@ partial class MainMenu
     {
         if (e.PropertyName is nameof(IGameResourceCataloger.PackageExaminationsRemaining)
             && GameResourceCataloger.PackageExaminationsRemaining is 0)
-            StaticDispatcher.Dispatch(StateHasChanged);
+            RefreshPackSelectorLocked();
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-            StaticDispatcher.Dispatch(StateHasChanged);
+            RefreshPackSelectorLocked();
     }
 
     async Task HandleOpenDownloadsFolderOnClickAsync()
@@ -167,5 +168,22 @@ partial class MainMenu
         base.OnInitialized();
         GameResourceCataloger.PropertyChanged += HandleGameResourceCatalogerPropertyChanged;
         ModsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        packSelectorLocked = ShouldPackSelectorBeLocked();
     }
+
+    void RefreshPackSelectorLocked()
+    {
+        var newPackSelectorLocked = ShouldPackSelectorBeLocked();
+        if (newPackSelectorLocked != packSelectorLocked)
+        {
+            StaticDispatcher.Dispatch(() =>
+            {
+                packSelectorLocked = newPackSelectorLocked;
+                StateHasChanged();
+            });
+        }
+    }
+
+    bool ShouldPackSelectorBeLocked() =>
+        ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping || GameResourceCataloger.PackageExaminationsRemaining is not 0;
 }
