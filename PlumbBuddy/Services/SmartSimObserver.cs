@@ -872,14 +872,29 @@ public partial class SmartSimObserver :
 
     public async Task HelpWithPackPurchaseAsync(string packCode, IDialogService dialogService, IReadOnlyList<string>? creators, string? electronicArtsPromoCode)
     {
-        if (!IsSteamInstallation && creators?.Count is > 0 && electronicArtsPromoCode is not null)
+        if (!IsSteamInstallation)
         {
-            if (await dialogService.ShowQuestionDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text, creators.Humanize(), electronicArtsPromoCode, packCode), true) is not { } copyToClipboardPreference)
-                return;
-            if (copyToClipboardPreference)
+            if (creators?.Count is > 0
+                && electronicArtsPromoCode is not null)
             {
-                await Clipboard.SetTextAsync(electronicArtsPromoCode);
-                await dialogService.ShowSuccessDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Text, electronicArtsPromoCode, creators.Humanize()));
+                if (await dialogService.ShowQuestionDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text, creators.Humanize(), electronicArtsPromoCode, packCode), true) is not { } copyToClipboardPreference)
+                    return;
+                if (copyToClipboardPreference)
+                {
+                    await Clipboard.SetTextAsync(electronicArtsPromoCode);
+                    await dialogService.ShowSuccessDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Text, electronicArtsPromoCode, creators.Humanize()));
+                }
+            }
+            else if ((publicCatalogs.PackCatalog?.TryGetValue(packCode, out var packDesription) ?? false)
+                && !string.IsNullOrWhiteSpace(packDesription.EaPromoCode))
+            {
+                if (await dialogService.ShowQuestionDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption, string.Format(AppText.SmartSimObserver_HelpWithPackPurchase_PresentCreatorKitOpportunity_Text, packDesription.EaPromoCode, packCode), true) is not { } copyToClipboardPreference)
+                    return;
+                if (copyToClipboardPreference)
+                {
+                    await Clipboard.SetTextAsync(packDesription.EaPromoCode);
+                    await dialogService.ShowSuccessDialogAsync(AppText.SmartSimObserver_HelpWithPackPurchase_Thanks_Caption, string.Format(AppText.SmartSimObserver_HelpWithCreatorKitPackPurchase_Thanks_Text, packDesription.EaPromoCode));
+                }
             }
         }
         await Browser.OpenAsync($"https://plumbbuddy.app/redirect?purchase-pack={packCode}{(IsSteamInstallation ? "&from=steam" : string.Empty)}", BrowserLaunchMode.External);

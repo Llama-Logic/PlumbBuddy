@@ -22,6 +22,7 @@ public partial class GameResourceCataloger :
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        idleManualResetEvent = new(true);
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
@@ -30,9 +31,10 @@ public partial class GameResourceCataloger :
         scanDebouncer = new(ScanAsync, TimeSpan.FromSeconds(5));
     }
 
-    int packageExaminationsRemaining;
+    readonly AsyncManualResetEvent idleManualResetEvent;
     readonly ILogger<GameResourceCataloger> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
+    int packageExaminationsRemaining;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
     readonly AsyncDebouncer scanDebouncer;
@@ -452,9 +454,16 @@ public partial class GameResourceCataloger :
         finally
         {
             PackageExaminationsRemaining = 0;
+            idleManualResetEvent.Set();
         }
     }
 
-    public void ScanSoon() =>
+    public void ScanSoon()
+    {
+        idleManualResetEvent.Reset();
         scanDebouncer.Execute();
+    }
+
+    public Task WaitForIdleAsync(CancellationToken cancellationToken = default) =>
+        idleManualResetEvent.WaitAsync(cancellationToken);
 }

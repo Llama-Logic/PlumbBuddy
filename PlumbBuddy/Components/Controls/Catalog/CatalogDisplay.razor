@@ -11,11 +11,16 @@
 		</MudPaper>
 	</MudItem>
 	<MudItem>
-		<MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
-			<MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideCatalog{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
-		</MudTooltip>
-	</MudItem>
-	<MudItem>
+        <MudTooltip Text="Switching this on will connect to the PlumbBuddy.app web site, allowing us to show you pack and kit names rather than their codes. This feature requires an Internet connection." Color="Color.Primary" Placement="Placement.Bottom" Arrow>
+            <MudSwitchM3 @bind-Value="@Binding(() => Settings.UsePublicPackCatalog).Value" Color="Color.Primary" Disabled="@Observed(() => Catalog.IsQuerying)" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+        </MudTooltip>
+    </MudItem>
+    <MudItem>
+        <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info">
+            <MudIconButton Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideCatalog{Observed(() => Settings.Type)}")" Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n6" />
+        </MudTooltip>
+    </MudItem>
+    <MudItem>
 		<MudTextField T="string" @bind-Value="@Binding(() => Catalog.ModsSearchText).Value" Variant="Variant.Filled" Label="@StringLocalizer[nameof(AppText.CatalogDisplay_SearchCatalog)]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" ShrinkLabel Immediate Clearable DebounceInterval="250" Style="background-color: var(--mud-palette-surface);" />
 	</MudItem>	
 	<MudFlexBreak />

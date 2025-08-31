@@ -5472,6 +5472,208 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pack Selector.
+        /// </summary>
+        internal static string PackSelectorDialog_Caption {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **Disabling a pack will stop all parts of that pack from loading in your game.**
+        ///
+        ///If you load an existing save where you used that pack, everything from it will vanish—all hair, clothes, traits, furniture, and the world if one is added.
+        ///You should be _very careful_ and only load a save where you used a pack that is now disabled if you&apos;re sure that&apos;s what you want.
+        ///If you save like that, items from the pack will stay missing even if you enable the pack again and the only way to get them back will be to b [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PackSelectorDialog_EUA {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_EUA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to close the game&apos;s launcher and apply your changes..
+        /// </summary>
+        internal static string PackSelectorDialog_Ok_Tip {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Ok_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your changes are being applied..
+        /// </summary>
+        internal static string PackSelectorDialog_Ok_Tip_Applying {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Ok_Tip_Applying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You need to close The Sims 4 before you can do this..
+        /// </summary>
+        internal static string PackSelectorDialog_Ok_Tip_GameIsRunning {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Ok_Tip_GameIsRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hold on a moment, I&apos;m looking at your DLC..
+        /// </summary>
+        internal static string PackSelectorDialog_Ok_Tip_Loading {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Ok_Tip_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build &amp; Buy Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_BuildAndBuyKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_BuildAndBuyKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Combination Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_CombinationKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_CombinationKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create A Sim Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_CreateASimKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_CreateASimKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator Build &amp; Buy Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_CreatorBuildAndBuyKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_CreatorBuildAndBuyKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator Combination Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_CreatorCombinationKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_CreatorCombinationKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creator Create A Sim Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_CreatorCreateASimKit {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_CreatorCreateASimKit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expansion Packs.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_Expansion {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_Expansion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Free.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_Free {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_Free", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Packs.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_Game {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_Game", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stuff Packs.
+        /// </summary>
+        internal static string PackSelectorDialog_PackType_Stuff {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_PackType_Stuff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select all {0}.
+        /// </summary>
+        internal static string PackSelectorDialog_SelectAll {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_SelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packs &amp; Kits.
+        /// </summary>
+        internal static string PackSelectorDialog_SelectAll_Global {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_SelectAll_Global", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I am applying your changes. One moment....
+        /// </summary>
+        internal static string PackSelectorDialog_Status_Applying {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Status_Applying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I am examining The Sims 4 DLC you have installed. One moment....
+        /// </summary>
+        internal static string PackSelectorDialog_Status_Examining {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Status_Examining", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use PlumbBuddy.app Public Pack Catalog to Display Pack and Kit Names.
+        /// </summary>
+        internal static string PackSelectorDialog_UsePublicPackCatalog_Label {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_UsePublicPackCatalog_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switching this on will connect to the PlumbBuddy.app web site, allowing us to show you pack and kit names rather than their codes. This feature requires an Internet connection..
+        /// </summary>
+        internal static string PackSelectorDialog_UsePublicPackCatalog_Tip {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_UsePublicPackCatalog_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Format Invalid.
         /// </summary>
         internal static string Parlay_MergeStringTable_InvalidFileFormat_Caption {
@@ -8243,6 +8445,33 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve just copied this Promo Code to your computer&apos;s clipboard:
+        ///`{0}`
+        ///
+        ///You can now just paste it right in to the Promo Code field during check-out and help support mod creators!.
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithCreatorKitPackPurchase_Thanks_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithCreatorKitPackPurchase_Thanks_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that **{1}** was made by a mod community creator in cooperation with Electronic Arts, and the creator has a Promo Code for this program:
+        ///
+        ///`{0}`
+        ///
+        ///Since you&apos;re interested in purchasing a pack originally made by a community mod creator with a Promo Code, would you like to support them by entering their Promo Code at check-out?
+        ///
+        ///Doing so **will not cost you any more**, but it will cause the [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SmartSimObserver_HelpWithPackPurchase_PresentCreatorKitOpportunity_Text {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_PresentCreatorKitOpportunity_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An Opportunity Has Presented Itself....
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption {
@@ -8253,6 +8482,7 @@ namespace PlumbBuddy.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
+        ///
         ///`{1}`
         ///
         ///Since you&apos;re interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?

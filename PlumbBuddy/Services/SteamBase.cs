@@ -1,5 +1,6 @@
 using Gameloop.Vdf.Linq;
 using Gameloop.Vdf;
+using LlamaLogic.ValveDataFormat;
 
 namespace PlumbBuddy.Services;
 
@@ -15,9 +16,63 @@ abstract class SteamBase :
         return Task.FromResult(false);
     }
 
+    public abstract Task<bool> GetIsSteamRunningAsync();
+
     protected abstract DirectoryInfo? GetSteamDataDirectory();
 
     protected abstract FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory);
+
+    public async Task<string?> GetTS4ConfiguredCommandLineArgumentsAsync()
+    {
+        var steamDirectory = GetSteamDataDirectory();
+        if (steamDirectory is null)
+            return null;
+        var userDataDirectory = new DirectoryInfo(Path.Combine(steamDirectory.FullName, "userdata"));
+        if (!userDataDirectory.Exists)
+            return null;
+        foreach (var userDirectory in userDataDirectory.GetDirectories())
+        {
+            var configDirectory = new DirectoryInfo(Path.Combine(userDirectory.FullName, "config"));
+            if (!configDirectory.Exists)
+                continue;
+            var localConfigFile = new FileInfo(Path.Combine(configDirectory.FullName, "localconfig.vdf"));
+            if (!localConfigFile.Exists)
+                continue;
+            IReadOnlyList<VdfNode> localConfig;
+            using (var localConfigFileStream = localConfigFile.OpenRead())
+            using (var localConfigFileReader = new StreamReader(localConfigFileStream))
+                localConfig = await VdfNode.DeserializeAsync(localConfigFileReader).ConfigureAwait(false);
+            if (localConfig.Count is 0
+                || localConfig[0] is not VdfKeyValuePair userLocalConfigStore
+                || userLocalConfigStore.Key is not "UserLocalConfigStore"
+                || userLocalConfigStore.Value is not VdfSection userLocalConfigStoreSection)
+                continue;
+            try
+            {
+                if (userLocalConfigStoreSection["Software"] is not VdfSection softwareSection
+                    || softwareSection["Valve"] is not VdfSection valveSection
+                    || valveSection["Steam"] is not VdfSection steamSection
+                    || steamSection["apps"] is not VdfSection appsSection
+                    || appsSection[steamAppId] is not VdfSection ts4Section)
+                    continue;
+                try
+                {
+                    if (ts4Section["LaunchOptions"] is string launchOptionsValue)
+                        return launchOptionsValue;
+                }
+                catch (InvalidOperationException)
+                {
+                    // don't care
+                }
+                return null;
+            }
+            catch (InvalidOperationException)
+            {
+                continue;
+            }
+        }
+        return null;
+    }
 
     public async Task<DirectoryInfo?> GetTS4InstallationDirectoryAsync()
     {
@@ -62,5 +117,87 @@ abstract class SteamBase :
             return ts4Directory; // well, if we got here, this shit is Classic Coke -- the real TS4, baby
         }
         return null; // sigh, ran all out of Steam libraries and no TS4 to be found 😔
+    }
+
+    public abstract Task LaunchSteamAsync();
+
+    public abstract Task<bool> QuitSteamAsync();
+
+    public async Task SetTS4ConfiguredCommandLineArgumentsAsync(string? commandLineArguments)
+    {
+        var quitSteam = await QuitSteamAsync().ConfigureAwait(false);
+        var delayTicks = 20;
+        while (await GetIsSteamRunningAsync().ConfigureAwait(false) && --delayTicks > 0)
+            await Task.Delay(TimeSpan.FromSeconds(0.25)).ConfigureAwait(false);
+        var steamDirectory = GetSteamDataDirectory();
+        if (steamDirectory is null)
+            return;
+        var userDataDirectory = new DirectoryInfo(Path.Combine(steamDirectory.FullName, "userdata"));
+        if (!userDataDirectory.Exists)
+            return;
+        foreach (var userDirectory in userDataDirectory.GetDirectories())
+        {
+            var configDirectory = new DirectoryInfo(Path.Combine(userDirectory.FullName, "config"));
+            if (!configDirectory.Exists)
+                continue;
+            var localConfigFile = new FileInfo(Path.Combine(configDirectory.FullName, "localconfig.vdf"));
+            if (!localConfigFile.Exists)
+                continue;
+            IReadOnlyList<VdfNode> localConfig;
+            using (var localConfigFileStream = localConfigFile.OpenRead())
+            using (var localConfigFileReader = new StreamReader(localConfigFileStream))
+                localConfig = await VdfNode.DeserializeAsync(localConfigFileReader).ConfigureAwait(false);
+            if (localConfig.Count is 0
+                || localConfig[0] is not VdfKeyValuePair userLocalConfigStore
+                || userLocalConfigStore.Key is not "UserLocalConfigStore"
+                || userLocalConfigStore.Value is not VdfSection userLocalConfigStoreSection)
+                continue;
+            var localConfigChanged = false;
+            try
+            {
+                if (userLocalConfigStoreSection["Software"] is not VdfSection softwareSection
+                    || softwareSection["Valve"] is not VdfSection valveSection
+                    || valveSection["Steam"] is not VdfSection steamSection
+                    || steamSection["apps"] is not VdfSection appsSection
+                    || appsSection[steamAppId] is not VdfSection ts4Section)
+                    continue;
+                if (ts4Section.Nodes.FirstOrDefault(node => node is VdfKeyValuePair kvp && kvp.Key == "LaunchOptions") is VdfKeyValuePair launchOptionsKeyValuePair)
+                {
+                    if (string.IsNullOrWhiteSpace(commandLineArguments))
+                    {
+                        ts4Section.Nodes.Remove(launchOptionsKeyValuePair);
+                        localConfigChanged = true;
+                    }
+                    else if (launchOptionsKeyValuePair.Value is not string value
+                        || value != commandLineArguments)
+                    {
+                        launchOptionsKeyValuePair.Value = commandLineArguments;
+                        localConfigChanged = true;
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(commandLineArguments))
+                {
+                    ts4Section.Nodes.Add(new VdfKeyValuePair
+                    {
+                        Key = "LaunchOptions",
+                        Value = commandLineArguments
+                    });
+                    localConfigChanged = true;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // don't care
+            }
+            if (localConfigChanged)
+            {
+                using var localConfigFileStream = new FileStream(localConfigFile.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
+                using var localConfigFileWriter = new StreamWriter(localConfigFileStream);
+                await localConfig[0].SerializeAsync(localConfigFileWriter).ConfigureAwait(false);
+                await localConfigFileWriter.FlushAsync().ConfigureAwait(false);
+            }
+        }
+        if (quitSteam)
+            await LaunchSteamAsync().ConfigureAwait(false);
     }
 }

@@ -4,29 +4,52 @@ namespace PlumbBuddy.Services;
 public partial class Catalog :
     ICatalog
 {
-    public Catalog(ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger)
+    public Catalog(ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, IGameResourceCataloger gameResourceCataloger, IPublicCatalogs publicCatalogs)
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        ArgumentNullException.ThrowIfNull(gameResourceCataloger);
+        ArgumentNullException.ThrowIfNull(publicCatalogs);
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        this.gameResourceCataloger = gameResourceCataloger;
+        this.publicCatalogs = publicCatalogs;
+        this.publicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
+        packIcons = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        PackIcons = packIcons.AsReadOnly();
         QueryManifests();
     }
 
     ~Catalog() =>
         Dispose(false);
 
+    readonly IGameResourceCataloger gameResourceCataloger;
     bool isDisposed;
+    bool isQuerying;
     IReadOnlyDictionary<CatalogModKey, IReadOnlyList<CatalogModValue>> mods =
         new Dictionary<CatalogModKey, IReadOnlyList<CatalogModValue>>().ToImmutableDictionary();
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     string modsSearchText = string.Empty;
+    readonly Dictionary<string, string> packIcons;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
+    readonly IPublicCatalogs publicCatalogs;
     CatalogModKey? selectedModKey;
     readonly ISettings settings;
+
+    public bool IsQuerying
+    {
+        get => isQuerying;
+        private set
+        {
+            if (isQuerying == value)
+                return;
+            isQuerying = value;
+            OnPropertyChanged();
+        }
+    }
 
     public IReadOnlyDictionary<CatalogModKey, IReadOnlyList<CatalogModValue>> Mods
     {
@@ -49,6 +72,8 @@ public partial class Catalog :
             OnPropertyChanged();
         }
     }
+
+    public IReadOnlyDictionary<string, string> PackIcons { get; }
 
     public CatalogModKey? SelectedModKey
     {
@@ -74,7 +99,19 @@ public partial class Catalog :
     {
         if (disposing && !isDisposed)
         {
+            modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+            publicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
             isDisposed = true;
+        }
+    }
+
+    async Task EnsurePackIconsAsync(ModFileManifestModel model)
+    {
+        foreach (var packCode in model.RequiredPacks.Concat(model.IncompatiblePacks).Concat(model.RecommendedPacks.Select(recommendedPack => recommendedPack.PackCode)).Distinct())
+        {
+            if (packIcons.ContainsKey(packCode))
+                continue;
+            packIcons.Add(packCode, $"data:image/png;base64,{Convert.ToBase64String((await gameResourceCataloger.GetPackIcon64Async(packCode).ConfigureAwait(false)).Span)}");
         }
     }
 
@@ -82,6 +119,12 @@ public partial class Catalog :
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State)
             && modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
+            QueryManifests();
+    }
+
+    void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
             QueryManifests();
     }
 
@@ -97,9 +140,11 @@ public partial class Catalog :
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task QueryManifestsAsync()
     {
+        IsQuerying = true;
         var userDataFolderPath = settings.UserDataFolderPath;
         var mods = new Dictionary<CatalogModKey, List<CatalogModValue>>();
         await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+        await gameResourceCataloger.WaitForIdleAsync().ConfigureAwait(false);
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         foreach (var activeManifest in await pbDbContext.ModFileManifestHashes
             .SelectMany(mfmh => mfmh.ManifestsByCalculation!)
@@ -138,14 +183,17 @@ public partial class Catalog :
                 values = [];
                 mods.Add(key, values);
             }
+            var model = activeManifest.ToModel();
+            await EnsurePackIconsAsync(model).ConfigureAwait(false);
             values.Add(new
             (
-                activeManifest.ToModel(),
+                model,
                 activeManifest.ModFileHash.ModFiles.Select(mf => new FileInfo(Path.Combine(userDataFolderPath, "Mods", mf.Path))).ToList().AsReadOnly(),
                 (activeManifest.RequiredMods ?? Enumerable.Empty<RequiredMod>()).Select(rm => new CatalogModKey(rm.Name, rm.Creators?.Select(c => c.Name).Order().Humanize(), rm.Url)).Distinct().Except([key]).ToList().AsReadOnly(),
                 (activeManifest.CalculatedModFileManifestHash?.Dependents ?? Enumerable.Empty<RequiredMod>()).Concat(activeManifest.SubsumedHashes.SelectMany(sh => sh.Dependents) ?? []).Select(d => d.ModFileManifest).Where(mfm => mfm is not null).Cast<ModFileManifest>().Select(mfm => new CatalogModKey(mfm.Name, mfm.Creators?.Select(c => c.Name).Order().Humanize(), mfm.Url)).Distinct().Except([key]).ToList().AsReadOnly()
             ));
         }
         Mods = mods.ToImmutableDictionary(kv => kv.Key, kv => (IReadOnlyList<CatalogModValue>)kv.Value.AsReadOnly());
+        IsQuerying = false;
     }
 }

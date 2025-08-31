@@ -162,7 +162,7 @@ static class DialogExtensions
     public static Task ShowPackSelectorDialogAsync(this IDialogService dialogService) =>
         StaticDispatcher.DispatchAsync(async () =>
         {
-            var dialog = await dialogService.ShowAsync<PackSelectorDialog>("Pack Selector", new DialogParameters<PackSelectorDialog>(), new DialogOptions
+            var dialog = await dialogService.ShowAsync<PackSelectorDialog>(AppText.PackSelectorDialog_Caption, new DialogParameters<PackSelectorDialog>(), new DialogOptions
             {
                 BackdropClick = false,
                 CloseOnEscapeKey = false,

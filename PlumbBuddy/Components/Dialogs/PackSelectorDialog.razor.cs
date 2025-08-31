@@ -79,7 +79,9 @@ partial class PackSelectorDialog
     {
         isApplying = true;
         StateHasChanged();
-        var commandLineArgumentsLine = await ElectronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync();
+        var commandLineArgumentsLine = SmartSimObserver.IsSteamInstallation
+            ? await Steam.GetTS4ConfiguredCommandLineArgumentsAsync()
+            : await ElectronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync();
         if (!string.IsNullOrWhiteSpace(commandLineArgumentsLine)
             && GetDisablePacksCommandLineArgumentPattern().Match(commandLineArgumentsLine) is { Success: true } match)
             commandLineArgumentsLine = commandLineArgumentsLine.Remove(match.Index, match.Length);
@@ -89,7 +91,12 @@ partial class PackSelectorDialog
             commandLineArguments.Add($"-disablepacks:{string.Join(",", disabledPacks)}");
         var newCommandLineArgumentsLine = commandLineArguments.Count is 0 ? null : string.Join(" ", commandLineArguments);
         if (newCommandLineArgumentsLine != commandLineArgumentsLine)
-            await ElectronicArtsApp.SetTS4ConfiguredCommandLineArgumentsAsync(newCommandLineArgumentsLine);
+        {
+            if (SmartSimObserver.IsSteamInstallation)
+                await Steam.SetTS4ConfiguredCommandLineArgumentsAsync(newCommandLineArgumentsLine);
+            else
+                await ElectronicArtsApp.SetTS4ConfiguredCommandLineArgumentsAsync(newCommandLineArgumentsLine);
+        }
         MudDialog?.Close(DialogResult.Cancel());
     }
 
@@ -116,9 +123,11 @@ partial class PackSelectorDialog
         isLoading = true;
         StateHasChanged();
         var currentlyDisabledPacks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var commandLineArguments = await ElectronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync();
-        if (!string.IsNullOrWhiteSpace(commandLineArguments)
-            && GetDisablePacksCommandLineArgumentPattern().Match(commandLineArguments) is { Success: true } match)
+        var commandLineArgumentsLine = SmartSimObserver.IsSteamInstallation
+            ? await Steam.GetTS4ConfiguredCommandLineArgumentsAsync()
+            : await ElectronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync();
+        if (!string.IsNullOrWhiteSpace(commandLineArgumentsLine)
+            && GetDisablePacksCommandLineArgumentPattern().Match(commandLineArgumentsLine) is { Success: true } match)
             foreach (var packCode in match.Groups["packCodes"].Value.Split(","))
                 currentlyDisabledPacks.Add(packCode);
         var packGroups = new Dictionary<string, (string name, IList<Pack> packs)>();
@@ -134,24 +143,25 @@ partial class PackSelectorDialog
                     packs = packGroup.packs;
                 else
                 {
+                    var isCreator = !string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode);
                     packs = [];
                     packGroups.Add
                     (
                         packGroupKey,
                         (
                             packCatalogEntry.Type is PackDescriptionType.Expansion
-                            ? "Expansion Packs"
+                            ? AppText.PackSelectorDialog_PackType_Expansion
                             : packCatalogEntry.Type is PackDescriptionType.Game
-                            ? "Game Packs"
+                            ? AppText.PackSelectorDialog_PackType_Game
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.SubType is PackDescriptionSubType.Full
-                            ? "Stuff Packs"
+                            ? AppText.PackSelectorDialog_PackType_Stuff
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is null
-                            ? $"{(string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode) ? string.Empty : "Creator ")}Combination Kits"
+                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorCombinationKit : AppText.PackSelectorDialog_PackType_CombinationKit)
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is PackDescriptionKitType.CAS
-                            ? $"{(string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode) ? string.Empty : "Creator ")}Create A Sim Kits"
+                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorCreateASimKit : AppText.PackSelectorDialog_PackType_CreateASimKit)
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is PackDescriptionKitType.BuildBuy
-                            ? $"{(string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode) ? string.Empty : "Creator ")}Build & Buy Kits"
-                            : "Free",
+                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorBuildAndBuyKit : AppText.PackSelectorDialog_PackType_BuildAndBuyKit)
+                            : AppText.PackSelectorDialog_PackType_Free,
                             packs
                         )
                     );
@@ -181,12 +191,12 @@ partial class PackSelectorDialog
                         packGroupKey,
                         (
                             packGroupKey.Equals("E", StringComparison.OrdinalIgnoreCase)
-                            ? "Expansion Packs"
+                            ? AppText.PackSelectorDialog_PackType_Expansion
                             : packGroupKey.Equals("G", StringComparison.OrdinalIgnoreCase)
-                            ? "Game Packs"
+                            ? AppText.PackSelectorDialog_PackType_Game
                             : packGroupKey.Equals("S", StringComparison.OrdinalIgnoreCase)
-                            ? "Stuff Packs"
-                            : "Free",
+                            ? AppText.PackSelectorDialog_PackType_Stuff
+                            : AppText.PackSelectorDialog_PackType_Free,
                             packs
                         )
                     );

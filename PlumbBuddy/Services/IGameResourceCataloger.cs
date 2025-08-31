@@ -22,4 +22,6 @@ public interface IGameResourceCataloger :
     Task<ReadOnlyMemory<byte>> GetRawResourceAsync(ResourceKey key);
 
     void ScanSoon();
+
+    Task WaitForIdleAsync(CancellationToken cancellationToken = default);
 }

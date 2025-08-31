@@ -4,6 +4,7 @@
 @inject ILogger<CatalogDisplayModDetails> Logger
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IPublicCatalogs PublicCatalogs
+@inject ISettings Settings
 @inject ISmartSimObserver SmartSimObserver
 @inject IStringLocalizer<AppText> StringLocalizer
 
@@ -63,17 +64,28 @@
 				<MudFlexBreak />
 			}
 			<MudItem>
-				<MudGrid Justify="Justify.Center" Spacing="2">
+				<MudGrid Justify="Justify.Center" Spacing="2" Class="align-center">
                     <MudItem>
                         <MudTooltip Arrow Text="@StringLocalizer["CatalogDisplay_AskForHelp_Tip", selectedModKey.Name]" Color="Color.Info">
-                            <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))" StartIcon="@MaterialDesignIcons.Normal.FaceAgent" Color="Color.Info">@MarkupLocalizer[nameof(AppText.CatalogDisplay_AskForHelp)]</MudButton>
+                            <MudChip T="string" Class="ma-0" Color="Color.Info" Icon="@MaterialDesignIcons.Normal.FaceAgent" Label="true" OnClick="@(() => DialogService.ShowAskForHelpDialogAsync(Logger, PublicCatalogs, forCreators: creators, forManifestHashHex: hashHex))">
+                                <ChildContent>
+                                    @MarkupLocalizer[nameof(AppText.CatalogDisplay_AskForHelp)]
+                                </ChildContent>
+                            </MudChip>
                         </MudTooltip>
                     </MudItem>
 					@foreach (var requiredPackCode in requiredPackCodes)
 					{
                         <MudItem>
-                            <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
-                                <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(requiredPackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))" StartIcon="@MaterialDesignIcons.Normal.BagPersonal" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">@requiredPackCode</MudButton>
+                            <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, (PublicCatalogs.PackCatalog?.TryGetValue(requiredPackCode, out var packDescription) ?? false) ? packDescription.EnglishName : requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
+                                <MudChip T="string" Class="ma-0" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)" Label="true" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(requiredPackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))">
+                                    <AvatarContent>
+                                        <MudAvatar>
+                                            <MudImage Src="@Catalog.PackIcons[requiredPackCode]" />
+                                        </MudAvatar>
+                                    </AvatarContent>
+                                    <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(requiredPackCode, out var packDescription) ?? false) ? packDescription.EnglishName : requiredPackCode)</ChildContent>
+                                </MudChip>
                             </MudTooltip>
                         </MudItem>
 					}
@@ -82,20 +94,27 @@
                         <MudItem>
                             <MudTooltip Arrow Color="Color.Primary">
                                 <ChildContent>
-                                    <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(recommendPack.PackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))" StartIcon="@MaterialDesignIcons.Normal.BagPersonalPlus" Color="Color.Info">@(recommendPack.PackCode)</MudButton>
+                                    <MudChip T="string" Class="ma-0" Color="Color.Info" Label="true" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(recommendPack.PackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))">
+                                        <AvatarContent>
+                                            <MudAvatar>
+                                                <MudImage Src="@Catalog.PackIcons[recommendPack.PackCode]" />
+                                            </MudAvatar>
+                                        </AvatarContent>
+                                        <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(recommendPack.PackCode, out var packDescription) ?? false) ? packDescription.EnglishName : recommendPack.PackCode)</ChildContent>
+                                    </MudChip>
                                 </ChildContent>
                                 <TooltipContent>
                                     @if (string.IsNullOrWhiteSpace(recommendPack.Reason))
                                     {
                                         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                            @MarkupLocalizer[installedPackCodes.Contains(recommendPack.PackCode) ? nameof(AppText.CatalogDisplay_RecommendedPack_Tip_Installed) : nameof(AppText.CatalogDisplay_RecommendedPack_Tip), selectedModKey.Name, recommendPack.PackCode]
+                                            @MarkupLocalizer[installedPackCodes.Contains(recommendPack.PackCode) ? nameof(AppText.CatalogDisplay_RecommendedPack_Tip_Installed) : nameof(AppText.CatalogDisplay_RecommendedPack_Tip), selectedModKey.Name, (PublicCatalogs.PackCatalog?.TryGetValue(recommendPack.PackCode, out var packDescription) ?? false) ? packDescription.EnglishName : recommendPack.PackCode]
                                         </MudTextM3>
                                     }
                                     else
                                     {
                                         <MudStack Spacing="4">
                                             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                                                @MarkupLocalizer[installedPackCodes.Contains(recommendPack.PackCode) ? nameof(AppText.CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason) : nameof(AppText.CatalogDisplay_RecommendedPack_Tip_CreatorReason), creators.Humanize(), recommendPack.PackCode, selectedModKey.Name]
+                                                @MarkupLocalizer[installedPackCodes.Contains(recommendPack.PackCode) ? nameof(AppText.CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason) : nameof(AppText.CatalogDisplay_RecommendedPack_Tip_CreatorReason), creators.Humanize(), (PublicCatalogs.PackCatalog?.TryGetValue(recommendPack.PackCode, out var packDescription) ?? false) ? packDescription.EnglishName : recommendPack.PackCode, selectedModKey.Name]
                                             </MudTextM3>
                                             @foreach (var paragraph in recommendPack.Reason.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                                             {
@@ -113,7 +132,14 @@
 					{
                         <MudItem>
                             <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(incompatiblePackCode) ? "CatalogDisplay_IncompatiblePack_Installed_Tip" : "CatalogDisplay_IncompatiblePack_NotInstalled_Tip", selectedModKey.Name, incompatiblePackCode])" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
-                                <MudButton Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => Browser.OpenAsync(new Uri("https://jamesturner.yt/disablepacks", UriKind.Absolute), BrowserLaunchMode.External))" StartIcon="@MaterialDesignIcons.Normal.BagPersonalOff" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">@incompatiblePackCode</MudButton>
+                                <MudChip T="string" Class="ma-0" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)" Label="true">
+                                    <AvatarContent>
+                                        <MudAvatar>
+                                            <MudImage Src="@Catalog.PackIcons[incompatiblePackCode]" />
+                                        </MudAvatar>
+                                    </AvatarContent>
+                                    <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(incompatiblePackCode, out var packDescription) ?? false) ? packDescription.EnglishName : incompatiblePackCode)</ChildContent>
+                                </MudChip>
                             </MudTooltip>
                         </MudItem>
 					}

@@ -2372,6 +2372,7 @@ Click me to start Guided Support for the PlumbBuddy Discord and we can get that 
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text" xml:space="preserve">
     <value>Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that {0} gave me their Promo Code for this program:
+
 `{1}`
 
 Since you're interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?
@@ -3398,5 +3399,98 @@ More detailed technical information is available in my log.</value>
   <data name="CatalogDisplay_RecommendedPack_Tip_InstalledCreatorReason" xml:space="preserve">
     <value>According to {0}, because you have installed {1}, {2} has been enhanced:</value>
     <comment>{0} = Creator Name; {1} = Recommended Pack Code; {2} = Mod Name</comment>
+  </data>
+  <data name="SmartSimObserver_HelpWithPackPurchase_PresentCreatorKitOpportunity_Text" xml:space="preserve">
+    <value>Electronic Arts has an affiliate program for creators which gives them a commission for sales of packs. It turns out that **{1}** was made by a mod community creator in cooperation with Electronic Arts, and the creator has a Promo Code for this program:
+
+`{0}`
+
+Since you're interested in purchasing a pack originally made by a community mod creator with a Promo Code, would you like to support them by entering their Promo Code at check-out?
+
+Doing so **will not cost you any more**, but it will cause the creator to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!</value>
+    <comment>This text is in Markdown. {0} = EA Promo Code; {1} = Pack Code</comment>
+  </data>
+  <data name="SmartSimObserver_HelpWithCreatorKitPackPurchase_Thanks_Text" xml:space="preserve">
+    <value>I've just copied this Promo Code to your computer's clipboard:
+`{0}`
+
+You can now just paste it right in to the Promo Code field during check-out and help support mod creators!</value>
+    <comment>This text is in Markdown. {0} = EA Promo Code</comment>
+  </data>
+  <data name="PackSelectorDialog_Caption" xml:space="preserve">
+    <value>Pack Selector</value>
+  </data>
+  <data name="PackSelectorDialog_EUA" xml:space="preserve">
+    <value>**Disabling a pack will stop all parts of that pack from loading in your game.**
+
+If you load an existing save where you used that pack, everything from it will vanish—all hair, clothes, traits, furniture, and the world if one is added.
+You should be _very careful_ and only load a save where you used a pack that is now disabled if you're sure that's what you want.
+If you save like that, items from the pack will stay missing even if you enable the pack again and the only way to get them back will be to by going back to a previous save.
+
+If you plan to disable a pack, remove all mods that require it from your Mods folder and clear your cache before you load the game again.</value>
+    <comment>This text is Markdown.</comment>
+  </data>
+  <data name="PackSelectorDialog_Status_Examining" xml:space="preserve">
+    <value>I am examining The Sims 4 DLC you have installed. One moment...</value>
+    <comment>This text is Markdown.</comment>
+  </data>
+  <data name="PackSelectorDialog_Status_Applying" xml:space="preserve">
+    <value>I am applying your changes. One moment...</value>
+    <comment>This text is Markdown.</comment>
+  </data>
+  <data name="PackSelectorDialog_SelectAll" xml:space="preserve">
+    <value>Select all {0}</value>
+    <comment>This text is Markdown. {0} = The classification of elements being selected (e.g. BB Kits, CAS Kits, etc.)</comment>
+  </data>
+  <data name="PackSelectorDialog_SelectAll_Global" xml:space="preserve">
+    <value>Packs &amp; Kits</value>
+  </data>
+  <data name="PackSelectorDialog_UsePublicPackCatalog_Label" xml:space="preserve">
+    <value>Use PlumbBuddy.app Public Pack Catalog to Display Pack and Kit Names</value>
+  </data>
+  <data name="PackSelectorDialog_UsePublicPackCatalog_Tip" xml:space="preserve">
+    <value>Switching this on will connect to the PlumbBuddy.app web site, allowing us to show you pack and kit names rather than their codes. This feature requires an Internet connection.</value>
+  </data>
+  <data name="PackSelectorDialog_Ok_Tip" xml:space="preserve">
+    <value>Click here to close the game's launcher and apply your changes.</value>
+  </data>
+  <data name="PackSelectorDialog_Ok_Tip_Loading" xml:space="preserve">
+    <value>Hold on a moment, I'm looking at your DLC.</value>
+  </data>
+  <data name="PackSelectorDialog_Ok_Tip_Applying" xml:space="preserve">
+    <value>Your changes are being applied.</value>
+  </data>
+  <data name="PackSelectorDialog_Ok_Tip_GameIsRunning" xml:space="preserve">
+    <value>You need to close The Sims 4 before you can do this.</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_Expansion" xml:space="preserve">
+    <value>Expansion Packs</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_Game" xml:space="preserve">
+    <value>Game Packs</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_Stuff" xml:space="preserve">
+    <value>Stuff Packs</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_Free" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_CombinationKit" xml:space="preserve">
+    <value>Combination Kits</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_CreatorCombinationKit" xml:space="preserve">
+    <value>Creator Combination Kits</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_CreateASimKit" xml:space="preserve">
+    <value>Create A Sim Kits</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_CreatorCreateASimKit" xml:space="preserve">
+    <value>Creator Create A Sim Kits</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_BuildAndBuyKit" xml:space="preserve">
+    <value>Build &amp; Buy Kits</value>
+  </data>
+  <data name="PackSelectorDialog_PackType_CreatorBuildAndBuyKit" xml:space="preserve">
+    <value>Creator Build &amp; Buy Kits</value>
   </data>
 </root>
