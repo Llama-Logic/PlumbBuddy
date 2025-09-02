@@ -24,27 +24,31 @@ public sealed class DependencyScan :
         BrokenFile = UnspecifiedDependentSource | UnspecifiedDependencySource
     }
 
+    record ModWithDisabledPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
     record ModWithIncompatiblePacks(string Name, IReadOnlyList<string> IncompatiblePackCodes, IReadOnlyList<string> FilePaths);
     record ModWithMissingDependencyMod(long ModManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
     record ModWithMissingPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
 
-    public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings settings, ISmartSimObserver smartSimObserver)
+    public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings settings, ISmartSimObserver smartSimObserver, IPublicCatalogs publicCatalogs)
     {
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(blazorFramework);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(smartSimObserver);
+        ArgumentNullException.ThrowIfNull(publicCatalogs);
         this.pbDbContextFactory = pbDbContextFactory;
         this.platformFunctions = platformFunctions;
         this.blazorFramework = blazorFramework;
         this.settings = settings;
         this.smartSimObserver = smartSimObserver;
+        this.publicCatalogs = publicCatalogs;
     }
 
     readonly IBlazorFramework blazorFramework;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly IPlatformFunctions platformFunctions;
+    readonly IPublicCatalogs publicCatalogs;
     readonly ISettings settings;
     readonly ISmartSimObserver smartSimObserver;
 
@@ -54,6 +58,8 @@ public sealed class DependencyScan :
         {
             if (issueData is ModWithMissingPacks modWithMissingPacks && resolutionStr.StartsWith("purchase-"))
                 await smartSimObserver.HelpWithPackPurchaseAsync(resolutionStr[9..], blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>(), modWithMissingPacks.Creators, modWithMissingPacks.ElectronicArtsPromoCode).ConfigureAwait(false);
+            else if (resolutionStr is "selectPacks")
+                await blazorFramework.MainLayoutLifetimeScope!.Resolve<IDialogService>().ShowPackSelectorDialogAsync();
             else if (resolutionStr.StartsWith("showfile-") && new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", resolutionStr[9..])) is { } modFile && modFile.Exists)
                 platformFunctions.ViewFile(modFile);
             else if (resolutionStr is "stopTellingMe")
@@ -66,6 +72,7 @@ public sealed class DependencyScan :
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         var installedPackCodes = smartSimObserver.InstalledPackCodes;
+        var disabledPackCodes = smartSimObserver.DisabledPackCodes;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modWithMissingPacks in pbDbContext.ModFileManifests
             .Where(mfm => mfm.ModFileHash.ModFiles.Any() && mfm.RequiredPacks.Any(pc => !installedPackCodes.Contains(pc.Code.ToUpper())))
@@ -82,7 +89,7 @@ public sealed class DependencyScan :
             yield return new ScanIssue
             {
                 Caption = string.Format(AppText.Scan_Dependency_RequiredPack_Caption, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithMissingPacks.MissingPackCodes.Count)),
-                Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, modWithMissingPacks.MissingPackCodes.Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
+                Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithMissingPacks.MissingPackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithMissingPacks.MissingPackCodes).Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -92,7 +99,7 @@ public sealed class DependencyScan :
                 [
                     ..modWithMissingPacks.MissingPackCodes.Select(missingPackCode => new ScanIssueResolution
                     {
-                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, missingPackCode),
+                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, publicCatalogs.PackCatalog is { } packCatalog ? packCatalog[missingPackCode].EnglishName : missingPackCode),
                         Icon = MaterialDesignIcons.Normal.Store,
                         Color = MudBlazor.Color.Primary,
                         Data = $"purchase-{missingPackCode}"
@@ -115,6 +122,54 @@ public sealed class DependencyScan :
                 ]
             };
         }
+        await foreach (var modWithDisabledPacks in pbDbContext.ModFileManifests
+            .Where(mfm => mfm.ModFileHash.ModFiles.Any() && mfm.RequiredPacks.Any(pc => disabledPackCodes.Contains(pc.Code.ToUpper())))
+            .Select(mfm => new ModWithDisabledPacks
+            (
+                mfm.Name,
+                mfm.Creators.Select(c => c.Name).ToList(),
+                mfm.ElectronicArtsPromoCode == null ? null : mfm.ElectronicArtsPromoCode.Code,
+                mfm.RequiredPacks.Where(pc => disabledPackCodes.Contains(pc.Code.ToUpper())).Select(pc => pc.Code.ToUpper()).ToList(),
+                mfm.ModFileHash.ModFiles.Select(mf => mf.Path).ToList()
+            ))
+            .AsAsyncEnumerable())
+        {
+            yield return new ScanIssue
+            {
+                Caption = string.Format(AppText.Scan_Dependency_DisabledPack_Caption, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithDisabledPacks.MissingPackCodes.Count)),
+                Description = string.Format(AppText.Scan_Dependency_DisabledPack_Description, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithDisabledPacks.MissingPackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithDisabledPacks.MissingPackCodes).Humanize()),
+                Icon = MaterialDesignIcons.Normal.BagPersonalOff,
+                Type = ScanIssueType.Sick,
+                Origin = this,
+                Data = modWithDisabledPacks,
+                GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthDependencyScan{settings.Type}", UriKind.Absolute),
+                Resolutions =
+                [
+                    ..modWithDisabledPacks.MissingPackCodes.Select(disabledPackCode => new ScanIssueResolution
+                    {
+                        Label = string.Format(AppText.Scan_Dependency_DisabledPack_HelpMeEnable_Label, publicCatalogs.PackCatalog is { } packCatalog ? packCatalog[disabledPackCode].EnglishName : disabledPackCode),
+                        Icon = MaterialDesignIcons.Normal.BagPersonal,
+                        Color = MudBlazor.Color.Primary,
+                        Data = "selectPacks"
+                    }),
+                    ..modWithDisabledPacks.FilePaths.Select(filePath => new ScanIssueResolution
+                    {
+                        Label = string.Format(AppText.Scan_Common_ShowMeTheFile_Label, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Common_ShowMeTheFile_Label_ModNameFallback : modWithDisabledPacks.Name),
+                        Icon = MaterialDesignIcons.Normal.FileFind,
+                        Color = MudBlazor.Color.Secondary,
+                        Data = $"showfile-{filePath}"
+                    }),
+                    new()
+                    {
+                        Icon = MaterialDesignIcons.Normal.Cancel,
+                        Label = AppText.Scan_Common_StopTellingMe_Label,
+                        CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
+                        CautionText = AppText.Scan_Dependency_DisabledPack_StopTellingMe_CautionText,
+                        Data = "stopTellingMe"
+                    }
+                ]
+            };
+        }
         await foreach (var modWithIncompatiblePacks in pbDbContext.ModFileManifests
             .Where(mfm => mfm.ModFileHash.ModFiles.Any() && mfm.IncompatiblePacks.Any(pc => installedPackCodes.Contains(pc.Code.ToUpper())))
             .Select(mfm => new ModWithIncompatiblePacks
@@ -127,7 +182,7 @@ public sealed class DependencyScan :
             yield return new ScanIssue
             {
                 Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
-                Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, modWithIncompatiblePacks.IncompatiblePackCodes.Humanize()),
+                Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithIncompatiblePacks.IncompatiblePackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithIncompatiblePacks.IncompatiblePackCodes).Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonalTag,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -138,10 +193,9 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = AppText.Scan_Dependency_IncompatiblePack_HelpMeDisable_Label,
-                        Icon = MaterialDesignIcons.Normal.Web,
+                        Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                         Color = MudBlazor.Color.Primary,
-                        Data = $"remove-packs",
-                        Url = new("https://jamesturner.yt/disablepacks", UriKind.Absolute)
+                        Data = "selectPacks"
                     },
                     ..modWithIncompatiblePacks.FilePaths.Select(filePath => new ScanIssueResolution
                     {

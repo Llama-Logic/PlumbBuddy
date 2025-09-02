@@ -1,3 +1,5 @@
+using PlumbBuddy.Services;
+
 namespace PlumbBuddy.Components.Dialogs;
 
 partial class PackSelectorDialog
@@ -92,6 +94,49 @@ partial class PackSelectorDialog
         var newCommandLineArgumentsLine = commandLineArguments.Count is 0 ? null : string.Join(" ", commandLineArguments);
         if (newCommandLineArgumentsLine != commandLineArgumentsLine)
         {
+            var inGamePackSelectorActive = false;
+            var userSettingIniFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "UserSetting.ini"));
+            if (userSettingIniFile.Exists)
+            {
+                try
+                {
+                    var parser = new IniDataParser();
+                    var data = parser.Parse(await File.ReadAllTextAsync(userSettingIniFile.FullName));
+                    var usersettingData = data["usersetting"];
+                    inGamePackSelectorActive = !string.IsNullOrWhiteSpace(usersettingData["packstoskipmount"]);
+                }
+                catch (ParsingException ex)
+                {
+                    // eww, a bad INI file?
+                    Logger.LogWarning(ex, "attempting to parse the game user setting INI file at {path} failed", userSettingIniFile.FullName);
+                }
+            }
+            if (inGamePackSelectorActive)
+            {
+                var nullableResetInGamePackSelector = await DialogService.ShowQuestionDialogAsync(AppText.PackSelectorDialog_Question_ResetInGame_Caption, AppText.PackSelectorDialog_Question_ResetInGame_Text, userCanCancel: true);
+                if (nullableResetInGamePackSelector is not { } resetInGamePackSelector)
+                {
+                    isApplying = false;
+                    StateHasChanged();
+                    return;
+                }
+                if (resetInGamePackSelector)
+                {
+                    try
+                    {
+                        var parser = new IniDataParser();
+                        var data = parser.Parse(await File.ReadAllTextAsync(userSettingIniFile.FullName));
+                        var usersettingData = data["usersetting"];
+                        usersettingData["packstoskipmount"] = string.Empty;
+                        await File.WriteAllTextAsync(userSettingIniFile.FullName, data.ToString());
+                    }
+                    catch (ParsingException ex)
+                    {
+                        // eww, a bad INI file?
+                        Logger.LogWarning(ex, "attempting to parse the game user setting INI file at {path} failed", userSettingIniFile.FullName);
+                    }
+                }
+            }
             if (SmartSimObserver.IsSteamInstallation)
                 await Steam.SetTS4ConfiguredCommandLineArgumentsAsync(newCommandLineArgumentsLine);
             else

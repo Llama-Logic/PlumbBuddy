@@ -1667,7 +1667,7 @@ As an additional service to mod users (and to yourself), you may wish to conside
     <value>The Cache is Clear</value>
   </data>
   <data name="Scan_Dependency_RequiredPack_StopTellingMe_CautionText" xml:space="preserve">
-    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required pack is missing and... you're annoyed? Alrighty then, you do you.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="Scan_Dependency_IncompatiblePack_Caption" xml:space="preserve">
@@ -1682,7 +1682,7 @@ As an additional service to mod users (and to yourself), you may wish to conside
     <value>Help me Disable or Remove Packs</value>
   </data>
   <data name="Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText" xml:space="preserve">
-    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when an incompatible pack is active and... you're annoyed? Alrighty then, you do you.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="Scan_Dependency_BrokenFile_Caption" xml:space="preserve">
@@ -1802,7 +1802,7 @@ As an additional service to mod users (and to yourself), you may wish to conside
     <value>But, you know, it's kinda chill. It says you can actually meet the requirement in more than one way. What do you want to do? 🤷</value>
   </data>
   <data name="Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText" xml:space="preserve">
-    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you're annoyed? Alrighty then, you do you.</value>
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a requirement is missing and... you're annoyed? Alrighty then, you do you.</value>
   </data>
   <data name="ModRequirementEditor_Hashes_HelperText" xml:space="preserve">
     <value>There should be one manifest hash per each mod file in the requirement. You should add one for each mod file in the required mod that you know your mod uses. Don't worry about the required mod's requirements. It's responsible for those considerations.</value>
@@ -3492,5 +3492,28 @@ If you plan to disable a pack, remove all mods that require it from your Mods fo
   </data>
   <data name="PackSelectorDialog_PackType_CreatorBuildAndBuyKit" xml:space="preserve">
     <value>Creator Build &amp; Buy Kits</value>
+  </data>
+  <data name="Scan_Dependency_DisabledPack_Caption" xml:space="preserve">
+    <value>{0} is Missing {1}</value>
+    <comment>This text is in Markdown. {0} = The Name of the Mod; {1} = The Quantized Packs</comment>
+  </data>
+  <data name="Scan_Dependency_DisabledPack_Description" xml:space="preserve">
+    <value>**{0}** requires **{1}**, but **{1}** is currently *disabled*. When a mod requires a pack, you need to either remove the mod or re-enable the disabled pack.</value>
+  </data>
+  <data name="Scan_Dependency_DisabledPack_HelpMeEnable_Label" xml:space="preserve">
+    <value>Help me Enable {0}</value>
+  </data>
+  <data name="Scan_Dependency_DisabledPack_StopTellingMe_CautionText" xml:space="preserve">
+    <value>So the creators went to all this trouble to embed metadata so that I can tell you when a required pack is disabled and... you're annoyed? Alrighty then, you do you.</value>
+  </data>
+  <data name="PackSelectorDialog_Question_ResetInGame_Caption" xml:space="preserve">
+    <value>Should I Reset the In-Game Pack Selector?</value>
+  </data>
+  <data name="PackSelectorDialog_Question_ResetInGame_Text" xml:space="preserve">
+    <value>At some point, you used the In-Game Pack Selector to disable packs. Also selecting packs via your game launcher (as I'm about to do) might be confusing. I'm able to reset the In-Game Pack Selector for you, though.
+
+* Choose **YES** to have me reset the In-Game Pack Selector for you while I also select packs via your game launcher.
+* Choose **NO** to ignore the In-Game Pack Selector and still select packs via your game launcher.
+* Choose **CANCEL** to stop doing anything and return to pack selection.</value>
   </data>
 </root>

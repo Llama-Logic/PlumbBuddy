@@ -1,3 +1,5 @@
+using PlumbBuddy.Platforms.Windows;
+
 namespace PlumbBuddy.Services;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -26,6 +28,9 @@ public partial class SmartSimObserver :
         return ModsDirectoryFileType.Ignored;
     }
 
+    [GeneratedRegex(@"\-disablepacks:(?<packCodes>[^\s]*)")]
+    private static partial Regex GetDisablePacksCommandLineArgumentPattern();
+
     [GeneratedRegex(@"^Mods[\\/].+$")]
     private static partial Regex GetModsDirectoryRelativePathPattern();
 
@@ -35,7 +40,7 @@ public partial class SmartSimObserver :
     [GeneratedRegex(@"^\wp\d{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex GetTs4PackCodePattern();
 
-    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IGameResourceCataloger gameResourceCataloger, IModsDirectoryCataloger modsDirectoryCataloger, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs, IProxyHost proxyHost)
+    public SmartSimObserver(ILifetimeScope lifetimeScope, ILogger<ISmartSimObserver> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IGameResourceCataloger gameResourceCataloger, IModsDirectoryCataloger modsDirectoryCataloger, IElectronicArtsApp electronicArtsApp, ISteam steam, ISuperSnacks superSnacks, IBlazorFramework blazorFramework, IPublicCatalogs publicCatalogs, IProxyHost proxyHost)
     {
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
@@ -45,6 +50,7 @@ public partial class SmartSimObserver :
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(gameResourceCataloger);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
+        ArgumentNullException.ThrowIfNull(electronicArtsApp);
         ArgumentNullException.ThrowIfNull(steam);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(blazorFramework);
@@ -58,6 +64,7 @@ public partial class SmartSimObserver :
         this.settings = settings;
         this.gameResourceCataloger = gameResourceCataloger;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
+        this.electronicArtsApp = electronicArtsApp;
         this.steam = steam;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
@@ -88,6 +95,8 @@ public partial class SmartSimObserver :
     readonly IAppLifecycleManager appLifecycleManager;
     readonly IBlazorFramework blazorFramework;
     ImmutableArray<FileSystemInfo> cacheComponents;
+    IReadOnlyList<string> disabledPackCodes = [];
+    readonly IElectronicArtsApp electronicArtsApp;
     readonly AsyncLock enqueuedFresheningTaskLock;
     readonly AsyncLock enqueuedResamplingPacksTaskLock;
     readonly AsyncLock enqueuedScanningTaskLock;
@@ -109,6 +118,8 @@ public partial class SmartSimObserver :
     bool isShowModListStartupGameSettingOn;
     bool isSteamInstallation;
     string lastModHealthStatusSummary = string.Empty;
+    [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
+    FileSystemWatcher? launcherUserDataDirectoryWatcher;
     readonly ILifetimeScope lifetimeScope;
     readonly ILogger<ISmartSimObserver> logger;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
@@ -128,6 +139,26 @@ public partial class SmartSimObserver :
     readonly ISuperSnacks superSnacks;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? userDataDirectoryWatcher;
+
+    public IReadOnlyList<string> DisabledPackCodes
+    {
+        get => disabledPackCodes;
+        private set
+        {
+            var cleaned = value
+                .Where(code => GetTs4PackCodePattern().IsMatch(code))
+                .Select(code => code.Trim().ToUpperInvariant())
+                .Distinct()
+                .Order();
+            if (disabledPackCodes.SequenceEqual(cleaned))
+                return;
+            disabledPackCodes = [..cleaned];
+            FreshenIntegration(force: true);
+            OnPropertyChanged();
+            if (ScanIssues.Count is > 0)
+                Scan();
+        }
+    }
 
     public Version? GameVersion
     {
@@ -183,6 +214,8 @@ public partial class SmartSimObserver :
             installedPackCodes = [..cleaned];
             FreshenIntegration(force: true);
             OnPropertyChanged();
+            if (ScanIssues.Count is > 0)
+                Scan();
         }
     }
 
@@ -340,6 +373,8 @@ public partial class SmartSimObserver :
         IsSteamInstallation =
             await steam.GetTS4InstallationDirectoryAsync() is { } steamInstallationDirectory
             && Path.GetFullPath(steamInstallationDirectory.FullName) == Path.GetFullPath(settings.InstallationFolderPath);
+        await ResampleDisabledPacksAsync().ConfigureAwait(false);
+        await ResetLauncherUserDataMonitoringAsync().ConfigureAwait(false);
     }
 
     public async Task<bool> ClearCacheAsync()
@@ -704,6 +739,16 @@ public partial class SmartSimObserver :
     {
         if (disposing)
         {
+            if (launcherUserDataDirectoryWatcher is { } activeLauncherUserDataDirectoryWatcher)
+            {
+                launcherUserDataDirectoryWatcher = null;
+                activeLauncherUserDataDirectoryWatcher.Changed -= HandleLauncherUserDataDirectoryWatcherEvent;
+                activeLauncherUserDataDirectoryWatcher.Created -= HandleLauncherUserDataDirectoryWatcherEvent;
+                activeLauncherUserDataDirectoryWatcher.Deleted -= HandleLauncherUserDataDirectoryWatcherEvent;
+                activeLauncherUserDataDirectoryWatcher.Renamed -= HandleLauncherUserDataDirectoryWatcherEvent;
+                activeLauncherUserDataDirectoryWatcher.Error -= HandleLauncherUserDataDirectoryWatcherError;
+                activeLauncherUserDataDirectoryWatcher.Dispose();
+            }
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
@@ -776,6 +821,8 @@ public partial class SmartSimObserver :
             var model = new GlobalModsManifestModel();
             foreach (var packCode in InstalledPackCodes)
                 model.InstalledPacks.Add(packCode);
+            foreach (var packCode in DisabledPackCodes)
+                model.DisabledPacks.Add(packCode);
             foreach (var manifestedModFile in manifestedModFiles.OrderBy(mfm => mfm.ModsFolderPath))
                 model.ManifestedModFiles.Add(manifestedModFile);
             using var integrationPackage = new DataBasePackedFile();
@@ -812,6 +859,12 @@ public partial class SmartSimObserver :
             throw new ArgumentException("Path is not valid or not within the user data folder", nameof(fullPath), ex);
         }
     }
+
+    void HandleLauncherUserDataDirectoryWatcherError(object sender, ErrorEventArgs e) =>
+        ResetLauncherUserDataMonitoring();
+
+    void HandleLauncherUserDataDirectoryWatcherEvent(object sender, FileSystemEventArgs e) =>
+        ResampleDisabledPacks();
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -1028,6 +1081,22 @@ public partial class SmartSimObserver :
             settings.CacheStatus = SmartSimCacheStatus.Clear;
     }
 
+    void ResampleDisabledPacks() =>
+        _ = Task.Run(ResampleDisabledPacksAsync);
+
+    async Task ResampleDisabledPacksAsync()
+    {
+        var currentlyDisabledPacks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var commandLineArgumentsLine = IsSteamInstallation
+            ? await steam.GetTS4ConfiguredCommandLineArgumentsAsync().ConfigureAwait(false)
+            : await electronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync().ConfigureAwait(false);
+        if (!string.IsNullOrWhiteSpace(commandLineArgumentsLine)
+            && GetDisablePacksCommandLineArgumentPattern().Match(commandLineArgumentsLine) is { Success: true } match)
+            foreach (var packCode in match.Groups["packCodes"].Value.Split(","))
+                currentlyDisabledPacks.Add(packCode);
+        DisabledPackCodes = currentlyDisabledPacks.ToList();
+    }
+
     void ResampleGameOptions() =>
         _ = Task.Run(ResampleGameOptionsAsync);
 
@@ -1106,7 +1175,44 @@ public partial class SmartSimObserver :
         var packsDirectory = new DirectoryInfo(PacksDirectoryPath);
         if (!packsDirectory.Exists)
             return;
-        InstalledPackCodes = [.. packsDirectory.GetDirectories().Select(directoryInfo => directoryInfo.Name)];
+        InstalledPackCodes = [..packsDirectory.GetDirectories().Select(directoryInfo => directoryInfo.Name)];
+    }
+
+    void ResetLauncherUserDataMonitoring() =>
+        _ = Task.Run(ResetLauncherUserDataMonitoringAsync);
+
+    async Task ResetLauncherUserDataMonitoringAsync()
+    {
+        if (launcherUserDataDirectoryWatcher is { } activeWatcher)
+        {
+            launcherUserDataDirectoryWatcher = null;
+            activeWatcher.Changed -= HandleLauncherUserDataDirectoryWatcherEvent;
+            activeWatcher.Created -= HandleLauncherUserDataDirectoryWatcherEvent;
+            activeWatcher.Deleted -= HandleLauncherUserDataDirectoryWatcherEvent;
+            activeWatcher.Renamed -= HandleLauncherUserDataDirectoryWatcherEvent;
+            activeWatcher.Error -= HandleLauncherUserDataDirectoryWatcherError;
+            activeWatcher.Dispose();
+        }
+        if (await (IsSteamInstallation ? steam.GetSteamUserDataDirectoryAsync() : electronicArtsApp.GetElectronicArtsUserDataDirectoryAsync()).ConfigureAwait(false) is not { } launcherUserDataDirectory)
+            return;
+        var newWatcher = new FileSystemWatcher(launcherUserDataDirectory.FullName)
+        {
+            IncludeSubdirectories = true,
+            InternalBufferSize = 64 * 1024,
+            NotifyFilter =
+                  NotifyFilters.CreationTime
+                | NotifyFilters.DirectoryName
+                | NotifyFilters.FileName
+                | NotifyFilters.LastWrite
+                | NotifyFilters.Size
+        };
+        newWatcher.Changed += HandleLauncherUserDataDirectoryWatcherEvent;
+        newWatcher.Created += HandleLauncherUserDataDirectoryWatcherEvent;
+        newWatcher.Deleted += HandleLauncherUserDataDirectoryWatcherEvent;
+        newWatcher.Renamed += HandleLauncherUserDataDirectoryWatcherEvent;
+        newWatcher.Error += HandleLauncherUserDataDirectoryWatcherError;
+        newWatcher.EnableRaisingEvents = true;
+        launcherUserDataDirectoryWatcher = newWatcher;
     }
 
     public void Scan() =>

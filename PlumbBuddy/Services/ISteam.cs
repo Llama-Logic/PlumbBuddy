@@ -18,6 +18,12 @@ public interface ISteam
     Task<bool> GetIsSteamRunningAsync();
 
     /// <summary>
+    /// Gets Steam's user data directory if it exists
+    /// </summary>
+    /// <returns>Steam's user data directory if it exists; otherwise, <see langword="null"/></returns>
+    Task<DirectoryInfo?> GetSteamUserDataDirectoryAsync();
+
+    /// <summary>
     /// Gets the command line arguments configured in Steam for The Sims 4
     /// </summary>
     /// <returns>The command line arguments for The Sims 4 in Steam if they exist; otherwise, <see langword="null"/></returns>

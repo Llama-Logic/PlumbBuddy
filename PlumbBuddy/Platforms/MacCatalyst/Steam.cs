@@ -20,6 +20,9 @@ class Steam :
             : null;
     }
 
+    public override Task<DirectoryInfo?> GetSteamUserDataDirectoryAsync() =>
+        throw new NotImplementedException();
+
     protected override FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory) =>
         new DirectoryInfo(Path.Combine(installationDirectory.FullName, "The Sims 4.app"));
 

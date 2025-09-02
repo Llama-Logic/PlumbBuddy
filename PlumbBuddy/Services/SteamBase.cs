@@ -20,15 +20,13 @@ abstract class SteamBase :
 
     protected abstract DirectoryInfo? GetSteamDataDirectory();
 
+    public abstract Task<DirectoryInfo?> GetSteamUserDataDirectoryAsync();
+
     protected abstract FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory);
 
     public async Task<string?> GetTS4ConfiguredCommandLineArgumentsAsync()
     {
-        var steamDirectory = GetSteamDataDirectory();
-        if (steamDirectory is null)
-            return null;
-        var userDataDirectory = new DirectoryInfo(Path.Combine(steamDirectory.FullName, "userdata"));
-        if (!userDataDirectory.Exists)
+        if (await GetSteamUserDataDirectoryAsync().ConfigureAwait(false) is not { } userDataDirectory)
             return null;
         foreach (var userDirectory in userDataDirectory.GetDirectories())
         {
@@ -129,11 +127,7 @@ abstract class SteamBase :
         var delayTicks = 20;
         while (await GetIsSteamRunningAsync().ConfigureAwait(false) && --delayTicks > 0)
             await Task.Delay(TimeSpan.FromSeconds(0.25)).ConfigureAwait(false);
-        var steamDirectory = GetSteamDataDirectory();
-        if (steamDirectory is null)
-            return;
-        var userDataDirectory = new DirectoryInfo(Path.Combine(steamDirectory.FullName, "userdata"));
-        if (!userDataDirectory.Exists)
+        if (await GetSteamUserDataDirectoryAsync().ConfigureAwait(false) is not { } userDataDirectory)
             return;
         foreach (var userDirectory in userDataDirectory.GetDirectories())
         {

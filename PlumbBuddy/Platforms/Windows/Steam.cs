@@ -69,6 +69,17 @@ class Steam :
         }
     }
 
+    public override Task<DirectoryInfo?> GetSteamUserDataDirectoryAsync()
+    {
+        var steamDirectory = GetSteamDataDirectory();
+        if (steamDirectory is null)
+            return Task.FromResult<DirectoryInfo?>(null);
+        var userDataDirectory = new DirectoryInfo(Path.Combine(steamDirectory.FullName, "userdata"));
+        if (!userDataDirectory.Exists)
+            return Task.FromResult<DirectoryInfo?>(null);
+        return Task.FromResult<DirectoryInfo?>(userDataDirectory);
+    }
+
     protected override FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory) =>
         new FileInfo(Path.Combine(installationDirectory.FullName, "Game", "Bin", "TS4_x64.exe"));
 

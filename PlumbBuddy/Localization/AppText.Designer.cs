@@ -5620,6 +5620,28 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Should I Reset the In-Game Pack Selector?.
+        /// </summary>
+        internal static string PackSelectorDialog_Question_ResetInGame_Caption {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Question_ResetInGame_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At some point, you used the In-Game Pack Selector to disable packs. Also selecting packs via your game launcher (as I&apos;m about to do) might be confusing. I&apos;m able to reset the In-Game Pack Selector for you, though.
+        ///
+        ///* Choose **YES** to have me reset the In-Game Pack Selector for you while I also select packs via your game launcher.
+        ///* Choose **NO** to ignore the In-Game Pack Selector and still select packs via your game launcher.
+        ///* Choose **CANCEL** to stop doing anything and return to pack selection..
+        /// </summary>
+        internal static string PackSelectorDialog_Question_ResetInGame_Text {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_Question_ResetInGame_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select all {0}.
         /// </summary>
         internal static string PackSelectorDialog_SelectAll {
@@ -6304,6 +6326,42 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is Missing {1}.
+        /// </summary>
+        internal static string Scan_Dependency_DisabledPack_Caption {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_DisabledPack_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to **{0}** requires **{1}**, but **{1}** is currently *disabled*. When a mod requires a pack, you need to either remove the mod or re-enable the disabled pack..
+        /// </summary>
+        internal static string Scan_Dependency_DisabledPack_Description {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_DisabledPack_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help me Enable {0}.
+        /// </summary>
+        internal static string Scan_Dependency_DisabledPack_HelpMeEnable_Label {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_DisabledPack_HelpMeEnable_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required pack is disabled and... you&apos;re annoyed? Alrighty then, you do you..
+        /// </summary>
+        internal static string Scan_Dependency_DisabledPack_StopTellingMe_CautionText {
+            get {
+                return ResourceManager.GetString("Scan_Dependency_DisabledPack_StopTellingMe_CautionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some Mods Need {0} Installed.
         /// </summary>
         internal static string Scan_Dependency_FileNeedsDependency_Caption {
@@ -6421,7 +6479,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when an incompatible pack is active and... you&apos;re annoyed? Alrighty then, you do you..
         /// </summary>
         internal static string Scan_Dependency_IncompatiblePack_StopTellingMe_CautionText {
             get {
@@ -6603,7 +6661,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required pack is missing and... you&apos;re annoyed? Alrighty then, you do you..
         /// </summary>
         internal static string Scan_Dependency_RequiredPack_StopTellingMe_CautionText {
             get {
@@ -6648,7 +6706,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a required mod is missing and... you&apos;re annoyed? Alrighty then, you do you..
+        ///   Looks up a localized string similar to So the creators went to all this trouble to embed metadata so that I can tell you when a requirement is missing and... you&apos;re annoyed? Alrighty then, you do you..
         /// </summary>
         internal static string Scan_Dependency_UnmetRequirement_StopTellingMe_CautionText {
             get {

@@ -4,6 +4,7 @@ public interface ISmartSimObserver :
     IDisposable,
     INotifyPropertyChanged
 {
+    IReadOnlyList<string> DisabledPackCodes { get; }
     Version? GameVersion { get; }
     IReadOnlyList<string> InstalledPackCodes { get; }
     bool IsModsDisabledGameSettingOn { get; }

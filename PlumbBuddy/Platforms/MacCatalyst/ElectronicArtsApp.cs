@@ -6,6 +6,24 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
     const string eaAppBundleId = "com.ea.mac.eaapp";
     const string ts4AppBundleId = "com.ea.mac.thesims4";
 
+    static async Task<string> GetUidAsync()
+    {
+        using var p = Process.Start(new ProcessStartInfo("/usr/bin/id")
+        {
+            ArgumentList = { "-u" },
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        });
+        if (p is null)
+            return "501";
+        var output = await p.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
+        await p.WaitForExitAsync().ConfigureAwait(false);
+        var uid = output.Trim();
+        return string.IsNullOrWhiteSpace(uid)
+            ? "501"
+            : uid;
+    }
+
     async Task<string?> FindAppByBundleIdAsync(string bundleId)
     {
         try
@@ -99,20 +117,47 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
             return false;
         var psi = new ProcessStartInfo("/usr/bin/osascript")
         {
-            UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
+            UseShellExecute = false
         };
         psi.ArgumentList.Add("-e");
         psi.ArgumentList.Add($"tell application id \"{eaAppBundleId}\" to quit");
         using var osascriptProcess = Process.Start(psi);
         if (osascriptProcess is null)
             return false;
-        await osascriptProcess.WaitForExitAsync().ConfigureAwait(false);
-        do
+        var patience = 100;
+        var osascriptProcessWaitForExit = osascriptProcess.WaitForExitAsync();
+        while (!osascriptProcess.HasExited && --patience > 0)
+            await Task.WhenAny(osascriptProcessWaitForExit, Task.Delay(TimeSpan.FromSeconds(0.1))).ConfigureAwait(false);
+        if (!await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false))
+            return true;
+        var uid = await GetUidAsync().ConfigureAwait(false);
+        var terminateProcess = Process.Start(new ProcessStartInfo("/bin/launchctl")
         {
-            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
-        }
-        while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false));
-        return true;
+            Arguments = $"kill TERM gui/{uid}/{eaAppBundleId}",
+            CreateNoWindow = true,
+            UseShellExecute = false
+        });
+        if (terminateProcess is null)
+            return false;
+        await terminateProcess.WaitForExitAsync().ConfigureAwait(false);
+        patience = 50;
+        while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false) && --patience > 0)
+            await Task.Delay(TimeSpan.FromSeconds(0.1)).ConfigureAwait(false);
+        if (!await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false))
+            return true;
+        var killProcess = Process.Start(new ProcessStartInfo("/bin/launchctl")
+        {
+            Arguments = $"kill KILL gui/{uid}/{eaAppBundleId}",
+            CreateNoWindow = true,
+            UseShellExecute = false
+        });
+        if (killProcess is null)
+            return false;
+        await killProcess.WaitForExitAsync().ConfigureAwait(false);
+        patience = 50;
+        while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false) && --patience > 0)
+            await Task.Delay(TimeSpan.FromSeconds(0.1)).ConfigureAwait(false);
+        return !await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false);
     }
 }
