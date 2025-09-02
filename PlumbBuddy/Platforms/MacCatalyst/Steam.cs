@@ -26,9 +26,9 @@ class Steam :
     protected override FileSystemInfo GetTS4Executable(DirectoryInfo installationDirectory) =>
         new DirectoryInfo(Path.Combine(installationDirectory.FullName, "The Sims 4.app"));
 
-    override Task LaunchSteamAsync() =>
+    public override Task LaunchSteamAsync() =>
         throw new NotImplementedException();
 
-    override Task QuitSteamAsync() =>
+    public override Task<bool> QuitSteamAsync() =>
         throw new NotImplementedException();
 }
