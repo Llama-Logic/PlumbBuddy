@@ -95,7 +95,7 @@
             else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
                 okTip = AppText.PackSelectorDialog_Ok_Tip_GameIsRunning;
         }
-        <MudTooltip Arrow Color="Color.Primary" Text="@okTip">
+        <MudTooltip Arrow Color="Color.Primary" Placement="Placement.Top" Text="@okTip">
             <MudButton Color="Color.Primary" Disabled="@(isLoading || isApplying || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" OnClick="OkOnClickHandlerAsync">
                 @MarkupLocalizer[nameof(AppText.Common_Ok)]
             </MudButton>

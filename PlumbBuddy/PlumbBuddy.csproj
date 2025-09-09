@@ -98,7 +98,7 @@
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.117.227" />
         <PackageReference Include="LlamaLogic.ValveDataFormat" Version="1.0.3" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.15" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.19" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.100" />

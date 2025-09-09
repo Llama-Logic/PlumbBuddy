@@ -2,9 +2,13 @@ namespace PlumbBuddy.Components.Layout;
 
 partial class MainMenu
 {
+    public MainMenu() =>
+        packSelectorLockedDebouncer = new(RefreshPackSelectorLockedAsync, TimeSpan.FromSeconds(0.1));
+
     int devToolsUnlockProgress = 10;
     bool devToolsUnlockProgressBadgeVisible = false;
     bool packSelectorLocked = false;
+    readonly AsyncDebouncer packSelectorLockedDebouncer;
 
     [Parameter]
     public EventCallback CloseDrawer { get; set; }
@@ -52,15 +56,14 @@ partial class MainMenu
 
     void HandleGameResourceCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IGameResourceCataloger.PackageExaminationsRemaining)
-            && GameResourceCataloger.PackageExaminationsRemaining is 0)
-            RefreshPackSelectorLocked();
+        if (e.PropertyName is nameof(IGameResourceCataloger.PackageExaminationsRemaining))
+            packSelectorLockedDebouncer.Execute();
     }
 
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State))
-            RefreshPackSelectorLocked();
+            packSelectorLockedDebouncer.Execute();
     }
 
     async Task HandleOpenDownloadsFolderOnClickAsync()
@@ -171,19 +174,25 @@ partial class MainMenu
         packSelectorLocked = ShouldPackSelectorBeLocked();
     }
 
-    void RefreshPackSelectorLocked()
+    async Task RefreshPackSelectorLockedAsync()
     {
         var newPackSelectorLocked = ShouldPackSelectorBeLocked();
         if (newPackSelectorLocked != packSelectorLocked)
         {
-            StaticDispatcher.Dispatch(() =>
+            await StaticDispatcher.DispatchAsync(() =>
             {
                 packSelectorLocked = newPackSelectorLocked;
                 StateHasChanged();
-            });
+            }).ConfigureAwait(false);
         }
     }
 
-    bool ShouldPackSelectorBeLocked() =>
-        ModsDirectoryCataloger.State is not ModsDirectoryCatalogerState.Idle or ModsDirectoryCatalogerState.Sleeping || GameResourceCataloger.PackageExaminationsRemaining is not 0;
+    bool ShouldPackSelectorBeLocked()
+    {
+        if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle && GameResourceCataloger.PackageExaminationsRemaining is 0)
+            return false;
+        if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+            return false;
+        return true;
+    }
 }

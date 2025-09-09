@@ -161,6 +161,9 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
             }
             process.CloseMainWindow();
             PInvoke.PostThreadMessage((uint)process.Id, PInvoke.WM_QUIT, 0, 0);
+            await Task.WhenAny(process.WaitForExitAsync(), Task.Delay(TimeSpan.FromSeconds(10))).ConfigureAwait(false);
+            if (!process.HasExited)
+                process.Kill();
             await process.WaitForExitAsync().ConfigureAwait(false);
             return true;
         }
