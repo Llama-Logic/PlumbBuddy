@@ -44,11 +44,11 @@
         <AppxPackageResourcePackLanguages>en-us</AppxPackageResourcePackLanguages>
         <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
         <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
+        <AppxPackageSigningTimestampServerUrl>http://timestamp.sectigo.com</AppxPackageSigningTimestampServerUrl>
         <AppxSymbolPackageEnabled>true</AppxSymbolPackageEnabled>
         <GenerateAppInstallerFile>true</GenerateAppInstallerFile>
         <GenerateTestArtifacts>false</GenerateTestArtifacts>
-        <PackageCertificateThumbprint>42C9C862153CCA1FBCA9833001935D52A79003E8</PackageCertificateThumbprint>
+        <PackageCertificateThumbprint>0c3a6be3d44b381a2185f90423fcc567a6cb4338</PackageCertificateThumbprint>
         <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
