@@ -82,6 +82,7 @@ public partial class SmartSimObserver :
         scanningTaskLock = new();
         fileSystemStringComparison = platformFunctions.FileSystemStringComparison;
         this.modsDirectoryCataloger.PropertyChanged += HandleModsDirectoryCatalogerPropertyChanged;
+        this.publicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         ConnectToInstallationDirectory();
         ConnectToUserDataDirectory();
@@ -750,6 +751,7 @@ public partial class SmartSimObserver :
             DisconnectFromInstallationDirectoryWatcher();
             DisconnectFromUserDataDirectoryWatcher();
             modsDirectoryCataloger.PropertyChanged -= HandleModsDirectoryCatalogerPropertyChanged;
+            publicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
             settings.PropertyChanged -= HandleSettingsPropertyChanged;
             lifetimeScope.Dispose();
         }
@@ -873,6 +875,12 @@ public partial class SmartSimObserver :
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.AnalyzingTopology or ModsDirectoryCatalogerState.Idle)
                 Scan();
         }
+    }
+
+    void HandlePublicCatalogsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPublicCatalogs.PackCatalog))
+            Scan();
     }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
