@@ -200,26 +200,6 @@ public partial class MainLayout
         {
             await JSRuntime.InvokeVoidAsync("registerExternalLinkHandler", javaScriptThis);
             SuperSnacks.StopHoarding();
-#if WINDOWS
-            var appxPackagesDirectory = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages"));
-            if (appxPackagesDirectory.Exists
-                && appxPackagesDirectory.GetDirectories().Count(packageDirectory => packageDirectory.Name.StartsWith("com.llamalogic.plumbbuddy_", StringComparison.OrdinalIgnoreCase)) is > 1
-                && await DialogService.ShowCautionDialogAsync
-                (
-                    "Multiple Installations of PlumbBuddy Detected",
-                    """
-                    You have more than one PlumbBuddy installation at the moment, and you really should *only have one.*
-
-                    This is definitely not your fault.
-                    Sometimes, when we need to update part of how we build and digitally sign PlumbBuddy for your protection, we change something which causes Windows to think of it as an entirely new app.
-                    But PlumbBuddy is not designed to work properly with sibling installations of itself.
-                    You really need to remove all but one of them.
-
-                    We'd like to launch **Windows Settings** for you now so that you can type `PlumbBuddy` into the **Search apps** box and then remove all but the most recently installed version.
-                    """
-                ))
-                await Windows.System.Launcher.LaunchUriAsync(new("ms-settings:appsfeatures"));
-#endif
             if (!Settings.Onboarded)
                 await DialogService.ShowOnboardingDialogAsync();
         }

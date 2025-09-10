@@ -2,6 +2,7 @@ AllowSetForegroundWindow
 GetSystemCpuSetInformation
 GetWindowPlacement
 IsIconic
+MessageBoxW
 SetForegroundWindow
 SetWindowPlacement
 ShowWindow
