@@ -1,9 +1,9 @@
-using PlumbBuddy.Services;
-
 namespace PlumbBuddy.Components.Dialogs;
 
 partial class PackSelectorDialog
 {
+    static readonly Dictionary<string, string> cachedBase64PackIcons = [];
+
     [GeneratedRegex(@"\-disablepacks:(?<packCodes>[^\s]*)")]
     private static partial Regex GetDisablePacksCommandLineArgumentPattern();
 
@@ -50,6 +50,16 @@ partial class PackSelectorDialog
             PublicCatalogs.PropertyChanged -= HandlePublicCatalogsPropertyChanged;
             SmartSimObserver.PropertyChanged -= HandleSmartSimObserverPropertyChanged;
         }
+    }
+
+    async Task<string> GetPackIconAsync(string packCode)
+    {
+        if (!cachedBase64PackIcons.TryGetValue(packCode, out var base64Icon))
+        {
+            base64Icon = Convert.ToBase64String((await GameResourceCataloger.GetPackIcon64Async(packCode)).Span);
+            cachedBase64PackIcons.Add(packCode, base64Icon);
+        }
+        return base64Icon;
     }
 
     void GroupValueChangedHandler(PackGroup packGroup, bool? isChecked)
@@ -164,6 +174,7 @@ partial class PackSelectorDialog
 
     async Task ReloadPackGroupsAsync()
     {
+        var minimumTimeDelay = Task.Delay(TimeSpan.FromSeconds(2));
         PackGroups.Clear();
         isLoading = true;
         StateHasChanged();
@@ -214,7 +225,7 @@ partial class PackSelectorDialog
                 packs.Add(new()
                 {
                     Code = packCode,
-                    Icon = $"data:image/png;base64,{Convert.ToBase64String((await GameResourceCataloger.GetPackIcon64Async(packCode)).Span)}",
+                    Icon = $"data:image/png;base64,{await GetPackIconAsync(packCode)}",
                     IsChecked = !currentlyDisabledPacks.Contains(packCode),
                     Name = packCatalogEntry.EnglishName
                 });
@@ -249,12 +260,13 @@ partial class PackSelectorDialog
                 packs.Add(new()
                 {
                     Code = packCode,
-                    Icon = $"data:image/png;base64,{Convert.ToBase64String((await GameResourceCataloger.GetPackIcon64Async(packCode)).Span)}",
+                    Icon = $"data:image/png;base64,{await GetPackIconAsync(packCode)}",
                     IsChecked = !currentlyDisabledPacks.Contains(packCode),
                     Name = packCode
                 });
             }
         }
+        await minimumTimeDelay;
         PackGroups.AddRange(packGroups.OrderBy(kv => kv.Key).Select(kv => new PackGroup() { Name = kv.Value.name, Packs = kv.Value.packs.AsReadOnly() }));
         isLoading = false;
         StateHasChanged();
