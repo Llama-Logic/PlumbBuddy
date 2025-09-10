@@ -19,8 +19,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.38</ApplicationDisplayVersion>
-        <ApplicationVersion>1.5.38</ApplicationVersion>
+        <ApplicationDisplayVersion>1.6.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1.6.0</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -44,11 +44,11 @@
         <AppxPackageResourcePackLanguages>en-us</AppxPackageResourcePackLanguages>
         <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
         <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
+        <AppxPackageSigningTimestampServerUrl>http://timestamp.sectigo.com</AppxPackageSigningTimestampServerUrl>
         <AppxSymbolPackageEnabled>true</AppxSymbolPackageEnabled>
         <GenerateAppInstallerFile>true</GenerateAppInstallerFile>
         <GenerateTestArtifacts>false</GenerateTestArtifacts>
-        <PackageCertificateThumbprint>9b374dad1ec6399c31f3701c03b29961e8c46d32</PackageCertificateThumbprint>
+        <PackageCertificateThumbprint>0c3a6be3d44b381a2185f90423fcc567a6cb4338</PackageCertificateThumbprint>
         <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 

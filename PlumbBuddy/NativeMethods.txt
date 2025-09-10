@@ -4,6 +4,9 @@ GetWindowPlacement
 IsIconic
 PostThreadMessage
 SetForegroundWindow
+IsIconic
+MessageBoxW
+SetForegroundWindow
 SetWindowPlacement
 ShowWindow
 
