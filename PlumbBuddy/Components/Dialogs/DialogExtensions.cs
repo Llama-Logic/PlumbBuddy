@@ -74,6 +74,8 @@ static class DialogExtensions
                 { x => x.Text, text }
             }, new DialogOptions
             {
+                BackdropClick = false,
+                CloseOnEscapeKey = false,
                 MaxWidth = MaxWidth.Small
             });
             if (await dialog.Result is { } dialogResult
