@@ -15,6 +15,7 @@ abstract partial class ElectronicArtsApp :
         this.logger = logger;
     }
 
+    ImmutableHashSet<string>? cachedOfferIds;
     protected readonly ILogger<IElectronicArtsApp> logger;
 
     /// <inheritdoc/>
@@ -50,6 +51,8 @@ abstract partial class ElectronicArtsApp :
     /// <inheritdoc/>
     public async Task<ImmutableHashSet<string>?> GetTS4ElectronicArtsOfferIdsAsync()
     {
+        if (cachedOfferIds is not null)
+            return cachedOfferIds;
         if (await GetElectronicArtsUserDataDirectoryAsync().ConfigureAwait(false) is not { } userDataDirectory)
             return null;
         var offerIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -75,7 +78,8 @@ abstract partial class ElectronicArtsApp :
                 logger.LogError(ex, "while trying to process {FileName}", logFileOfInterest.FullName);
             }
         }
-        return offerIds.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
+        cachedOfferIds = offerIds.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
+        return cachedOfferIds;
     }
 
     /// <inheritdoc/>
