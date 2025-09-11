@@ -13,6 +13,8 @@ namespace PlumbBuddy.WinUI;
 public partial class App :
     MauiWinUIApplication
 {
+    const string publisherHash = "27xcxqx0sss1r";
+
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -23,6 +25,24 @@ public partial class App :
         if (appxPackagesDirectory.Exists
             && appxPackagesDirectory.GetDirectories().Count(packageDirectory => packageDirectory.Name.StartsWith("com.llamalogic.plumbbuddy_", StringComparison.OrdinalIgnoreCase)) is > 1)
         {
+            var processId = Environment.ProcessId;
+            foreach (var process in Process.GetProcesses()
+                .Select(p =>
+                {
+                    try
+                    {
+                        return (process: p, mainModule: p.MainModule!);
+                    }
+                    catch (Win32Exception)
+                    {
+                        return (process: p, mainModule: null!);
+                    }
+                })
+                .Where(t => t.mainModule is not null)
+                .Select(t => (t.process, file: new FileInfo(t.mainModule.FileName)))
+                .Where(t => t.file.Name == "PlumbBuddy.exe" && t.process.Id != processId)
+                .Select(t => t.process))
+                process.Kill();
             if (PInvoke.MessageBox
             (
                 new(IntPtr.Zero),
@@ -64,7 +84,39 @@ public partial class App :
                     );
                 }
             }
+            var packagesDirectory = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages"));
+            var thisPackageDirectory = new DirectoryInfo(Path.Combine(packagesDirectory.FullName, $"com.llamalogic.plumbbuddy_{publisherHash}"));
+            if (thisPackageDirectory.Exists)
+            {
+                foreach (var otherPackageDirectory in packagesDirectory
+                    .GetDirectories()
+                    .Where(d => d.Name.StartsWith("com.llamalogic.plumbbuddy_", StringComparison.OrdinalIgnoreCase) && !d.Name.EndsWith($"_{publisherHash}", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var settingsFile = new FileInfo(Path.Combine(otherPackageDirectory.FullName, "Settings", "settings.dat"));
+                    if (settingsFile.Exists)
+                        settingsFile.CopyTo(Path.Combine(thisPackageDirectory.FullName, "Settings", "settings.dat"), true);
+                    var fromLocalState = new DirectoryInfo(Path.Combine(otherPackageDirectory.FullName, "LocalState"));
+                    if (fromLocalState.Exists)
+                    {
+                        IReadOnlyList<string> extensions = [".sqlite", ".sqlite-wal", ".sqlite-shm", ".txt"];
+                        var toLocalState = Directory.CreateDirectory(Path.Combine(thisPackageDirectory.FullName, "LocalState"));
+                        foreach (var file in fromLocalState.GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                            .Where(file => extensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
+                            file.CopyTo(Path.Combine(toLocalState.FullName, file.Name), true);
+                        var fromRDS = new DirectoryInfo(Path.Combine(fromLocalState.FullName, "Relational Data Storage"));
+                        if (fromRDS.Exists)
+                        {
+                            var toRDS = Directory.CreateDirectory(Path.Combine(toLocalState.FullName, "Relational Data Storage"));
+                            foreach (var file in fromRDS.GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                                .Where(file => extensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)))
+                                file.CopyTo(Path.Combine(toRDS.FullName, file.Name), true);
+                        }
+                    }
+                    break;
+                }
+            }
             Environment.Exit(0);
+            return;
         }
         var args = AppInstance.GetCurrent().GetActivatedEventArgs();
         var keyInstance = AppInstance.FindOrRegisterForKey("PlumbBuddy");

@@ -174,7 +174,6 @@ partial class PackSelectorDialog
 
     async Task ReloadPackGroupsAsync()
     {
-        var minimumTimeDelay = Task.Delay(TimeSpan.FromSeconds(2));
         PackGroups.Clear();
         isLoading = true;
         StateHasChanged();
@@ -266,7 +265,6 @@ partial class PackSelectorDialog
                 });
             }
         }
-        await minimumTimeDelay;
         PackGroups.AddRange(packGroups.OrderBy(kv => kv.Key).Select(kv => new PackGroup() { Name = kv.Value.name, Packs = kv.Value.packs.AsReadOnly() }));
         isLoading = false;
         StateHasChanged();

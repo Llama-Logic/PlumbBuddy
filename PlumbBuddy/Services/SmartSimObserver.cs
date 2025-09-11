@@ -571,12 +571,14 @@ public partial class SmartSimObserver :
                         && (f.Name.Contains("exception", StringComparison.OrdinalIgnoreCase)
                         || f.Name.Contains("crash", StringComparison.OrdinalIgnoreCase)))
                     .ToList();
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
                 var userDataFolderTextAndHtmlFilesOfInterest = await pbDbContext.FilesOfInterest
                     .Where(foi => foi.Path.Replace($"{Path.DirectorySeparatorChar}", string.Empty) == foi.Path
                         && (foi.Path.ToUpper().Replace("EXCEPTION", string.Empty) != foi.Path.ToUpper()
                         || foi.Path.ToUpper().Replace("CRASH", string.Empty) != foi.Path.ToUpper())
                         && (foi.FileType == ModsDirectoryFileType.TextFile || foi.FileType == ModsDirectoryFileType.HtmlFile))
                     .ToListAsync().ConfigureAwait(false);
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
                 await pbDbContext.FilesOfInterest.AddRangeAsync(userDataFolderTextAndHtmlFiles
                     .Where(f => !userDataFolderTextAndHtmlFilesOfInterest.Any(foi => foi.Path == f.Name))
                     .Select(f =>
@@ -703,7 +705,7 @@ public partial class SmartSimObserver :
                     catch (IOException)
                     {
                     }
-                    integrationPackageLastSha256 = ImmutableArray<byte>.Empty;
+                    integrationPackageLastSha256 = [];
                 }
                 if (integrationScriptModFile.Exists)
                 {
@@ -714,7 +716,7 @@ public partial class SmartSimObserver :
                     catch (IOException)
                     {
                     }
-                    integrationScriptModLastSha256 = ImmutableArray<byte>.Empty;
+                    integrationScriptModLastSha256 = [];
                 }
                 cacheComponents = [];
                 IsModsDisabledGameSettingOn = false;
@@ -1100,7 +1102,7 @@ public partial class SmartSimObserver :
             && GetDisablePacksCommandLineArgumentPattern().Match(commandLineArgumentsLine) is { Success: true } match)
             foreach (var packCode in match.Groups["packCodes"].Value.Split(","))
                 currentlyDisabledPacks.Add(packCode);
-        DisabledPackCodes = currentlyDisabledPacks.ToList();
+        DisabledPackCodes = [..currentlyDisabledPacks];
     }
 
     void ResampleGameOptions() =>
@@ -1298,7 +1300,7 @@ public partial class SmartSimObserver :
         try
         {
             var fullyConnectedToGame = installationDirectoryWatcher is not null && userDataDirectoryWatcher is not null;
-            var scansInitialized = scanInstances.Count > 0;
+            var scansInitialized = !scanInstances.IsEmpty;
             if (!fullyConnectedToGame && scansInitialized)
             {
                 while (scanInstances.Keys.FirstOrDefault() is { } key)
@@ -1438,7 +1440,9 @@ public partial class SmartSimObserver :
         {
             using var pbDbContext = pbDbContextFactory.CreateDbContext();
             var relativePathToLower = relativePath.ToUpperInvariant();
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
             pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == relativePathToLower).ExecuteDelete();
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
             if (modsDirectoryCataloger.State is ModsDirectoryCatalogerState.Idle)
                 Scan();
             return;
@@ -1467,7 +1471,9 @@ public partial class SmartSimObserver :
         {
             using var pbDbContext = pbDbContextFactory.CreateDbContext();
             var oldRelativePathToLower = relativePath.ToUpperInvariant();
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
             pbDbContext.FilesOfInterest.Where(foi => foi.Path.ToUpper() == oldRelativePathToLower).ExecuteDelete();
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         }
         var errorOrTraceLogInRootType = CatalogIfLikelyErrorOrTraceLogInRoot(relativePath);
         if (errorOrTraceLogInRootType is not ModsDirectoryFileType.Ignored)
