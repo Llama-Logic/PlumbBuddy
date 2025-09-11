@@ -3516,4 +3516,13 @@ If you plan to disable a pack, remove all mods that require it from your Mods fo
 * Choose **NO** to ignore the In-Game Pack Selector and still select packs via your game launcher.
 * Choose **CANCEL** to stop doing anything and return to pack selection.</value>
   </data>
+  <data name="MainMenu_PackSelector_Label" xml:space="preserve">
+    <value>Pack Selector</value>
+  </data>
+  <data name="MainLayout_PackSelector_Tip" xml:space="preserve">
+    <value>Select which packs the game should load.</value>
+  </data>
+  <data name="MainLayout_PackSelector_Tip_Locked" xml:space="preserve">
+    <value>The Pack Selector requires that I'm done looking at your mods and game files. When that's done, come back.</value>
+  </data>
 </root>

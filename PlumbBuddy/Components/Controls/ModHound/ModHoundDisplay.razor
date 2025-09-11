@@ -47,7 +47,7 @@
 				}
 				@if (ObservedCollection(() => ModHoundClient.AvailableReports) is { Count: > 0 } availableReports)
 				{
-					<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Label="@AppText.ModHoundDisplay_DisplayReport_Label" Variant="Variant.Filled">
+					<MudSelect @bind-Value="@(Binding(() => ModHoundClient.SelectedReport).Value)" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.ChartBox" Clearable Label="@AppText.ModHoundDisplay_DisplayReport_Label" Variant="Variant.Filled">
 						@foreach (var availableReport in availableReports.OrderByDescending(ar => ar.Retrieved))
 						{
 							<MudSelectItem Value="@availableReport" />

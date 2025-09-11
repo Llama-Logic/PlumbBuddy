@@ -77,6 +77,22 @@ public sealed class UpdateManager :
                             .SetProperty(grp => grp.Size, default(long))
                         ).ConfigureAwait(false);
                     });
+                if (lastVersion is { Major: < 1 } or { Major: 1, Minor: < 6 } or { Major: 1, Minor: 6, Build: < 3 })
+                    superSnacks.OfferRefreshments
+                    (
+                        new MarkupString
+                        (
+                            """
+                            PlumbBuddy now has its own <strong>Pack Selector</strong>!
+                            You can just click the icon in the toolbar to open it, and have me manage the disabled packs setting in the EA App or Steam for you.
+                            """
+                        ),
+                        Severity.Success,
+                        options =>
+                        {
+                            options.Icon = MaterialDesignIcons.Normal.BagPersonalTag;
+                            options.VisibleStateDuration = (int)TimeSpan.FromMinutes(1).TotalMicroseconds;
+                        });
             }
             else
                 logger.LogInformation("This is the first time this installation is starting.");

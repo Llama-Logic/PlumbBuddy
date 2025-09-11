@@ -6,25 +6,24 @@
 
 <MudTooltip Arrow="true">
     <ChildContent>
-        <MudIconButton Disabled="@packSelectorLocked" Icon="@MaterialDesignIcons.Normal.BagPersonal" Color="Color.Info" OnClick="@(() => DialogService.ShowPackSelectorDialogAsync())" />
+        <MudIconButton Disabled="@packSelectorLocked" Icon="@MaterialDesignIcons.Normal.BagPersonalTag" Color="Color.Info" OnClick="@(() => DialogService.ShowPackSelectorDialogAsync())" />
     </ChildContent>
     <TooltipContent>
         <MudStack Row="true">
-            <MudIcon Icon="@MaterialDesignIcons.Normal.BagPersonal" />
+            <MudIcon Icon="@MaterialDesignIcons.Normal.BagPersonalTag" />
             <MudTextM3 Typo="TypoM3.Title">
-                Pack Selector
+                @MarkupLocalizer[nameof(AppText.MainMenu_PackSelector_Label)]
             </MudTextM3>
         </MudStack>
         <MudDivider />
         <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-            Select which packs the game should load.
+            @MarkupLocalizer[nameof(AppText.MainLayout_PackSelector_Tip)]
         </MudTextM3>
         @if (packSelectorLocked)
         {
             <MudDivider />
             <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
-                The Pack Selector requires that I'm done looking at your mods and game files.
-                When that's done, come back.
+                @MarkupLocalizer[nameof(AppText.MainLayout_PackSelector_Tip_Locked)]
             </MudTextM3>
         }
     </TooltipContent>

@@ -148,7 +148,7 @@ public sealed class DependencyScan :
                     ..modWithDisabledPacks.MissingPackCodes.Select(disabledPackCode => new ScanIssueResolution
                     {
                         Label = string.Format(AppText.Scan_Dependency_DisabledPack_HelpMeEnable_Label, publicCatalogs.PackCatalog is { } packCatalog ? packCatalog[disabledPackCode].EnglishName : disabledPackCode),
-                        Icon = MaterialDesignIcons.Normal.BagPersonal,
+                        Icon = MaterialDesignIcons.Normal.BagPersonalTag,
                         Color = MudBlazor.Color.Primary,
                         Data = "selectPacks"
                     }),
@@ -183,7 +183,7 @@ public sealed class DependencyScan :
             {
                 Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
                 Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithIncompatiblePacks.IncompatiblePackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithIncompatiblePacks.IncompatiblePackCodes).Humanize()),
-                Icon = MaterialDesignIcons.Normal.BagPersonalTag,
+                Icon = MaterialDesignIcons.Normal.BagPersonal,
                 Type = ScanIssueType.Sick,
                 Origin = this,
                 Data = modWithIncompatiblePacks,
@@ -193,7 +193,7 @@ public sealed class DependencyScan :
                     new()
                     {
                         Label = AppText.Scan_Dependency_IncompatiblePack_HelpMeDisable_Label,
-                        Icon = MaterialDesignIcons.Normal.BagPersonalOff,
+                        Icon = MaterialDesignIcons.Normal.BagPersonalTag,
                         Color = MudBlazor.Color.Primary,
                         Data = "selectPacks"
                     },

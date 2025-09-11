@@ -2070,6 +2070,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select which packs the game should load..
+        /// </summary>
+        internal static string MainLayout_PackSelector_Tip {
+            get {
+                return ResourceManager.GetString("MainLayout_PackSelector_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Pack Selector requires that I&apos;m done looking at your mods and game files. When that&apos;s done, come back..
+        /// </summary>
+        internal static string MainLayout_PackSelector_Tip_Locked {
+            get {
+                return ResourceManager.GetString("MainLayout_PackSelector_Tip_Locked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ask for Help.
         /// </summary>
         internal static string MainMenu_AskForHelp_Label {
@@ -2264,6 +2282,15 @@ namespace PlumbBuddy.Localization {
         internal static string MainMenu_OpenModsFolder_Label {
             get {
                 return ResourceManager.GetString("MainMenu_OpenModsFolder_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pack Selector.
+        /// </summary>
+        internal static string MainMenu_PackSelector_Label {
+            get {
+                return ResourceManager.GetString("MainMenu_PackSelector_Label", resourceCulture);
             }
         }
         

@@ -39,8 +39,8 @@
         <MudNavLink Icon="@MaterialDesignIcons.Normal.Eraser" IconColor="@(Observed(() => Settings.CacheStatus) is SmartSimCacheStatus.Stale ? Color.Warning : Color.Default)" OnClick="HandleClearCacheOnClickAsync" Disabled="@(Observed(() => ModsDirectoryCataloger.State) is ModsDirectoryCatalogerState.Sleeping)">
             @MarkupLocalizer[nameof(AppText.MainMenu_ClearCache_Label)]
         </MudNavLink>
-        <MudNavLink Disabled="@packSelectorLocked" Icon="@MaterialDesignIcons.Normal.BagPersonal" OnClick="HandlePackSelectorOnClickAsync" IconColor="Color.Primary">
-            Pack Selector
+        <MudNavLink Disabled="@packSelectorLocked" Icon="@MaterialDesignIcons.Normal.BagPersonalTag" OnClick="HandlePackSelectorOnClickAsync" IconColor="Color.Primary">
+            @MarkupLocalizer[nameof(AppText.MainMenu_PackSelector_Label)]
         </MudNavLink>
         <MudNavLink Icon="@MaterialDesignIcons.Normal.FaceAgent" OnClick="HandleAskForHelpOnClickAsync" IconColor="Color.Info">
             @MarkupLocalizer[nameof(AppText.MainMenu_AskForHelp_Label)]
