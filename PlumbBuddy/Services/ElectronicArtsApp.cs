@@ -3,10 +3,10 @@ namespace PlumbBuddy.Services;
 abstract partial class ElectronicArtsApp :
     IElectronicArtsApp
 {
-    [GeneratedRegex(@"^.*offerId=\[(?<offerId>.*)\] slug=\[the-sims-4\].*$", RegexOptions.Multiline)]
+    [GeneratedRegex(@"^.*offerId=\[(?<offerId>.*)\] slug=\[the-sims-4\].*$", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex GetLogEntryContainingTS4OfferIdPattern();
 
-    [GeneratedRegex(@"^user\.gamecommandline\.(?<offerId>.*)$")]
+    [GeneratedRegex(@"^user\.gamecommandline\.(?<offerId>.*)$", RegexOptions.IgnoreCase)]
     private static partial Regex GetUserIniFileCommandLineArgumentsKeyPattern();
 
     protected ElectronicArtsApp(ILogger<IElectronicArtsApp> logger)
