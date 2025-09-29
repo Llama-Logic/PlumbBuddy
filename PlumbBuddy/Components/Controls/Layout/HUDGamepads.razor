@@ -1,0 +1,67 @@
+@using PlumbBuddy.Services.Input
+@inherits ReactiveComponentBase
+@inject IGamepadInterop GamepadInterop
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject ISettings Settings
+
+@if (ObservedCollection(() => GamepadInterop.Gamepads).Count is > 0)
+{
+    <MudTooltip Arrow Color="Color.Success">
+        <ChildContent>
+            <MudIcon Class="mr-3 mt-1" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.Controller" />
+        </ChildContent>
+        <TooltipContent>
+            <MudStack Row>
+                <MudIcon Icon="@MaterialDesignIcons.Normal.Controller" />
+                <MudTextM3 Typo="TypoM3.Title">Gamepads Connected</MudTextM3>
+            </MudStack>
+            <MudDivider />
+            <MudTextM3 Typo="TypoM3.Label" Align="Align.Justify">
+                I see that you have more or more fancy gamepads!
+                If you have <strong>Runtime Mod Integration</strong> enabled in <strong>Settings</strong>, I'll tell your mods about your gamepads and allow mods to use them.
+            </MudTextM3>
+            @foreach (var gamepad in ObservedCollection(() => GamepadInterop.Gamepads))
+            {
+                <MudDivider />
+                <MudStack Row>
+                    <MudIcon Icon="@MaterialDesignIcons.Normal.Controller" />
+                    <MudTextM3 Typo="TypoM3.Title">@(gamepad.Gamepad.Name)</MudTextM3>
+                </MudStack>
+                <MudGrid Spacing="0">
+                    @foreach (var button in gamepad.Buttons)
+                    {
+                        <MudItem>
+                            <MudChip Color="@(button.Pressed ? Color.Primary: Color.Dark)" Icon="@(button.Pressed ? MaterialDesignIcons.Normal.ArrowDownCircle : MaterialDesignIcons.Outline.ArrowUpCircle)" Value="@(button.Button.Name)" />
+                        </MudItem>
+                    }
+                </MudGrid>
+                <MudGrid Spacing="2">
+                    @foreach (var thumbstick in gamepad.Thumbsticks)
+                    {
+                        var position = gamepad.Gamepad.Deadzone.Apply(thumbstick.Position);
+                        <MudItem>
+                            <MudStack Row>
+                                <MudIcon Icon="@MaterialDesignIcons.Normal.AxisZRotateClockwise" Size="Size.Small" />
+                                <MudTextM3>Thumbstick</MudTextM3>
+                            </MudStack>
+                            <MudChip Class="mx-0" Color="@(position is not 0 ? Color.Primary : Color.Dark)" Icon="@MaterialDesignIcons.Normal.AlphaXCircle" Value="@Math.Round(thumbstick.X, 2)" />
+                            <MudChip Class="mx-0" Color="@(position is not 0 ? Color.Primary : Color.Dark)" Icon="@MaterialDesignIcons.Normal.AlphaYCircle" Value="@Math.Round(thumbstick.Y, 2)" />
+                            <MudChip Class="mx-0" Color="@(position is not 0 ? Color.Primary : Color.Dark)" Icon="@MaterialDesignIcons.Normal.SignDirection" Value="@Math.Round(thumbstick.Direction, 2)" />
+                            <MudChip Class="mx-0" Color="@(position is not 0 ? Color.Primary : Color.Dark)" Icon="@MaterialDesignIcons.Normal.AngleAcute" Value="@Math.Round(position, 2)" />
+                        </MudItem>
+                    }
+                    @foreach (var trigger in gamepad.Triggers)
+                    {
+                        <MudItem>
+                            <MudStack Row>
+                                <MudIcon Icon="@MaterialDesignIcons.Normal.Comma" Size="Size.Small" />
+                                <MudTextM3>Trigger</MudTextM3>
+                            </MudStack>
+                            <MudChip Class="mx-0" Color="Color.Info" Icon="@MaterialDesignIcons.Normal.AngleAcute" Value="@Math.Round(trigger.Position, 2)" />
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+        </TooltipContent>
+    </MudTooltip>
+}

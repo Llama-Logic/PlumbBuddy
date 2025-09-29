@@ -71,6 +71,18 @@ class Settings :
         }
     }
 
+    public bool ConnectToGamePads
+    {
+        get => preferences.Get(nameof(ConnectToGamePads), true);
+        set
+        {
+            if (ConnectToGamePads == value)
+                return;
+            preferences.Set(nameof(ConnectToGamePads), value);
+            OnPropertyChanged();
+        }
+    }
+
     public string DefaultCreatorsList
     {
         get => preferences.Get(nameof(DefaultCreatorsList), string.Empty);

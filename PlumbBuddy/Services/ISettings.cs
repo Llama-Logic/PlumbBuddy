@@ -8,6 +8,7 @@ public interface ISettings :
     bool ArchivistAutoIngestSaves { get; set; }
     bool AutomaticallyCheckForUpdates { get; set; }
     SmartSimCacheStatus CacheStatus { get; set; }
+    bool ConnectToGamePads { get; set; }
     string DefaultCreatorsList { get; set; }
     bool DevToolsUnlocked { get; set; }
     string DownloadsFolderPath { get; set; }

@@ -7,6 +7,7 @@ static class Configuration
         services.AddSingleton<IBlazorFramework, BlazorFramework>();
         services.AddSingleton<ICustomThemes, CustomThemes>();
         services.AddSingleton<ISettings, Settings>();
+        services.AddSingleton<IGamepadInterop, GamepadInterop>();
         services.AddSingleton<IPublicCatalogs, PublicCatalogs>();
         services.AddSingleton<IMarkupLocalizer, MarkupLocalizer>();
         services.AddSingleton(typeof(IMarkupLocalizer<>), typeof(MarkupLocalizer<>));

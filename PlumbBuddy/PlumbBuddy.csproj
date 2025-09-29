@@ -19,8 +19,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.6.4</ApplicationDisplayVersion>
-        <ApplicationVersion>1.6.4</ApplicationVersion>
+        <ApplicationDisplayVersion>1.7.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1.7.0</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -124,6 +124,8 @@
         <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="Sharpnado.Tabs.Maui" Version="3.2.1" />
+        <PackageReference Include="Silk.NET.Input" Version="2.22.0" />
+        <PackageReference Include="Silk.NET.Windowing" Version="2.22.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
         <PackageReference Include="System.Linq.Async" Version="6.0.3" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
