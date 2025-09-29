@@ -237,6 +237,7 @@ partial class PlatformFunctions :
     {
         ArgumentNullException.ThrowIfNull(installationDirectory);
         var gameProcess = Process.GetProcessesByName("TS4_x64").FirstOrDefault()
+            ?? Process.GetProcessesByName("TS4_x64_fpb").FirstOrDefault()
             ?? Process.GetProcessesByName("TS4_DX9_x64").FirstOrDefault();
         try
         {
