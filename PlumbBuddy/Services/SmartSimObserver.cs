@@ -380,6 +380,27 @@ public partial class SmartSimObserver :
     {
         try
         {
+            if (await platformFunctions.GetGameProcessAsync(new(settings.InstallationFolderPath)) is not null)
+            {
+                superSnacks.OfferRefreshments
+                (
+                    new
+                    (
+                        """
+                        <strong>Scratch Guard</strong> has belayed your order to clear the cache.
+                        We musn't mess around with game data while the game is running.
+                        Are you <em>trying</em> to get save corruption? 😏
+                        """
+                    ),
+                    Severity.Error,
+                    options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.HandFrontRight;
+                        options.RequireInteraction = true;
+                    }
+                );
+                return false;
+            }
             var saveScratchDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves", "scratch"));
             if (saveScratchDirectory.Exists)
                 saveScratchDirectory.Delete(true);
