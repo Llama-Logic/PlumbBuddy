@@ -384,14 +384,7 @@ public partial class SmartSimObserver :
             {
                 superSnacks.OfferRefreshments
                 (
-                    new
-                    (
-                        """
-                        <strong>Scratch Guard</strong> has belayed your order to clear the cache.
-                        We musn't mess around with game data while the game is running.
-                        Are you <em>trying</em> to get save corruption? 😏
-                        """
-                    ),
+                    new(AppText.SmartSimObserver_Error_ClearingCacheBlocked),
                     Severity.Error,
                     options =>
                     {
