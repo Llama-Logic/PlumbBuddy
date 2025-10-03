@@ -542,8 +542,8 @@ partial class ManifestEditor
                     {
                         var model = new ModFileManifestModelRequiredMod
                         {
-                            IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
-                            IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [.. unavailableSequence] : [],
+                            IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [..availableSequence] : [],
+                            IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [..unavailableSequence] : [],
                             IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable) ? null : component.IgnoreIfPackAvailable,
                             IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable) ? null : component.IgnoreIfPackUnavailable,
                             Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
@@ -571,7 +571,20 @@ partial class ManifestEditor
                     if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
                         var requirementIndex = -1;
-                        foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements.Where(t => t.component != component && (string.IsNullOrWhiteSpace(component.RequirementIdentifier) || component.RequirementIdentifier != t.component.RequirementIdentifier)))
+                        foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements
+                            .Where
+                            (
+                                t =>
+                                t.component != component
+                                &&
+                                (
+                                    (component.RequirementIdentifier ?? string.Empty) != (t.component.RequirementIdentifier ?? string.Empty)
+                                    || !(component.IgnoreIfHashAvailable ?? string.Empty).Equals(t.component.IgnoreIfHashAvailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                                    || !(component.IgnoreIfHashUnavailable ?? string.Empty).Equals(t.component.IgnoreIfHashUnavailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                                    || !(component.IgnoreIfPackAvailable ?? string.Empty).Equals(t.component.IgnoreIfPackAvailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                                    || !(component.IgnoreIfPackUnavailable ?? string.Empty).Equals(t.component.IgnoreIfPackUnavailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                                )
+                            ))
                             manifest.RequiredMods.Insert(++requirementIndex, requiredModModel);
                     }
                 }
