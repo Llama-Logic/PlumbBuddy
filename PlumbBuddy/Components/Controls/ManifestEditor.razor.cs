@@ -576,20 +576,23 @@ partial class ManifestEditor
                             (
                                 t =>
                                 t.component != component
-                                && t.component.IsRequired
                                 &&
-                                !(
-                                    (component.RequirementIdentifier ?? string.Empty) == (t.component.RequirementIdentifier ?? string.Empty)
-                                    &&
-                                    (
-                                        string.IsNullOrWhiteSpace(component.IgnoreIfHashAvailable)
-                                        && string.IsNullOrWhiteSpace(component.IgnoreIfHashUnavailable)
-                                        && string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable)
-                                        && string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable)
-                                        || string.IsNullOrWhiteSpace(t.component.IgnoreIfHashAvailable)
-                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfHashUnavailable)
-                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackAvailable)
-                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackUnavailable)
+                                (
+                                    string.IsNullOrWhiteSpace(t.component.RequirementIdentifier)
+                                    ||
+                                    !(
+                                        (component.RequirementIdentifier ?? string.Empty) == (t.component.RequirementIdentifier ?? string.Empty)
+                                        &&
+                                        (
+                                            string.IsNullOrWhiteSpace(component.IgnoreIfHashAvailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfHashUnavailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable)
+                                            || string.IsNullOrWhiteSpace(t.component.IgnoreIfHashAvailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfHashUnavailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackAvailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackUnavailable)
+                                        )
                                     )
                                 )
                             ))

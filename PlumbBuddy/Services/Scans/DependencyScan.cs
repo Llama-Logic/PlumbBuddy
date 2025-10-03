@@ -26,7 +26,7 @@ public sealed class DependencyScan :
 
     record ModWithDisabledPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
     record ModWithIncompatiblePacks(string Name, IReadOnlyList<string> IncompatiblePackCodes, IReadOnlyList<string> FilePaths);
-    record ModWithMissingDependencyMod(long Id, long ModFileManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, int UnfulfilledCommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
+    record ModWithMissingDependencyMod(long Id, long ModFileManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
     record ModWithMissingPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
 
     public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings settings, ISmartSimObserver smartSimObserver, IPublicCatalogs publicCatalogs)
@@ -258,7 +258,6 @@ public sealed class DependencyScan :
                     rm.ModFileManfiestId,
                     rm.RequirementIdentifier == null ? null : rm.RequirementIdentifier.Identifier,
                     rm.ModFileManifest.RequiredMods.Count(rm2 => rm2.RequirementIdentifierId == rm.RequirementIdentifierId),
-                    rm.ModFileManifest.RequiredMods.Where(rm2 => rm2.RequirementIdentifierId == rm.RequirementIdentifierId).Count(rm2 => requiredModAbsent.Invoke(rm2)),
                     rm.ModFileManifest.Name,
                     rm.ModFileManifest.Creators.Select(c => c.Name).ToList(),
                     rm.ModFileManifest.Url,
