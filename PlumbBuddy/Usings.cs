@@ -17,6 +17,7 @@ global using Humanizer.Bytes;
 global using ICSharpCode.SharpZipLib.Zip;
 global using IniParser.Exceptions;
 global using IniParser.Parser;
+global using LinqKit;
 global using LlamaLogic.Packages;
 global using LlamaLogic.Packages.Cryptography;
 global using LlamaLogic.Packages.Formats;

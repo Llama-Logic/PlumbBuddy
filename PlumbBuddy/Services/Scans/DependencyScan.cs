@@ -26,7 +26,7 @@ public sealed class DependencyScan :
 
     record ModWithDisabledPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
     record ModWithIncompatiblePacks(string Name, IReadOnlyList<string> IncompatiblePackCodes, IReadOnlyList<string> FilePaths);
-    record ModWithMissingDependencyMod(long ModManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
+    record ModWithMissingDependencyMod(long Id, long ModFileManifestId, string? RequirementIdentifier, int CommonRequirementIdentifiers, int UnfulfilledCommonRequirementIdentifiers, string? Name, IReadOnlyList<string> Creators, Uri? Url, string? DependencyName, IReadOnlyList<string> DependencyCreators, Uri? DependencyUrl, IReadOnlyList<string> FilePaths, bool WasFeatureRemoved);
     record ModWithMissingPacks(string Name, IReadOnlyList<string> Creators, string? ElectronicArtsPromoCode, IReadOnlyList<string> MissingPackCodes, IReadOnlyList<string> FilePaths);
 
     public DependencyScan(IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IBlazorFramework blazorFramework, ISettings settings, ISmartSimObserver smartSimObserver, IPublicCatalogs publicCatalogs)
@@ -217,41 +217,60 @@ public sealed class DependencyScan :
             };
         var modsWithMissingDependencyMod = new List<ModWithMissingDependencyMod>();
         var commonRequirementIdentifiers = new Dictionary<(long modManifestId, string requirementIdentifier), List<ModWithMissingDependencyMod>>();
+        Expression<Func<RequiredMod, bool>> requiredModAbsenceIgnored = rm =>
+            rm.IgnoreIfHashAvailable != null // if hash available is set
+                && (rm.IgnoreIfHashAvailable.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // and hash is available by calculation
+                || rm.IgnoreIfHashAvailable.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // or hash is available by subsumption
+            || rm.IgnoreIfHashUnavailable != null // or if hash unavailable is set
+                && !rm.IgnoreIfHashUnavailable.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // and hash is not available by calculation
+                && !rm.IgnoreIfHashUnavailable.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // and hash is not available by subsumption
+            || rm.IgnoreIfPackAvailable != null // if pack available is set
+                && availablePackCodes.Contains(rm.IgnoreIfPackAvailable.Code) // pack is available
+            || rm.IgnoreIfPackUnavailable != null // if pack unavailable is set
+                && !availablePackCodes.Contains(rm.IgnoreIfPackUnavailable.Code); // pack is unavailable
+        Expression<Func<RequiredMod, bool>> requiredModAbsent = rm =>
+            rm.Hashes.Any(h => // at least one required hash is
+            !h.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) //... not available via calculation
+                && !h.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // and not available via subsumption
+            || rm.RequiredFeatures.Any(rf => !rm.Hashes.Any(h => // ... or at least one feature is not
+                h.ManifestsByCalculation.Any(mfm => mfm.Features.Any(f => f.Name == rf.Name)) // ... available via calculation
+                || h.ManifestsBySubsumption.Any(mfm => mfm.Features.Any(f => f.Name == rf.Name)))); // ... or available via subsumption
         await foreach (var modWithMissingDependencyMod in pbDbContext.RequiredMods
-            .Where(rm =>
-                rm.ModFileManifest.ModFileHash.ModFiles.Any() // mod is present in Mods folder
-                && (rm.IgnoreIfHashAvailable == null // ignore if hash available is unset
-                    || !rm.IgnoreIfHashAvailable.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // hash is not available by calculation
-                    && !rm.IgnoreIfHashAvailable.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // hash is not available by subsumption
-                && (rm.IgnoreIfHashUnavailable == null // ignore if hash unavailable is unset
-                    || rm.IgnoreIfHashUnavailable.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // hash is available by calculation
-                    || rm.IgnoreIfHashUnavailable.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // hash is available by subsumption
-                && (rm.IgnoreIfPackAvailable == null // ignore if pack available is unset
-                    || !availablePackCodes.Contains(rm.IgnoreIfPackAvailable.Code)) // pack is not available
-                && (rm.IgnoreIfPackUnavailable == null // ignore if pack unavailable is unset
-                    || availablePackCodes.Contains(rm.IgnoreIfPackUnavailable.Code)) // pack is available
-                && (rm.Hashes.Any(h => // at least one required hash is
-                    !h.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) //... not available via calculation
-                        && !h.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // and not available via subsumption
-                    || rm.RequiredFeatures.Any(rf => !rm.Hashes.Any(h => // ... or at least one feature is not
-                        h.ManifestsByCalculation.Any(mfm => mfm.Features.Any(f => f.Name == rf.Name)) // ... available via calculation
-                        || h.ManifestsBySubsumption.Any(mfm => mfm.Features.Any(f => f.Name == rf.Name)))))) // ... or available via subsumption
-            .Select(rm => new ModWithMissingDependencyMod
+            .AsExpandable()
+            .Where
             (
-                rm.ModFileManfiestId,
-                rm.RequirementIdentifier == null ? null : rm.RequirementIdentifier.Identifier,
-                rm.ModFileManifest.RequiredMods.Count(orm => orm.RequirementIdentifierId == rm.RequirementIdentifierId),
-                rm.ModFileManifest.Name,
-                rm.ModFileManifest.Creators.Select(c => c.Name).ToList(),
-                rm.ModFileManifest.Url,
-                rm.Name,
-                rm.Creators.Select(c => c.Name).ToList(),
-                rm.Url,
-                rm.ModFileManifest.ModFileHash.ModFiles.Select(mf => mf.Path).ToList(),
-                rm.Hashes.All(h => // all hashes are
-                    h.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) //... available via calculation
-                        || h.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // or available via subsumption
-            ))
+                rm =>
+                rm.ModFileManifest.ModFileHash.ModFiles.Any() // mod is present in Mods folder
+                && !requiredModAbsenceIgnored.Invoke(rm)
+                &&
+                (
+                    rm.RequirementIdentifier == null
+                    && requiredModAbsent.Invoke(rm)
+                    || rm.RequirementIdentifier != null
+                    && rm.ModFileManifest.RequiredMods.Where(rm2 => rm2.RequirementIdentifierId == rm.RequirementIdentifierId).All(rm2 => requiredModAbsent.Invoke(rm2))
+                )
+            )
+            .Select
+            (
+                rm => new ModWithMissingDependencyMod
+                (
+                    rm.Id,
+                    rm.ModFileManfiestId,
+                    rm.RequirementIdentifier == null ? null : rm.RequirementIdentifier.Identifier,
+                    rm.ModFileManifest.RequiredMods.Count(rm2 => rm2.RequirementIdentifierId == rm.RequirementIdentifierId),
+                    rm.ModFileManifest.RequiredMods.Where(rm2 => rm2.RequirementIdentifierId == rm.RequirementIdentifierId).Count(rm2 => requiredModAbsent.Invoke(rm2)),
+                    rm.ModFileManifest.Name,
+                    rm.ModFileManifest.Creators.Select(c => c.Name).ToList(),
+                    rm.ModFileManifest.Url,
+                    rm.Name,
+                    rm.Creators.Select(c => c.Name).ToList(),
+                    rm.Url,
+                    rm.ModFileManifest.ModFileHash.ModFiles.Select(mf => mf.Path).ToList(),
+                    rm.Hashes.All(h => // all hashes are
+                        h.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) //... available via calculation
+                            || h.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // or available via subsumption
+                )
+            )
             .AsAsyncEnumerable())
         {
             if (modWithMissingDependencyMod.RequirementIdentifier is null)
@@ -259,7 +278,7 @@ public sealed class DependencyScan :
                 modsWithMissingDependencyMod.Add(modWithMissingDependencyMod);
                 continue;
             }
-            var key = (modWithMissingDependencyMod.ModManifestId, modWithMissingDependencyMod.RequirementIdentifier);
+            var key = (modWithMissingDependencyMod.ModFileManifestId, modWithMissingDependencyMod.RequirementIdentifier);
             if (!commonRequirementIdentifiers.TryGetValue(key, out var list))
             {
                 list = [];
@@ -388,7 +407,6 @@ public sealed class DependencyScan :
                 );
         }
         var commonRequirementIdentifiersValuesBySolitude = commonRequirementIdentifiers.Values
-            .Where(list => list.Count == list.First().CommonRequirementIdentifiers)
             .ToLookup(list => list.Count is 1);
         foreach (var modWithMissingDependencyMod in modsWithMissingDependencyMod.Concat(commonRequirementIdentifiersValuesBySolitude[true].SelectMany(list => list)))
         {

@@ -576,13 +576,21 @@ partial class ManifestEditor
                             (
                                 t =>
                                 t.component != component
+                                && t.component.IsRequired
                                 &&
-                                (
-                                    (component.RequirementIdentifier ?? string.Empty) != (t.component.RequirementIdentifier ?? string.Empty)
-                                    || !(component.IgnoreIfHashAvailable ?? string.Empty).Equals(t.component.IgnoreIfHashAvailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
-                                    || !(component.IgnoreIfHashUnavailable ?? string.Empty).Equals(t.component.IgnoreIfHashUnavailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
-                                    || !(component.IgnoreIfPackAvailable ?? string.Empty).Equals(t.component.IgnoreIfPackAvailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
-                                    || !(component.IgnoreIfPackUnavailable ?? string.Empty).Equals(t.component.IgnoreIfPackUnavailable ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                                !(
+                                    (component.RequirementIdentifier ?? string.Empty) == (t.component.RequirementIdentifier ?? string.Empty)
+                                    &&
+                                    (
+                                        string.IsNullOrWhiteSpace(component.IgnoreIfHashAvailable)
+                                        && string.IsNullOrWhiteSpace(component.IgnoreIfHashUnavailable)
+                                        && string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable)
+                                        && string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable)
+                                        || string.IsNullOrWhiteSpace(t.component.IgnoreIfHashAvailable)
+                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfHashUnavailable)
+                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackAvailable)
+                                        && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackUnavailable)
+                                    )
                                 )
                             ))
                             manifest.RequiredMods.Insert(++requirementIndex, requiredModModel);
