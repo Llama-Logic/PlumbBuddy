@@ -73,6 +73,7 @@ public sealed class DependencyScan :
     {
         var installedPackCodes = smartSimObserver.InstalledPackCodes;
         var disabledPackCodes = smartSimObserver.DisabledPackCodes;
+        var availablePackCodes = installedPackCodes.Except(disabledPackCodes).ToList().AsReadOnly();
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modWithMissingPacks in pbDbContext.ModFileManifests
             .Where(mfm => mfm.ModFileHash.ModFiles.Any() && mfm.RequiredPacks.Any(pc => !installedPackCodes.Contains(pc.Code.ToUpper())))
@@ -226,9 +227,9 @@ public sealed class DependencyScan :
                     || rm.IgnoreIfHashUnavailable.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) // hash is available by calculation
                     || rm.IgnoreIfHashUnavailable.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // hash is available by subsumption
                 && (rm.IgnoreIfPackAvailable == null // ignore if pack available is unset
-                    || !installedPackCodes.Contains(rm.IgnoreIfPackAvailable.Code)) // pack is not installed
+                    || !availablePackCodes.Contains(rm.IgnoreIfPackAvailable.Code)) // pack is not available
                 && (rm.IgnoreIfPackUnavailable == null // ignore if pack unavailable is unset
-                    || installedPackCodes.Contains(rm.IgnoreIfPackUnavailable.Code)) // pack is installed
+                    || availablePackCodes.Contains(rm.IgnoreIfPackUnavailable.Code)) // pack is available
                 && (rm.Hashes.Any(h => // at least one required hash is
                     !h.ManifestsByCalculation.Any(mfm => mfm.ModFileHash.ModFiles.Any()) //... not available via calculation
                         && !h.ManifestsBySubsumption.Any(mfm => mfm.ModFileHash.ModFiles.Any())) // and not available via subsumption
