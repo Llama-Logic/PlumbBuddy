@@ -25,7 +25,8 @@ class AsyncDebouncer
             performanceCancellationTokenSource?.Cancel();
             performanceCancellationTokenSource?.Dispose();
             performanceCancellationTokenSource = new();
-            _ = Task.Run(async () => await PerformActionAsync(performanceCancellationTokenSource.Token).ConfigureAwait(false));
+            var cancellationToken = performanceCancellationTokenSource.Token;
+            _ = Task.Run(async () => await PerformActionAsync(cancellationToken).ConfigureAwait(false));
             return true;
         }
         catch (OperationCanceledException)

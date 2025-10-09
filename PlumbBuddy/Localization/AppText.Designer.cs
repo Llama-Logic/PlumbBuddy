@@ -8484,6 +8484,17 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;strong&gt;Scratch Guard&lt;/strong&gt; has belayed your order to clear the cache.
+        ///We musn&apos;t mess around with game data while the game is running.
+        ///Are you &lt;em&gt;trying&lt;/em&gt; to get save corruption? 😏.
+        /// </summary>
+        internal static string SmartSimObserver_Error_ClearingCacheBlocked {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_Error_ClearingCacheBlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;h3&gt;Whoops!&lt;/h3&gt;
         ///I ran into a problem trying to clear your cache for you.&lt;br /&gt;
         ///&lt;br /&gt;

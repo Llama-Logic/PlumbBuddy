@@ -380,6 +380,20 @@ public partial class SmartSimObserver :
     {
         try
         {
+            if (await platformFunctions.GetGameProcessAsync(new(settings.InstallationFolderPath)) is not null)
+            {
+                superSnacks.OfferRefreshments
+                (
+                    new(AppText.SmartSimObserver_Error_ClearingCacheBlocked),
+                    Severity.Error,
+                    options =>
+                    {
+                        options.Icon = MaterialDesignIcons.Normal.HandFrontRight;
+                        options.RequireInteraction = true;
+                    }
+                );
+                return false;
+            }
             var saveScratchDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves", "scratch"));
             if (saveScratchDirectory.Exists)
                 saveScratchDirectory.Delete(true);

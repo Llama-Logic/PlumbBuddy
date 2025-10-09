@@ -165,17 +165,17 @@ partial class ManifestEditor
         set => Settings.WriteScaffoldingToSubdirectory = value;
     }
 
-    async Task<AddFileResult> AddFileAsync(FileInfo modFile)
+    async Task<(AddFileResult result, ImmutableArray<ModFileManifestModel> manifests, ManifestedModFileScaffolding? scaffolding)> AddFileAsync(FileInfo modFile)
     {
         modFile.Refresh();
+        ImmutableArray<ModFileManifestModel> manifests = [];
         if (!modFile.Exists)
         {
             batchCancellationTokenSource?.Cancel();
-            return AddFileResult.NonExistent;
+            return (AddFileResult.NonExistent, manifests, null);
         }
         if (components.Any(component => component.File is { } file && Path.GetFullPath(file.FullName) == Path.GetFullPath(modFile.FullName)))
-            return AddFileResult.AlreadyAdded;
-        ImmutableArray<ModFileManifestModel> manifests = [];
+            return (AddFileResult.AlreadyAdded, manifests, null);
         IDisposable fileObjectModel;
         string? manifestResourceName = null;
         if (modFile.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase))
@@ -193,7 +193,7 @@ partial class ManifestEditor
                     AppText.ManifestEditor_Error_InaccessiblePackage_Caption,
                     string.Format(AppText.ManifestEditor_Error_InaccessiblePackage_Text, modFile.FullName)
                 ).ConfigureAwait(false);
-                return AddFileResult.Unreadable;
+                return (AddFileResult.Unreadable, manifests, null);
             }
             manifests = [..(await ModFileManifestModel.GetModFileManifestsAsync(dbpf).ConfigureAwait(false))
                 .Values
@@ -228,7 +228,7 @@ partial class ManifestEditor
                     AppText.ManifestEditor_Error_InaccessibleScriptArchive_Caption,
                     string.Format(AppText.ManifestEditor_Error_InaccessibleScriptArchive_Text, modFile.FullName)
                 ).ConfigureAwait(false);
-                return AddFileResult.Unreadable;
+                return (AddFileResult.Unreadable, manifests, null);
             }
             if (await ModFileManifestModel.GetModFileManifestAsync(zipFile).ConfigureAwait(false) is { } manifest)
                 manifests = [manifest];
@@ -242,10 +242,10 @@ partial class ManifestEditor
                 AppText.ManifestEditor_Error_UnrecognizedFileType_Caption,
                 StringLocalizer["ManifestEditor_Error_UnrecognizedFileType_Text", modFile.FullName]
             ).ConfigureAwait(false);
-            return AddFileResult.Unrecognized;
+            return (AddFileResult.Unrecognized, manifests, null);
         }
-        if (await ManifestedModFileScaffolding.TryLoadForAsync(modFile, Settings) is { } scaffolding
-            && scaffolding.Manifest is { } scaffoldingManifest)
+        var scaffolding = await ManifestedModFileScaffolding.TryLoadForAsync(modFile, Settings);
+        if (scaffolding?.Manifest is { } scaffoldingManifest)
         {
             manifests = manifests.Add(scaffoldingManifest);
             manifestResourceName = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.TuningName))?.TuningName ?? $"llamalogic:manifest_{Guid.NewGuid():n}";
@@ -273,9 +273,9 @@ partial class ManifestEditor
         );
         component.PropertyChanged += HandleComponentPropertyChanged;
         components.Add(component);
-        return manifests.Length is > 0
+        return (manifests.Length is > 0
             ? AddFileResult.SucceededManifested
-            : AddFileResult.Succeeded;
+            : AddFileResult.Succeeded, manifests, scaffolding);
     }
 
     async Task<bool> AddFilesAsync(IReadOnlyList<FileInfo> modFiles)
@@ -283,7 +283,7 @@ partial class ManifestEditor
         var filesAdded = false;
         foreach (var modFile in modFiles)
         {
-            var addFileResult = await AddFileAsync(modFile).ConfigureAwait(false);
+            var (addFileResult, _, _) = await AddFileAsync(modFile).ConfigureAwait(false);
             if (addFileResult is AddFileResult.Succeeded or AddFileResult.SucceededManifested)
             {
                 filesAdded = true;
@@ -542,8 +542,8 @@ partial class ManifestEditor
                     {
                         var model = new ModFileManifestModelRequiredMod
                         {
-                            IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [.. availableSequence] : [],
-                            IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [.. unavailableSequence] : [],
+                            IgnoreIfHashAvailable = (component.IgnoreIfHashAvailable?.TryToByteSequence(out var availableSequence) ?? false) ? [..availableSequence] : [],
+                            IgnoreIfHashUnavailable = (component.IgnoreIfHashUnavailable?.TryToByteSequence(out var unavailableSequence) ?? false) ? [..unavailableSequence] : [],
                             IgnoreIfPackAvailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable) ? null : component.IgnoreIfPackAvailable,
                             IgnoreIfPackUnavailable = string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable) ? null : component.IgnoreIfPackUnavailable,
                             Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
@@ -571,7 +571,31 @@ partial class ManifestEditor
                     if (componentManifests.TryGetValue(component, out var manifest) && manifest is not null)
                     {
                         var requirementIndex = -1;
-                        foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements.Where(t => t.component != component && (string.IsNullOrWhiteSpace(component.RequirementIdentifier) || component.RequirementIdentifier != t.component.RequirementIdentifier)))
+                        foreach (var (otherComponent, requiredModModel) in crossReferenceRequirements
+                            .Where
+                            (
+                                t =>
+                                t.component != component
+                                &&
+                                (
+                                    string.IsNullOrWhiteSpace(t.component.RequirementIdentifier)
+                                    ||
+                                    !(
+                                        (component.RequirementIdentifier ?? string.Empty) == (t.component.RequirementIdentifier ?? string.Empty)
+                                        &&
+                                        (
+                                            string.IsNullOrWhiteSpace(component.IgnoreIfHashAvailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfHashUnavailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfPackAvailable)
+                                            && string.IsNullOrWhiteSpace(component.IgnoreIfPackUnavailable)
+                                            || string.IsNullOrWhiteSpace(t.component.IgnoreIfHashAvailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfHashUnavailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackAvailable)
+                                            && string.IsNullOrWhiteSpace(t.component.IgnoreIfPackUnavailable)
+                                        )
+                                    )
+                                )
+                            ))
                             manifest.RequiredMods.Insert(++requirementIndex, requiredModModel);
                     }
                 }
@@ -857,35 +881,23 @@ partial class ManifestEditor
             loadingText = AppText.ManifestEditor_Loading_ExaminingModFile;
             isLoading = true;
             StateHasChanged();
-            var selectStepFileAddResult = await AddFileAsync(selectStepFile);
+            var (selectStepFileAddResult, selectStepFileAddManifests, scaffolding) = await AddFileAsync(selectStepFile);
             if (selectStepFileAddResult is AddFileResult.Succeeded or AddFileResult.SucceededManifested)
             {
-                var scaffolding = await ManifestedModFileScaffolding.TryLoadForAsync(selectStepFile, Settings);
                 if (selectStepFileAddResult is AddFileResult.SucceededManifested)
                 {
-                    ImmutableArray<ModFileManifestModel> manifests;
-                    var fileObjectModel = components[0].FileObjectModel;
-                    if (fileObjectModel is DataBasePackedFile dbpf)
-                        manifests = [..(await ModFileManifestModel.GetModFileManifestsAsync(dbpf))
-                            .Values
-                            .OrderBy(manifest => manifest.Name.Length)
-                            .ThenBy(manifest => manifest.Name).Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
-                    else if (fileObjectModel is ZipFile zipFile)
-                        manifests = [..Enumerable.Empty<ModFileManifestModel>().Concat(await ModFileManifestModel.GetModFileManifestAsync(zipFile) is { } scriptFileManifest ? [scriptFileManifest] : []).Concat(scaffolding?.Manifest is { } scaffoldingManifest ? [scaffoldingManifest] : [])];
-                    else
-                        throw new NotSupportedException($"Unsupported file object model {fileObjectModel?.GetType().Name}");
-                    name = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
-                    description = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Description))?.Description ?? string.Empty;
-                    creators = manifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
+                    name = selectStepFileAddManifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Name))?.Name ?? string.Empty;
+                    description = selectStepFileAddManifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Description))?.Description ?? string.Empty;
+                    creators = selectStepFileAddManifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
                     creatorsChipSetField?.Refresh();
-                    url = manifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
-                    requiredPacks = manifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
+                    url = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
+                    requiredPacks = selectStepFileAddManifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     requiredPacksChipSetField?.Refresh();
-                    recommendedPacks.AddRange(manifests.SelectMany(manifest => manifest.RecommendedPacks).DistinctBy(recommendedPack => recommendedPack.PackCode).Select(recommendedPack => new RecommendedPack(PublicCatalogs, recommendedPack.PackCode, recommendedPack.Reason)));
-                    electronicArtsPromoCode = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.ElectronicArtsPromoCode))?.ElectronicArtsPromoCode ?? string.Empty;
-                    incompatiblePacks = manifests.SelectMany(manifest => manifest.IncompatiblePacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
+                    recommendedPacks.AddRange(selectStepFileAddManifests.SelectMany(manifest => manifest.RecommendedPacks).DistinctBy(recommendedPack => recommendedPack.PackCode).Select(recommendedPack => new RecommendedPack(PublicCatalogs, recommendedPack.PackCode, recommendedPack.Reason)));
+                    electronicArtsPromoCode = selectStepFileAddManifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.ElectronicArtsPromoCode))?.ElectronicArtsPromoCode ?? string.Empty;
+                    incompatiblePacks = selectStepFileAddManifests.SelectMany(manifest => manifest.IncompatiblePacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     incompatibleChipSetField?.Refresh();
-                    requiredMods.AddRange(manifests
+                    requiredMods.AddRange(selectStepFileAddManifests
                         .SelectMany(manifest => manifest.RequiredMods)
                         .GroupBy(requiredMod => $"{string.Join(string.Empty, requiredMod.Hashes.Select(hash => hash.ToHexString()).Order())}|{requiredMod.RequirementIdentifier}|{requiredMod.IgnoreIfPackAvailable}|{requiredMod.IgnoreIfPackUnavailable}|{requiredMod.IgnoreIfHashAvailable}|{requiredMod.IgnoreIfHashUnavailable}")
                         .Select(functionallyIdenticalRequiredMods =>
@@ -909,9 +921,9 @@ partial class ManifestEditor
                                 prioritizedRequiredMods.FirstOrDefault(requiredMod => !string.IsNullOrWhiteSpace(requiredMod.Version))?.Version
                             );
                         }));
-                    version = manifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Version))?.Version ?? string.Empty;
+                    version = selectStepFileAddManifests.FirstOrDefault(manifest => !string.IsNullOrWhiteSpace(manifest.Version))?.Version ?? string.Empty;
                     versionEnabled = !string.IsNullOrWhiteSpace(version);
-                    features = manifests.SelectMany(manifest => manifest.Features).Distinct().ToList().AsReadOnly();
+                    features = selectStepFileAddManifests.SelectMany(manifest => manifest.Features).Distinct().ToList().AsReadOnly();
                 }
                 else
                 {
@@ -926,21 +938,26 @@ partial class ManifestEditor
                 }
                 if (scaffolding is not null)
                 {
-                    components[0].IsRequired = scaffolding.IsRequired;
-                    components[0].Name = string.IsNullOrWhiteSpace(scaffolding.ComponentName)
+                    var initialComponent = components[0];
+                    initialComponent.IsRequired = scaffolding.IsRequired;
+                    var loadInitialComponentRequirementCharacteristics = scaffolding.IsRequired
+                        && scaffolding.OtherModComponents.Count is > 0;
+                    initialComponent.Name = string.IsNullOrWhiteSpace(scaffolding.ComponentName)
                         ? null
                         : scaffolding.ComponentName;
                     hashingLevel = scaffolding.HashingLevel;
                     foreach (var otherModComponent in scaffolding.OtherModComponents)
                     {
                         var addScaffoldedComponentResult = AddFileResult.NonExistent;
-                        FileInfo? otherFileInfo = null;
+                        var addScaffoldedComponentManifests = ImmutableArray<ModFileManifestModel>.Empty;
+                        ManifestedModFileScaffolding? otherScaffolding = null;
+                        FileInfo ? otherFileInfo = null;
                         if (otherModComponent.LocalRelativePath is { } localRelativePath
                             && !string.IsNullOrWhiteSpace(localRelativePath))
-                            addScaffoldedComponentResult = await AddFileAsync(otherFileInfo = new FileInfo(Path.Combine(selectStepFile.DirectoryName!, localRelativePath)));
+                            (addScaffoldedComponentResult, addScaffoldedComponentManifests, otherScaffolding) = await AddFileAsync(otherFileInfo = new FileInfo(Path.Combine(selectStepFile.DirectoryName!, localRelativePath)));
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent
                             && !string.IsNullOrWhiteSpace(otherModComponent.LocalAbsolutePath))
-                            addScaffoldedComponentResult = await AddFileAsync(otherFileInfo = new FileInfo(otherModComponent.LocalAbsolutePath));
+                            (addScaffoldedComponentResult, addScaffoldedComponentManifests, otherScaffolding) = await AddFileAsync(otherFileInfo = new FileInfo(otherModComponent.LocalAbsolutePath));
                         if (addScaffoldedComponentResult is AddFileResult.NonExistent)
                             await DialogService.ShowErrorDialogAsync
                             (
@@ -949,10 +966,30 @@ partial class ManifestEditor
                             );
                         var otherComponent = components[^1];
                         RemoveComponentFromRequiredMods(otherComponent, addScaffoldedComponentResult);
-                        if (otherFileInfo is not null && await ManifestedModFileScaffolding.TryLoadForAsync(otherFileInfo, Settings) is { } otherScaffolding)
+                        if (otherFileInfo is not null
+                            && otherScaffolding is not null)
+                        {
                             otherComponent.Name = string.IsNullOrWhiteSpace(otherScaffolding.ComponentName)
                                 ? null
                                 : otherScaffolding.ComponentName;
+                            if (loadInitialComponentRequirementCharacteristics)
+                            {
+                                var initialComponentSubsumedHashes = initialComponent.SubsumedHashes.Select(hex => hex.ToByteSequence().ToImmutableArray());
+                                if (addScaffoldedComponentManifests.SelectMany(manifest => manifest.RequiredMods).FirstOrDefault(requiredModOfOtherComponent => requiredModOfOtherComponent.Hashes.All(rmooch => initialComponentSubsumedHashes.Any(icsh => icsh.SequenceEqual(rmooch)))) is { } otherComponentRequirementOfInitialComponent)
+                                {
+                                    initialComponent.RequirementIdentifier = otherComponentRequirementOfInitialComponent.RequirementIdentifier;
+                                    initialComponent.IgnoreIfHashAvailable = otherComponentRequirementOfInitialComponent.IgnoreIfHashAvailable.IsDefault
+                                        ? null
+                                        : otherComponentRequirementOfInitialComponent.IgnoreIfHashAvailable.ToHexString();
+                                    initialComponent.IgnoreIfHashUnavailable = otherComponentRequirementOfInitialComponent.IgnoreIfHashUnavailable.IsDefault
+                                        ? null
+                                        : otherComponentRequirementOfInitialComponent.IgnoreIfHashUnavailable.ToHexString();
+                                    initialComponent.IgnoreIfPackAvailable = otherComponentRequirementOfInitialComponent.IgnoreIfPackAvailable;
+                                    initialComponent.IgnoreIfPackUnavailable = otherComponentRequirementOfInitialComponent.IgnoreIfPackUnavailable;
+                                    loadInitialComponentRequirementCharacteristics = false;
+                                }
+                            }
+                        }
                     }
                     if (!string.IsNullOrWhiteSpace(scaffolding.ModName))
                         name = scaffolding.ModName.Trim();

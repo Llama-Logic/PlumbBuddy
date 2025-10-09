@@ -3525,4 +3525,9 @@ If you plan to disable a pack, remove all mods that require it from your Mods fo
   <data name="MainLayout_PackSelector_Tip_Locked" xml:space="preserve">
     <value>The Pack Selector requires that I'm done looking at your mods and game files. When that's done, come back.</value>
   </data>
+  <data name="SmartSimObserver_Error_ClearingCacheBlocked" xml:space="preserve">
+    <value>&lt;strong&gt;Scratch Guard&lt;/strong&gt; has belayed your order to clear the cache.
+We musn't mess around with game data while the game is running.
+Are you &lt;em&gt;trying&lt;/em&gt; to get save corruption? 😏</value>
+  </data>
 </root>
