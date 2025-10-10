@@ -1,3 +1,18 @@
 @inherits ReactiveComponentBase
 
-<MudListItem T="Chronicle" Value="@Chronicle" Text="@Observed(() => Chronicle!.Name)" SecondaryText="@(string.Format(AppText.Archivist_Chronicle_SecondaryText_Format, Observed(() => Chronicle!.LatestLastWriteTime), AppText.Archivist_Chronicle_Snapshot.ToQuantity(ObservedCollection(() => Chronicle!.Snapshots).Count)))" Icon="@MaterialDesignIcons.Normal.Altimeter" IconColor="Color.Secondary" />
+<MudListItem T="Chronicle" Value="@Chronicle" Text="@Observed(() => Chronicle!.Name)" SecondaryText="@(string.Format(AppText.Archivist_Chronicle_SecondaryText_Format, Observed(() => Chronicle!.LatestLastWriteTime), AppText.Archivist_Chronicle_Snapshot.ToQuantity(ObservedCollection(() => Chronicle!.Snapshots).Count)))" Icon="@MaterialDesignIcons.Normal.Altimeter" IconColor="Color.Secondary">
+    <AvatarContent>
+        @if (Chronicle is { } chronicle)
+        {
+            @if (Observed(() => chronicle.Thumbnail) is { Length: > 0 } thumbnail)
+            {
+                <MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Width="60" Height="40" Class="mr-4" />
+            }
+            else if (ObservedCollection(() => chronicle.Snapshots).OrderByDescending(s => s.SavePackageSnapshotId).FirstOrDefault() is { } mostRecentSnapshot)
+            {
+                mostRecentSnapshot.LoadThumbnailUri();
+                <MudImage Src="@Observed(() => mostRecentSnapshot.ThumbnailUri)" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Width="60" Height="40" Class="mr-4" />
+            }
+        }
+    </AvatarContent>
+</MudListItem>

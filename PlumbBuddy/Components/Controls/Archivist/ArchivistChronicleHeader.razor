@@ -13,9 +13,17 @@
 		isEditingChronicle = false;
 	}
 	<div class="d-flex gap-4 align-start">
-		@if (!isEditingChronicle && Observed(() => chronicle.Thumbnail) is { Length: > 0 } thumbnail)
+		@if (!isEditingChronicle)
 		{
-			<MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
+            if (Observed(() => chronicle.Thumbnail) is { Length: > 0 } thumbnail)
+            {
+                <MudImage Src="@($"data:image/png;base64,{Convert.ToBase64String(thumbnail.ToArray())}")" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
+            }
+            else if (ObservedCollection(() => chronicle.Snapshots).OrderByDescending(s => s.SavePackageSnapshotId).FirstOrDefault() is { } mostRecentSnapshot)
+            {
+                mostRecentSnapshot.LoadThumbnailUri();
+                <MudImage Src="@Observed(() => mostRecentSnapshot.ThumbnailUri)" Width="180" Height="120" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center" Class="flex-shrink-1" />
+            }
 		}
 		<MudStack Spacing="1" Class="flex-grow-1">
 			@if (isEditingChronicle)

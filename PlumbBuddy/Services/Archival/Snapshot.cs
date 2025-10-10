@@ -212,16 +212,8 @@ public class Snapshot :
             showDetails = value;
             OnPropertyChanged();
             if (value)
-                _ = Task.Run(async () =>
-                {
-                    using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                    var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(SavePackageSnapshotId).ConfigureAwait(false);
-                    if (savePackageSnapshot?.Thumbnail is { Length: > 0 } thumbnail)
-                        ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(thumbnail)}";
-                    else
-                        ThumbnailUri = null;
-                });
-            else
+                LoadThumbnailUri();
+            else if (Chronicle.Snapshots.OrderByDescending(s => s.SavePackageSnapshotId).First().SavePackageSnapshotId != SavePackageSnapshotId)
                 ThumbnailUri = null;
         }
     }
@@ -445,6 +437,21 @@ public class Snapshot :
     {
         await ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
         firstLoadComplete.SetResult();
+    }
+
+    public void LoadThumbnailUri() =>
+        Task.Run(LoadThumbnailUriAsync);
+
+    public async Task LoadThumbnailUriAsync()
+    {
+        if (ThumbnailUri is not null)
+            return;
+        using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        var savePackageSnapshot = await dbContext.SavePackageSnapshots.FindAsync(SavePackageSnapshotId).ConfigureAwait(false);
+        if (savePackageSnapshot?.Thumbnail is { Length: > 0 } thumbnail)
+            ThumbnailUri = $"data:image/png;base64,{Convert.ToBase64String(thumbnail)}";
+        else
+            ThumbnailUri = null;
     }
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>

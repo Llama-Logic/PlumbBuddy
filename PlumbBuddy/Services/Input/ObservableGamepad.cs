@@ -8,7 +8,7 @@ namespace PlumbBuddy.Services.Input;
 public sealed partial class ObservableGamepad :
     IDisposable
 {
-    #if WINDOWS
+#if WINDOWS
 
     [StructLayout(LayoutKind.Sequential)]
     [SuppressMessage("Style", "IDE1006: Naming Styles")]
@@ -45,7 +45,7 @@ public sealed partial class ObservableGamepad :
     static readonly int?[] xInputSlots = [null, null, null, null];
     static readonly AsyncLock xInputSlotsLock = new();
 
-    #endif
+#endif
 
     public ObservableGamepad(IGamepad gamepad)
     {
