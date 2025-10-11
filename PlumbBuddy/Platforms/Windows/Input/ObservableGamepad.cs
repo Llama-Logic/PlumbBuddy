@@ -60,6 +60,9 @@ public sealed partial class ObservableGamepad :
         gamepad.TriggerMoved += HandleGamepadTriggerMoved;
     }
 
+    ~ObservableGamepad() =>
+        Dispose(false);
+
     readonly int xInputSlot;
 
     public IReadOnlyList<IObservableButton> Buttons { get; }
