@@ -1,4 +1,5 @@
 using Foundation;
+using PlumbBuddy.Platforms.MacCatalyst.Input;
 
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
@@ -14,7 +15,8 @@ public class AppDelegate :
         builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<UiBridgeWebView, UiBridgeWebViewHandler>());
         builder.Services.AddSingleton<IAppLifecycleManager>(Program.AppLifecycleManager);
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
-        builder.Services.AddSingleton<IElectronicArtsApp, Platforms.MacCatalyst.ElectronicArtsApp>();
+        builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
+        builder.Services.AddSingleton<IGamepadInterop, GamepadInterop>();
     }
 }
