@@ -27,14 +27,14 @@ public sealed partial class ObservableGamepad :
     [DllImport("xinput9_1_0.dll", EntryPoint = "XInputSetState")]
     static extern int Set910(int i, ref XINPUT_VIBRATION v);
 
-    static bool XInputTrySetVibration(int i, double l, double r)
+    static bool XInputTrySetVibration(int index, double intensity)
     {
         var vibration = new XINPUT_VIBRATION
         {
-            wLeftMotorSpeed = (ushort)(Math.Clamp(l, 0, 1) * ushort.MaxValue),
-            wRightMotorSpeed = (ushort)(Math.Clamp(r, 0, 1) * ushort.MaxValue)
+            wLeftMotorSpeed = (ushort)(Math.Clamp(intensity, 0, 1) * ushort.MaxValue),
+            wRightMotorSpeed = (ushort)(Math.Clamp(intensity, 0, 1) * ushort.MaxValue)
         };
-        return Set14(i, ref Unsafe.AsRef(ref vibration)) == 0 || Set910(i, ref Unsafe.AsRef(ref vibration)) == 0;
+        return Set14(index, ref Unsafe.AsRef(ref vibration)) == 0 || Set910(index, ref Unsafe.AsRef(ref vibration)) == 0;
     }
 
     static readonly int?[] xInputSlots = [null, null, null, null];
@@ -121,10 +121,10 @@ public sealed partial class ObservableGamepad :
         Updated?.Invoke(this, EventArgs.Empty);
     }
 
-    public bool Vibrate(double left, double right)
+    public bool Vibrate(double intensity)
     {
         if (xInputSlot is >= 0 and < 4)
-            return XInputTrySetVibration(xInputSlot, left, right);
+            return XInputTrySetVibration(xInputSlot, intensity);
         return false;
     }
 }

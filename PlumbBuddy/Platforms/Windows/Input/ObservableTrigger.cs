@@ -8,7 +8,7 @@ public sealed class ObservableTrigger :
     public ObservableTrigger(Trigger trigger)
     {
         Trigger = trigger;
-        position = trigger.Position;
+        position = (trigger.Position + 1f) / 2f;
     }
 
     public Trigger Trigger { get; }
@@ -38,10 +38,11 @@ public sealed class ObservableTrigger :
 
     internal void UpdateFrom(Trigger trigger)
     {
-        Position = trigger.Position;
+        var position = (trigger.Position + 1f) / 2f;
+        Position = position;
         TriggerUpdated?.Invoke(this, new()
         {
-            Position = trigger.Position
+            Position = position
         });
     }
 }

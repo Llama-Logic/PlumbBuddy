@@ -57,7 +57,7 @@
                                 <MudIcon Icon="@MaterialDesignIcons.Normal.Comma" Size="Size.Small" />
                                 <MudTextM3>Trigger</MudTextM3>
                             </MudStack>
-                            <MudChip Class="mx-0" Color="Color.Info" Icon="@MaterialDesignIcons.Normal.AngleAcute" Value="@Math.Round(trigger.Position, 2)" />
+                            <MudChip Class="mx-0" Color="@(trigger.Position is not 0 ? Color.Primary : Color.Dark)" Icon="@MaterialDesignIcons.Normal.AngleAcute" Value="@Math.Round(trigger.Position, 2)" />
                         </MudItem>
                     }
                 </MudGrid>
