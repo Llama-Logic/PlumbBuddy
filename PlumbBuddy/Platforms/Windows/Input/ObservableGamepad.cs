@@ -2,14 +2,12 @@ using Silk.NET.Input;
 using Button = Silk.NET.Input.Button;
 using Trigger = Silk.NET.Input.Trigger;
 
-namespace PlumbBuddy.Services.Input;
+namespace PlumbBuddy.Platforms.Windows.Input;
 
 [SuppressMessage("Design", "CA1060: Move pinvokes to native methods class")]
 public sealed partial class ObservableGamepad :
-    IDisposable
+    IObservableGamepad
 {
-#if WINDOWS
-
     [StructLayout(LayoutKind.Sequential)]
     [SuppressMessage("Style", "IDE1006: Naming Styles")]
     struct XINPUT_VIBRATION
@@ -29,9 +27,6 @@ public sealed partial class ObservableGamepad :
     [DllImport("xinput9_1_0.dll", EntryPoint = "XInputSetState")]
     static extern int Set910(int i, ref XINPUT_VIBRATION v);
 
-    static bool XInputIsOn(int i) =>
-        Get14(i, out _) == 0 || Get910(i, out _) == 0;
-
     static bool XInputTrySetVibration(int i, double l, double r)
     {
         var vibration = new XINPUT_VIBRATION
@@ -45,20 +40,17 @@ public sealed partial class ObservableGamepad :
     static readonly int?[] xInputSlots = [null, null, null, null];
     static readonly AsyncLock xInputSlotsLock = new();
 
-#endif
-
     public ObservableGamepad(IGamepad gamepad)
     {
         ArgumentNullException.ThrowIfNull(gamepad);
-#if WINDOWS
         using (var xInputSlotsLockHeld = xInputSlotsLock.Lock())
         {
             xInputSlot = xInputSlots.IndexOf(null);
             if (xInputSlot >= 0)
                 xInputSlots[xInputSlot] = gamepad.Index;
         }
-#endif
         Gamepad = gamepad;
+        Name = gamepad.Name;
         Buttons = gamepad.Buttons.Select(button => new ObservableButton(button)).ToList().AsReadOnly();
         Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new ObservableThumbstick(thumbstick)).ToList().AsReadOnly();
         Triggers = gamepad.Triggers.Select(trigger => new ObservableTrigger(trigger)).ToList().AsReadOnly();
@@ -68,19 +60,22 @@ public sealed partial class ObservableGamepad :
         gamepad.TriggerMoved += HandleGamepadTriggerMoved;
     }
 
-#if WINDOWS
     readonly int xInputSlot;
-#endif
 
-    public IReadOnlyList<ObservableButton> Buttons { get; }
+    public IReadOnlyList<IObservableButton> Buttons { get; }
 
     public IGamepad Gamepad { get; }
 
-    public IReadOnlyList<ObservableThumbstick> Thumbsticks { get; }
+    public string Name { get; }
 
-    public IReadOnlyList<ObservableTrigger> Triggers { get; }
+    public IReadOnlyList<IObservableThumbstick> Thumbsticks { get; }
+
+    public IReadOnlyList<IObservableTrigger> Triggers { get; }
 
     public event EventHandler? Updated;
+
+    public float ApplyDeadzone(float raw) =>
+        Gamepad.Deadzone.Apply(raw);
 
     public void Dispose()
     {
@@ -97,16 +92,14 @@ public sealed partial class ObservableGamepad :
             Gamepad.ThumbstickMoved -= HandleGamepadThumbstickMoved;
             Gamepad.TriggerMoved -= HandleGamepadTriggerMoved;
             Vibrate(0, 0);
-#if WINDOWS
             using var xInputSlotsLockHeld = xInputSlotsLock.Lock();
             xInputSlots[xInputSlot] = null;
-#endif
         }
     }
 
     void HandleGamepadButtonChanged(IGamepad gamepad, Button button)
     {
-        if (Buttons.FirstOrDefault(ob => ob.Button.Index == button.Index) is not { } observableButton)
+        if (Buttons.Cast<ObservableButton>().FirstOrDefault(ob => ob.Button.Index == button.Index) is not { } observableButton)
             return;
         observableButton.UpdateFrom(button);
         Updated?.Invoke(this, EventArgs.Empty);
@@ -114,7 +107,7 @@ public sealed partial class ObservableGamepad :
 
     void HandleGamepadThumbstickMoved(IGamepad gamepad, Thumbstick thumbstick)
     {
-        if (Thumbsticks.FirstOrDefault(ot => ot.Thumbstick.Index == thumbstick.Index) is not { } observableThumbstick)
+        if (Thumbsticks.Cast<ObservableThumbstick>().FirstOrDefault(ot => ot.Thumbstick.Index == thumbstick.Index) is not { } observableThumbstick)
             return;
         observableThumbstick.UpdateFrom(thumbstick);
         Updated?.Invoke(this, EventArgs.Empty);
@@ -122,7 +115,7 @@ public sealed partial class ObservableGamepad :
 
     void HandleGamepadTriggerMoved(IGamepad gamepad, Trigger trigger)
     {
-        if (Triggers.FirstOrDefault(ot => ot.Trigger.Index == trigger.Index) is not { } observableTrigger)
+        if (Triggers.Cast<ObservableTrigger>().FirstOrDefault(ot => ot.Trigger.Index == trigger.Index) is not { } observableTrigger)
             return;
         observableTrigger.UpdateFrom(trigger);
         Updated?.Invoke(this, EventArgs.Empty);
@@ -130,10 +123,8 @@ public sealed partial class ObservableGamepad :
 
     public bool Vibrate(double left, double right)
     {
-#if WINDOWS
         if (xInputSlot is >= 0 and < 4)
             return XInputTrySetVibration(xInputSlot, left, right);
-#endif
         return false;
     }
 }

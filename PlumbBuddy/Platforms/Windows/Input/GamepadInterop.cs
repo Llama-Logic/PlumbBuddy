@@ -4,7 +4,7 @@ using Silk.NET.Windowing;
 using IWindow = Silk.NET.Windowing.IWindow;
 using Window = Silk.NET.Windowing.Window;
 
-namespace PlumbBuddy.Services.Input;
+namespace PlumbBuddy.Platforms.Windows.Input;
 
 public sealed partial class GamepadInterop :
     IGamepadInterop
@@ -24,14 +24,14 @@ public sealed partial class GamepadInterop :
     ~GamepadInterop() =>
         Dispose(false);
 
-    readonly ObservableRangeCollection<ObservableGamepad> gamepads;
+    readonly ObservableRangeCollection<IObservableGamepad> gamepads;
     readonly AsyncLock gamepadsLock;
     IInputContext? input;
     readonly ISettings settings;
     IWindow? window;
     CancellationTokenSource? windowCts;
 
-    public ReadOnlyObservableCollection<ObservableGamepad> Gamepads { get; }
+    public ReadOnlyObservableCollection<IObservableGamepad> Gamepads { get; }
 
     public event EventHandler? Updated;
 
@@ -93,7 +93,7 @@ public sealed partial class GamepadInterop :
             return;
         using (var heldGamepadsLock = gamepadsLock.Lock())
         {
-            foreach (var observableGamepad in gamepads)
+            foreach (var observableGamepad in gamepads.Cast<ObservableGamepad>())
             {
                 observableGamepad.Updated -= HandleObservableGamepadUpdated;
                 observableGamepad.Dispose();
@@ -123,7 +123,7 @@ public sealed partial class GamepadInterop :
         using var heldGamepadsLock = gamepadsLock.Lock();
         if (isConnected)
         {
-            if (gamepads.Any(og => og.Gamepad == gamepad))
+            if (gamepads.Cast<ObservableGamepad>().Any(og => og.Gamepad == gamepad))
                 return;
             var observableGamepad = new ObservableGamepad(gamepad);
             observableGamepad.Updated += HandleObservableGamepadUpdated;
@@ -131,8 +131,8 @@ public sealed partial class GamepadInterop :
         }
         else
         {
-            var removedObservableGamepads = gamepads.GetAndRemoveAll(og => og.Gamepad == gamepad);
-            foreach (var removedObservableGamepad in removedObservableGamepads)
+            var removedObservableGamepads = gamepads.GetAndRemoveAll(og => ((ObservableGamepad)og).Gamepad == gamepad);
+            foreach (var removedObservableGamepad in removedObservableGamepads.Cast<ObservableGamepad>())
             {
                 removedObservableGamepad.Updated -= HandleObservableGamepadUpdated;
                 removedObservableGamepad.Dispose();

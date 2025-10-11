@@ -25,20 +25,20 @@
                 <MudDivider />
                 <MudStack Row>
                     <MudIcon Icon="@MaterialDesignIcons.Normal.Controller" />
-                    <MudTextM3 Typo="TypoM3.Title">@(gamepad.Gamepad.Name)</MudTextM3>
+                    <MudTextM3 Typo="TypoM3.Title">@(gamepad.Name)</MudTextM3>
                 </MudStack>
                 <MudGrid Spacing="0">
                     @foreach (var button in gamepad.Buttons)
                     {
                         <MudItem>
-                            <MudChip Color="@(button.Pressed ? Color.Primary: Color.Dark)" Icon="@(button.Pressed ? MaterialDesignIcons.Normal.ArrowDownCircle : MaterialDesignIcons.Outline.ArrowUpCircle)" Value="@(button.Button.Name)" />
+                            <MudChip Color="@(button.Pressed ? Color.Primary: Color.Dark)" Icon="@(button.Pressed ? MaterialDesignIcons.Normal.ArrowDownCircle : MaterialDesignIcons.Outline.ArrowUpCircle)" Value="@(button.Name)" />
                         </MudItem>
                     }
                 </MudGrid>
                 <MudGrid Spacing="2">
                     @foreach (var thumbstick in gamepad.Thumbsticks)
                     {
-                        var position = gamepad.Gamepad.Deadzone.Apply(thumbstick.Position);
+                        var position = gamepad.ApplyDeadzone(thumbstick.Position);
                         <MudItem>
                             <MudStack Row>
                                 <MudIcon Icon="@MaterialDesignIcons.Normal.AxisZRotateClockwise" Size="Size.Small" />

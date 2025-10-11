@@ -1,18 +1,22 @@
 using Button = Silk.NET.Input.Button;
 
-namespace PlumbBuddy.Services.Input;
+namespace PlumbBuddy.Platforms.Windows.Input;
 
-public sealed class ObservableButton
+public sealed class ObservableButton :
+    IObservableButton
 {
     public ObservableButton(Button button)
     {
         Button = button;
+        Name = button.Name.ToString();
         pressed = button.Pressed;
     }
 
     bool pressed;
 
     public Button Button { get; }
+
+    public string Name { get; }
 
     public bool Pressed
     {

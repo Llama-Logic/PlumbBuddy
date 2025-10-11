@@ -2,6 +2,7 @@
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 using Microsoft.Windows.AppLifecycle;
 using PlumbBuddy.Platforms.Windows;
+using PlumbBuddy.Platforms.Windows.Input;
 using Windows.Win32;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -146,6 +147,7 @@ public partial class App :
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
         builder.Services.AddSingleton<IElectronicArtsApp, Platforms.Windows.ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
+        builder.Services.AddSingleton<IGamepadInterop, GamepadInterop>();
     }
 
     static void HandleInstanceActivated(object? sender, AppActivationArguments args) =>

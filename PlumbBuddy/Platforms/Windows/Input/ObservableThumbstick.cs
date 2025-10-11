@@ -1,9 +1,9 @@
 using Silk.NET.Input;
 
-namespace PlumbBuddy.Services.Input;
+namespace PlumbBuddy.Platforms.Windows.Input;
 
 public sealed class ObservableThumbstick :
-    INotifyPropertyChanged
+    IObservableThumbstick
 {
     public ObservableThumbstick(Thumbstick thumbstick)
     {

@@ -3,7 +3,7 @@ namespace PlumbBuddy.Services.Input;
 public interface IGamepadInterop :
     IDisposable
 {
-    ReadOnlyObservableCollection<ObservableGamepad> Gamepads { get; }
+    ReadOnlyObservableCollection<IObservableGamepad> Gamepads { get; }
 
     event EventHandler? Updated;
 }

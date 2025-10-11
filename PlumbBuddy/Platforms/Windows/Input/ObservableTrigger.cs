@@ -1,9 +1,9 @@
 using Trigger = Silk.NET.Input.Trigger;
 
-namespace PlumbBuddy.Services.Input;
+namespace PlumbBuddy.Platforms.Windows.Input;
 
 public sealed class ObservableTrigger :
-    INotifyPropertyChanged
+    IObservableTrigger
 {
     public ObservableTrigger(Trigger trigger)
     {
