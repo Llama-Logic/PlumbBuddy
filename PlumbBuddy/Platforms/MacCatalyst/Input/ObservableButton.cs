@@ -26,6 +26,9 @@ public sealed class ObservableButton :
     readonly ObservableGamepad gamepad;
     bool pressed;
 
+    public IObservableGamepad Gamepad =>
+        gamepad;
+
     public string Name { get; }
 
     public bool Pressed

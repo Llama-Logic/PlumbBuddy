@@ -23,6 +23,9 @@ public sealed class ObservableTrigger :
     float position;
     readonly GCControllerButtonInput trigger;
 
+    public IObservableGamepad Gamepad =>
+        gamepad;
+
     public float Position
     {
         get => position;

@@ -1,7 +1,6 @@
 import base64
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
-from distributor.shared_messages import IconInfoData
 from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
 from plumbbuddy_proxy import logger
@@ -131,6 +130,324 @@ class BridgedUi:
             'type': 'send_data_to_bridged_ui',
             'recipient': str(self._unique_id),
             'data': data
+        })
+
+class GamepadButton:
+    """
+    A PlumbBuddy Runtime Mod Integration Gamepad Button
+    """
+
+    def __init__(self, gamepad, name: str, pressed: bool):
+        self._gamepad = gamepad
+        self._name = name
+        self._pressed = pressed
+        self._dispatch_changed: Callable[[GamepadButton], None] = lambda _: None
+        def set_dispatch_changed(dispatch: Callable[[GamepadButton], None]):
+            self._dispatch_changed = dispatch
+        self._changed: Event[GamepadButton] = Event(set_dispatch_changed)
+    
+    def _raise_changed(self, pressed: bool):
+        self._pressed = pressed
+        self._dispatch_changed(self)
+    
+    @property
+    def changed(self):
+        """
+        Gets the event which is dispatched when the state of the button has changed
+        """
+
+        return self._changed
+    
+    @property
+    def gamepad(self):
+        """
+        Gets the gamepad to which this button belongs
+        """
+
+        return self._gamepad
+    
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the button
+        """
+
+        return self._name
+    
+    @property
+    def pressed(self) -> bool:
+        """
+        Gets whether the button is pressed
+        """
+
+        return self._pressed
+
+class GamepadThumbstick:
+    """
+    A PlumbBuddy Runtime Mod Integration Gamepad Thumbstick
+    """
+
+    def __init__(self, gamepad, index: int, x: float, y: float, direction: float, position: float):
+        self._gamepad = gamepad
+        self._index = index
+        self._x = x
+        self._y = y
+        self._direction = direction
+        self._position = position
+        self._dispatch_changed: Callable[[GamepadThumbstick], None] = lambda _: None
+        def set_dispatch_changed(dispatch: Callable[[GamepadThumbstick], None]):
+            self._dispatch_changed = dispatch
+        self._changed: Event[GamepadThumbstick] = Event(set_dispatch_changed)
+    
+    def _raise_changed(self, x: float, y: float, direction: float, position: float):
+        self._x = x
+        self._y = y
+        self._direction = direction
+        self._position = position
+        self._dispatch_changed(self)
+    
+    @property
+    def changed(self):
+        """
+        Gets the event which is dispatched when the state of the thumbstick has changed
+        """
+
+        return self._changed
+    
+    @property
+    def direction(self) -> float:
+        """
+        Gets the direction in which the thumbstick is pointed as a float (East being 0, South being π/2, West being π or -π, North being -π/2)
+        """
+
+        return self._direction
+    
+    @property
+    def gamepad(self):
+        """
+        Gets the gamepad to which this thumbstick belongs
+        """
+
+        return self._gamepad
+    
+    @property
+    def index(self) -> int:
+        """
+        Gets the index of the thumbstick according to the gamepad to which it belongs
+        """
+
+        return self._index
+    
+    @property
+    def position(self):
+        """
+        Gets the position of the thumbstick as a float inclusively between 0 (dead center) and 1 (as far in the direction as is possible)
+
+        [Important: When pushed all the way in one direction, a thumbstick may report its position as slightly greater than 1]
+        """
+
+        return self._position
+    
+    @property
+    def x(self):
+        """
+        Gets the X axis coordinate of the thumbstick as a float inclusively between -1 (all the way West) and 1 (all the way East)
+        """
+        
+        return self._x
+    
+    @property
+    def y(self):
+        """
+        Gets the Y axis coordinate of the thumbstick as a float inclusively between -1 (all the way North) and 1 (all the way South)
+        """
+        
+        return self._y
+
+class GamepadTrigger:
+    """
+    A PlumbBuddy Runtime Mod Integration Gamepad Trigger
+    """
+    def __init__(self, gamepad, index: int, position: float):
+        self._gamepad = gamepad
+        self._index = index
+        self._position = position
+        self._dispatch_changed: Callable[[GamepadTrigger], None] = lambda _: None
+        def set_dispatch_changed(dispatch: Callable[[GamepadTrigger], None]):
+            self._dispatch_changed = dispatch
+        self._changed: Event[GamepadTrigger] = Event(set_dispatch_changed)
+    
+    def _raise_changed(self, position: float):
+        self._position = position
+        self._dispatch_changed(self)
+    
+    @property
+    def changed(self):
+        """
+        Gets the event which is dispatched when the state of the trigger has changed
+        """
+
+        return self._changed
+    
+    @property
+    def gamepad(self):
+        """
+        Gets the gamepad to which this trigger belongs
+        """
+
+        return self._gamepad
+    
+    @property
+    def index(self) -> int:
+        """
+        Gets the index of the trigger according to the gamepad to which it belongs
+        """
+
+        return self._index
+    
+    @property
+    def position(self):
+        """
+        Gets the position of the trigger as a float inclusively between 0 (no pressure) and 1 (fully squeezed)
+        """
+
+        return self._position
+
+class Gamepad:
+    """
+    A PlumbBuddy Runtime Mod Integration Gamepad
+    """
+
+    def __init__(self, index: int, buttons: Sequence[Tuple[str, bool]], thumbsticks: Sequence[Tuple[float, float, float, float]], triggers: Sequence[float]):
+        self._index = index
+        self._dispatch_disconnected: Callable[[Gamepad], None] = lambda _: None
+        def set_dispatch_disconnected(dispatch: Callable[[Gamepad], None]):
+            self._dispatch_disconnected = dispatch
+        self._disconnected: Event[Gamepad] = Event(set_dispatch_disconnected)
+        self._dispatch_index_changed: Callable[[Gamepad], None] = lambda _: None
+        def set_dispatch_index_changed(dispatch: Callable[[Gamepad], None]):
+            self._dispatch_index_changed = dispatch
+        self._index_changed: Event[Gamepad] = Event(set_dispatch_index_changed)
+        self._buttons: List[GamepadButton] = []
+        for button in buttons:
+            self._buttons.append(GamepadButton(self, button[0], button[1]))
+        self._thumbsticks: List[GamepadThumbstick] = []
+        thumbstick_index = -1
+        for thumbstick in thumbsticks:
+            thumbstick_index += 1
+            self._thumbsticks.append(GamepadThumbstick(self, thumbstick_index, thumbstick[0], thumbstick[1], thumbstick[2], thumbstick[3]))
+        self._triggers: List[GamepadTrigger] = []
+        trigger_index = -1
+        for position in triggers:
+            trigger_index += 1
+            self._triggers.append(GamepadTrigger(self, trigger_index, position))
+
+    def _raise_disconnected(self):
+        self._dispatch_disconnected(self)
+    
+    def _raise_index_changed(self, index: int):
+        if self._index != index:
+            self._index = index
+            self._dispatch_index_changed(self)
+
+    @property
+    def button_names(self) -> Sequence[str]:
+        """
+        Gets the names of the gamepad's buttons
+        """
+
+        names = []
+        for button in self._buttons:
+            names.append(button.name)
+        return tuple(names)
+    
+    @property
+    def disconnected(self):
+        """
+        Gets the event which is dispatched when the gamepad has been disconnected
+        """
+
+        return self._disconnected
+
+    @property
+    def index(self) -> int:
+        """
+        Gets the index of this gamepad according to the gateway
+        """
+
+        return self._index
+    
+    @property
+    def index_changed(self):
+        """
+        Gets the event which is dispatched when the gamepad's index according to the gateway has changed
+        """
+
+        return self._index_changed
+    
+    @property
+    def thumbstick_count(self) -> int:
+        """
+        Gets the number of thumbsticks the gamepad has
+        """
+
+        return len(self._thumbsticks)
+    
+    @property
+    def trigger_count(self) -> int:
+        """
+        Gets the number of triggers the gamepad has
+        """
+
+        return len(self._triggers)
+    
+    def get_button(self, name: str) -> GamepadButton:
+        """
+        Gets the gamepad's button with the specified name
+
+        :param name: the name of the button
+        :returns: the button if there is one with the specified name; otherwise, None
+        """
+
+        for button in self._buttons:
+            if button.name == name:
+                return button
+        return None
+    
+    def get_thumbstick(self, index: int) -> GamepadThumbstick:
+        """
+        Gets the gamepad's thumbstick with the specified index
+
+        :param index: the index of the thumbstick
+        :returns: the thumbstick if there is one with the specified index; otherwise, None
+        """
+
+        if index >= 0 and index < len(self._thumbsticks):
+            return self._thumbsticks[index]
+        return None
+    
+    def get_trigger(self, index: int) -> GamepadTrigger:
+        """
+        Gets the gamepad's trigger with the specified index
+
+        :param index: the index of the trigger
+        :returns: the trigger if there is one with the specified index; otherwise, None
+        """
+        if index >= 0 and index < len(self._triggers):
+            return self._triggers[index]
+        return None
+    
+    def vibrate(self, intensity: float):
+        """
+        Vibrates the controller with the specified intensity
+
+        :param intensity: an intensity value between 0 (off) and 1 (full intensity)
+        """
+
+        ipc.send({
+            'type': 'vibrate_gamepad',
+            'index': self._index,
+            'intensity': intensity
         })
 
 class RelationalDataStorageQueryRecordSet:
@@ -373,6 +690,7 @@ class Gateway:
     """
 
     def __init__(self):
+        self._gamepads: List[Gamepad] = []
         self._global_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._reset_bridged_ui_cache()
@@ -382,6 +700,11 @@ class Gateway:
         def set_dispatch_is_connected_changed(dispatch: Callable[[bool], None]):
             self._dispatch_is_connected_changed = dispatch
         self._is_connected_changed: Event[bool] = Event(set_dispatch_is_connected_changed)
+
+        self._dispatch_gamepad_connected: Callable[[Gamepad], None] = lambda _: None
+        def set_dispatch_gamepad_disconnected(dispatch: Callable[[Gamepad], None]):
+            self._dispatch_gamepad_connected = dispatch
+        self._gamepad_connected: Event[Gamepad] = Event(set_dispatch_gamepad_disconnected)
 
         @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
@@ -505,6 +828,51 @@ class Gateway:
         if message_type == 'foreground_plumbbuddy':
             _try_to_foreground_plumbbuddy()
             return
+        if message_type == 'gamepad_button_changed':
+            gamepad = self.get_gamepad(message['index'])
+            button = gamepad.get_button(message['name'])
+            button._raise_changed(message['pressed'])
+            return
+        if message_type == 'gamepad_connected':
+            gamepad = Gamepad(message['index'], message['buttons'], message['thumbsticks'], message['triggers'])
+            self._gamepads.insert(gamepad.index, gamepad)
+            for additional_gamepad in self._gamepads[gamepad.index + 1:]:
+                additional_gamepad._raise_index_changed(additional_gamepad.index + 1)
+            self._dispatch_gamepad_connected(gamepad)
+            return
+        if message_type == 'gamepad_disconnected':
+            gamepad = self._gamepads.pop(message['index'])
+            for additional_gamepad in self._gamepads[gamepad.index:]:
+                additional_gamepad._raise_index_changed(additional_gamepad.index - 1)
+            gamepad._raise_disconnected()
+            return
+        if message_type == 'gamepad_moved':
+            gamepad = self._gamepads.pop(message['index'])
+            self._gamepads.insert(message['new_index'], gamepad)
+            for shifted_gamepad in self._gamepads[min(message['index'], message['new_index']):max(message['index'], message['new_index']) + 1]:
+                shifted_gamepad._raise_index_changed(self._gamepads.index(shifted_gamepad))
+            return
+        if message_type == 'gamepad_thumbstick_changed':
+            gamepad = self.get_gamepad(message['index'])
+            thumbstick = gamepad.get_thumbstick(message['thumbstick'])
+            thumbstick._raise_changed(message['x'], message['y'], message['direction'], message['position'])
+            return
+        if message_type == 'gamepad_trigger_changed':
+            gamepad = self.get_gamepad(message['index'])
+            trigger = gamepad.get_trigger(message['trigger'])
+            trigger._raise_changed(message['position'])
+            return
+        if message_type == 'gamepads_reset':
+            while len(self._gamepads):
+                gamepad = self._gamepads[0]
+                for additional_gamepad in self._gamepads:
+                    additional_gamepad._raise_index_changed(additional_gamepad.index - 1)
+                gamepad._raise_disconnected()
+            for new_gamepad in message['gamepads']:
+                gamepad = Gamepad(len(self._gamepads), new_gamepad['buttons'], new_gamepad['thumbsticks'], new_gamepad['triggers'])
+                self._gamepads.append(gamepad)
+                self._dispatch_gamepad_connected(gamepad)
+            return
         if message_type == 'look_up_localized_strings_response':
             eventual: Eventual[Sequence[StringTableEntry]] = None
             try:
@@ -541,6 +909,22 @@ class Gateway:
         self._look_up_string_table_entries_requests: Dict[UUID, Eventual[Sequence[StringTableEntry]]]
 
     @property
+    def gamepad_connected(self) -> Event[Gamepad]:
+        """
+        Gets the event which is dispatched when the player has connected a gamepad
+        """
+
+        return self._gamepad_connected
+    
+    @property
+    def gamepad_count(self) -> int:
+        """
+        Gets the number of currently connected gamepads
+        """
+
+        return len(self._gamepads)
+
+    @property
     def is_connected() -> bool:
         """
         Gets whether PlumbBuddy is currently connected
@@ -559,6 +943,18 @@ class Gateway:
         """
 
         return self._is_connected_changed
+    
+    def get_gamepad(self, index: int) -> Gamepad:
+        """
+        Gets the gamepad with the specified index
+
+        :param index: the index of the gamepad to retrieve
+        :returns: A gamepad if one is available at the specified index; otherwise, None
+        """
+
+        if index < 0 or index >= len(self._gamepads):
+            return None
+        return self._gamepads[index]
 
     def get_relational_data_storage(self, unique_id: UUID, is_save_specific: bool) -> RelationalDataStorage:
         """

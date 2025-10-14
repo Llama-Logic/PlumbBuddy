@@ -49,6 +49,18 @@ public partial class ProxyHost :
         return options;
     }
 
+    static GamepadConnectedMessage CreateGamepadConnectedMessage(IObservableGamepad gamepad, int index, bool python) =>
+        new()
+        {
+            Index = index,
+            Buttons = gamepad.Buttons.Select(button => new List<object>([button.Name, button.Pressed]).AsReadOnly()).ToList().AsReadOnly(),
+            Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new List<object>([thumbstick.X, thumbstick.Y, thumbstick.Direction, thumbstick.Position]).AsReadOnly()).ToList().AsReadOnly(),
+            Triggers = gamepad.Triggers.Select(trigger => trigger.Position).ToList().AsReadOnly(),
+            Type = python
+                ? nameof(HostMessageType.GamepadConnected).Underscore().ToLowerInvariant()
+                : nameof(HostMessageType.GamepadConnected).Camelize()
+        };
+
     static async Task<DirectoryInfo> GetAppDataDirectoryAsync()
     {
         var tcs = new TaskCompletionSource<DirectoryInfo>();
@@ -96,7 +108,7 @@ public partial class ProxyHost :
         }
     }
 
-    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IGameResourceCataloger gameResourceCataloger)
+    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IGameResourceCataloger gameResourceCataloger, IGamepadInterop gamepadInterop)
     {
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(logger);
@@ -104,18 +116,22 @@ public partial class ProxyHost :
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(gameResourceCataloger);
+        ArgumentNullException.ThrowIfNull(gamepadInterop);
         this.platformFunctions = platformFunctions;
         this.logger = logger;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
         this.appLifecycleManager = appLifecycleManager;
         this.gameResourceCataloger = gameResourceCataloger;
+        this.gamepadInterop = gamepadInterop;
         cancellationTokenSource = new();
         cancellationToken = cancellationTokenSource.Token;
         connectedClients = new();
         bridgedUiLoadingLocks = new();
         loadedBridgedUis = new();
         gameIsSavingManualResetEvent = new(true);
+        gamepadMessagingEnrolledBridgedUis = new();
+        gamepadMessagingEnrolledClients = new();
         reserveSavesAccessManualResetEvent = new(true);
         gameServicesRunningManualResetEvent = new(false);
         saveSpecificDataStorageConnectionLocks = new();
@@ -125,6 +141,11 @@ public partial class ProxyHost :
         saveSpecificDataStoragePropagationLock = new();
         pendingSaveSpecificDataStorageInitialization = true;
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
+        foreach (var gamepad in this.gamepadInterop.Gamepads)
+            WireGamepad(gamepad);
+        ((INotifyCollectionChanged)this.gamepadInterop.Gamepads).CollectionChanged += HandleGamepadInteropGamepadsCollectionChanged;
+        gamepadMessagingQueue = new();
+        _ = Task.Run(ProcessGamepadMessagesAsync);
         listener = new(IPAddress.Loopback, port);
         listener.Start();
         _ = Task.Run(ListenAsync);
@@ -140,6 +161,7 @@ public partial class ProxyHost :
     readonly ConcurrentDictionary<TcpClient, AsyncLock> connectedClients;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
+    readonly IGamepadInterop gamepadInterop;
     readonly IGameResourceCataloger gameResourceCataloger;
     bool isBridgedUiDevelopmentModeEnabled;
     bool isClientConnected;
@@ -149,6 +171,9 @@ public partial class ProxyHost :
     AsyncProducerConsumerQueue<string>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     readonly AsyncManualResetEvent gameIsSavingManualResetEvent;
+    readonly ConcurrentDictionary<Guid, object?> gamepadMessagingEnrolledBridgedUis;
+    readonly ConcurrentDictionary<TcpClient, object?> gamepadMessagingEnrolledClients;
+    readonly AsyncProducerConsumerQueue<Func<Task>> gamepadMessagingQueue;
     readonly AsyncManualResetEvent gameServicesRunningManualResetEvent;
     bool pendingSaveSpecificDataStorageInitialization;
     readonly IPlatformFunctions platformFunctions;
@@ -279,6 +304,14 @@ public partial class ProxyHost :
         _ = Task.Run(ProcessPathsQueueAsync);
     }
 
+    IReadOnlyList<GamepadsResetMessageGamepad> CreateGamepadsResetMessageGamepadList() =>
+        gamepadInterop.Gamepads.Select(gamepad => new GamepadsResetMessageGamepad
+        {
+            Buttons = gamepad.Buttons.Select(button => new List<object>([button.Name, button.Pressed]).AsReadOnly()).ToList().AsReadOnly(),
+            Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new List<object>([thumbstick.X, thumbstick.Y, thumbstick.Direction, thumbstick.Position]).AsReadOnly()).ToList().AsReadOnly(),
+            Triggers = gamepad.Triggers.Select(trigger => trigger.Position).ToList().AsReadOnly()
+        }).ToList().AsReadOnly();
+
     public void DestroyBridgedUi(Guid uniqueId) =>
         _ = Task.Run(async () => await DestroyBridgedUiAsync(uniqueId).ConfigureAwait(false));
 
@@ -289,6 +322,7 @@ public partial class ProxyHost :
         if (!loadedBridgedUis.TryRemove(uniqueId, out var archives))
             return;
         logger.LogDebug("I now take from bridged UI {UniqueId} its power, in the name of CodeBleu, and Scumbumbo before. I, PlumbBuddy, CAST YOU OFF!", uniqueId);
+        gamepadMessagingEnrolledBridgedUis.TryRemove(uniqueId, out _);
         BridgedUiDestroyed?.Invoke(this, new() { UniqueId = uniqueId });
         await SendMessageToProxyAsync(new BridgedUiDestroyedMessage
         {
@@ -342,6 +376,9 @@ public partial class ProxyHost :
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+            ((INotifyCollectionChanged)gamepadInterop.Gamepads).CollectionChanged -= HandleGamepadInteropGamepadsCollectionChanged;
+            gamepadMessagingQueue.CompleteAdding();
+            settings.PropertyChanged -= HandleSettingsPropertyChanged;
             DisconnectFromSavesFolder();
             cancellationTokenSource.Cancel();
             listener.Dispose();
@@ -408,6 +445,7 @@ public partial class ProxyHost :
         }
         finally
         {
+            gamepadMessagingEnrolledClients.TryRemove(client, out _);
             if (connectedClients.TryRemove(client, out var clientWriteLock))
             {
                 using var clientWriteLockHeld = await clientWriteLock.LockAsync(cancellationToken).ConfigureAwait(false);
@@ -448,6 +486,184 @@ public partial class ProxyHost :
 
     void HandleFileSystemWatcherRenamed(object sender, RenamedEventArgs e) =>
         pathsProcessingQueue?.Enqueue(e.FullPath);
+
+    void HandleGamepadButtonButtonUpdated(object? sender, ButtonUpdatedEventArgs e)
+    {
+        if (sender is not IObservableButton observableButton)
+            return;
+        var index = gamepadInterop.Gamepads.IndexOf(observableButton.Gamepad);
+        var proxyMessage = new GamepadButtonChangedMessage
+        {
+            Index = index,
+            Name = observableButton.Name,
+            Pressed = e.Pressed,
+            Type = nameof(HostMessageType.GamepadButtonChanged).Underscore().ToLowerInvariant()
+        };
+        var bridgedUiMessage = new GamepadButtonChangedMessage
+        {
+            Index = index,
+            Name = observableButton.Name,
+            Pressed = e.Pressed,
+            Type = nameof(HostMessageType.GamepadButtonChanged).Camelize()
+        };
+        gamepadMessagingQueue.Enqueue(() => SendGamepadMessageAsync(proxyMessage, bridgedUiMessage));
+    }
+
+    void HandleGamepadInteropGamepadsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add when e.NewItems is { } newItems:
+                var newGamepads = newItems.Cast<IObservableGamepad>();
+                var proxyConnectedMessages = newGamepads.Select((gamepad, index) => CreateGamepadConnectedMessage(gamepad, e.NewStartingIndex + index, true)).ToImmutableArray();
+                var bridgedUiConnectedMessages = newGamepads.Select((gamepad, index) => CreateGamepadConnectedMessage(gamepad, e.NewStartingIndex + index, false)).ToImmutableArray();
+                gamepadMessagingQueue.Enqueue(async () =>
+                {
+                    for (var i = 0; i < proxyConnectedMessages.Length; ++i)
+                        await SendGamepadMessageAsync(proxyConnectedMessages[i], bridgedUiConnectedMessages[i]).ConfigureAwait(false);
+                });
+                foreach (var newGamepad in newGamepads)
+                    WireGamepad(newGamepad);
+                break;
+            case NotifyCollectionChangedAction.Move when e.OldItems is { } movedItems:
+                var movedGamepads = movedItems.Cast<IObservableGamepad>();
+                var proxyMovedMessages = movedGamepads.Select((_, index) => new GamepadMovedMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    NewIndex = e.NewStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadMoved).Underscore().ToLowerInvariant()
+                }).ToImmutableArray();
+                var bridgedUiMovedMessages = movedGamepads.Select((_, index) => new GamepadMovedMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    NewIndex = e.NewStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadMoved).Camelize()
+                }).ToImmutableArray();
+                gamepadMessagingQueue.Enqueue(async () =>
+                {
+                    for (var i = 0; i < proxyMovedMessages.Length; ++i)
+                        await SendGamepadMessageAsync(proxyMovedMessages[i], bridgedUiMovedMessages[i]).ConfigureAwait(false);
+                });
+                break;
+            case NotifyCollectionChangedAction.Remove when e.OldItems is { } oldItems:
+                var removedGamepads = oldItems.Cast<IObservableGamepad>();
+                var proxyDisconnectedMessages = removedGamepads.Select((_, index) => new GamepadMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadDisconnected).Underscore().ToLowerInvariant()
+                }).ToImmutableArray();
+                var bridgedUiDisconnectedMessages = removedGamepads.Select((_, index) => new GamepadMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadDisconnected).Camelize()
+                }).ToImmutableArray();
+                gamepadMessagingQueue.Enqueue(async () =>
+                {
+                    for (var i = 0; i < proxyDisconnectedMessages.Length; ++i)
+                        await SendGamepadMessageAsync(proxyDisconnectedMessages[i], bridgedUiDisconnectedMessages[i]).ConfigureAwait(false);
+                });
+                foreach (var newGamepad in removedGamepads)
+                    UnwireGamepad(newGamepad);
+                break;
+            case NotifyCollectionChangedAction.Replace when e.OldItems is { } replacedItems && e.NewItems is { } replacedWithItems:
+                var replacedGamepads = replacedItems.Cast<IObservableGamepad>();
+                var proxyReplacedMessages = replacedGamepads.Select((_, index) => new GamepadMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadDisconnected).Underscore().ToLowerInvariant()
+                }).ToImmutableArray();
+                var bridgedUiReplacedMessages = replacedGamepads.Select((_, index) => new GamepadMessage
+                {
+                    Index = e.OldStartingIndex + index,
+                    Type = nameof(HostMessageType.GamepadDisconnected).Camelize()
+                }).ToImmutableArray();
+                var replacedWithGamepads = replacedWithItems.Cast<IObservableGamepad>();
+                var proxyReplacedWithMessages = replacedWithGamepads.Select((gamepad, index) => CreateGamepadConnectedMessage(gamepad, e.NewStartingIndex + index, true)).ToImmutableArray();
+                var bridgedUiReplacedWithMessages = replacedWithGamepads.Select((gamepad, index) => CreateGamepadConnectedMessage(gamepad, e.NewStartingIndex + index, false)).ToImmutableArray();
+                gamepadMessagingQueue.Enqueue(async () =>
+                {
+                    for (var i = 0; i < proxyReplacedMessages.Length; ++i)
+                        await SendGamepadMessageAsync(proxyReplacedMessages[i], bridgedUiReplacedMessages[i]).ConfigureAwait(false);
+                    for (var i = 0; i < proxyReplacedWithMessages.Length; ++i)
+                        await SendGamepadMessageAsync(proxyReplacedWithMessages[i], bridgedUiReplacedWithMessages[i]).ConfigureAwait(false);
+                });
+                foreach (var newGamepad in replacedGamepads)
+                    UnwireGamepad(newGamepad);
+                foreach (var newGamepad in replacedWithGamepads)
+                    WireGamepad(newGamepad);
+                break;
+            case NotifyCollectionChangedAction.Reset:
+                var gamepadsList = CreateGamepadsResetMessageGamepadList();
+                var proxyResetMessage = new GamepadsResetMessage
+                {
+                    Gamepads = gamepadsList,
+                    Type = nameof(HostMessageType.GamepadsReset).Underscore().ToLowerInvariant()
+                };
+                var bridgedUiResetMessage = new GamepadsResetMessage
+                {
+                    Gamepads = gamepadsList,
+                    Type = nameof(HostMessageType.GamepadsReset).Camelize()
+                };
+                gamepadMessagingQueue.Enqueue(() => SendGamepadMessageAsync(proxyResetMessage, bridgedUiResetMessage));
+                foreach (var newGamepad in gamepadInterop.Gamepads)
+                    WireGamepad(newGamepad);
+                break;
+        }
+    }
+
+    void HandleGamepadThumbstickThumbstickUpdated(object? sender, ThumbstickUpdatedEventArgs e)
+    {
+        if (sender is not IObservableThumbstick observableThumbstick)
+            return;
+        var gamepad = observableThumbstick.Gamepad;
+        var index = gamepadInterop.Gamepads.IndexOf(gamepad);
+        var thumbstick = gamepad.Thumbsticks.IndexOf(observableThumbstick);
+        var proxyMessage = new GamepadThumbstickChangedMessage
+        {
+            Direction = e.Direction,
+            Index = index,
+            Position = e.Position,
+            Thumbstick = thumbstick,
+            Type = nameof(HostMessageType.GamepadThumbstickChanged).Underscore().ToLowerInvariant(),
+            X = e.X,
+            Y = e.Y
+        };
+        var bridgedUiMessage = new GamepadThumbstickChangedMessage
+        {
+            Direction = e.Direction,
+            Index = index,
+            Position = e.Position,
+            Thumbstick = thumbstick,
+            Type = nameof(HostMessageType.GamepadThumbstickChanged).Camelize(),
+            X = e.X,
+            Y = e.Y
+        };
+        gamepadMessagingQueue.Enqueue(() => SendGamepadMessageAsync(proxyMessage, bridgedUiMessage));
+    }
+
+    void HandleGamepadTriggerTriggerUpdated(object? sender, TriggerUpdatedEventArgs e)
+    {
+        if (sender is not IObservableTrigger observableTrigger)
+            return;
+        var gamepad = observableTrigger.Gamepad;
+        var index = gamepadInterop.Gamepads.IndexOf(gamepad);
+        var trigger = gamepad.Triggers.IndexOf(observableTrigger);
+        var proxyMessage = new GamepadTriggerChangedMessage
+        {
+            Index = index,
+            Position = e.Position,
+            Trigger = trigger,
+            Type = nameof(HostMessageType.GamepadTriggerChanged).Underscore().ToLowerInvariant()
+        };
+        var bridgedUiMessage = new GamepadTriggerChangedMessage
+        {
+            Index = index,
+            Position = e.Position,
+            Trigger = trigger,
+            Type = nameof(HostMessageType.GamepadTriggerChanged).Camelize()
+        };
+        gamepadMessagingQueue.Enqueue(() => SendGamepadMessageAsync(proxyMessage, bridgedUiMessage));
+    }
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -656,6 +872,15 @@ public partial class ProxyHost :
                 {
                     Type = nameof(HostMessageType.SendLoadedSaveIdentifiers).Underscore().ToLowerInvariant()
                 }).ConfigureAwait(false);
+                gamepadMessagingQueue.Enqueue(async () =>
+                {
+                    gamepadMessagingEnrolledClients.TryAdd(client, null);
+                    await SendMessageToSpecificProxyAsync(client, new GamepadsResetMessage
+                    {
+                        Gamepads = CreateGamepadsResetMessageGamepadList(),
+                        Type = nameof(HostMessageType.GamepadsReset).Underscore().ToLowerInvariant()
+                    }).ConfigureAwait(false);
+                });
             }
         }
         catch (OperationCanceledException)
@@ -734,6 +959,22 @@ public partial class ProxyHost :
         PromptPlayerForBridgedUiAuthorization(requestMessage, archive, layers.AsReadOnly());
     }
 
+    async Task ProcessGamepadMessagesAsync()
+    {
+        while (await gamepadMessagingQueue.OutputAvailableAsync().ConfigureAwait(false))
+        {
+            var asyncFunc = await gamepadMessagingQueue.DequeueAsync().ConfigureAwait(false);
+            try
+            {
+                await asyncFunc().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "unhandled exception when processing gamepad messaging queue");
+            }
+        }
+    }
+
     async Task ProcessLookUpLocalizedStringsMessageAsync(LookUpLocalizedStringsMessage lookUpLocalizedStringsMessage, Guid? fromBridgedUiUniqueId = null)
     {
         var response = new LookUpLocalizedStringsResponseMessage
@@ -792,6 +1033,16 @@ public partial class ProxyHost :
                 if (fromBridgedUiUniqueId is not { } loaderUniqueId)
                     return;
                 BridgedUiDomLoaded?.Invoke(this, new BridgedUiEventArgs{ UniqueId = loaderUniqueId });
+                gamepadMessagingQueue.Enqueue(() =>
+                {
+                    gamepadMessagingEnrolledBridgedUis.TryAdd(loaderUniqueId, null);
+                    SendMessageToSpecificBridgedUi(loaderUniqueId, new GamepadsResetMessage
+                    {
+                        Gamepads = CreateGamepadsResetMessageGamepadList(),
+                        Type = nameof(HostMessageType.GamepadsReset).Camelize()
+                    });
+                    return Task.CompletedTask;
+                });
                 break;
             case ComponentMessageType.BridgedUiLookUp:
                 if (TryParseMessage<BridgedUiLookUpMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "bridged UI look up", out var bridgedUiLookUpMessage))
@@ -955,11 +1206,7 @@ public partial class ProxyHost :
                         }
                         listScreenshotsResponseMessage.Screenshots.Add(screenshot);
                     }
-                SpecificBridgedUiMessageSent?.Invoke(this, new()
-                {
-                    UniqueId = bridgedUiRequestingScreenshotsList,
-                    MessageJson = JsonSerializer.Serialize(listScreenshotsResponseMessage, bridgedUiJsonSerializerOptions)
-                });
+                SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotsList, JsonSerializer.Serialize(listScreenshotsResponseMessage, bridgedUiJsonSerializerOptions));
                 break;
             case ComponentMessageType.LookUpLocalizedStrings:
                 if (TryParseMessage<LookUpLocalizedStringsMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "look up localized strings", out var lookUpLocalizedStringsMessage))
@@ -1004,6 +1251,13 @@ public partial class ProxyHost :
                     saveSlotId = requestedSlotId;
                     gameServicesRunningManualResetEvent.Set();
                 }
+                break;
+            case ComponentMessageType.VibrateGamepad:
+                if (TryParseMessage<VibrateGamepadMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "vibrate gamepad", out var vibrateGamepadMessage)
+                    && vibrateGamepadMessage.Intensity >= 0
+                    && vibrateGamepadMessage.Intensity <= 1
+                    && gamepadInterop.Gamepads.ElementAtOrDefault(vibrateGamepadMessage.Index) is { } observableGamepad)
+                    observableGamepad.Vibrate(vibrateGamepadMessage.Intensity);
                 break;
         }
     }
@@ -1336,12 +1590,30 @@ public partial class ProxyHost :
         pendingSaveSpecificDataStorageInitialization = true;
     }
 
+    async Task SendGamepadMessageAsync(object proxyMessage, object bridgedUiMessage)
+    {
+        foreach (var client in gamepadMessagingEnrolledClients.Keys)
+            await SendMessageToSpecificProxyAsync(client, proxyMessage).ConfigureAwait(false);
+        foreach (var uniqueId in gamepadMessagingEnrolledBridgedUis.Keys)
+            SendMessageToSpecificBridgedUi(uniqueId, bridgedUiMessage);
+    }
+
     void SendMessageToBridgedUis(object message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
         BridgedUiMessageSent?.Invoke(this, new()
         {
             MessageJson = JsonSerializer.Serialize(message, bridgedUiJsonSerializerOptions)
+        });
+    }
+
+    void SendMessageToSpecificBridgedUi(Guid uniqueId, object message)
+    {
+        ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
+        SpecificBridgedUiMessageSent?.Invoke(this, new()
+        {
+            MessageJson = JsonSerializer.Serialize(message, bridgedUiJsonSerializerOptions),
+            UniqueId = uniqueId
         });
     }
 
@@ -1377,6 +1649,35 @@ public partial class ProxyHost :
         }
     }
 
+    async Task SendMessageToSpecificProxyAsync(TcpClient client, object message)
+    {
+        ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
+        if (!connectedClients.TryGetValue(client, out var clientWriteLock))
+            return;
+        var serializedMessageBytes = JsonSerializer.SerializeToUtf8Bytes(message, proxyJsonSerializerOptions);
+        Memory<byte> serializedMessageSizeBytes = new byte[4];
+        var serializedMessageSize = BinaryPrimitives.ReverseEndianness(serializedMessageBytes.Length);
+        MemoryMarshal.Write(serializedMessageSizeBytes.Span, in serializedMessageSize);
+        try
+        {
+            using var clientWriteLockHeld = await clientWriteLock.LockAsync(cancellationToken).ConfigureAwait(false);
+            var stream = client.GetStream();
+            await stream.WriteAsync(serializedMessageSizeBytes, cancellationToken).ConfigureAwait(false);
+            await stream.WriteAsync(serializedMessageBytes, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            ProxyDisconnected?.Invoke(this, EventArgs.Empty);
+            logger.LogError(ex, "unexpected unhandled exception while processing proxy communication");
+            if (connectedClients.TryRemove(client, out var finallyClientWriteLock))
+            {
+                using var clientWriteLockHeld = await finallyClientWriteLock.LockAsync(cancellationToken).ConfigureAwait(false);
+                IsClientConnected = !connectedClients.IsEmpty;
+                client.Dispose();
+            }
+        }
+    }
+
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities")]
     async Task<(ResourceKey key, ReadOnlyMemory<byte> content)> SnapshotSaveSpecificRelationalDataStorageAsync(CancellationToken cancellationToken = default)
     {
@@ -1406,8 +1707,28 @@ public partial class ProxyHost :
         return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
+    void UnwireGamepad(IObservableGamepad newGamepad)
+    {
+        foreach (var gamepadButton in newGamepad.Buttons)
+            gamepadButton.ButtonUpdated -= HandleGamepadButtonButtonUpdated;
+        foreach (var gamepadThumbstick in newGamepad.Thumbsticks)
+            gamepadThumbstick.ThumbstickUpdated -= HandleGamepadThumbstickThumbstickUpdated;
+        foreach (var gamepadTrigger in newGamepad.Triggers)
+            gamepadTrigger.TriggerUpdated -= HandleGamepadTriggerTriggerUpdated;
+    }
+
     public Task WaitForSavesAccessAsync(CancellationToken cancellationToken = default) =>
         reserveSavesAccessManualResetEvent.WaitAsync(cancellationToken);
+
+    void WireGamepad(IObservableGamepad newGamepad)
+    {
+        foreach (var gamepadButton in newGamepad.Buttons)
+            gamepadButton.ButtonUpdated += HandleGamepadButtonButtonUpdated;
+        foreach (var gamepadThumbstick in newGamepad.Thumbsticks)
+            gamepadThumbstick.ThumbstickUpdated += HandleGamepadThumbstickThumbstickUpdated;
+        foreach (var gamepadTrigger in newGamepad.Triggers)
+            gamepadTrigger.TriggerUpdated += HandleGamepadTriggerTriggerUpdated;
+    }
 
     async Task WithRelationalDataStorageConnectionAsync(Guid uniqueId, bool isSaveSpecific, Func<SqliteConnection, Task> withSqliteConnectionAsyncAction, CancellationToken cancellationToken = default)
     {

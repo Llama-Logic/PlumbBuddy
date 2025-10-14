@@ -44,7 +44,7 @@ public partial class UiBridgeWebView
                     Content: contentStream.AsRandomAccessStream(),
                     StatusCode: 200,
                     ReasonPhrase: "OK",
-                    Headers: $"Cache-Control: no-cache, max-age=0, must-revalidate, no-store\r\nContent-Length: {content.Length}\r\nContent-Type: {contentType}"
+                    Headers: $"Cache-Control: no-cache, max-age=0, must-revalidate, no-store\r\nContent-Length: {content.Length}\r\nContent-Type: {contentType}\r\nPermissions-Policy: gamepad=(self)"
                 ) : sender.Environment.CreateWebResourceResponse
                 (
                     Content: new InMemoryRandomAccessStream(),

@@ -67,6 +67,7 @@ global using System.Buffers.Binary;
 global using System.Collections.Concurrent;
 global using System.Collections.Immutable;
 global using System.Collections.ObjectModel;
+global using System.Collections.Specialized;
 global using System.ComponentModel;
 global using System.Data;
 global using System.Diagnostics;

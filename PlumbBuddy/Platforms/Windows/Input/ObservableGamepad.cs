@@ -51,9 +51,9 @@ public sealed partial class ObservableGamepad :
         }
         Gamepad = gamepad;
         Name = gamepad.Name;
-        Buttons = gamepad.Buttons.Select(button => new ObservableButton(button)).ToList().AsReadOnly();
-        Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new ObservableThumbstick(thumbstick)).ToList().AsReadOnly();
-        Triggers = gamepad.Triggers.Select(trigger => new ObservableTrigger(trigger)).ToList().AsReadOnly();
+        Buttons = gamepad.Buttons.Select(button => new ObservableButton(this, button)).ToList().AsReadOnly();
+        Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new ObservableThumbstick(this, thumbstick)).ToList().AsReadOnly();
+        Triggers = gamepad.Triggers.Select(trigger => new ObservableTrigger(this, trigger)).ToList().AsReadOnly();
         gamepad.ButtonDown += HandleGamepadButtonChanged;
         gamepad.ButtonUp += HandleGamepadButtonChanged;
         gamepad.ThumbstickMoved += HandleGamepadThumbstickMoved;
@@ -94,7 +94,7 @@ public sealed partial class ObservableGamepad :
             Gamepad.ButtonUp -= HandleGamepadButtonChanged;
             Gamepad.ThumbstickMoved -= HandleGamepadThumbstickMoved;
             Gamepad.TriggerMoved -= HandleGamepadTriggerMoved;
-            Vibrate(0, 0);
+            Vibrate(0);
             using var xInputSlotsLockHeld = xInputSlotsLock.Lock();
             xInputSlots[xInputSlot] = null;
         }

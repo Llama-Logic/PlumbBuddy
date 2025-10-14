@@ -119,6 +119,7 @@ class UiBridgeWebViewHandler :
                 dict.Add((NSString)"Content-Length", (NSString)content.Length.ToString(CultureInfo.InvariantCulture));
                 dict.Add((NSString)"Content-Type", (NSString)contentType);
                 dict.Add((NSString)"Cache-Control", (NSString)"no-cache, max-age=0, must-revalidate, no-store");
+                dict.Add((NSString)"Permissions-Policy", (NSString)"gamepad=(self)");
                 if (urlSchemeTask.Request.Url is not null)
                 {
                     using var response = new NSHttpUrlResponse(urlSchemeTask.Request.Url, 200, "HTTP/1.1", dict);

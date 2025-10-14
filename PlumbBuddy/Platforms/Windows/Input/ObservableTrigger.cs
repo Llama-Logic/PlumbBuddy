@@ -5,11 +5,14 @@ namespace PlumbBuddy.Platforms.Windows.Input;
 public sealed class ObservableTrigger :
     IObservableTrigger
 {
-    public ObservableTrigger(Trigger trigger)
+    public ObservableTrigger(IObservableGamepad gamepad, Trigger trigger)
     {
+        Gamepad = gamepad;
         Trigger = trigger;
         position = (trigger.Position + 1f) / 2f;
     }
+
+    public IObservableGamepad Gamepad { get; }
 
     public Trigger Trigger { get; }
 

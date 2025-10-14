@@ -5,9 +5,10 @@ namespace PlumbBuddy.Platforms.Windows.Input;
 public sealed class ObservableButton :
     IObservableButton
 {
-    public ObservableButton(Button button)
+    public ObservableButton(IObservableGamepad gamepad, Button button)
     {
         Button = button;
+        Gamepad = gamepad;
         Name = button.Name.ToString();
         pressed = button.Pressed;
     }
@@ -15,6 +16,8 @@ public sealed class ObservableButton :
     bool pressed;
 
     public Button Button { get; }
+
+    public IObservableGamepad Gamepad { get; }
 
     public string Name { get; }
 

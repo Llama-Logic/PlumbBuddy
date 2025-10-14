@@ -38,6 +38,9 @@ public sealed class ObservableThumbstick :
         }
     }
 
+    public IObservableGamepad Gamepad =>
+        gamepad;
+
     public float Position
     {
         get => position;

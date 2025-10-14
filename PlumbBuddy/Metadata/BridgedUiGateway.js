@@ -177,6 +177,336 @@
     }
 
     /**
+     * A PlumbBuddy Runtime Mod Integration Gamepad Button
+     */
+    class GamepadButton {
+        #changed;
+        #gamepad;
+        #name;
+        #pressed;
+
+        constructor(gamepad, name, pressed, receiveChanger) {
+            this.#gamepad = gamepad;
+            this.#name = name;
+            this.#pressed = pressed;
+            const dispatches = {};
+            this.#changed = new Event(dispatch => dispatches.changed = dispatch);
+            receiveChanger(pressed => {
+                this.#pressed = pressed;
+                dispatches.changed(this);
+            });
+        }
+
+        /**
+         * Gets the event which is dispatched when the state of the button has changed
+         * @returns {Event}
+         */
+        get changed() {
+            return this.#changed;
+        }
+
+        /**
+         * Gets the gamepad to which this button belongs
+         * @returns {Gamepad}
+         */
+        get gamepad() {
+            return this.#gamepad;
+        }
+
+        /**
+         * Gets the name of the button
+         * @returns {String}
+         */
+        get name() {
+            return this.#name;
+        }
+
+        /**
+         * Gets whether the button is pressed
+         * @returns {Boolean}
+         */
+        get pressed() {
+            return this.#pressed;
+        }
+    }
+
+    /**
+     * A PlumbBuddy Runtime Mod Integration Gamepad Thumbstick
+     */
+    class GamepadThumbstick {
+        #changed;
+        #direction;
+        #gamepad;
+        #index;
+        #position;
+        #x;
+        #y;
+
+        constructor(gamepad, index, x, y, direction, position, receiveChanger) {
+            this.#gamepad = gamepad;
+            this.#index = index;
+            this.#x = x;
+            this.#y = y;
+            this.#direction = direction;
+            this.#position = position;
+            const dispatches = {};
+            this.#changed = new Event(dispatch => dispatches.changed = dispatch);
+            receiveChanger((x, y, direction, position) => {
+                this.#x = x;
+                this.#y = y;
+                this.#direction = direction;
+                this.#position = position;
+                dispatches.changed(this);
+            });
+        }
+
+        /**
+         * Gets the event which is dispatched when the state of the thumbstick has changed
+         * @returns {Event}
+         */
+        get changed() {
+            return this.#changed;
+        }
+
+        /**
+         * Gets the direction in which the thumbstick is pointed as a float (East being 0, South being π/2, West being π or -π, North being -π/2)
+         * @returns {Number}
+         */
+        get direction() {
+            return this.#direction;
+        }
+
+        /**
+         * Gets the gamepad to which this thumbstick belongs
+         * @returns {Gamepad}
+         */
+        get gamepad() {
+            return this.#gamepad;
+        }
+
+        /**
+         * Gets the index of the thumbstick according to the gamepad to which it belongs
+         * @returns {Number}
+         */
+        get index() {
+            return this.#index;
+        }
+
+        /**
+         * Gets the position of the thumbstick as a float inclusively between 0 (dead center) and 1 (as far in the direction as is possible)
+         * [Important: When pushed all the way in one direction, a thumbstick may report its position as slightly greater than 1]
+         * @returns {Number}
+         */
+        get position() {
+            return this.#position;
+        }
+
+        /**
+         * Gets the X axis coordinate of the thumbstick as a float inclusively between -1 (all the way West) and 1 (all the way East)
+         * @returns {Number}
+         */
+        get x() {
+            return this.#x;
+        }
+
+        /**
+         * Gets the Y axis coordinate of the thumbstick as a float inclusively between -1 (all the way North) and 1 (all the way South)
+         * @returns {Number}
+         */
+        get y() {
+            return this.#y;
+        }
+    }
+
+    /**
+     * A PlumbBuddy Runtime Mod Integration Gamepad Trigger
+     */
+    class GamepadTrigger {
+        #changed;
+        #gamepad;
+        #index;
+        #position;
+
+        constructor(gamepad, index, position, receiveChanger) {
+            this.#gamepad = gamepad;
+            this.#index = index;
+            this.#position = position;
+            const dispatches = {};
+            this.#changed = new Event(dispatch => dispatches.changed = dispatch);
+            receiveChanger(position => {
+                this.#position = position;
+                dispatches.changed(this);
+            });
+        }
+
+        /**
+         * Gets the event which is dispatched when the state of the trigger has changed
+         * @returns {Event}
+         */
+        get changed() {
+            return this.#changed;
+        }
+
+        /**
+         * Gets the gamepad to which this trigger belongs
+         * @returns {Gamepad}
+         */
+        get gamepad() {
+            return this.#gamepad;
+        }
+
+        /**
+         * Gets the index of the trigger according to the gamepad to which it belongs
+         * @returns {Number}
+         */
+        get index() {
+            return this.#index;
+        }
+
+        /**
+         * Gets the position of the trigger as a float inclusively between 0 (no pressure) and 1 (fully squeezed)
+         * @returns {Number}
+         */
+        get position() {
+            return this.#position;
+        }
+    }
+
+    /**
+     * A PlumbBuddy Runtime Mod Integration Gamepad
+     */
+    class Gamepad {
+        #buttons;
+        #disconnected;
+        #index;
+        #indexChanged;
+        #thumbsticks;
+        #triggers;
+
+        constructor(index, buttons, thumbsticks, triggers, receiveChangers) {
+            this.#index = index;
+            const buttonChangers = {};
+            this.#buttons = Object.fromEntries(buttons.map(button => {
+                const name = button[0];
+                return [
+                    name,
+                    new GamepadButton(this, name, button[1], changer => buttonChangers[name] = changer)
+                ];
+            }));
+            const thumbstickChangers = [];
+            this.#thumbsticks = thumbsticks.map((thumbstick, index) => {
+                return new GamepadThumbstick(this, index, thumbstick[0], thumbstick[1], thumbstick[2], thumbstick[3], changer => thumbstickChangers.push(changer));
+            });
+            const triggerChangers = [];
+            this.#triggers = triggers.map((position, index) => {
+                return new GamepadTrigger(this, index, position, changer => triggerChangers.push(changer));
+            });
+            const dispatches = {};
+            this.#disconnected = new Event(dispatch => dispatches.disconnected = dispatch);
+            this.#indexChanged = new Event(dispatch => dispatches.indexChanged = dispatch);
+            receiveChangers({
+                buttonChangers,
+                disconnect: () => dispatches.disconnected(this),
+                indexChanger: index => {
+                    if (this.#index !== index) {
+                        this.#index = index;
+                        dispatches.indexChanged(this);
+                    }
+                },
+                thumbstickChangers,
+                triggerChangers,
+            });
+        }
+
+        /**
+         * Gets the names of the gamepad's buttons
+         * @returns {Array<String>}
+         */
+        get buttonNames() {
+            return Object.keys(this.#buttons);
+        }
+
+        /**
+         * Gets the event which is dispatched when the gamepad has been disconnected
+         * @returns {Event}
+         */
+        get disconnected() {
+            return this.#disconnected;
+        }
+
+        /**
+         * Gets the index of this gamepad according to the gateway
+         * @returns {Number}
+         */
+        get index() {
+            return this.#index;
+        }
+
+        /**
+         * Gets the event which is dispatched when the gamepad's index according to the gateway has changed
+         * @returns {Event}
+         */
+        get indexChanged() {
+            return this.#indexChanged;
+        }
+
+        /**
+         * Gets the number of thumbsticks the gamepad has
+         * @returns {Number}
+         */
+        get thumbstickCount() {
+            return this.#thumbsticks.length;
+        }
+
+        /**
+         * Gets the number of triggers the gamepad has
+         * @returns {Number}
+         */
+        get triggerCount() {
+            return this.#triggers.length;
+        }
+
+        /**
+         * Gets the gamepad's button with the specified name
+         * @param {String} name the name of the button
+         * @returns {GamepadButton}
+         */
+        getButton(name) {
+            return this.#buttons[name];
+        }
+
+        /**
+         * Gets the gamepad's thumbstick with the specified index
+         * @param {Number} index the index of the thumbstick
+         * @returns {GamepadThumbstick}
+         */
+        getThumbstick(index) {
+            return this.#thumbsticks[index];
+        }
+
+        /**
+         * Gets the gamepad's trigger with the specified index
+         * @param {Number} index the index of the trigger
+         * @returns {GamepadTrigger}
+         */
+        getTrigger(index) {
+            return this.#triggers[index];
+        }
+
+        /**
+         * Vibrates the controller with the specified intensity
+         * @param {Number} intensity an intensity value between 0 (off) and 1 (full intensity)
+         */
+        vibrate(intensity) {
+            sendMessageToPlumbBuddy({
+                type: 'vibrateGamepad',
+                index: this.#index,
+                intensity: intensity,
+            });
+        }
+    }
+
+    /**
      * A PlumbBuddy Runtime Mod Integration Relational Data Storage Query Record Set
      */
     class RelationalDataStorageQueryRecordSet {
@@ -418,6 +748,8 @@
     }
 
     const bridgedUis = [];
+    const gamepads = [];
+    const gamepadChangers = [];
     const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
@@ -425,6 +757,7 @@
     const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
+    let dispatchGamepadConnected = null;
     let dispatchScreenshotsChanged = null;
 
     /**
@@ -432,6 +765,7 @@
      */
     class Gateway {
         #dataReceived;
+        #gamepadConnected;
         #screenshotsChanged;
         #uniqueId = sanitizeUuid('__UNIQUE_ID__');
         #version = '__PB_VERSION__';
@@ -441,21 +775,54 @@
                 throw new Error('Gateway has already been initialized for you. Use window.gateway.')
             }
             this.#dataReceived = new Event(dispatch => dispatchDataReceived = dispatch);
+            this.#gamepadConnected = new Event(dispatch => dispatchGamepadConnected = dispatch);
             this.#screenshotsChanged = new Event(dispatch => dispatchScreenshotsChanged = dispatch);
         }
 
+        /**
+         * Gets the event which is dispatched when this bridged UI has received data from a mod or another component
+         * @returns {Event}
+         */
         get dataReceived() {
             return this.#dataReceived;
         }
 
+        /**
+         * Gets the event which is dispatched when the player has connected a gamepad
+         * @returns {Event}
+         */
+        get gamepadConnected() {
+            return this.#gamepadConnected;
+        }
+
+        /**
+         * Gets the number of currently connected gamepads
+         * @returns {Number}
+         */
+        get gamepadCount() {
+            return gamepads.length;
+        }
+
+        /**
+         * Gets the event which is dispatched when the player's screenshots have changed
+         * @returns {Event}
+         */
         get screenshotsChanged() {
             return this.#screenshotsChanged;
         }
 
+        /**
+         * Gets the unique ID of this bridged UI
+         * @returns {String}
+         */
         get uniqueId() {
             return this.#uniqueId;
         }
 
+        /**
+         * Gets the version of PlumbBuddy
+         * @returns {String}
+         */
         get version() {
             return this.#version;
         }
@@ -478,6 +845,15 @@
             sendMessageToPlumbBuddy({
                 type: 'foregroundGame',
             });
+        }
+
+        /**
+         * Gets the gamepad with the specified index
+         * @param {Number} index the index of the gamepad to retrieve
+         * @returns A gamepad if one is available at the specified index; otherwise, undefined
+         */
+        getGamepad(index) {
+            return gamepads[index];
         }
 
         /**
@@ -653,6 +1029,46 @@
                     fault = new Error('Unknown denial reason')
                 }
                 promisedBridgedUi.reject(fault);
+            } else if (message.type === 'gamepadButtonChanged') {
+                gamepadChangers[message.index].buttonChangers[message.name](message.pressed);
+            } else if (message.type === 'gamepadConnected') {
+                const gamepad = new Gamepad(message.index, message.buttons, message.thumbsticks, message.triggers, changers => gamepadChangers.splice(message.index, 0, changers));
+                gamepads.splice(message.index, 0, gamepad);
+                for (let i = message.index + 1; i < gamepadChangers.length; ++i) {
+                    gamepadChangers[i].indexChanger(i);
+                }
+                dispatchGamepadConnected(gamepad);
+            } else if (message.type === 'gamepadDisconnected') {
+                gamepads.splice(message.index, 1);
+                const removedChangers = gamepadChangers.splice(message.index, 1)[0];
+                for (let i = message.index + 1; i < gamepadChangers.length; ++i) {
+                    gamepadChangers[i].indexChanger(i);
+                }
+                removedChangers.disconnect();
+            } else if (message.type === 'gamepadMoved') {
+                gamepads.splice(message.newIndex, 0, gamepads.splice(message.index, 1));
+                gamepadChangers.splice(message.newIndex, 0, gamepadChangers.splice(message.index, 1));
+                for (let i = Math.min(message.index, message.newIndex); i < Math.max(message.index, message.newIndex) + 1; ++i) {
+                    gamepadChangers[i].indexChanger(i);
+                }
+            } else if (message.type === 'gamepadThumbstickChanged') {
+                gamepadChangers[message.index].thumbstickChangers[message.thumbstick](message.x, message.y, message.direction, message.position);
+            } else if (message.type === 'gamepadTriggerChanged') {
+                gamepadChangers[message.index].triggerChangers[message.trigger](message.position);
+            } else if (message.type === 'gamepadsReset') {
+                while (gamepads.length) {
+                    gamepads.splice(0, 1);
+                    const removedChangers = gamepadChangers.splice(0, 1)[0];
+                    for (let i = 0; i < gamepadChangers.length; ++i) {
+                        gamepadChangers[i].indexChanger(i);
+                    }
+                    removedChangers.disconnect();
+                }
+                message.gamepads.forEach(element => {
+                    const gamepad = new Gamepad(gamepads.length, element.buttons, element.thumbsticks, element.triggers, changers => gamepadChangers.push(changers));
+                    gamepads.push(gamepad);
+                    dispatchGamepadConnected(gamepad);
+                });
             } else if (message.type === 'listScreenshotsResponse') {
                 if (!promisedScreenshotList) {
                     return;

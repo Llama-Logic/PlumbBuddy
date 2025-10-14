@@ -5,8 +5,9 @@ namespace PlumbBuddy.Platforms.Windows.Input;
 public sealed class ObservableThumbstick :
     IObservableThumbstick
 {
-    public ObservableThumbstick(Thumbstick thumbstick)
+    public ObservableThumbstick(IObservableGamepad gamepad, Thumbstick thumbstick)
     {
+        Gamepad = gamepad;
         Thumbstick = thumbstick;
         direction = thumbstick.Direction;
         position = thumbstick.Position;
@@ -18,6 +19,8 @@ public sealed class ObservableThumbstick :
     float position;
     float x;
     float y;
+
+    public IObservableGamepad Gamepad { get; }
 
     public Thumbstick Thumbstick { get; }
 

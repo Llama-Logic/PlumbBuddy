@@ -15,5 +15,6 @@ public enum ComponentMessageType
     OpenUrl,
     QueryRelationalDataStorage,
     SendDataToBridgedUi,
-    SendLoadedSaveIdentifiersResponse
+    SendLoadedSaveIdentifiersResponse,
+    VibrateGamepad
 }
