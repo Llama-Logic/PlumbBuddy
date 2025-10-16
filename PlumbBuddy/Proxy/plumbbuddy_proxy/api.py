@@ -437,17 +437,19 @@ class Gamepad:
             return self._triggers[index]
         return None
     
-    def vibrate(self, intensity: float):
+    def vibrate(self, intensity: float, duration: float):
         """
         Vibrates the controller with the specified intensity
 
         :param intensity: an intensity value between 0 (off) and 1 (full intensity)
+        :param duration: the number of seconds to vibrate the gamepad (up to 30 seconds)
         """
 
         ipc.send({
             'type': 'vibrate_gamepad',
             'index': self._index,
-            'intensity': intensity
+            'intensity': intensity,
+            'duration': duration
         })
 
 class RelationalDataStorageQueryRecordSet:

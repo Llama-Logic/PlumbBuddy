@@ -496,12 +496,14 @@
         /**
          * Vibrates the controller with the specified intensity
          * @param {Number} intensity an intensity value between 0 (off) and 1 (full intensity)
+         * @param {Number} duration the number of seconds to vibrate the gamepad (up to 30 seconds)
          */
-        vibrate(intensity) {
+        vibrate(intensity, duration) {
             sendMessageToPlumbBuddy({
                 type: 'vibrateGamepad',
                 index: this.#index,
                 intensity: intensity,
+                duration: duration,
             });
         }
     }

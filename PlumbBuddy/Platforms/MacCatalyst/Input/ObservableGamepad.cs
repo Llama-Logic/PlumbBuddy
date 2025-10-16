@@ -122,8 +122,10 @@ public sealed class ObservableGamepad :
         gamepadInterop.RaiseUpdated();
     }
 
-    public bool Vibrate(double intensity)
+    public bool Vibrate(double intensity, TimeSpan duration)
     {
+        if (duration < TimeSpan.Zero || duration > TimeSpan.FromSeconds(30))
+            return false;
         if (this.hapticEngine.Value is not { } hapticEngine)
             return false;
         if (hapticPatternPlayer is not null
@@ -142,7 +144,7 @@ public sealed class ObservableGamepad :
                 new CHHapticEventParameter(CHHapticEventParameterId.HapticSharpness, 0.5f)
             ],
             0,
-            30
+            (float)duration.TotalSeconds
         );
 #pragma warning restore CA2000 // Dispose objects before losing scope
         using var pattern = new CHHapticPattern([hapticEvent], Array.Empty<CHHapticDynamicParameter>(), out _);

@@ -13,11 +13,18 @@ public class PersonalNotes :
 
     string? editNotes;
     DateTime? editPersonalDate;
+    DateTime? fileDateLowerBound;
+    DateTime? fileDateUpperBound;
+    DateTime? modFilesDateLowerBound;
+    DateTime? modFilesDateUpperBound;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
     DateTime? personalDateLowerBound;
     DateTime? personalDateUpperBound;
+    DateTime? playerDataDateLowerBound;
+    DateTime? playerDataDateUpperBound;
     string? searchText;
     readonly ISettings settings;
+
 
     public string? EditNotes
     {
@@ -43,6 +50,54 @@ public class PersonalNotes :
         }
     }
 
+    public DateTime? FileDateLowerBound
+    {
+        get => fileDateLowerBound;
+        set
+        {
+            if (fileDateLowerBound == value)
+                return;
+            fileDateLowerBound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? FileDateUpperBound
+    {
+        get => fileDateUpperBound;
+        set
+        {
+            if (fileDateUpperBound == value)
+                return;
+            fileDateUpperBound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? ModFilesDateLowerBound
+    {
+        get => modFilesDateLowerBound;
+        private set
+        {
+            if (modFilesDateLowerBound == value)
+                return;
+            modFilesDateLowerBound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? ModFilesDateUpperBound
+    {
+        get => modFilesDateUpperBound;
+        private set
+        {
+            if (modFilesDateUpperBound == value)
+                return;
+            modFilesDateUpperBound = value;
+            OnPropertyChanged();
+        }
+    }
+
     public DateTime? PersonalDateLowerBound
     {
         get => personalDateLowerBound;
@@ -63,6 +118,30 @@ public class PersonalNotes :
             if (personalDateUpperBound == value)
                 return;
             personalDateUpperBound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? PlayerDataDateLowerBound
+    {
+        get => playerDataDateLowerBound;
+        private set
+        {
+            if (playerDataDateLowerBound == value)
+                return;
+            playerDataDateLowerBound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? PlayerDataDateUpperBound
+    {
+        get => playerDataDateUpperBound;
+        private set
+        {
+            if (playerDataDateUpperBound == value)
+                return;
+            playerDataDateUpperBound = value;
             OnPropertyChanged();
         }
     }
@@ -159,6 +238,8 @@ public class PersonalNotes :
                 "FolderPath" => recordsInScope.OrderBy(mhrr => mhrr.FolderPath.ToUpper()),
                 "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.FileName.ToUpper()),
                 "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName.ToUpper()),
+                "FileDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.LastWrite),
+                "FileDate" => recordsInScope.OrderBy(mf => mf.LastWrite),
                 "ManifestedName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFileManifests.First().Name.ToUpper()),
                 "ManifestedName" => recordsInScope.OrderBy(mhrr => mhrr.ModFileHash.ModFileManifests.First().Name.ToUpper()),
                 "Notes" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFilePlayerRecords.First().Notes!.ToUpper()),
@@ -187,11 +268,13 @@ public class PersonalNotes :
                     || mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => EF.Functions.Like(mfpr.Notes, likePattern))
                 );
         }
-        var copiedPersonalDateLowerBound = personalDateLowerBound;
-        if (copiedPersonalDateLowerBound is not null)
+        if (fileDateLowerBound is { } copiedFileDateLowerBound)
+            recordsInScope = recordsInScope.Where(mf => mf.LastWrite >= copiedFileDateLowerBound);
+        if (fileDateUpperBound is { } copiedFileDateUpperBound)
+            recordsInScope = recordsInScope.Where(mf => mf.LastWrite <= copiedFileDateUpperBound);
+        if (personalDateLowerBound is { } copiedPersonalDateLowerBound)
             recordsInScope = recordsInScope.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBound));
-        var copiedPersonalDateUpperBound = personalDateUpperBound;
-        if (copiedPersonalDateUpperBound is not null)
+        if (personalDateUpperBound is { } copiedPersonalDateUpperBound)
             recordsInScope = recordsInScope.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBound));
         var items = new List<PersonalNotesRecord>();
         await foreach (var dbRecord in recordsInScope
@@ -202,6 +285,7 @@ public class PersonalNotes :
                 mf.Path,
                 mf.FolderPath,
                 mf.FileName,
+                mf.LastWrite,
                 ModFilePlayerRecord = mf.ModFileHash.ModFilePlayerRecords.Select(mfpr => new
                 {
                     mfpr.Notes,
@@ -216,11 +300,28 @@ public class PersonalNotes :
                 new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", dbRecord.Path)),
                 dbRecord.FolderPath,
                 dbRecord.FileName,
+                dbRecord.LastWrite,
                 dbRecord.ManifestedName,
                 dbRecord.ModFilePlayerRecord?.Notes,
                 dbRecord.ModFilePlayerRecord?.PersonalDate
             ));
         }
+        ModFilesDateLowerBound = await pbDbContext.ModFiles.MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
+            && minLastWrite != default
+            ? minLastWrite.LocalDateTime
+            : null;
+        ModFilesDateUpperBound = await pbDbContext.ModFiles.MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
+            && maxLastWrite != default
+            ? maxLastWrite.LocalDateTime
+            : null;
+        PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
+            && minPersonalDate != default
+            ? minPersonalDate.LocalDateTime
+            : null;
+        PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
+            && maxPersonalDate != default
+            ? maxPersonalDate.LocalDateTime
+            : null;
         return new TableData<PersonalNotesRecord>
         {
             TotalItems = await recordsInScope.CountAsync(token),

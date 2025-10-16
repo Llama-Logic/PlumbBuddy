@@ -57,6 +57,7 @@ public class ModsDirectoryCataloger :
                             dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: false).ConfigureAwait(false);
                             dbpf.Delete(GlobalModsManifestModel.ResourceKey);
                             await dbpf.SaveAsync().ConfigureAwait(false);
+                            dbpf.Dispose();
                             // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
                             return (false, fileType);
                         }

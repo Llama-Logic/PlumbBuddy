@@ -164,6 +164,10 @@
         background-image: var(--plumbbuddy-tab-background-catalog-dark);
     }
 
+    .personal-notes-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-catalog-dark);
+    }
+
     .mod-hound-tab-container .background {
         background-image: var(--plumbbuddy-tab-background-mod-hound-dark);
     }

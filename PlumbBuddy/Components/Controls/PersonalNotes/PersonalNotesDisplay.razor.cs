@@ -1,3 +1,5 @@
+using System.Windows.Forms;
+
 namespace PlumbBuddy.Components.Controls.PersonalNotes;
 
 partial class PersonalNotesDisplay
@@ -15,9 +17,6 @@ partial class PersonalNotesDisplay
         }
     }
 
-    void HandledPersonalNotesDataAltered(object? sender, EventArgs e) =>
-        recordsTable?.ReloadServerData();
-
     void HandleModsDirectoryCatalogerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(IModsDirectoryCataloger.State)
@@ -25,9 +24,20 @@ partial class PersonalNotesDisplay
             recordsTable?.ReloadServerData();
     }
 
+    void HandledPersonalNotesDataAltered(object? sender, EventArgs e) =>
+        recordsTable?.ReloadServerData();
+
     void HandlePersonalNotesPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IPersonalNotes.SearchText) or nameof(IPersonalNotes.PersonalDateLowerBound) or nameof(IPersonalNotes.PersonalDateUpperBound))
+        if (e.PropertyName is nameof(IPersonalNotes.SearchText)
+            or nameof(IPersonalNotes.FileDateLowerBound)
+            or nameof(IPersonalNotes.FileDateUpperBound)
+            or nameof(IPersonalNotes.ModFilesDateLowerBound)
+            or nameof(IPersonalNotes.ModFilesDateUpperBound)
+            or nameof(IPersonalNotes.PersonalDateLowerBound)
+            or nameof(IPersonalNotes.PersonalDateUpperBound)
+            or nameof(IPersonalNotes.PlayerDataDateLowerBound)
+            or nameof(IPersonalNotes.PlayerDataDateUpperBound))
             recordsTable?.ReloadServerData();
     }
 

@@ -1257,7 +1257,7 @@ public partial class ProxyHost :
                     && vibrateGamepadMessage.Intensity >= 0
                     && vibrateGamepadMessage.Intensity <= 1
                     && gamepadInterop.Gamepads.ElementAtOrDefault(vibrateGamepadMessage.Index) is { } observableGamepad)
-                    observableGamepad.Vibrate(vibrateGamepadMessage.Intensity);
+                    observableGamepad.Vibrate(vibrateGamepadMessage.Intensity, TimeSpan.FromSeconds(vibrateGamepadMessage.Duration));
                 break;
         }
     }
