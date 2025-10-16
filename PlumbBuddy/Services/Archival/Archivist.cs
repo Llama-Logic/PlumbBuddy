@@ -401,12 +401,12 @@ public partial class Archivist :
             {
                 var nucleusId = account.NucleusId;
                 var nucleusIdBytes = new byte[8];
-                Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
-                MemoryMarshal.Write(nucleusIdBytesSpan, in nucleusId);
+                Memory<byte> nucleusIdBytesMemory = nucleusIdBytes;
+                MemoryMarshal.Write(nucleusIdBytesMemory.Span, in nucleusId);
                 var created = account.Created;
                 var createdBytes = new byte[8];
-                Span<byte> createdBytesSpan = createdBytes;
-                MemoryMarshal.Write(createdBytesSpan, in created);
+                Memory<byte> createdBytesMemory = createdBytes;
+                MemoryMarshal.Write(createdBytesMemory.Span, in created);
                 chroniclePropertySet = new ChroniclePropertySet
                 {
                     Created = createdBytes,
@@ -443,13 +443,13 @@ public partial class Archivist :
                     try
                     {
                         var keyBytes = new byte[16];
-                        Span<byte> keyBytesSpan = keyBytes;
+                        Memory<byte> keyBytesMemory = keyBytes;
                         var type = key.Type;
-                        MemoryMarshal.Write(keyBytesSpan[0..4], in type);
+                        MemoryMarshal.Write(keyBytesMemory.Span[0..4], in type);
                         var group = key.Group;
-                        MemoryMarshal.Write(keyBytesSpan[4..8], in group);
+                        MemoryMarshal.Write(keyBytesMemory.Span[4..8], in group);
                         var fullInstance = key.FullInstance;
-                        MemoryMarshal.Write(keyBytesSpan[8..16], in fullInstance);
+                        MemoryMarshal.Write(keyBytesMemory.Span[8..16], in fullInstance);
                         var explicitCompressionMode = package.GetExplicitCompressionMode(key);
                         var content =
                               explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable

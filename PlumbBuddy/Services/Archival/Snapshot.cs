@@ -72,12 +72,12 @@ public class Snapshot :
                         var compressionType = resource.CompressionType;
                         try
                         {
-                            Span<byte> keyBytes = resource.Key;
+                            Memory<byte> keyBytes = resource.Key;
                             var key = new ResourceKey
                             (
-                                MemoryMarshal.Read<ResourceType>(keyBytes[0..4]),
-                                MemoryMarshal.Read<uint>(keyBytes[4..8]),
-                                MemoryMarshal.Read<ulong>(keyBytes[8..16])
+                                MemoryMarshal.Read<ResourceType>(keyBytes.Span[0..4]),
+                                MemoryMarshal.Read<uint>(keyBytes.Span[4..8]),
+                                MemoryMarshal.Read<ulong>(keyBytes.Span[8..16])
                             );
                             foreach (var delta in resource.Deltas)
                             {
@@ -280,11 +280,11 @@ public class Snapshot :
                 await package.SetAsync(saveGameDataKey, saveGameData.ToProtobufMessage(), compressionMode).ConfigureAwait(false);
                 var nucleusId = account.NucleusId;
                 var nucleusIdBytes = new byte[8];
-                Span<byte> nucleusIdBytesSpan = nucleusIdBytes;
-                MemoryMarshal.Write(nucleusIdBytesSpan, in nucleusId);
+                Memory<byte> nucleusIdBytesMemory = nucleusIdBytes;
+                MemoryMarshal.Write(nucleusIdBytesMemory.Span, in nucleusId);
                 var createdBytes = new byte[8];
-                Span<byte> createdBytesSpan = createdBytes;
-                MemoryMarshal.Write(createdBytesSpan, in created);
+                Memory<byte> createdBytesMemory = createdBytes;
+                MemoryMarshal.Write(createdBytesMemory.Span, in created);
                 IDbContextFactory<ChronicleDbContext> newChronicleDbContextFactory = new ChronicleDbContextFactory(new FileInfo(Path.Combine(settings.ArchiveFolderPath, $"N-{nucleusId:x16}-C-{created:x16}.chronicle.sqlite")));
                 using var newChronicleDbContext = await newChronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 if ((await newChronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
