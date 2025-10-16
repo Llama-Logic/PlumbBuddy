@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlumbBuddy.Data;
 
@@ -10,9 +11,11 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    partial class PbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251015171212_ModelV13")]
+    partial class ModelV13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -90,21 +93,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.HasIndex("SpecifiedByRequiredModsId");
 
                     b.ToTable("ModFeatureRequiredMod");
-                });
-
-            modelBuilder.Entity("ModFileHashModFilePlayerRecord", b =>
-                {
-                    b.Property<long>("ModFileHashesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("ModFilePlayerRecordsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ModFileHashesId", "ModFilePlayerRecordsId");
-
-                    b.HasIndex("ModFilePlayerRecordsId");
-
-                    b.ToTable("ModFileHashModFilePlayerRecord");
                 });
 
             modelBuilder.Entity("ModFileManifestHashRequiredMod", b =>
@@ -363,26 +351,14 @@ namespace PlumbBuddy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Creation")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT")
-                        .HasComputedColumnSql("CASE WHEN instr([Path], '\\') > 0 THEN substr([Path], instr([Path], '\\') + 1) WHEN instr([Path], '/') > 0 THEN substr([Path], instr([Path], '/') + 1) ELSE [Path] END", false);
+                    b.Property<DateTimeOffset>("Creation")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("FileType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("FolderPath")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT")
-                        .HasComputedColumnSql("CASE WHEN instr([Path], '\\') > 0 THEN substr([Path], 1, instr([Path], '\\') - 1) WHEN instr([Path], '/') > 0 THEN substr([Path], 1, instr([Path], '/') - 1) ELSE '' END", false);
-
-                    b.Property<long>("LastWrite")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTimeOffset>("LastWrite")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("ModFileHashId")
                         .HasColumnType("INTEGER");
@@ -623,44 +599,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.HasIndex("ModFileManifestId");
 
                     b.ToTable("ModFileManifestTranslators");
-                });
-
-            modelBuilder.Entity("PlumbBuddy.Data.ModFilePlayerRecord", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("PersonalDate")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ModFilePlayerRecords");
-                });
-
-            modelBuilder.Entity("PlumbBuddy.Data.ModFilePlayerRecordPath", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("ModFilePlayerRecordId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModFilePlayerRecordId", "Path")
-                        .IsUnique();
-
-                    b.ToTable("ModFilePlayerRecordPaths");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileResource", b =>
@@ -1179,21 +1117,6 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModFileHashModFilePlayerRecord", b =>
-                {
-                    b.HasOne("PlumbBuddy.Data.ModFileHash", null)
-                        .WithMany()
-                        .HasForeignKey("ModFileHashesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PlumbBuddy.Data.ModFilePlayerRecord", null)
-                        .WithMany()
-                        .HasForeignKey("ModFilePlayerRecordsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ModFileManifestHashRequiredMod", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.RequiredMod", null)
@@ -1377,17 +1300,6 @@ namespace PlumbBuddy.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ModFileManifest");
-                });
-
-            modelBuilder.Entity("PlumbBuddy.Data.ModFilePlayerRecordPath", b =>
-                {
-                    b.HasOne("PlumbBuddy.Data.ModFilePlayerRecord", "ModFilePlayerRecord")
-                        .WithMany("ModFilePlayerRecordPaths")
-                        .HasForeignKey("ModFilePlayerRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ModFilePlayerRecord");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileResource", b =>
@@ -1610,11 +1522,6 @@ namespace PlumbBuddy.Data.Migrations
                     b.Navigation("ManifestsByCalculation");
 
                     b.Navigation("ManifestsByInscription");
-                });
-
-            modelBuilder.Entity("PlumbBuddy.Data.ModFilePlayerRecord", b =>
-                {
-                    b.Navigation("ModFilePlayerRecordPaths");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.ModFileResource", b =>

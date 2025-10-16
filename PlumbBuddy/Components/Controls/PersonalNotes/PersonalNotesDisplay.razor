@@ -1,0 +1,99 @@
+@inherits ReactiveComponentBase
+@inject IMarkupLocalizer<AppText> MarkupLocalizer
+@inject IModsDirectoryCataloger ModsDirectoryCataloger
+@inject IPersonalNotes PersonalNotes
+@inject IPlatformFunctions PlatformFunctions
+@inject ISuperSnacks SuperSnacks
+
+<MudTable @ref="@recordsTable" Breakpoint="Breakpoint.Sm" CanCancelEdit Class="rounded my-0 break-words" Dense EditButtonPosition="TableEditButtonPosition.End" FixedFooter FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 216px)" Hover OnPreviewEditClick="PersonalNotes.HandleRecordOnPreviewEditClick" Outlined RowEditCommit="PersonalNotes.HandleRecordRowEditCommit" ServerData="PersonalNotes.LoadRecordsAsync">
+    <ToolBarContent>
+        <MudStack Row Style="width: 100%;">
+            <MudTextField @bind-Value="@Binding(() => PersonalNotes.SearchText).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.Magnify" Class="flex-grow-1" Clearable DebounceInterval="250" Label="Search" Variant="Variant.Filled" />
+            <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.PersonalDateLowerBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarStart" Class="flex-grow-0" Clearable Label="From Personal Date" Variant="Variant.Filled" />
+            <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.PersonalDateUpperBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarEnd" Class="flex-grow-0" Clearable Label="To Personal Date" Variant="Variant.Filled" />
+        </MudStack>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel Class="no-break" SortLabel="FolderPath" SortBy="new Func<PersonalNotesRecord, object>(pnr => pnr.FolderPath)">
+                Mods Folder Path
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel Class="no-break" SortLabel="FileName" SortBy="new Func<PersonalNotesRecord, object>(pnr => pnr.FileName)">
+                File Name
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel Class="no-break" SortLabel="ManifestedName" SortBy="new Func<PersonalNotesRecord, object>(pnr => pnr.ManifestedName ?? string.Empty)">
+                Manifested Name
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel Class="no-break" SortLabel="Notes" SortBy="new Func<PersonalNotesRecord, object>(pnr => pnr.Notes ?? string.Empty)">
+                Personal Notes
+            </MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel Class="no-break" SortLabel="PersonalDate" SortBy="new Func<PersonalNotesRecord, object>(pnr => pnr.PersonalDate ?? default)">
+                Personal Date
+            </MudTableSortLabel>
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudStack Row Spacing="0">
+                <MudTooltip Arrow Text="@AppText.CatalogDisplay_Files_ViewThisFile_Tip">
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="@(() => ViewFile(context.File))" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+        <MudTd DataLabel="Folder">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.FolderPath" />
+        </MudTd>
+        <MudTd DataLabel="File">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.FileName" />
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.ManifestedName" />
+        </MudTd>
+        <MudTd DataLabel="Notes">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.Notes" />
+        </MudTd>
+        <MudTd DataLabel="Personal Date">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.PersonalDate?.ToString("d")" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd>
+            <MudStack Row Spacing="0">
+                <MudTooltip Arrow Text="@AppText.CatalogDisplay_Files_ViewThisFile_Tip">
+                    <MudIconButton Icon="@MaterialDesignIcons.Normal.FileFind" Size="Size.Small" OnClick="@(() => ViewFile(context.File))" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+        <MudTd DataLabel="Folder">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.FolderPath" />
+        </MudTd>
+        <MudTd DataLabel="File">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.FileName" />
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <MudHighlighter HighlightedText="@Observed(() => PersonalNotes.SearchText)" Text="@context.ManifestedName" />
+        </MudTd>
+        <MudTd DataLabel="Notes">
+            <MudTextField @bind-Value="@Binding(() => PersonalNotes.EditNotes).Value" AutoFocus AutoGrow Clearable Label="Personal Notes" Lines="5" Variant="Variant.Filled" />
+        </MudTd>
+        <MudTd DataLabel="Personal Date">
+            <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.EditPersonalDate).Value" Clearable Color="Color.Primary" Label="Personal Date" Variant="Variant.Filled" />
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <NoRecordsContent>
+        There are no mods installed which match your selected filters for which you could take notes.
+    </NoRecordsContent>
+</MudTable>

@@ -29,6 +29,8 @@ public class PbDbContext :
     public DbSet<ModFileManifestResourceKey> ModFileManifestResourceKeys { get; set; }
     public DbSet<ModFileManifest> ModFileManifests { get; set; }
     public DbSet<ModFileManifestRepurposedLanguage> ModFileManifestRepurposedLanguages { get; set; }
+    public DbSet<ModFilePlayerRecord> ModFilePlayerRecords { get; set; }
+    public DbSet<ModFilePlayerRecordPath> ModFilePlayerRecordPaths { get; set; }
     public DbSet<ModFileStringTableEntry> ModFileStringTableEntries { get; set; }
     public DbSet<ModHoundReport> ModHoundReports { get; set; }
     public DbSet<ModHoundReportIncompatibilityRecord> ModHoundReportIncompatibilityRecords { get; set; }
@@ -66,6 +68,12 @@ public class PbDbContext :
             v => DateTimeOffset.FromUnixTimeSeconds(v)
         );
 
+        var nullableDtoConverter = new ValueConverter<DateTimeOffset?, long?>
+        (
+            v => v.HasValue ? v.Value.ToUnixTimeSeconds() : null,
+            v => v.HasValue ? DateTimeOffset.FromUnixTimeSeconds(v.Value) : null
+        );
+
         var nullableUriValueConverter = new ValueConverter<Uri?, string?>
         (
             maybeNullUri =>
@@ -82,6 +90,18 @@ public class PbDbContext :
             .Property(e => e.Creation)
             .HasConversion(dtoConverter);
         modelBuilder.Entity<GameResourcePackage>()
+            .Property(e => e.LastWrite)
+            .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModFile>()
+            .Property(e => e.FolderPath)
+            .HasComputedColumnSql(@"CASE WHEN instr([Path], '\') > 0 THEN substr([Path], 1, instr([Path], '\') - 1) WHEN instr([Path], '/') > 0 THEN substr([Path], 1, instr([Path], '/') - 1) ELSE '' END", stored: false);
+        modelBuilder.Entity<ModFile>()
+            .Property(e => e.FileName)
+            .HasComputedColumnSql(@"CASE WHEN instr([Path], '\') > 0 THEN substr([Path], instr([Path], '\') + 1) WHEN instr([Path], '/') > 0 THEN substr([Path], instr([Path], '/') + 1) ELSE [Path] END", stored: false);
+        modelBuilder.Entity<ModFile>()
+            .Property(e => e.Creation)
+            .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModFile>()
             .Property(e => e.LastWrite)
             .HasConversion(dtoConverter);
         modelBuilder.Entity<ModFileHash>()
@@ -101,6 +121,9 @@ public class PbDbContext :
         modelBuilder.Entity<ModFileManifest>()
             .Property(e => e.TranslationSubmissionUrl)
             .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModFilePlayerRecord>()
+            .Property(e => e.PersonalDate)
+            .HasConversion(nullableDtoConverter);
         modelBuilder.Entity<ModHoundReport>()
             .Property(e => e.RequestSha256)
             .HasMaxLength(32)

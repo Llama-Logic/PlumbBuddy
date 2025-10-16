@@ -209,6 +209,8 @@ public class ModHoundClient :
             UpdateSectionCounts();
             UpdateSelectedReportIncompatibilityRecords();
             UpdateSelectedReportMissingRequirementsRecords();
+            if (selectedReport is null)
+                SelectedReportSection = null;
         }
     }
 
@@ -883,6 +885,38 @@ public class ModHoundClient :
             OutdatedCount = counts.OutdatedCount;
             UnknownStatusCount = counts.UnknownStatusCount;
             UpToDateCount = counts.UpToDateCount;
+            if (selectedReportSection switch
+            {
+                IModHoundClient.SectionBrokenObsolete => counts.BrokenObsoleteCount,
+                IModHoundClient.SectionDuplicates => counts.DuplicatesCount,
+                IModHoundClient.SectionIncompatible => counts.IncompatibleCount,
+                IModHoundClient.SectionMissingRequirements => counts.MissingRequirementsCount,
+                IModHoundClient.SectionNotTracked => counts.NotTrackedCount,
+                IModHoundClient.SectionOutdated => counts.OutdatedCount,
+                IModHoundClient.SectionUnknownStatus => counts.UnknownStatusCount,
+                IModHoundClient.SectionUpToDate => counts.UpToDateCount,
+                _ => 0
+            } is 0)
+            {
+                if (counts.OutdatedCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionOutdated;
+                else if (counts.DuplicatesCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionDuplicates;
+                else if (counts.BrokenObsoleteCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionBrokenObsolete;
+                else if (counts.IncompatibleCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionIncompatible;
+                else if (counts.MissingRequirementsCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionMissingRequirements;
+                else if (counts.UnknownStatusCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionUnknownStatus;
+                else if (counts.UpToDateCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionUpToDate;
+                else if (counts.NotTrackedCount is > 0)
+                    SelectedReportSection = IModHoundClient.SectionNotTracked;
+                else
+                    SelectedReportSection = null;
+            }
         }
         catch (Exception ex)
         {

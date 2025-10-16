@@ -467,6 +467,7 @@ public partial class SmartSimObserver :
         containerBuilder.RegisterType<CacheStalenessScan>().As<ICacheStalenessScan>();
         containerBuilder.RegisterType<MultipleModVersionsScan>().As<IMultipleModVersionsScan>();
         containerBuilder.RegisterType<MismatchedInscribedHashesScan>().As<IMismatchedInscribedHashesScan>();
+        containerBuilder.RegisterType<WrongGameVersionScan>().As<IWrongGameVersionScan>();
     }
 
     void ConnectToInstallationDirectory()
@@ -1359,6 +1360,7 @@ public partial class SmartSimObserver :
                 initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMismatchedInscribedHashes, typeof(IMismatchedInscribedHashesScan));
+                initializationChange |= checkScanInitialization(settings.ScanForWrongGameVersion, typeof(IWrongGameVersionScan));
                 if (initializationChange)
                     Scan();
             }

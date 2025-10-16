@@ -1,5 +1,3 @@
-using PlumbBuddy.Data;
-
 namespace PlumbBuddy.Services.Scans.Corrupt;
 
 public abstract class CorruptScan :

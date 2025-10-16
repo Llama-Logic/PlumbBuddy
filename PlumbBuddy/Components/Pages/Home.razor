@@ -16,7 +16,13 @@
             <ModHealthDisplay />
         </div>
     </MudTabPanel>
-	<MudTabPanel Text="@(AppText.Home_Catalog_Label)" Icon="@MaterialDesignIcons.Normal.Book" IconColor="Color.Primary">
+    <MudTabPanel Text="Personal Notes" Icon="@MaterialDesignIcons.Normal.NotebookEdit" IconColor="Color.Primary">
+        <div class="personal-notes-tab-container">
+            <div class="background"></div>
+            <PersonalNotesDisplay />
+        </div>
+    </MudTabPanel>
+    <MudTabPanel Text="@(AppText.Home_Catalog_Label)" Icon="@MaterialDesignIcons.Normal.Book" IconColor="Color.Primary">
         <div class="catalog-tab-container">
             <div class="background"></div>
             <CatalogDisplay />

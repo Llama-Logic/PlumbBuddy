@@ -169,6 +169,12 @@ partial class OnboardingDialog
         set => Settings.ScanForShowModsListAtStartupEnabled = value;
     }
 
+    bool ScanForWrongGameVersion
+    {
+        get => Settings.ScanForWrongGameVersion;
+        set => Settings.ScanForWrongGameVersion = value;
+    }
+
     bool ShowSystemTrayIcon
     {
         get => Settings.ShowSystemTrayIcon;
@@ -308,6 +314,7 @@ partial class OnboardingDialog
                 Settings.ScanForMultipleModVersions = false;
                 Settings.ScanForMutuallyExclusiveMods = true;
                 Settings.ScanForShowModsListAtStartupEnabled = false;
+                Settings.ScanForWrongGameVersion = false;
                 break;
             default:
                 Settings.OfferPatchDayModUpdatesHelp = value is UserType.Casual;
@@ -330,6 +337,7 @@ partial class OnboardingDialog
                 Settings.ScanForMultipleModVersions = ScanAttribute.Get(typeof(IMultipleModVersionsScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForWrongGameVersion = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
                 break;
         }
     }

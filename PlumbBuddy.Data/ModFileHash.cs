@@ -25,4 +25,10 @@ public class ModFileHash
     public required bool IsCorrupt { get; set; }
 
     public bool StringTablesCataloged { get; set; }
+
+    public int? DataBasePackedFileMajorVersion { get; set; }
+
+    public int? DataBasePackedFileMinorVersion { get; set; }
+
+    public ICollection<ModFilePlayerRecord> ModFilePlayerRecords { get; } = [];
 }

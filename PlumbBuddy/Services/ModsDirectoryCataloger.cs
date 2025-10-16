@@ -11,7 +11,7 @@ public class ModsDirectoryCataloger :
         ArgumentNullException.ThrowIfNull(pbDbContext);
         ArgumentNullException.ThrowIfNull(fileInfo);
         ArgumentNullException.ThrowIfNull(modFileHash);
-        if (!modFileHash.ResourcesAndManifestsCataloged || !modFileHash.StringTablesCataloged)
+        if (!modFileHash.ResourcesAndManifestsCataloged || !modFileHash.StringTablesCataloged || fileType is ModsDirectoryFileType.Package && (modFileHash.DataBasePackedFileMajorVersion is null || modFileHash.DataBasePackedFileMinorVersion is null))
         {
             IDisposable? modFileAccessor = null;
             var ioExceptionGraceAttempts = 10;
@@ -29,7 +29,7 @@ public class ModsDirectoryCataloger :
                 }
                 catch (IOException ioEx) when (--ioExceptionGraceAttempts is >= 0)
                 {
-                    logger.LogWarning(ioEx, "unhnalded exception when trying to open {Path} for read; {GraceAttempts} grace attempt(s) remain", fileInfo.FullName, ioExceptionGraceAttempts);
+                    logger.LogWarning(ioEx, "unhandled exception when trying to open {Path} for read; {GraceAttempts} grace attempt(s) remain", fileInfo.FullName, ioExceptionGraceAttempts);
                     await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                 }
                 catch
@@ -86,6 +86,8 @@ public class ModsDirectoryCataloger :
                                 logger.LogWarning(ex, "encountered unhandled exception while parsing STBL {ResourceKey}", modFileResource.Key);
                             }
                         }
+                    modFileHash.DataBasePackedFileMajorVersion = dbpf.FileVersion.Major;
+                    modFileHash.DataBasePackedFileMinorVersion = dbpf.FileVersion.Minor;
                 }
                 else if (modFileAccessor is ZipFile zipFile && !modFileHash.ResourcesAndManifestsCataloged)
                 {
@@ -633,6 +635,29 @@ public class ModsDirectoryCataloger :
                 State = ModsDirectoryCatalogerState.Cataloging;
                 platformFunctions.ProgressState = AppProgressState.Indeterminate;
                 using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                var fullyCatalogedFiles = (await pbDbContext.ModFiles
+                    .Where
+                    (
+                        mf =>
+                        mf.ModFileHash.ResourcesAndManifestsCataloged
+                        &&
+                        (
+                            mf.FileType != ModsDirectoryFileType.Package
+                            || mf.ModFileHash.StringTablesCataloged
+                            && mf.ModFileHash.DataBasePackedFileMajorVersion != null
+                            && mf.ModFileHash.DataBasePackedFileMinorVersion != null
+                        )
+                    )
+                    .Select(mf => new
+                    {
+                        Path = Path.Combine(settings.UserDataFolderPath, "Mods", mf.Path),
+                        mf.Creation,
+                        mf.LastWrite,
+                        mf.Size
+                    })
+                    .ToListAsync()
+                    .ConfigureAwait(false))
+                    .ToImmutableDictionary(mf => mf.Path, mf => (Creation: mf.Creation.TrimSeconds(), LastWrite: mf.LastWrite.TrimSeconds(), mf.Size));
                 while (nomNom.TryDequeue(out var path))
                 {
                     var filesOfInterestPath = Path.Combine("Mods", path);
@@ -643,44 +668,54 @@ public class ModsDirectoryCataloger :
                         await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
                     else if (Directory.Exists(fullPath))
                     {
-                        var modsDirectoryFiles = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.AllDirectories).ToImmutableArray();
+                        var modsDirectoryFiles = new DirectoryInfo(fullPath)
+                            .GetFiles("*.*", SearchOption.AllDirectories)
+                            .ToLookup
+                            (
+                                mdm =>
+                                !fullyCatalogedFiles.TryGetValue(mdm.FullName, out var fullyCatalogedFile)
+                                || ((DateTimeOffset)mdm.CreationTimeUtc).TrimSeconds() != fullyCatalogedFile.Creation
+                                || ((DateTimeOffset)mdm.LastWriteTimeUtc).TrimSeconds() != fullyCatalogedFile.LastWrite
+                                || mdm.Length != fullyCatalogedFile.Size
+                            );
                         var filesCataloged = 0;
-                        var filesToCatalog = modsDirectoryFiles.Length;
+                        var filesToCatalog = modsDirectoryFiles[true].Count();
                         ProgressValue = 0;
                         ProgressMax = filesToCatalog;
                         platformFunctions.ProgressState = AppProgressState.Normal;
                         platformFunctions.ProgressMaximum = progressMax!.Value;
-                        var preservedModFilePaths = new ConcurrentBag<string>();
+                        var preservedModFilePaths = new ConcurrentBag<string>(modsDirectoryFiles[false].Select(fileInfo => fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
                         var preservedFileOfInterestPaths = new ConcurrentBag<string>();
                         using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 2)))
                         {
                             var timeAtCataloged = new ConcurrentDictionary<int, DateTimeOffset>();
-                            await Task.WhenAll(modsDirectoryFiles.Select(async fileInfo =>
-                            {
-                                await semaphore.WaitAsync().ConfigureAwait(false);
-                                try
+                            await Task.WhenAll(modsDirectoryFiles[true]
+                                .Select(async fileInfo =>
                                 {
-                                    await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
-                                    var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
-                                    ProgressValue = newFilesCataloged;
-                                    platformFunctions.ProgressValue = progressValue;
-                                    if (newFilesCataloged % estimateBackwardSample is 0)
+                                    await semaphore.WaitAsync().ConfigureAwait(false);
+                                    try
                                     {
-                                        timeAtCataloged.TryAdd(newFilesCataloged, DateTimeOffset.Now);
-                                        if (timeAtCataloged.TryGetValue(newFilesCataloged - estimateBackwardSample, out var timeSomeFilesAgo))
-                                            EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - timeSomeFilesAgo).Ticks / estimateBackwardSample * (filesToCatalog - newFilesCataloged) / 10000000 * 10000000 + 10000000);
+                                        await ProcessDequeuedFileAsync(modsDirectoryInfo, fileInfo).ConfigureAwait(false);
+                                        var newFilesCataloged = Interlocked.Increment(ref filesCataloged);
+                                        ProgressValue = newFilesCataloged;
+                                        platformFunctions.ProgressValue = progressValue;
+                                        if (newFilesCataloged % estimateBackwardSample is 0)
+                                        {
+                                            timeAtCataloged.TryAdd(newFilesCataloged, DateTimeOffset.Now);
+                                            if (timeAtCataloged.TryGetValue(newFilesCataloged - estimateBackwardSample, out var timeSomeFilesAgo))
+                                                EstimatedStateTimeRemaining = new TimeSpan((DateTimeOffset.Now - timeSomeFilesAgo).Ticks / estimateBackwardSample * (filesToCatalog - newFilesCataloged) / 10000000 * 10000000 + 10000000);
+                                        }
+                                        var fileType = GetFileType(fileInfo);
+                                        if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
+                                            preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
+                                        else if (fileType is not ModsDirectoryFileType.Ignored)
+                                            preservedFileOfInterestPaths.Add(Path.Combine("Mods", fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
                                     }
-                                    var fileType = GetFileType(fileInfo);
-                                    if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.ScriptArchive)
-                                        preservedModFilePaths.Add(fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]);
-                                    else if (fileType is not ModsDirectoryFileType.Ignored)
-                                        preservedFileOfInterestPaths.Add(Path.Combine("Mods", fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..]));
-                                }
-                                finally
-                                {
-                                    semaphore.Release();
-                                }
-                            })).ConfigureAwait(false);
+                                    finally
+                                    {
+                                        semaphore.Release();
+                                    }
+                                })).ConfigureAwait(false);
                         }
                         var now = DateTimeOffset.Now;
                         await pbDbContext.ModFiles
@@ -718,6 +753,55 @@ public class ModsDirectoryCataloger :
                 await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
                 var pathCollation = platformFunctions.FileSystemSQliteCollation;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection
+                // add mod file player record / mod file hash links that should exist (a mod file was updated)
+                await pbDbContext.Database.ExecuteSqlRawAsync
+                (
+                    $"""
+                    INSERT INTO
+                    	ModFileHashModFilePlayerRecord (ModFilePlayerRecordsId, ModFileHashesId)
+                    SELECT DISTINCT
+                    	mfpr.Id,
+                    	mf.ModFileHashId
+                    FROM
+                    	ModFilePlayerRecords mfpr
+                    	JOIN ModFilePlayerRecordPaths mfprp ON mfprp.ModFilePlayerRecordId = mfpr.Id
+                    	JOIN ModFiles mf ON mf.Path = mfprp.Path
+                    ON CONFLICT DO NOTHING
+                    """
+                ).ConfigureAwait(false);
+                // add mod file player record paths that should exist (a mod file was moved)
+                await pbDbContext.Database.ExecuteSqlRawAsync
+                (
+                    $"""
+                    INSERT INTO
+                    	ModFilePlayerRecordPaths (ModFilePlayerRecordId, Path)
+                    SELECT
+                    	mfpr.Id,
+                    	mf.Path
+                    FROM
+                    	ModFilePlayerRecords mfpr
+                    	JOIN ModFileHashModFilePlayerRecord mfhmfpr ON mfhmfpr.ModFilePlayerRecordsId = mfpr.Id
+                    	JOIN ModFileHashes mfh ON mfh.Id = mfhmfpr.ModFileHashesId
+                    	JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                    ON CONFLICT DO NOTHING
+                    """
+                ).ConfigureAwait(false);
+                // remove mod file player record paths for which there are no longer mod files (a mod file was deleted)
+                await pbDbContext.Database.ExecuteSqlRawAsync
+                (
+                    $"""
+                    DELETE FROM
+                    	ModFilePlayerRecordPaths
+                    WHERE
+                    	Path NOT IN
+                    	(
+                    		SELECT
+                    			Path
+                    		FROM
+                    			ModFiles
+                    	)
+                    """
+                ).ConfigureAwait(false);
                 await pbDbContext.Database.ExecuteSqlRawAsync
                 (
                     $"""
@@ -787,6 +871,9 @@ public class ModsDirectoryCataloger :
             return;
         var path = fileInfo.FullName[(modsDirectoryInfo.FullName.Length + 1)..];
         var filesOfInterestPath = Path.Combine("Mods", path);
+        var creation = ((DateTimeOffset)fileInfo.CreationTimeUtc).TrimSeconds();
+        var lastWrite = ((DateTimeOffset)fileInfo.LastWriteTimeUtc).TrimSeconds();
+        var size = fileInfo.Length;
         if (path is SmartSimObserver.IntegrationPackageName or SmartSimObserver.IntegrationScriptModName)
             return;
         try
@@ -796,9 +883,6 @@ public class ModsDirectoryCataloger :
             {
                 ModFile? modFile = null;
                 ModFileHash? modFileHash = null;
-                var creation = (DateTimeOffset)fileInfo.CreationTimeUtc;
-                var lastWrite = (DateTimeOffset)fileInfo.LastWriteTimeUtc;
-                var size = fileInfo.Length;
                 modFile = await pbDbContext.ModFiles.Include(mf => mf.ModFileHash).ThenInclude(mfh => mfh.Resources).FirstOrDefaultAsync
                 (
                     mf =>

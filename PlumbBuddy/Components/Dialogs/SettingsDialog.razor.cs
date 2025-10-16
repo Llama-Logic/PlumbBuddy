@@ -101,6 +101,8 @@ partial class SettingsDialog
 
     bool ScanForShowModsListAtStartupEnabled { get; set; }
 
+    bool ScanForWrongGameVersion { get; set; }
+
     bool ShowSystemTrayIcon { get; set; }
 
     [Inject]
@@ -222,6 +224,7 @@ partial class SettingsDialog
         ScanForMutuallyExclusiveMods = Settings.ScanForMutuallyExclusiveMods;
         ScanForScriptModsDisabled = Settings.ScanForScriptModsDisabled;
         ScanForShowModsListAtStartupEnabled = Settings.ScanForShowModsListAtStartupEnabled;
+        ScanForWrongGameVersion = Settings.ScanForWrongGameVersion;
         ShowSystemTrayIcon = Settings.ShowSystemTrayIcon;
         Type = Settings.Type;
     }
@@ -278,6 +281,7 @@ partial class SettingsDialog
         Settings.ScanForMutuallyExclusiveMods = ScanForMutuallyExclusiveMods;
         Settings.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
         Settings.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
+        Settings.ScanForWrongGameVersion = ScanForWrongGameVersion;
         Settings.ShowSystemTrayIcon = ShowSystemTrayIcon;
         Settings.Type = Type;
         Settings.UserDataFolderPath = UserDataFolderPath;

@@ -489,6 +489,18 @@ class Settings :
         }
     }
 
+    public bool ScanForWrongGameVersion
+    {
+        get => preferences.Get(nameof(ScanForWrongGameVersion), true);
+        set
+        {
+            if (ScanForWrongGameVersion == value)
+                return;
+            preferences.Set(nameof(ScanForWrongGameVersion), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ShowSystemTrayIcon
     {
         get => preferences.Get(nameof(ShowSystemTrayIcon), false);

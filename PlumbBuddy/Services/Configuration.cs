@@ -22,6 +22,7 @@ static class Configuration
         services.AddSingleton<IParlay, Parlay>();
         services.AddSingleton<IModHoundClient, ModHoundClient>();
         services.AddSingleton<IProxyHost, ProxyHost>();
+        services.AddSingleton<IPersonalNotes, PersonalNotes>();
         return services;
     }
 }

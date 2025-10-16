@@ -51,6 +51,27 @@
         z-index: -10;
     }
 
+.personal-notes-tab-container {
+    width: calc(var(--plumbbuddy-zoomed-vw) - 200px);
+    height: calc(var(--plumbbuddy-zoomed-vh) - 64px);
+    overflow-y: hidden;
+    padding: 16px;
+}
+
+    .personal-notes-tab-container .background {
+        background-image: var(--plumbbuddy-tab-background-catalog-light);
+        background-position: var(--plumbbuddy-tab-background-catalog-position);
+        background-repeat: var(--plumbbuddy-tab-background-catalog-repeat);
+        background-size: var(--plumbbuddy-tab-background-catalog-size);
+        height: var(--plumbbuddy-zoomed-vh);
+        left: 0;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        width: var(--plumbbuddy-zoomed-vw);
+        z-index: -10;
+    }
+
 .mod-hound-tab-container {
     width: calc(var(--plumbbuddy-zoomed-vw) - 200px);
     height: calc(var(--plumbbuddy-zoomed-vh) - 64px);

@@ -18,6 +18,7 @@ partial class ScansToggler
         ];
         foundScanLabelByName = new Dictionary<string, string>
         {
+            { nameof(ScanForWrongGameVersion), AppText.ScansToggler_ScanForWrongGameVersion_Label },
             { nameof(ScanForInvalidModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidModSubdirectoryDepth_Label },
             { nameof(ScanForInvalidScriptModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label },
             { nameof(ScanForLooseZipArchives), AppText.ScansToggler_ScanForLooseZipArchives_Label },
@@ -29,6 +30,7 @@ partial class ScansToggler
         }.ToImmutableDictionary();
         foundScanLabels =
         [
+            foundScanLabelByName[nameof(ScanForWrongGameVersion)],
             foundScanLabelByName[nameof(ScanForInvalidModSubdirectoryDepth)],
             foundScanLabelByName[nameof(ScanForInvalidScriptModSubdirectoryDepth)],
             foundScanLabelByName[nameof(ScanForLooseZipArchives)],
@@ -191,6 +193,12 @@ partial class ScansToggler
     [Parameter]
     public EventCallback<bool> ScanForShowModsListAtStartupEnabledChanged { get; set; }
 
+    [Parameter]
+    public bool ScanForWrongGameVersion { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForWrongGameVersionChanged { get; set; }
+
     IEnumerable<string> SelectedAnalysisScans
     {
         get => GetSelectedScans(analysisScanLabelByName);
@@ -236,6 +244,7 @@ partial class ScansToggler
         ScanForMutuallyExclusiveMods = false;
         ScanForScriptModsDisabled = false;
         ScanForShowModsListAtStartupEnabled = false;
+        ScanForWrongGameVersion = false;
         StateHasChanged();
     }
 
@@ -260,6 +269,7 @@ partial class ScansToggler
         ScanForMutuallyExclusiveMods = true;
         ScanForScriptModsDisabled = true;
         ScanForShowModsListAtStartupEnabled = true;
+        ScanForWrongGameVersion = true;
         StateHasChanged();
     }
 
@@ -293,6 +303,7 @@ partial class ScansToggler
         ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
         ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
         ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
+        ScanForWrongGameVersion = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
         StateHasChanged();
     }
 

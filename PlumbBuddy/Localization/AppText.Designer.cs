@@ -7791,6 +7791,108 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Packages for Other Games.
+        /// </summary>
+        internal static string Scan_WrongGameVersion_NoneFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_NoneFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I didn&apos;t find any package files for other games in your Mods folder for The Sims 4. That&apos;s good because if I did, it would be a problem we&apos;d need to solve..
+        /// </summary>
+        internal static string Scan_WrongGameVersion_NoneFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_NoneFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mod File for Another Game Found: {0}.
+        /// </summary>
+        internal static string Scan_WrongGameVersion_PackageFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_PackageFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this package file for another game in your Mods folder for The Sims 4, specifically at this path:
+        ///`{0}`
+        ///
+        ///This file can only cause problems here—it&apos;s not meant for The Sims 4. Let&apos;s move it to your Downloads folder, safely out of The Sims 4&apos;s reach..
+        /// </summary>
+        internal static string Scan_WrongGameVersion_PackageFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_PackageFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SimCity (2013) Mod File Found: {0}.
+        /// </summary>
+        internal static string Scan_WrongGameVersion_SC5PackageFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_SC5PackageFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this package file for SimCity (2013) in your Mods folder for The Sims 4, specifically at this path:
+        ///`{0}`
+        ///
+        ///Okay, so... you&apos;re hilarious. 😏 But, let&apos;s be honest, EA is not *this* cool. A mod for a city&apos;s utilities isn&apos;t going to change how your household bills work—at best it will do nothing, or at worst, it will break The Sims 4 in fantastic ways. Let&apos;s move it to your Downloads folder, safely out of The Sims 4&apos;s reach..
+        /// </summary>
+        internal static string Scan_WrongGameVersion_SC5PackageFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_SC5PackageFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Sims 2 Mod File Found: {0}.
+        /// </summary>
+        internal static string Scan_WrongGameVersion_TS2PackageFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_TS2PackageFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this package file for The Sims 2 in your Mods folder for The Sims 4, specifically at this path:
+        ///`{0}`
+        ///
+        ///This file will likely prevent The Sims 4 from even being able to launch—it&apos;s not meant for this version of the game. Let&apos;s move it to your Downloads folder, safely out of The Sims 4&apos;s reach..
+        /// </summary>
+        internal static string Scan_WrongGameVersion_TS2PackageFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_TS2PackageFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Sims 3 Mod File Found: {0}.
+        /// </summary>
+        internal static string Scan_WrongGameVersion_TS3PackageFound_Caption {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_TS3PackageFound_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found this package file for The Sims 3 in your Mods folder for The Sims 4, specifically at this path:
+        ///`{0}`
+        ///
+        ///This file can only cause problems here—it&apos;s not meant for this version of the game. Let&apos;s move it to your Downloads folder, safely out of The Sims 4&apos;s reach..
+        /// </summary>
+        internal static string Scan_WrongGameVersion_TS3PackageFound_Description {
+            get {
+                return ResourceManager.GetString("Scan_WrongGameVersion_TS3PackageFound_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game&apos;s Running... So Sleepy....
         /// </summary>
         internal static string ScanIssuesDisplay_MDCAsleep_Caption {
@@ -8003,6 +8105,15 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_ScanForShowModsListAtStartupEnabled_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_ScanForShowModsListAtStartupEnabled_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a mod file for a game other than The Sims 4.
+        /// </summary>
+        internal static string ScansToggler_ScanForWrongGameVersion_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForWrongGameVersion_Label", resourceCulture);
             }
         }
         
