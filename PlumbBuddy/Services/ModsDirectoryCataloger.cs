@@ -659,6 +659,7 @@ public class ModsDirectoryCataloger :
                     .ToListAsync()
                     .ConfigureAwait(false))
                     .ToImmutableDictionary(mf => mf.Path, mf => (Creation: mf.Creation.TrimSeconds(), LastWrite: mf.LastWrite.TrimSeconds(), mf.Size));
+                var checkTopology = false;
                 while (nomNom.TryDequeue(out var path))
                 {
                     var filesOfInterestPath = Path.Combine("Mods", path);
@@ -666,7 +667,10 @@ public class ModsDirectoryCataloger :
                     var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
                     var fullPath = Path.Combine(modsDirectoryPath, path);
                     if (File.Exists(fullPath))
+                    {
                         await ProcessDequeuedFileAsync(modsDirectoryInfo, new FileInfo(fullPath)).ConfigureAwait(false);
+                        checkTopology = true;
+                    }
                     else if (Directory.Exists(fullPath))
                     {
                         var modsDirectoryFiles = new DirectoryInfo(fullPath)
@@ -718,24 +722,140 @@ public class ModsDirectoryCataloger :
                                     }
                                 })).ConfigureAwait(false);
                         }
-                        var now = DateTimeOffset.Now;
-                        await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.Path.StartsWith(path) && !preservedModFilePaths.Contains(md.Path))
-                            .ExecuteDeleteAsync()
-                            .ConfigureAwait(false);
+                        var connection = (SqliteConnection)pbDbContext.Database.GetDbConnection();
+                        var command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            CREATE TEMP TABLE IF NOT EXISTS "ModFilePreservedPaths" (
+                                "Path" TEXT PRIMARY KEY
+                            ) WITHOUT ROWID;
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        foreach (var preservedPathsChunk in preservedModFilePaths.Chunk(800))
+                        {
+                            command = connection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+                            command.CommandText =
+                                $"""
+                                INSERT OR IGNORE INTO "ModFilePreservedPaths" ("Path") VALUES ({string.Join(", ", preservedPathsChunk.Select((path, i) =>
+                                {
+                                    var paramName = $"@p{i}";
+                                    command.Parameters.AddWithValue(paramName, path);
+                                    return $"({paramName})";
+                                }))});
+                                """;
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+                            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        }
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DELETE FROM
+                                "ModFiles"
+                            WHERE
+                                "Path" LIKE @pathPattern ESCAPE '|'
+                                AND "Path" NOT IN
+                                (
+                                    SELECT
+                                        "Path"
+                                    FROM
+                                        "ModFilePreservedPaths"
+                                )
+                                AND "FileType" IN (@packageFileType, @corruptPackageFileType)
+                            """;
+                        command.Parameters.AddWithValue("@pathPattern", $"{path.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        command.Parameters.AddWithValue("@packageFileType", ModsDirectoryFileType.Package);
+                        command.Parameters.AddWithValue("@corruptPackageFileType", ModsDirectoryFileType.CorruptPackage);
+                        PackageCount -= await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DELETE FROM
+                                "ModFiles"
+                            WHERE
+                                "Path" LIKE @pathPattern ESCAPE '|'
+                                AND "Path" NOT IN
+                                (
+                                    SELECT
+                                        "Path"
+                                    FROM
+                                        "ModFilePreservedPaths"
+                                )
+                                AND "FileType" IN (@scriptArchiveFileType, @corruptScriptArchiveFileType)
+                            """;
+                        command.Parameters.AddWithValue("@pathPattern", $"{path.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        command.Parameters.AddWithValue("@scriptArchiveFileType", ModsDirectoryFileType.ScriptArchive);
+                        command.Parameters.AddWithValue("@corruptScriptArchiveFileType", ModsDirectoryFileType.CorruptScriptArchive);
+                        ScriptArchiveCount -= await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DROP TABLE IF EXISTS temp."ModFilePreservedPaths"
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         await pbDbContext.FilesOfInterest
                             .Where(foi => foi.Path.StartsWith(filesOfInterestPath) && !preservedFileOfInterestPaths.Contains(foi.Path))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
+                        command.CommandText =
+                            """
+                            CREATE TEMP TABLE IF NOT EXISTS "FileOfInterestPreservedPaths" (
+                                "Path" TEXT PRIMARY KEY
+                            ) WITHOUT ROWID;
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        foreach (var preservedPathsChunk in preservedFileOfInterestPaths.Chunk(800))
+                        {
+                            command = connection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+                            command.CommandText =
+                                $"""
+                                INSERT OR IGNORE INTO "FileOfInterestPreservedPaths" ("Path") VALUES ({string.Join(", ", preservedPathsChunk.Select((path, i) =>
+                                {
+                                    var paramName = $"@p{i}";
+                                    command.Parameters.AddWithValue(paramName, path);
+                                    return $"({paramName})";
+                                }))});
+                                """;
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+                            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        }
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DELETE FROM
+                                "FilesOfInterest"
+                            WHERE
+                                "Path" LIKE @pathPattern ESCAPE '|'
+                                AND "Path" NOT IN
+                                (
+                                    SELECT
+                                        "Path"
+                                    FROM
+                                        "FileOfInterestPreservedPaths"
+                                )
+                            """;
+                        command.Parameters.AddWithValue("@pathPattern", $"{filesOfInterestPath.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DROP TABLE IF EXISTS temp."FileOfInterestPreservedPaths"
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        if (modsDirectoryFiles[true].Any(mdf => mdf.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase) && mdf.FullName[(modsDirectoryInfo.FullName.Length + 1)..] is not SmartSimObserver.IntegrationPackageName))
+                            checkTopology = true;
                     }
                     else
                     {
-                        var now = DateTimeOffset.Now;
-                        var modFilesRemoved = await pbDbContext.ModFiles
-                            .Where(md => md.Path != null && md.Path.StartsWith(path))
+                        PackageCount -= await pbDbContext.ModFiles
+                            .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.Package || md.FileType == ModsDirectoryFileType.CorruptPackage))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
-                        modFilesRemoved.ToString();
+                        ScriptArchiveCount -= await pbDbContext.ModFiles
+                            .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.ScriptArchive || md.FileType == ModsDirectoryFileType.CorruptScriptArchive))
+                            .ExecuteDeleteAsync()
+                            .ConfigureAwait(false);
                         await pbDbContext.FilesOfInterest
                             .Where(foi => foi.Path.StartsWith(filesOfInterestPath))
                             .ExecuteDeleteAsync()
@@ -748,103 +868,106 @@ public class ModsDirectoryCataloger :
                 ProgressMax = null;
                 platformFunctions.ProgressState = AppProgressState.Indeterminate;
                 var resourceWasRemovedOrReplaced = false;
-                var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
-                var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
-                await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
-                await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
-                var pathCollation = platformFunctions.FileSystemSQliteCollation;
-#pragma warning disable EF1002 // Risk of vulnerability to SQL injection
-                // add mod file player record / mod file hash links that should exist (a mod file was updated)
-                await pbDbContext.Database.ExecuteSqlRawAsync
-                (
-                    $"""
-                    INSERT INTO
-                    	ModFileHashModFilePlayerRecord (ModFilePlayerRecordsId, ModFileHashesId)
-                    SELECT DISTINCT
-                    	mfpr.Id,
-                    	mf.ModFileHashId
-                    FROM
-                    	ModFilePlayerRecords mfpr
-                    	JOIN ModFilePlayerRecordPaths mfprp ON mfprp.ModFilePlayerRecordId = mfpr.Id
-                    	JOIN ModFiles mf ON mf.Path = mfprp.Path
-                    ON CONFLICT DO NOTHING
-                    """
-                ).ConfigureAwait(false);
-                // add mod file player record paths that should exist (a mod file was moved)
-                await pbDbContext.Database.ExecuteSqlRawAsync
-                (
-                    $"""
-                    INSERT INTO
-                    	ModFilePlayerRecordPaths (ModFilePlayerRecordId, Path)
-                    SELECT
-                    	mfpr.Id,
-                    	mf.Path
-                    FROM
-                    	ModFilePlayerRecords mfpr
-                    	JOIN ModFileHashModFilePlayerRecord mfhmfpr ON mfhmfpr.ModFilePlayerRecordsId = mfpr.Id
-                    	JOIN ModFileHashes mfh ON mfh.Id = mfhmfpr.ModFileHashesId
-                    	JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
-                    ON CONFLICT DO NOTHING
-                    """
-                ).ConfigureAwait(false);
-                // remove mod file player record paths for which there are no longer mod files (a mod file was deleted)
-                await pbDbContext.Database.ExecuteSqlRawAsync
-                (
-                    $"""
-                    DELETE FROM
-                    	ModFilePlayerRecordPaths
-                    WHERE
-                    	Path NOT IN
-                    	(
-                    		SELECT
-                    			Path
-                    		FROM
-                    			ModFiles
-                    	)
-                    """
-                ).ConfigureAwait(false);
-                await pbDbContext.Database.ExecuteSqlRawAsync
-                (
-                    $"""
-                    INSERT INTO
-                        ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
-                    SELECT DISTINCT
-                        {currentTopologySnapshot.Id},
-                        sq.Id
-                    FROM 
-                        (
-                    	    SELECT DISTINCT
-                    		    mfr.KeyType,
-                    		    mfr.KeyGroup,
-                    		    mfr.KeyFullInstance,
-                    		    FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
-                    	    FROM
-                    		    ModFileResources mfr
-                                JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
-                    		    JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
-                    	    WHERE
-                    		    mf.Path IS NOT NULL
-                    		    AND mf.FileType = 1
-                        ) sq
-                    """
-                ).ConfigureAwait(false);
-                if (latestTopologySnapshot is not null)
+                if (checkTopology)
                 {
-                    resourceWasRemovedOrReplaced =
-                        (await pbDbContext.Database.SqlQueryRaw<int>
-                        (
-                            $"""
-                            SELECT COUNT(*)
-                            FROM (
-                                SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
-                                EXCEPT
-                                SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
+                    var latestTopologySnapshot = await pbDbContext.TopologySnapshots.OrderByDescending(ts => ts.Id).FirstOrDefaultAsync().ConfigureAwait(false);
+                    var currentTopologySnapshot = new TopologySnapshot { Taken = DateTimeOffset.UtcNow };
+                    await pbDbContext.TopologySnapshots.AddAsync(currentTopologySnapshot).ConfigureAwait(false);
+                    await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+                    var pathCollation = platformFunctions.FileSystemSQliteCollation;
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection
+                    // add mod file player record / mod file hash links that should exist (a mod file was updated)
+                    await pbDbContext.Database.ExecuteSqlRawAsync
+                    (
+                        $"""
+                        INSERT INTO
+                            ModFileHashModFilePlayerRecord (ModFilePlayerRecordsId, ModFileHashesId)
+                        SELECT DISTINCT
+                            mfpr.Id,
+                            mf.ModFileHashId
+                        FROM
+                            ModFilePlayerRecords mfpr
+                            JOIN ModFilePlayerRecordPaths mfprp ON mfprp.ModFilePlayerRecordId = mfpr.Id
+                            JOIN ModFiles mf ON mf.Path = mfprp.Path
+                        ON CONFLICT DO NOTHING
+                        """
+                    ).ConfigureAwait(false);
+                    // add mod file player record paths that should exist (a mod file was moved)
+                    await pbDbContext.Database.ExecuteSqlRawAsync
+                    (
+                        $"""
+                        INSERT INTO
+                            ModFilePlayerRecordPaths (ModFilePlayerRecordId, Path)
+                        SELECT
+                            mfpr.Id,
+                            mf.Path
+                        FROM
+                            ModFilePlayerRecords mfpr
+                            JOIN ModFileHashModFilePlayerRecord mfhmfpr ON mfhmfpr.ModFilePlayerRecordsId = mfpr.Id
+                            JOIN ModFileHashes mfh ON mfh.Id = mfhmfpr.ModFileHashesId
+                            JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                        ON CONFLICT DO NOTHING
+                        """
+                    ).ConfigureAwait(false);
+                    // remove mod file player record paths for which there are no longer mod files (a mod file was deleted)
+                    await pbDbContext.Database.ExecuteSqlRawAsync
+                    (
+                        $"""
+                        DELETE FROM
+                            ModFilePlayerRecordPaths
+                        WHERE
+                            Path NOT IN
+                            (
+                                SELECT
+                                    Path
+                                FROM
+                                    ModFiles
                             )
-                            """
-                        ).ToListAsync().ConfigureAwait(false))[0] > 0;
-                    await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
-                }
+                        """
+                    ).ConfigureAwait(false);
+                    await pbDbContext.Database.ExecuteSqlRawAsync
+                    (
+                        $"""
+                        INSERT INTO
+                            ModFileResourceTopologySnapshot (TopologySnapshotsId, ResourcesId)
+                        SELECT DISTINCT
+                            {currentTopologySnapshot.Id},
+                            sq.Id
+                        FROM 
+                            (
+                                SELECT DISTINCT
+                                    mfr.KeyType,
+                                    mfr.KeyGroup,
+                                    mfr.KeyFullInstance,
+                                    FIRST_VALUE(mfr.Id) OVER (PARTITION BY mfr.KeyType, mfr.KeyGroup, mfr.KeyFullInstance ORDER BY mf.Path COLLATE {pathCollation}) Id
+                                FROM
+                                    ModFileResources mfr
+                                    JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
+                                    JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
+                                WHERE
+                                    mf.Path IS NOT NULL
+                                    AND mf.FileType = 1
+                            ) sq
+                        """
+                    ).ConfigureAwait(false);
+                    if (latestTopologySnapshot is not null)
+                    {
+                        resourceWasRemovedOrReplaced =
+                            (await pbDbContext.Database.SqlQueryRaw<int>
+                            (
+                                $"""
+                                SELECT COUNT(*)
+                                FROM (
+                                    SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {latestTopologySnapshot.Id}
+                                    EXCEPT
+                                    SELECT ResourcesId FROM ModFileResourceTopologySnapshot WHERE TopologySnapshotsId = {currentTopologySnapshot.Id}
+                                )
+                                """
+                            ).ToListAsync().ConfigureAwait(false))[0] > 0;
+                        await pbDbContext.TopologySnapshots.Where(ts => ts.Id != currentTopologySnapshot.Id).ExecuteDeleteAsync().ConfigureAwait(false);
+                    }
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection
+                }
                 if (resourceWasRemovedOrReplaced && settings.CacheStatus is SmartSimCacheStatus.Normal)
                     settings.CacheStatus = SmartSimCacheStatus.Stale;
                 platformFunctions.ProgressState = AppProgressState.None;

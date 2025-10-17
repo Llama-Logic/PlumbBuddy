@@ -1,5 +1,3 @@
-using System.Windows.Forms;
-
 namespace PlumbBuddy.Components.Controls.PersonalNotes;
 
 partial class PersonalNotesDisplay

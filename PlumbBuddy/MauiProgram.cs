@@ -97,6 +97,7 @@ public static class MauiProgram
                 .UseSqlite($"Data Source={Path.Combine(AppDataDirectory.FullName, "PlumbBuddy.sqlite")}", options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
 #if DEBUG
                 .EnableSensitiveDataLogging()
+                .EnableThreadSafetyChecks()
 #endif
         );
 

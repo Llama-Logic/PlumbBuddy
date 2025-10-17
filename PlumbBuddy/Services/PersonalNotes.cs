@@ -174,21 +174,23 @@ public class PersonalNotes :
     {
         if (item is PersonalNotesRecord record)
         {
-            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync();
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var path = string.IsNullOrWhiteSpace(record.FolderPath)
                 ? record.FileName
                 : Path.Combine(record.FolderPath, record.FileName);
             var modFileHash = await pbDbContext.ModFiles
                 .Where(mf => mf.Path == path)
                 .Select(mf => mf.ModFileHash)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
             if (modFileHash is null)
                 return;
             var modFilePlayerRecords = await pbDbContext.ModFilePlayerRecords
                 .Where(mfpr => mfpr.ModFileHashes.Any(mfh => mfh.Id == modFileHash.Id))
                 .Include(mfpr => mfpr.ModFileHashes)
                 .Include(mfpr => mfpr.ModFilePlayerRecordPaths)
-                .ToListAsync();
+                .ToListAsync()
+                .ConfigureAwait(false);
             if (modFilePlayerRecords.Count is 0
                 && (!string.IsNullOrWhiteSpace(editNotes) || editPersonalDate is not null))
             {
