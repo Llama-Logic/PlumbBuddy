@@ -52,12 +52,9 @@ public class ModsDirectoryCataloger :
                         var keys = await dbpf.GetKeysAsync().ConfigureAwait(false);
                         if (keys.Contains(GlobalModsManifestModel.ResourceKey))
                         {
-                            // BAD PLAYER (or frick'n hacker)
+                            // BAD PLAYER
                             dbpf.Dispose();
-                            dbpf = await DataBasePackedFile.FromPathAsync(fileInfo.FullName, forReadOnly: false).ConfigureAwait(false);
-                            dbpf.Delete(GlobalModsManifestModel.ResourceKey);
-                            await dbpf.SaveAsync().ConfigureAwait(false);
-                            dbpf.Dispose();
+                            fileInfo.Delete();
                             // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
                             return (false, fileType);
                         }
@@ -92,7 +89,16 @@ public class ModsDirectoryCataloger :
                 }
                 else if (modFileAccessor is ZipFile zipFile && !modFileHash.ResourcesAndManifestsCataloged)
                 {
-                    foreach (var entry in zipFile.Cast<ZipEntry>())
+                    var entries = zipFile.Cast<ZipEntry>();
+                    if (entries.Any(e => e.Name == "plumbbuddy_proxy/__init__.pyc"))
+                    {
+                        // BAD PLAYER
+                        ((IDisposable)zipFile).Dispose();
+                        fileInfo.Delete();
+                        // what we just did was noticed by SSO, a second sweep specifically of this file will be enqueued shortly
+                        return (false, fileType);
+                    }
+                    foreach (var entry in entries)
                         modFileHash.ScriptModArchiveEntries.Add(new(modFileHash)
                         {
                             Comment = entry.Comment,
@@ -103,8 +109,7 @@ public class ModsDirectoryCataloger :
                             IsEncrypted = entry.AESKeySize is not 0,
                             LastWriteTime = entry.DateTime,
                             Length = entry.Size,
-                            ModFileHash = modFileHash,
-                            Name = entry.Name
+                            ModFileHash = modFileHash
                         });
                     if (await ModFileManifestModel.GetModFileManifestAsync(zipFile).ConfigureAwait(false) is { } manifest)
                     {
@@ -730,6 +735,12 @@ public class ModsDirectoryCataloger :
                         }
                         var connection = (SqliteConnection)pathPbDbContext.Database.GetDbConnection();
                         var command = connection.CreateCommand();
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DROP TABLE IF EXISTS "ModFilePreservedPaths"
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         command.CommandText =
                             """
                             CREATE TEMP TABLE IF NOT EXISTS "ModFilePreservedPaths" (
@@ -769,7 +780,8 @@ public class ModsDirectoryCataloger :
                                 )
                                 AND "FileType" IN (@packageFileType, @corruptPackageFileType)
                             """;
-                        command.Parameters.AddWithValue("@pathPattern", $"{path.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        var pathPattern = Path.Combine($"{path.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}", "%");
+                        command.Parameters.AddWithValue("@pathPattern", pathPattern);
                         command.Parameters.AddWithValue("@packageFileType", ModsDirectoryFileType.Package);
                         command.Parameters.AddWithValue("@corruptPackageFileType", ModsDirectoryFileType.CorruptPackage);
                         PackageCount -= await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -789,14 +801,20 @@ public class ModsDirectoryCataloger :
                                 )
                                 AND "FileType" IN (@scriptArchiveFileType, @corruptScriptArchiveFileType)
                             """;
-                        command.Parameters.AddWithValue("@pathPattern", $"{path.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        command.Parameters.AddWithValue("@pathPattern", pathPattern);
                         command.Parameters.AddWithValue("@scriptArchiveFileType", ModsDirectoryFileType.ScriptArchive);
                         command.Parameters.AddWithValue("@corruptScriptArchiveFileType", ModsDirectoryFileType.CorruptScriptArchive);
                         ScriptArchiveCount -= await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         command = connection.CreateCommand();
                         command.CommandText =
                             """
-                            DROP TABLE IF EXISTS temp."ModFilePreservedPaths"
+                            DROP TABLE IF EXISTS "ModFilePreservedPaths"
+                            """;
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        command = connection.CreateCommand();
+                        command.CommandText =
+                            """
+                            DROP TABLE IF EXISTS "FileOfInterestPreservedPaths"
                             """;
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         command.CommandText =
@@ -837,12 +855,13 @@ public class ModsDirectoryCataloger :
                                         "FileOfInterestPreservedPaths"
                                 )
                             """;
-                        command.Parameters.AddWithValue("@pathPattern", $"{filesOfInterestPath.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}%");
+                        var filesOfInterestPathPattern = Path.Combine($"{filesOfInterestPath.Replace("|", "||", StringComparison.Ordinal).Replace("_", "|_", StringComparison.Ordinal).Replace("%", "|%", StringComparison.Ordinal)}", "%");
+                        command.Parameters.AddWithValue("@pathPattern", filesOfInterestPathPattern);
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         command = connection.CreateCommand();
                         command.CommandText =
                             """
-                            DROP TABLE IF EXISTS temp."FileOfInterestPreservedPaths"
+                            DROP TABLE IF EXISTS "FileOfInterestPreservedPaths"
                             """;
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                         if (modsDirectoryFiles[true].Any(mdf => mdf.Extension.Equals(".package", StringComparison.OrdinalIgnoreCase) && mdf.FullName[(modsDirectoryInfo.FullName.Length + 1)..] is not SmartSimObserver.IntegrationPackageName))
@@ -850,12 +869,13 @@ public class ModsDirectoryCataloger :
                     }
                     else
                     {
+                        var pathPrefix = $"{path}{(string.IsNullOrEmpty(Path.GetExtension(path)) ? Path.DirectorySeparatorChar : string.Empty)}";
                         PackageCount -= await pathPbDbContext.ModFiles
-                            .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.Package || md.FileType == ModsDirectoryFileType.CorruptPackage))
+                            .Where(md => md.Path.StartsWith(pathPrefix) && (md.FileType == ModsDirectoryFileType.Package || md.FileType == ModsDirectoryFileType.CorruptPackage))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
                         ScriptArchiveCount -= await pathPbDbContext.ModFiles
-                            .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.ScriptArchive || md.FileType == ModsDirectoryFileType.CorruptScriptArchive))
+                            .Where(md => md.Path.StartsWith(pathPrefix) && (md.FileType == ModsDirectoryFileType.ScriptArchive || md.FileType == ModsDirectoryFileType.CorruptScriptArchive))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
                         await pathPbDbContext.FilesOfInterest
@@ -985,6 +1005,9 @@ public class ModsDirectoryCataloger :
                 State = ModsDirectoryCatalogerState.Idle;
                 busyManualResetEvent.Reset();
                 idleManualResetEvent.Set();
+                platformFunctions.ProgressState = AppProgressState.None;
+                platformFunctions.ProgressValue = 0;
+                platformFunctions.ProgressMaximum = 0;
             }
         }
     }
@@ -1048,25 +1071,78 @@ public class ModsDirectoryCataloger :
                     };
                     modFileHash.ModFiles!.Add(modFile);
                     await pbDbContext.AddAsync(modFile).ConfigureAwait(false);
+                    var replacedModFile = await pbDbContext.ModFiles
+                        .Where(mf => mf.Path == path)
+                        .Select(mf => new
+                        {
+                            ResourceCount = mf.ModFileHash.Resources.Count(),
+                            ByteCodeEntries = mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.FullName.EndsWith(".pyc")),
+                            PythonEntries = mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.FullName.EndsWith(".py"))
+                        })
+                        .FirstOrDefaultAsync()
+                        .ConfigureAwait(false);
                     if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.CorruptPackage)
                     {
-                        Interlocked.Increment(ref packageCount);
-                        OnPropertyChanged(packageCountPropertyChangedEventArgs);
+                        if (replacedModFile is null)
+                        {
+                            Interlocked.Increment(ref packageCount);
+                            OnPropertyChanged(packageCountPropertyChangedEventArgs);
+                        }
+                        else
+                            Interlocked.Add(ref resourceCount, replacedModFile.ResourceCount * -1);
                         Interlocked.Add(ref resourceCount, modFileHash.Resources?.Count
                             ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false));
                         OnPropertyChanged(resourceCountPropertyChangedEventArgs);
                     }
                     else if (fileType is ModsDirectoryFileType.ScriptArchive or ModsDirectoryFileType.CorruptScriptArchive)
                     {
-                        Interlocked.Increment(ref scriptArchiveCount);
-                        OnPropertyChanged(scriptArchiveCountPropertyChangedEventArgs);
-                        Interlocked.Add(ref pythonByteCodeFileCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
-                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc")));
+                        if (replacedModFile is null)
+                        {
+                            Interlocked.Increment(ref scriptArchiveCount);
+                            OnPropertyChanged(scriptArchiveCountPropertyChangedEventArgs);
+                        }
+                        else
+                        {
+                            Interlocked.Add(ref pythonByteCodeFileCount, replacedModFile.ByteCodeEntries * -1);
+                            Interlocked.Add(ref pythonScriptCount, replacedModFile.PythonEntries * -1);
+                        }
+                        Interlocked.Add(ref pythonByteCodeFileCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.FullName.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.FullName.EndsWith(".pyc")));
                         OnPropertyChanged(pythonByteCodeFileCountPropertyChangedEventArgs);
-                        Interlocked.Add(ref pythonScriptCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
-                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py")));
+                        Interlocked.Add(ref pythonScriptCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.FullName.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.FullName.EndsWith(".py")));
                         OnPropertyChanged(pythonScriptCountPropertyChangedEventArgs);
                     }
+                }
+                if (fileType is ModsDirectoryFileType.Package
+                    && SmartSimObserver.IntegrationPackageLastSha256 is { IsDefaultOrEmpty: false } integrationPackageLastSha256
+                    && modFileHash!.Sha256.SequenceEqual(integrationPackageLastSha256))
+                {
+                    try
+                    {
+                        // rogue integration package
+                        fileInfo.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "failed to remove rogue integration package");
+                    }
+                    return;
+                }
+                if (fileType is ModsDirectoryFileType.ScriptArchive
+                    && SmartSimObserver.IntegrationScriptModLastSha256 is { IsDefaultOrEmpty: false } integrationScriptModLastSha256
+                    && modFileHash!.Sha256.SequenceEqual(integrationScriptModLastSha256))
+                {
+                    try
+                    {
+                        // rogue integration script archive
+                        fileInfo.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "failed to remove rogue integration script archive");
+                    }
+                    return;
                 }
                 modFile.Creation = creation;
                 modFile.LastWrite = lastWrite;
@@ -1134,11 +1210,11 @@ public class ModsDirectoryCataloger :
             .ConfigureAwait(false);
         PythonByteCodeFileCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)
-            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.Name.EndsWith(".pyc")))
+            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.FullName.EndsWith(".pyc")))
             .ConfigureAwait(false);
         PythonScriptCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)
-            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.Name.EndsWith(".py")))
+            .SumAsync(mf => mf.ModFileHash.ScriptModArchiveEntries.Count(smae => smae.FullName.EndsWith(".py")))
             .ConfigureAwait(false);
         ResourceCount = await pbDbContext.ModFiles
             .Where(mf => mf.Path != null)

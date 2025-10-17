@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlumbBuddy.Data;
 
@@ -10,9 +11,11 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    partial class PbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251017154609_ModelV17")]
+    partial class ModelV17
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -366,8 +369,20 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<long>("Creation")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("TEXT")
+                        .HasComputedColumnSql("CASE WHEN instr([Path], '\\') > 0 THEN substr([Path], instr([Path], '\\') + 1) WHEN instr([Path], '/') > 0 THEN substr([Path], instr([Path], '/') + 1) ELSE [Path] END", false);
+
                     b.Property<int>("FileType")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("FolderPath")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("TEXT")
+                        .HasComputedColumnSql("CASE WHEN instr([Path], '\\') > 0 THEN substr([Path], 1, instr([Path], '\\') - 1) WHEN instr([Path], '/') > 0 THEN substr([Path], 1, instr([Path], '/') - 1) ELSE '' END", false);
 
                     b.Property<long>("LastWrite")
                         .HasColumnType("INTEGER");

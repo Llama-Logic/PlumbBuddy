@@ -3,6 +3,8 @@ namespace PlumbBuddy.Services;
 public interface IPersonalNotes :
     INotifyPropertyChanged
 {
+    string? BatchNotes { get; set; }
+    DateTime? BatchPersonalDate { get; set; }
     string? EditNotes { get; set; }
     DateTime? EditPersonalDate { get; set; }
     DateTime? FileDateLowerBound { get; set; }
@@ -20,4 +22,6 @@ public interface IPersonalNotes :
     void HandleRecordOnPreviewEditClick(object? item);
     void HandleRecordRowEditCommit(object? item);
     Task<TableData<PersonalNotesRecord>> LoadRecordsAsync(TableState state, CancellationToken token);
+    Task SetAllNotesAsync();
+    Task SetAllPersonalDatesAsync();
 }

@@ -3,18 +3,23 @@ namespace PlumbBuddy.Services;
 public class PersonalNotes :
     IPersonalNotes
 {
-    public PersonalNotes(ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory)
+    public PersonalNotes(ILogger<PersonalNotes> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
+        this.logger = logger;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
     }
 
+    string? batchNotes;
+    DateTime? batchPersonalDate;
     string? editNotes;
     DateTime? editPersonalDate;
     DateTime? fileDateLowerBound;
     DateTime? fileDateUpperBound;
+    readonly ILogger<PersonalNotes> logger;
     DateTime? modFilesDateLowerBound;
     DateTime? modFilesDateUpperBound;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
@@ -25,6 +30,29 @@ public class PersonalNotes :
     string? searchText;
     readonly ISettings settings;
 
+    public string? BatchNotes
+    {
+        get => batchNotes;
+        set
+        {
+            if (batchNotes == value)
+                return;
+            batchNotes = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime? BatchPersonalDate
+    {
+        get => batchPersonalDate;
+        set
+        {
+            if (batchPersonalDate == value)
+                return;
+            batchPersonalDate = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string? EditNotes
     {
@@ -161,6 +189,32 @@ public class PersonalNotes :
     public event EventHandler? DataAltered;
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    IQueryable<ModFile> ApplyFilters(IQueryable<ModFile> records)
+    {
+        var copiedSearchText = searchText;
+        if (!string.IsNullOrWhiteSpace(copiedSearchText))
+        {
+            var likePattern = $"%{copiedSearchText.Trim()}%";
+            records = records
+                .Where
+                (
+                    mf =>
+                    EF.Functions.Like(mf.Path, likePattern)
+                    || mf.ModFileHash.ModFileManifests.Any(mfm => EF.Functions.Like(mfm.Name, likePattern))
+                    || mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => EF.Functions.Like(mfpr.Notes, likePattern))
+                );
+        }
+        if (fileDateLowerBound is { } copiedFileDateLowerBound)
+            records = records.Where(mf => mf.LastWrite >= copiedFileDateLowerBound);
+        if (fileDateUpperBound is { } copiedFileDateUpperBound)
+            records = records.Where(mf => mf.LastWrite <= copiedFileDateUpperBound);
+        if (personalDateLowerBound is { } copiedPersonalDateLowerBound)
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBound));
+        if (personalDateUpperBound is { } copiedPersonalDateUpperBound)
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBound));
+        return records;
+    }
+
     public void HandleRecordOnPreviewEditClick(object? item)
     {
         if (item is PersonalNotesRecord record)
@@ -175,11 +229,8 @@ public class PersonalNotes :
         if (item is PersonalNotesRecord record)
         {
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            var path = string.IsNullOrWhiteSpace(record.FolderPath)
-                ? record.FileName
-                : Path.Combine(record.FolderPath, record.FileName);
             var modFileHash = await pbDbContext.ModFiles
-                .Where(mf => mf.Path == path)
+                .Where(mf => mf.Path == record.ModsFolderPath)
                 .Select(mf => mf.ModFileHash)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -196,7 +247,7 @@ public class PersonalNotes :
             {
                 var newModFilePlayerRecord = new ModFilePlayerRecord();
                 newModFilePlayerRecord.ModFileHashes.Add(modFileHash);
-                newModFilePlayerRecord.ModFilePlayerRecordPaths.Add(new ModFilePlayerRecordPath(newModFilePlayerRecord) { Path = path });
+                newModFilePlayerRecord.ModFilePlayerRecordPaths.Add(new ModFilePlayerRecordPath(newModFilePlayerRecord) { Path = record.ModsFolderPath });
                 pbDbContext.ModFilePlayerRecords.Add(newModFilePlayerRecord);
                 modFilePlayerRecords.Add(newModFilePlayerRecord);
             }
@@ -214,8 +265,8 @@ public class PersonalNotes :
                 modFilePlayerRecord.PersonalDate = editPersonalDate is null
                     ? null
                     : editPersonalDate;
-                if (!modFilePlayerRecord.ModFilePlayerRecordPaths.Any(mfprp => mfprp.Path == path))
-                    modFilePlayerRecord.ModFilePlayerRecordPaths.Add(new(modFilePlayerRecord) { Path = path });
+                if (!modFilePlayerRecord.ModFilePlayerRecordPaths.Any(mfprp => mfprp.Path == record.ModsFolderPath))
+                    modFilePlayerRecord.ModFilePlayerRecordPaths.Add(new(modFilePlayerRecord) { Path = record.ModsFolderPath });
                 if (!modFilePlayerRecord.ModFileHashes.Any(mfh => mfh.Id == modFileHash.Id))
                     modFilePlayerRecord.ModFileHashes.Add(modFileHash);
             }
@@ -227,108 +278,95 @@ public class PersonalNotes :
     public async Task<TableData<PersonalNotesRecord>> LoadRecordsAsync(TableState state, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(state);
-        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync(token).ConfigureAwait(false);
-        var recordsInScope = pbDbContext.ModFiles.AsQueryable();
-        if (state.SortLabel is { } sortLabel
-            && !string.IsNullOrWhiteSpace(sortLabel)
-            && state.SortDirection is { } sortDirection
-            && sortDirection is SortDirection.Ascending or SortDirection.Descending)
+        try
         {
-            var orderedRecordsInScope = sortLabel switch
+            using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync(token).ConfigureAwait(false);
+            var recordsInScope = pbDbContext.ModFiles.AsQueryable();
+            if (state.SortLabel is { } sortLabel
+                && !string.IsNullOrWhiteSpace(sortLabel)
+                && state.SortDirection is { } sortDirection
+                && sortDirection is SortDirection.Ascending or SortDirection.Descending)
             {
-                "FolderPath" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.FolderPath.ToUpper()),
-                "FolderPath" => recordsInScope.OrderBy(mhrr => mhrr.FolderPath.ToUpper()),
-                "FileName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.FileName.ToUpper()),
-                "FileName" => recordsInScope.OrderBy(mhrr => mhrr.FileName.ToUpper()),
-                "FileDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.LastWrite),
-                "FileDate" => recordsInScope.OrderBy(mf => mf.LastWrite),
-                "ManifestedName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFileManifests.First().Name.ToUpper()),
-                "ManifestedName" => recordsInScope.OrderBy(mhrr => mhrr.ModFileHash.ModFileManifests.First().Name.ToUpper()),
-                "Notes" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFilePlayerRecords.First().Notes!.ToUpper()),
-                "Notes" => recordsInScope.OrderBy(mf => mf.ModFileHash.ModFilePlayerRecords.First().Notes!.ToUpper()),
-                "PersonalDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFilePlayerRecords.First().PersonalDate),
-                "PersonalDate" => recordsInScope.OrderBy(mf => mf.ModFileHash.ModFilePlayerRecords.First().PersonalDate),
-                _ => throw new Exception("Unsupported sort configuration")
-            };
-            if (sortDirection is SortDirection.Descending)
-                recordsInScope = orderedRecordsInScope.ThenByDescending(mf => mf.Path.ToUpper());
-            else
-                recordsInScope = orderedRecordsInScope.ThenBy(mf => mf.Path.ToUpper());
-        }
-        else
-            recordsInScope = recordsInScope.OrderBy(mf => mf.Path.ToUpper());
-        var copiedSearchText = searchText;
-        if (!string.IsNullOrWhiteSpace(copiedSearchText))
-        {
-            var likePattern = $"%{copiedSearchText.Trim()}%";
-            recordsInScope = recordsInScope
-                .Where
-                (
-                    mf =>
-                    EF.Functions.Like(mf.Path, likePattern)
-                    || mf.ModFileHash.ModFileManifests.Any(mfm => EF.Functions.Like(mfm.Name, likePattern))
-                    || mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => EF.Functions.Like(mfpr.Notes, likePattern))
-                );
-        }
-        if (fileDateLowerBound is { } copiedFileDateLowerBound)
-            recordsInScope = recordsInScope.Where(mf => mf.LastWrite >= copiedFileDateLowerBound);
-        if (fileDateUpperBound is { } copiedFileDateUpperBound)
-            recordsInScope = recordsInScope.Where(mf => mf.LastWrite <= copiedFileDateUpperBound);
-        if (personalDateLowerBound is { } copiedPersonalDateLowerBound)
-            recordsInScope = recordsInScope.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBound));
-        if (personalDateUpperBound is { } copiedPersonalDateUpperBound)
-            recordsInScope = recordsInScope.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBound));
-        var items = new List<PersonalNotesRecord>();
-        await foreach (var dbRecord in recordsInScope
-            .Skip(state.Page * state.PageSize)
-            .Take(state.PageSize)
-            .Select(mf => new
-            {
-                mf.Path,
-                mf.FolderPath,
-                mf.FileName,
-                mf.LastWrite,
-                ModFilePlayerRecord = mf.ModFileHash.ModFilePlayerRecords.Select(mfpr => new
+                var orderedRecordsInScope = sortLabel switch
                 {
-                    mfpr.Notes,
-                    mfpr.PersonalDate
-                }).FirstOrDefault(),
-                ManifestedName = mf.ModFileHash.ModFileManifests.Select(mfm => mfm.Name).FirstOrDefault()
-            }).AsAsyncEnumerable().ConfigureAwait(false))
-        {
-            token.ThrowIfCancellationRequested();
-            items.Add(new PersonalNotesRecord
-            (
-                new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", dbRecord.Path)),
-                dbRecord.FolderPath,
-                dbRecord.FileName,
-                dbRecord.LastWrite,
-                dbRecord.ManifestedName,
-                dbRecord.ModFilePlayerRecord?.Notes,
-                dbRecord.ModFilePlayerRecord?.PersonalDate
-            ));
+                    "FolderPath" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.Path.ToUpper()),
+                    "FolderPath" => recordsInScope.OrderBy(mhrr => mhrr.Path.ToUpper()),
+                    "FileDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.LastWrite),
+                    "FileDate" => recordsInScope.OrderBy(mf => mf.LastWrite),
+                    "ManifestedName" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFileManifests.First().Name.ToUpper()),
+                    "ManifestedName" => recordsInScope.OrderBy(mhrr => mhrr.ModFileHash.ModFileManifests.First().Name.ToUpper()),
+                    "Notes" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFilePlayerRecords.First().Notes!.ToUpper()),
+                    "Notes" => recordsInScope.OrderBy(mf => mf.ModFileHash.ModFilePlayerRecords.First().Notes!.ToUpper()),
+                    "PersonalDate" when sortDirection is SortDirection.Descending => recordsInScope.OrderByDescending(mf => mf.ModFileHash.ModFilePlayerRecords.First().PersonalDate),
+                    "PersonalDate" => recordsInScope.OrderBy(mf => mf.ModFileHash.ModFilePlayerRecords.First().PersonalDate),
+                    _ => throw new Exception("Unsupported sort configuration")
+                };
+                if (sortDirection is SortDirection.Descending)
+                    recordsInScope = orderedRecordsInScope.ThenByDescending(mf => mf.Path.ToUpper());
+                else
+                    recordsInScope = orderedRecordsInScope.ThenBy(mf => mf.Path.ToUpper());
+            }
+            else
+                recordsInScope = recordsInScope.OrderBy(mf => mf.Path.ToUpper());
+            recordsInScope = ApplyFilters(recordsInScope);
+            var items = new List<PersonalNotesRecord>();
+            await foreach (var dbRecord in recordsInScope
+                .Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .Select(mf => new
+                {
+                    mf.Path,
+                    mf.LastWrite,
+                    ModFilePlayerRecord = mf.ModFileHash.ModFilePlayerRecords.Select(mfpr => new
+                    {
+                        mfpr.Notes,
+                        mfpr.PersonalDate
+                    }).FirstOrDefault(),
+                    ManifestedName = mf.ModFileHash.ModFileManifests.Select(mfm => mfm.Name).FirstOrDefault()
+                }).AsAsyncEnumerable().ConfigureAwait(false))
+            {
+                token.ThrowIfCancellationRequested();
+                items.Add(new PersonalNotesRecord
+                (
+                    new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", dbRecord.Path)),
+                    dbRecord.Path,
+                    dbRecord.LastWrite,
+                    dbRecord.ManifestedName,
+                    dbRecord.ModFilePlayerRecord?.Notes,
+                    dbRecord.ModFilePlayerRecord?.PersonalDate
+                ));
+            }
+            ModFilesDateLowerBound = await pbDbContext.ModFiles.MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
+                && minLastWrite != default
+                ? minLastWrite.LocalDateTime
+                : null;
+            ModFilesDateUpperBound = await pbDbContext.ModFiles.MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
+                && maxLastWrite != default
+                ? maxLastWrite.LocalDateTime
+                : null;
+            PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
+                && minPersonalDate != default
+                ? minPersonalDate.LocalDateTime
+                : null;
+            PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
+                && maxPersonalDate != default
+                ? maxPersonalDate.LocalDateTime
+                : null;
+            return new TableData<PersonalNotesRecord>
+            {
+                TotalItems = await recordsInScope.CountAsync(token),
+                Items = items
+            };
         }
-        ModFilesDateLowerBound = await pbDbContext.ModFiles.MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
-            && minLastWrite != default
-            ? minLastWrite.LocalDateTime
-            : null;
-        ModFilesDateUpperBound = await pbDbContext.ModFiles.MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
-            && maxLastWrite != default
-            ? maxLastWrite.LocalDateTime
-            : null;
-        PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
-            && minPersonalDate != default
-            ? minPersonalDate.LocalDateTime
-            : null;
-        PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
-            && maxPersonalDate != default
-            ? maxPersonalDate.LocalDateTime
-            : null;
-        return new TableData<PersonalNotesRecord>
+        catch (Exception ex)
         {
-            TotalItems = await recordsInScope.CountAsync(token),
-            Items = items
-        };
+            logger.LogWarning(ex, "unhandled exception while loading records");
+            return new TableData<PersonalNotesRecord>
+            {
+                TotalItems = 0,
+                Items = []
+            };
+        }
     }
 
     void OnPropertyChanged(PropertyChangedEventArgs e) =>
@@ -336,4 +374,58 @@ public class PersonalNotes :
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    public async Task SetAllNotesAsync()
+    {
+        var copiedBatchNotes = batchNotes;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.AsQueryable())
+            .Include(mf => mf.ModFileHash)
+            .ThenInclude(mfh => mfh.ModFilePlayerRecords)
+            .Select(mf => mf.ModFileHash)
+            .AsAsyncEnumerable()
+            .ConfigureAwait(false))
+        {
+            if (modFileHash.ModFilePlayerRecords.Count is 0
+                && !string.IsNullOrEmpty(copiedBatchNotes))
+                modFileHash.ModFilePlayerRecords.Add(new ModFilePlayerRecord());
+            foreach (var modFilePlayerRecord in modFileHash.ModFilePlayerRecords)
+            {
+                modFilePlayerRecord.Notes = copiedBatchNotes;
+                if (modFilePlayerRecord.Id != default
+                    && string.IsNullOrEmpty(modFilePlayerRecord.Notes)
+                    && modFilePlayerRecord.PersonalDate is null)
+                    pbDbContext.ModFilePlayerRecords.Remove(modFilePlayerRecord);
+            }
+        }
+        await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+        DataAltered?.Invoke(this, EventArgs.Empty);
+    }
+
+    public async Task SetAllPersonalDatesAsync()
+    {
+        var copiedBatchPersonalDate = batchPersonalDate;
+        using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.AsQueryable())
+            .Include(mf => mf.ModFileHash)
+            .ThenInclude(mfh => mfh.ModFilePlayerRecords)
+            .Select(mf => mf.ModFileHash)
+            .AsAsyncEnumerable()
+            .ConfigureAwait(false))
+        {
+            if (modFileHash.ModFilePlayerRecords.Count is 0
+                && copiedBatchPersonalDate is not null)
+                modFileHash.ModFilePlayerRecords.Add(new ModFilePlayerRecord());
+            foreach (var modFilePlayerRecord in modFileHash.ModFilePlayerRecords)
+            {
+                modFilePlayerRecord.PersonalDate = copiedBatchPersonalDate;
+                if (modFilePlayerRecord.Id != default
+                    && string.IsNullOrEmpty(modFilePlayerRecord.Notes)
+                    && modFilePlayerRecord.PersonalDate is null)
+                    pbDbContext.ModFilePlayerRecords.Remove(modFilePlayerRecord);
+            }
+        }
+        await pbDbContext.SaveChangesAsync().ConfigureAwait(false);
+        DataAltered?.Invoke(this, EventArgs.Empty);
+    }
 }

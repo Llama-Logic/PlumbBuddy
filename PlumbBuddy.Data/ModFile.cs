@@ -27,10 +27,4 @@ public class ModFile(ModFileHash modFileHash)
     public long Size { get; set; }
 
     public ModsDirectoryFileType FileType { get; set; }
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string FolderPath { get; set; } = string.Empty;
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string FileName { get; set; } = string.Empty;
 }

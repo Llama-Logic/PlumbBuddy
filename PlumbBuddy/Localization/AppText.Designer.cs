@@ -1566,6 +1566,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Personal Notes.
+        /// </summary>
+        internal static string Home_PersonalNotes_Label {
+            get {
+                return ResourceManager.GetString("Home_PersonalNotes_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sample UI.
         /// </summary>
         internal static string Home_SampleUI_Label {
@@ -1764,7 +1773,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;m currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt; and &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they&apos;ve made, I&apos;ll explain and get your permission first..
+        ///   Looks up a localized string similar to I&apos;m currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt;, &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, and &lt;strong&gt;Alternative Input Devices&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they&apos;ve made, I&apos;ll explain and get your permission first..
         /// </summary>
         internal static string HUD_ProxyStatus_Tip_Description {
             get {
@@ -6012,6 +6021,114 @@ namespace PlumbBuddy.Localization {
         internal static string Parlay_Translator_Label {
             get {
                 return ResourceManager.GetString("Parlay_Translator_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Date.
+        /// </summary>
+        internal static string PersonalNotes_Column_FileDate {
+            get {
+                return ResourceManager.GetString("PersonalNotes_Column_FileDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manifested Name.
+        /// </summary>
+        internal static string PersonalNotes_Column_ManifestedName {
+            get {
+                return ResourceManager.GetString("PersonalNotes_Column_ManifestedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mods Folder Path.
+        /// </summary>
+        internal static string PersonalNotes_Column_ModsFolderPath {
+            get {
+                return ResourceManager.GetString("PersonalNotes_Column_ModsFolderPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Personal Date.
+        /// </summary>
+        internal static string PersonalNotes_Column_PersonalDate {
+            get {
+                return ResourceManager.GetString("PersonalNotes_Column_PersonalDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Personal Notes.
+        /// </summary>
+        internal static string PersonalNotes_Column_PersonalNotes {
+            get {
+                return ResourceManager.GetString("PersonalNotes_Column_PersonalNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to From File Date.
+        /// </summary>
+        internal static string PersonalNotes_FromFileDate_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_FromFileDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to From Personal Date.
+        /// </summary>
+        internal static string PersonalNotes_FromPersonalDate_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_FromPersonalDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Personal Date.
+        /// </summary>
+        internal static string PersonalNotes_PersonalDate_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_PersonalDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Personal Notes.
+        /// </summary>
+        internal static string PersonalNotes_PersonalNotes_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_PersonalNotes_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set for All.
+        /// </summary>
+        internal static string PersonalNotes_SetForAll_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_SetForAll_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To File Date.
+        /// </summary>
+        internal static string PersonalNotes_ToFileDate_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_ToFileDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To Personal Date.
+        /// </summary>
+        internal static string PersonalNotes_ToPersonalDate_Label {
+            get {
+                return ResourceManager.GetString("PersonalNotes_ToPersonalDate_Label", resourceCulture);
             }
         }
         

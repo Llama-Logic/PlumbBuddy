@@ -4,11 +4,19 @@ namespace PlumbBuddy.Services;
 public partial class SmartSimObserver :
     ISmartSimObserver
 {
+    static ImmutableArray<byte> integrationPackageLastSha256 = [];
+    static ImmutableArray<byte> integrationScriptModLastSha256 = [];
     static readonly Regex modsDirectoryRelativePathPattern = GetModsDirectoryRelativePathPattern();
     static readonly Regex trimmedLocalPathSegmentsPattern = GetTrimmedLocalPathSegmentsPattern();
 
     public const string IntegrationPackageName = "PlumbBuddy_Integration.package";
     public const string IntegrationScriptModName = "PlumbBuddy_Integration.ts4script";
+
+    public static ImmutableArray<byte> IntegrationPackageLastSha256 =>
+        integrationPackageLastSha256;
+
+    public static ImmutableArray<byte> IntegrationScriptModLastSha256 =>
+        integrationScriptModLastSha256;
 
     static ModsDirectoryFileType CatalogIfLikelyErrorOrTraceLogInRoot(string userDataDirectoryRelativePath)
     {
@@ -105,8 +113,6 @@ public partial class SmartSimObserver :
     readonly AsyncLock gameProcessOptimizationLock;
     Version? gameVersion;
     readonly IGameResourceCataloger gameResourceCataloger;
-    ImmutableArray<byte> integrationPackageLastSha256 = ImmutableArray<byte>.Empty;
-    ImmutableArray<byte> integrationScriptModLastSha256 = ImmutableArray<byte>.Empty;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? installationDirectoryWatcher;
     IReadOnlyList<string> installedPackCodes = [];

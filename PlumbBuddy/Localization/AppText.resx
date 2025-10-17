@@ -3339,7 +3339,7 @@ More detailed technical information is available in my log.</value>
     <value>Connected to The Sims 4</value>
   </data>
   <data name="HUD_ProxyStatus_Tip_Description" xml:space="preserve">
-    <value>I'm currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt; and &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they've made, I'll explain and get your permission first.</value>
+    <value>I'm currently connected to The Sims 4 and standing by to offer &lt;strong&gt;Runtime Mod Integration&lt;/strong&gt; services to your mods, such as &lt;strong&gt;UI Bridge&lt;/strong&gt;, &lt;strong&gt;Relational Data Storage&lt;/strong&gt;, and &lt;strong&gt;Alternative Input Devices&lt;/strong&gt;, which will help improve your gameplay experience without slowing down the game itself. If a mod creator wants me to show you a custom user interface they've made, I'll explain and get your permission first.</value>
   </data>
   <data name="MainLayout_DevTools_BridgedUiDevelopmentMode_Tip_Caption" xml:space="preserve">
     <value>UI Bridge Dev Mode</value>
@@ -3582,5 +3582,44 @@ This file can only cause problems here—it's not meant for The Sims 4. Let's mo
 
 Okay, so... you're hilarious. 😏 But, let's be honest, EA is not *this* cool. A mod for a city's utilities isn't going to change how your household bills work—at best it will do nothing, or at worst, it will break The Sims 4 in fantastic ways. Let's move it to your Downloads folder, safely out of The Sims 4's reach.</value>
     <comment>{0} The File's Path in the Mods Folder</comment>
+  </data>
+  <data name="PersonalNotes_Column_ModsFolderPath" xml:space="preserve">
+    <value>Mods Folder Path</value>
+  </data>
+  <data name="PersonalNotes_Column_FileDate" xml:space="preserve">
+    <value>File Date</value>
+  </data>
+  <data name="PersonalNotes_Column_ManifestedName" xml:space="preserve">
+    <value>Manifested Name</value>
+  </data>
+  <data name="PersonalNotes_Column_PersonalNotes" xml:space="preserve">
+    <value>Personal Notes</value>
+  </data>
+  <data name="PersonalNotes_Column_PersonalDate" xml:space="preserve">
+    <value>Personal Date</value>
+  </data>
+  <data name="PersonalNotes_SetForAll_Label" xml:space="preserve">
+    <value>Set for All</value>
+  </data>
+  <data name="PersonalNotes_PersonalNotes_Label" xml:space="preserve">
+    <value>Personal Notes</value>
+  </data>
+  <data name="PersonalNotes_PersonalDate_Label" xml:space="preserve">
+    <value>Personal Date</value>
+  </data>
+  <data name="PersonalNotes_FromFileDate_Label" xml:space="preserve">
+    <value>From File Date</value>
+  </data>
+  <data name="PersonalNotes_ToFileDate_Label" xml:space="preserve">
+    <value>To File Date</value>
+  </data>
+  <data name="PersonalNotes_FromPersonalDate_Label" xml:space="preserve">
+    <value>From Personal Date</value>
+  </data>
+  <data name="PersonalNotes_ToPersonalDate_Label" xml:space="preserve">
+    <value>To Personal Date</value>
+  </data>
+  <data name="Home_PersonalNotes_Label" xml:space="preserve">
+    <value>Personal Notes</value>
   </data>
 </root>

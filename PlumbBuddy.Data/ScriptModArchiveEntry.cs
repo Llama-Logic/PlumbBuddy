@@ -46,7 +46,4 @@ public class ScriptModArchiveEntry(ModFileHash modFileHash)
 
     [Required]
     public long Length { get; set; }
-
-    [Required]
-    public required string Name { get; set; }
 }

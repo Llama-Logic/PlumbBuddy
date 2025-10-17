@@ -53,7 +53,11 @@ public class PbDbContext :
     {
         base.OnConfiguring(optionsBuilder);
         ArgumentNullException.ThrowIfNull(optionsBuilder);
-        optionsBuilder.AddInterceptors(new SQLiteWalConnectionInterceptor(), new SQLiteBusyTimeoutConnectionInterceptor(TimeSpan.FromSeconds(5)));
+        optionsBuilder.AddInterceptors
+        (
+            new SQLiteWalConnectionInterceptor(),
+            new SQLiteBusyTimeoutConnectionInterceptor(TimeSpan.FromSeconds(5))
+        );
     }
 
     /// <inheritdoc/>
@@ -92,12 +96,6 @@ public class PbDbContext :
         modelBuilder.Entity<GameResourcePackage>()
             .Property(e => e.LastWrite)
             .HasConversion(dtoConverter);
-        modelBuilder.Entity<ModFile>()
-            .Property(e => e.FolderPath)
-            .HasComputedColumnSql(@"CASE WHEN instr([Path], '\') > 0 THEN substr([Path], 1, instr([Path], '\') - 1) WHEN instr([Path], '/') > 0 THEN substr([Path], 1, instr([Path], '/') - 1) ELSE '' END", stored: false);
-        modelBuilder.Entity<ModFile>()
-            .Property(e => e.FileName)
-            .HasComputedColumnSql(@"CASE WHEN instr([Path], '\') > 0 THEN substr([Path], instr([Path], '\') + 1) WHEN instr([Path], '/') > 0 THEN substr([Path], instr([Path], '/') + 1) ELSE [Path] END", stored: false);
         modelBuilder.Entity<ModFile>()
             .Property(e => e.Creation)
             .HasConversion(dtoConverter);
