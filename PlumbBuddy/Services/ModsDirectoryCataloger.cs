@@ -479,7 +479,7 @@ public class ModsDirectoryCataloger :
             if (estimatedStateTimeRemaining == value)
                 return;
             estimatedStateTimeRemaining = value;
-            PropertyChanged?.Invoke(this, estimatedStateTimeRemainingPropertyChangedEventArgs);
+            OnPropertyChanged(estimatedStateTimeRemainingPropertyChangedEventArgs);
         }
     }
 
@@ -491,7 +491,7 @@ public class ModsDirectoryCataloger :
             if (packageCount == value)
                 return;
             packageCount = value;
-            PropertyChanged?.Invoke(this, packageCountPropertyChangedEventArgs);
+            OnPropertyChanged(packageCountPropertyChangedEventArgs);
         }
     }
 
@@ -503,7 +503,7 @@ public class ModsDirectoryCataloger :
             if (progressMax == value)
                 return;
             progressMax = value;
-            PropertyChanged?.Invoke(this, progressMaxPropertyChangedEventArgs);
+            OnPropertyChanged(progressMaxPropertyChangedEventArgs);
         }
     }
 
@@ -515,7 +515,7 @@ public class ModsDirectoryCataloger :
             if (progressValue == value)
                 return;
             progressValue = value;
-            PropertyChanged?.Invoke(this, progressValuePropertyChangedEventArgs);
+            OnPropertyChanged(progressValuePropertyChangedEventArgs);
         }
     }
 
@@ -527,7 +527,7 @@ public class ModsDirectoryCataloger :
             if (pythonByteCodeFileCount == value)
                 return;
             pythonByteCodeFileCount = value;
-            PropertyChanged?.Invoke(this, pythonByteCodeFileCountPropertyChangedEventArgs);
+            OnPropertyChanged(pythonByteCodeFileCountPropertyChangedEventArgs);
         }
     }
 
@@ -539,7 +539,7 @@ public class ModsDirectoryCataloger :
             if (pythonScriptCount == value)
                 return;
             pythonScriptCount = value;
-            PropertyChanged?.Invoke(this, pythonScriptCountPropertyChangedEventArgs);
+            OnPropertyChanged(pythonScriptCountPropertyChangedEventArgs);
         }
     }
 
@@ -551,7 +551,7 @@ public class ModsDirectoryCataloger :
             if (resourceCount == value)
                 return;
             resourceCount = value;
-            PropertyChanged?.Invoke(this, resourceCountPropertyChangedEventArgs);
+            OnPropertyChanged(resourceCountPropertyChangedEventArgs);
         }
     }
 
@@ -563,7 +563,7 @@ public class ModsDirectoryCataloger :
             if (scriptArchiveCount == value)
                 return;
             scriptArchiveCount = value;
-            PropertyChanged?.Invoke(this, scriptArchiveCountPropertyChangedEventArgs);
+            OnPropertyChanged(scriptArchiveCountPropertyChangedEventArgs);
         }
     }
 
@@ -575,7 +575,7 @@ public class ModsDirectoryCataloger :
             if (state == value)
                 return;
             state = value;
-            PropertyChanged?.Invoke(this, statePropertyChangedEventArgs);
+            OnPropertyChanged(statePropertyChangedEventArgs);
         }
     }
 
@@ -586,6 +586,12 @@ public class ModsDirectoryCataloger :
 
     public void GoToSleep() =>
         awakeManualResetEvent.Reset();
+
+    void OnPropertyChanged(PropertyChangedEventArgs e) =>
+        PropertyChanged?.Invoke(this, e);
+
+    void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ProcessPathsQueueAsync()
@@ -635,33 +641,33 @@ public class ModsDirectoryCataloger :
             {
                 State = ModsDirectoryCatalogerState.Cataloging;
                 platformFunctions.ProgressState = AppProgressState.Indeterminate;
-                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-                var fullyCatalogedFiles = (await pbDbContext.ModFiles
-                    .Where
-                    (
-                        mf =>
-                        mf.ModFileHash.ResourcesAndManifestsCataloged
-                        &&
-                        (
-                            mf.FileType != ModsDirectoryFileType.Package
-                            || mf.ModFileHash.StringTablesCataloged
-                            && mf.ModFileHash.DataBasePackedFileMajorVersion != null
-                            && mf.ModFileHash.DataBasePackedFileMinorVersion != null
-                        )
-                    )
-                    .Select(mf => new
-                    {
-                        Path = Path.Combine(settings.UserDataFolderPath, "Mods", mf.Path),
-                        mf.Creation,
-                        mf.LastWrite,
-                        mf.Size
-                    })
-                    .ToListAsync()
-                    .ConfigureAwait(false))
-                    .ToImmutableDictionary(mf => mf.Path, mf => (Creation: mf.Creation.TrimSeconds(), LastWrite: mf.LastWrite.TrimSeconds(), mf.Size));
                 var checkTopology = false;
                 while (nomNom.TryDequeue(out var path))
                 {
+                    using var pathPbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                    var fullyCatalogedFiles = (await pathPbDbContext.ModFiles
+                        .Where
+                        (
+                            mf =>
+                            mf.ModFileHash.ResourcesAndManifestsCataloged
+                            &&
+                            (
+                                mf.FileType != ModsDirectoryFileType.Package
+                                || mf.ModFileHash.StringTablesCataloged
+                                && mf.ModFileHash.DataBasePackedFileMajorVersion != null
+                                && mf.ModFileHash.DataBasePackedFileMinorVersion != null
+                            )
+                        )
+                        .Select(mf => new
+                        {
+                            Path = Path.Combine(settings.UserDataFolderPath, "Mods", mf.Path),
+                            mf.Creation,
+                            mf.LastWrite,
+                            mf.Size
+                        })
+                        .ToListAsync()
+                        .ConfigureAwait(false))
+                        .ToImmutableDictionary(mf => mf.Path, mf => (Creation: mf.Creation.TrimSeconds(), LastWrite: mf.LastWrite.TrimSeconds(), mf.Size));
                     var filesOfInterestPath = Path.Combine("Mods", path);
                     var modsDirectoryPath = Path.Combine(settings.UserDataFolderPath, "Mods");
                     var modsDirectoryInfo = new DirectoryInfo(modsDirectoryPath);
@@ -722,7 +728,7 @@ public class ModsDirectoryCataloger :
                                     }
                                 })).ConfigureAwait(false);
                         }
-                        var connection = (SqliteConnection)pbDbContext.Database.GetDbConnection();
+                        var connection = (SqliteConnection)pathPbDbContext.Database.GetDbConnection();
                         var command = connection.CreateCommand();
                         command.CommandText =
                             """
@@ -793,10 +799,6 @@ public class ModsDirectoryCataloger :
                             DROP TABLE IF EXISTS temp."ModFilePreservedPaths"
                             """;
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
-                        await pbDbContext.FilesOfInterest
-                            .Where(foi => foi.Path.StartsWith(filesOfInterestPath) && !preservedFileOfInterestPaths.Contains(foi.Path))
-                            .ExecuteDeleteAsync()
-                            .ConfigureAwait(false);
                         command.CommandText =
                             """
                             CREATE TEMP TABLE IF NOT EXISTS "FileOfInterestPreservedPaths" (
@@ -848,21 +850,22 @@ public class ModsDirectoryCataloger :
                     }
                     else
                     {
-                        PackageCount -= await pbDbContext.ModFiles
+                        PackageCount -= await pathPbDbContext.ModFiles
                             .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.Package || md.FileType == ModsDirectoryFileType.CorruptPackage))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
-                        ScriptArchiveCount -= await pbDbContext.ModFiles
+                        ScriptArchiveCount -= await pathPbDbContext.ModFiles
                             .Where(md => md.Path.StartsWith(path) && (md.FileType == ModsDirectoryFileType.ScriptArchive || md.FileType == ModsDirectoryFileType.CorruptScriptArchive))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
-                        await pbDbContext.FilesOfInterest
+                        await pathPbDbContext.FilesOfInterest
                             .Where(foi => foi.Path.StartsWith(filesOfInterestPath))
                             .ExecuteDeleteAsync()
                             .ConfigureAwait(false);
                     }
                 }
                 EstimatedStateTimeRemaining = null;
+                using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 await UpdateAggregatePropertiesAsync(pbDbContext).ConfigureAwait(false);
                 State = ModsDirectoryCatalogerState.AnalyzingTopology;
                 ProgressMax = null;
@@ -1047,17 +1050,22 @@ public class ModsDirectoryCataloger :
                     await pbDbContext.AddAsync(modFile).ConfigureAwait(false);
                     if (fileType is ModsDirectoryFileType.Package or ModsDirectoryFileType.CorruptPackage)
                     {
-                        ++PackageCount;
-                        ResourceCount += modFileHash.Resources?.Count
-                            ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false);
+                        Interlocked.Increment(ref packageCount);
+                        OnPropertyChanged(packageCountPropertyChangedEventArgs);
+                        Interlocked.Add(ref resourceCount, modFileHash.Resources?.Count
+                            ?? await pbDbContext.ModFileResources.CountAsync(mfr => mfr.ModFileHashId == modFileHash.Id).ConfigureAwait(false));
+                        OnPropertyChanged(resourceCountPropertyChangedEventArgs);
                     }
                     else if (fileType is ModsDirectoryFileType.ScriptArchive or ModsDirectoryFileType.CorruptScriptArchive)
                     {
-                        ++ScriptArchiveCount;
-                        PythonByteCodeFileCount += modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
-                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc"));
-                        PythonScriptCount += modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
-                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py"));
+                        Interlocked.Increment(ref scriptArchiveCount);
+                        OnPropertyChanged(scriptArchiveCountPropertyChangedEventArgs);
+                        Interlocked.Add(ref pythonByteCodeFileCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".pyc", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".pyc")));
+                        OnPropertyChanged(pythonByteCodeFileCountPropertyChangedEventArgs);
+                        Interlocked.Add(ref pythonScriptCount, modFileHash.ScriptModArchiveEntries?.Count(smae => smae.Name.EndsWith(".py", StringComparison.OrdinalIgnoreCase))
+                            ?? await pbDbContext.ScriptModArchiveEntries.CountAsync(smae => smae.ModFileHashId == modFileHash.Id && smae.Name.EndsWith(".py")));
+                        OnPropertyChanged(pythonScriptCountPropertyChangedEventArgs);
                     }
                 }
                 modFile.Creation = creation;
