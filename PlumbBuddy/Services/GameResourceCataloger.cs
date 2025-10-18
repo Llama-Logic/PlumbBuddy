@@ -85,7 +85,7 @@ public partial class GameResourceCataloger :
                 		JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
                 		JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
                 	WHERE
-                		mf.Path IS NOT NULL
+                		mf.FoundAbsent IS NULL
                 		AND mf.FileType = 1
                 	UNION
                 	SELECT
@@ -232,7 +232,7 @@ public partial class GameResourceCataloger :
             		JOIN ModFileHashes mfh ON mfh.Id = mfr.ModFileHashId
             		JOIN ModFiles mf ON mf.ModFileHashId = mfh.Id
             	WHERE
-            		mf.Path IS NOT NULL
+            		mf.FoundAbsent IS NULL
             		AND mf.FileType = 1
             	UNION
             	SELECT
