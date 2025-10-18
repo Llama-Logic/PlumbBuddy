@@ -2,7 +2,7 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
-    const int manfiestEditorTabIndex = 5;
+    const int manfiestEditorTabIndex = 6;
 
     int activePanelIndex;
     DotNetObjectReference<Home>? javaScriptThis;

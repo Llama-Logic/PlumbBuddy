@@ -80,9 +80,12 @@
                             <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(requiredPackCode) ? "CatalogDisplay_RequiredPack_Installed_Tip" : "CatalogDisplay_RequiredPack_NotInstalled_Tip", selectedModKey.Name, (PublicCatalogs.PackCatalog?.TryGetValue(requiredPackCode, out var packDescription) ?? false) ? packDescription.EnglishName : requiredPackCode])" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)">
                                 <MudChip T="string" Class="ma-0" Color="@(installedPackCodes.Contains(requiredPackCode) ? Color.Success : Color.Error)" Label="true" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(requiredPackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))">
                                     <AvatarContent>
-                                        <MudAvatar>
-                                            <MudImage Src="@Catalog.PackIcons[requiredPackCode]" />
-                                        </MudAvatar>
+                                        @if (Catalog.PackIcons.TryGetValue(requiredPackCode, out var requiredPackIcon))
+                                        {
+                                            <MudAvatar>
+                                                <MudImage Src="@requiredPackIcon" />
+                                            </MudAvatar>
+                                        }
                                     </AvatarContent>
                                     <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(requiredPackCode, out var packDescription) ?? false) ? packDescription.EnglishName : requiredPackCode)</ChildContent>
                                 </MudChip>
@@ -96,9 +99,12 @@
                                 <ChildContent>
                                     <MudChip T="string" Class="ma-0" Color="Color.Info" Label="true" OnClick="@(() => SmartSimObserver.HelpWithPackPurchaseAsync(recommendPack.PackCode, DialogService, creators, selectedMod.Select(mod => mod.Manifest.ElectronicArtsPromoCode).FirstOrDefault(pc => pc is not null)))">
                                         <AvatarContent>
-                                            <MudAvatar>
-                                                <MudImage Src="@Catalog.PackIcons[recommendPack.PackCode]" />
-                                            </MudAvatar>
+                                            @if (Catalog.PackIcons.TryGetValue(recommendPack.PackCode, out var recommendedPackIcon))
+                                            {
+                                                <MudAvatar>
+                                                    <MudImage Src="@recommendedPackIcon" />
+                                                </MudAvatar>
+                                            }
                                         </AvatarContent>
                                         <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(recommendPack.PackCode, out var packDescription) ?? false) ? packDescription.EnglishName : recommendPack.PackCode)</ChildContent>
                                     </MudChip>
@@ -134,9 +140,12 @@
                             <MudTooltip Arrow Text="@(StringLocalizer[installedPackCodes.Contains(incompatiblePackCode) ? "CatalogDisplay_IncompatiblePack_Installed_Tip" : "CatalogDisplay_IncompatiblePack_NotInstalled_Tip", selectedModKey.Name, incompatiblePackCode])" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)">
                                 <MudChip T="string" Class="ma-0" Color="@(!installedPackCodes.Contains(incompatiblePackCode) ? Color.Success : Color.Error)" Label="true">
                                     <AvatarContent>
-                                        <MudAvatar>
-                                            <MudImage Src="@Catalog.PackIcons[incompatiblePackCode]" />
-                                        </MudAvatar>
+                                        @if (Catalog.PackIcons.TryGetValue(incompatiblePackCode, out var incompatiblePackIcon))
+                                        {
+                                            <MudAvatar>
+                                                <MudImage Src="@incompatiblePackIcon" />
+                                            </MudAvatar>
+                                        }
                                     </AvatarContent>
                                     <ChildContent>@((PublicCatalogs.PackCatalog?.TryGetValue(incompatiblePackCode, out var packDescription) ?? false) ? packDescription.EnglishName : incompatiblePackCode)</ChildContent>
                                 </MudChip>

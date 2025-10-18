@@ -90,7 +90,7 @@ public sealed class DependencyScan :
             yield return new ScanIssue
             {
                 Caption = string.Format(AppText.Scan_Dependency_RequiredPack_Caption, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithMissingPacks.MissingPackCodes.Count)),
-                Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithMissingPacks.MissingPackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithMissingPacks.MissingPackCodes).Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
+                Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithMissingPacks.MissingPackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithMissingPacks.MissingPackCodes).Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -100,7 +100,7 @@ public sealed class DependencyScan :
                 [
                     ..modWithMissingPacks.MissingPackCodes.Select(missingPackCode => new ScanIssueResolution
                     {
-                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, publicCatalogs.PackCatalog is { } packCatalog ? packCatalog[missingPackCode].EnglishName : missingPackCode),
+                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, publicCatalogs.PackCatalog is { } packCatalog && packCatalog.TryGetValue(missingPackCode, out var englishName) ? englishName : missingPackCode),
                         Icon = MaterialDesignIcons.Normal.Store,
                         Color = MudBlazor.Color.Primary,
                         Data = $"purchase-{missingPackCode}"
@@ -138,7 +138,7 @@ public sealed class DependencyScan :
             yield return new ScanIssue
             {
                 Caption = string.Format(AppText.Scan_Dependency_DisabledPack_Caption, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithDisabledPacks.MissingPackCodes.Count)),
-                Description = string.Format(AppText.Scan_Dependency_DisabledPack_Description, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithDisabledPacks.MissingPackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithDisabledPacks.MissingPackCodes).Humanize()),
+                Description = string.Format(AppText.Scan_Dependency_DisabledPack_Description, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithDisabledPacks.MissingPackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithDisabledPacks.MissingPackCodes).Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
                 Origin = this,
@@ -148,7 +148,7 @@ public sealed class DependencyScan :
                 [
                     ..modWithDisabledPacks.MissingPackCodes.Select(disabledPackCode => new ScanIssueResolution
                     {
-                        Label = string.Format(AppText.Scan_Dependency_DisabledPack_HelpMeEnable_Label, publicCatalogs.PackCatalog is { } packCatalog ? packCatalog[disabledPackCode].EnglishName : disabledPackCode),
+                        Label = string.Format(AppText.Scan_Dependency_DisabledPack_HelpMeEnable_Label, publicCatalogs.PackCatalog is { } packCatalog && packCatalog.TryGetValue(disabledPackCode, out var disabledPack) ? disabledPack.EnglishName : disabledPackCode),
                         Icon = MaterialDesignIcons.Normal.BagPersonalTag,
                         Color = MudBlazor.Color.Primary,
                         Data = "selectPacks"
@@ -183,7 +183,7 @@ public sealed class DependencyScan :
             yield return new ScanIssue
             {
                 Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
-                Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithIncompatiblePacks.IncompatiblePackCodes.Select(packCode => packCatalog[packCode].EnglishName) : modWithIncompatiblePacks.IncompatiblePackCodes).Humanize()),
+                Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithIncompatiblePacks.IncompatiblePackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithIncompatiblePacks.IncompatiblePackCodes).Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonal,
                 Type = ScanIssueType.Sick,
                 Origin = this,

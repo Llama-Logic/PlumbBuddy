@@ -209,9 +209,15 @@ public class PersonalNotes :
         if (fileDateUpperBound is { } copiedFileDateUpperBound)
             records = records.Where(mf => mf.LastWrite <= copiedFileDateUpperBound);
         if (personalDateLowerBound is { } copiedPersonalDateLowerBound)
-            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBound));
+        {
+            var copiedPersonalDateLowerBoundUtc = copiedPersonalDateLowerBound.ToUniversalTime();
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBoundUtc));
+        }
         if (personalDateUpperBound is { } copiedPersonalDateUpperBound)
-            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBound));
+        {
+            var copiedPersonalDateUpperBoundUtc = copiedPersonalDateUpperBound.ToUniversalTime();
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBoundUtc));
+        }
         return records;
     }
 
@@ -262,9 +268,9 @@ public class PersonalNotes :
                 modFilePlayerRecord.Notes = string.IsNullOrWhiteSpace(editNotes)
                     ? null
                     : editNotes;
-                modFilePlayerRecord.PersonalDate = editPersonalDate is null
-                    ? null
-                    : editPersonalDate;
+                modFilePlayerRecord.PersonalDate = editPersonalDate is { } nonNullEditPersonalDate
+                    ? nonNullEditPersonalDate.ToUniversalTime()
+                    : null;
                 if (!modFilePlayerRecord.ModFilePlayerRecordPaths.Any(mfprp => mfprp.Path == record.ModsFolderPath))
                     modFilePlayerRecord.ModFilePlayerRecordPaths.Add(new(modFilePlayerRecord) { Path = record.ModsFolderPath });
                 if (!modFilePlayerRecord.ModFileHashes.Any(mfh => mfh.Id == modFileHash.Id))
@@ -405,6 +411,7 @@ public class PersonalNotes :
     public async Task SetAllPersonalDatesAsync()
     {
         var copiedBatchPersonalDate = batchPersonalDate;
+        var copiedBatchPersonalDateUtc = copiedBatchPersonalDate?.ToUniversalTime();
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).AsQueryable())
             .Include(mf => mf.ModFileHash)
@@ -414,11 +421,11 @@ public class PersonalNotes :
             .ConfigureAwait(false))
         {
             if (modFileHash.ModFilePlayerRecords.Count is 0
-                && copiedBatchPersonalDate is not null)
+                && copiedBatchPersonalDateUtc is not null)
                 modFileHash.ModFilePlayerRecords.Add(new ModFilePlayerRecord());
             foreach (var modFilePlayerRecord in modFileHash.ModFilePlayerRecords)
             {
-                modFilePlayerRecord.PersonalDate = copiedBatchPersonalDate;
+                modFilePlayerRecord.PersonalDate = copiedBatchPersonalDateUtc;
                 if (modFilePlayerRecord.Id != default
                     && string.IsNullOrEmpty(modFilePlayerRecord.Notes)
                     && modFilePlayerRecord.PersonalDate is null)

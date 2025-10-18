@@ -57,7 +57,13 @@ partial class PackSelectorDialog
         if (!cachedBase64PackIcons.TryGetValue(packCode, out var base64Icon))
         {
             base64Icon = Convert.ToBase64String((await GameResourceCataloger.GetPackIcon64Async(packCode)).Span);
-            cachedBase64PackIcons.Add(packCode, base64Icon);
+            try
+            {
+                cachedBase64PackIcons.Add(packCode, base64Icon);
+            }
+            catch (ArgumentException)
+            {
+            }
         }
         return base64Icon;
     }

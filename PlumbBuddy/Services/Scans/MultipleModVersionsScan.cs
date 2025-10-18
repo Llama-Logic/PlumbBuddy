@@ -36,7 +36,7 @@ public sealed class MultipleModVersionsScan :
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         var uniqueConflictedFilesSignatures = new HashSet<string>();
         foreach (var modFileManfiestHashId in await pbDbContext.ModFileManifestHashes
-            .Where(mfmh => mfmh.ManifestsByCalculation.Count(mbc => mbc.ModFileHash.ModFiles.Any(mf => mf.FoundAbsent == null)) + mfmh.ManifestsBySubsumption.Count(mbs => mbs.ModFileHash.ModFiles.Any()) > 1)
+            .Where(mfmh => mfmh.ManifestsByCalculation.Count(mbc => mbc.ModFileHash.ModFiles.Any(mf => mf.FoundAbsent == null)) + mfmh.ManifestsBySubsumption.Count(mbs => mbs.ModFileHash.ModFiles.Any(mf => mf.FoundAbsent == null)) > 1)
             .Select(mfmh => mfmh.Id)
             .ToListAsync().ConfigureAwait(false))
         {
