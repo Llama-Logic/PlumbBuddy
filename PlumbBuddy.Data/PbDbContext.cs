@@ -69,13 +69,13 @@ public class PbDbContext :
         var dtoConverter = new ValueConverter<DateTimeOffset, long>
         (
             v => v.ToUnixTimeSeconds(),
-            v => DateTimeOffset.FromUnixTimeSeconds(v)
+            v => DateTimeOffset.FromUnixTimeSeconds(v).ToLocalTime()
         );
 
         var nullableDtoConverter = new ValueConverter<DateTimeOffset?, long?>
         (
             v => v.HasValue ? v.Value.ToUnixTimeSeconds() : null,
-            v => v.HasValue ? DateTimeOffset.FromUnixTimeSeconds(v.Value) : null
+            v => v.HasValue ? DateTimeOffset.FromUnixTimeSeconds(v.Value).ToLocalTime() : null
         );
 
         var nullableUriValueConverter = new ValueConverter<Uri?, string?>

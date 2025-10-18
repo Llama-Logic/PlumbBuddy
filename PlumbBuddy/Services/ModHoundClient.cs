@@ -365,7 +365,7 @@ public class ModHoundClient :
                 .Select(mf => new
                 {
                     name = mf.Path[(mf.Path.LastIndexOf('/') + 1)..mf.Path.LastIndexOf('.')],
-                    date = mf.LastWrite.LocalDateTime.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
+                    date = mf.LastWrite.ToString("MM/dd/yyyy, hh:mm:ss tt", CultureInfo.InvariantCulture),
                     extension = mf.Path[(mf.Path.LastIndexOf('.') + 1)..],
                     fullPath = $"Mods/{mf.Path}"
                 })

@@ -209,15 +209,9 @@ public class PersonalNotes :
         if (fileDateUpperBound is { } copiedFileDateUpperBound)
             records = records.Where(mf => mf.LastWrite <= copiedFileDateUpperBound);
         if (personalDateLowerBound is { } copiedPersonalDateLowerBound)
-        {
-            var copiedPersonalDateLowerBoundUtc = copiedPersonalDateLowerBound.ToUniversalTime();
-            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBoundUtc));
-        }
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate >= copiedPersonalDateLowerBound));
         if (personalDateUpperBound is { } copiedPersonalDateUpperBound)
-        {
-            var copiedPersonalDateUpperBoundUtc = copiedPersonalDateUpperBound.ToUniversalTime();
-            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBoundUtc));
-        }
+            records = records.Where(mf => mf.ModFileHash.ModFilePlayerRecords.Any(mfpr => mfpr.PersonalDate != null && mfpr.PersonalDate <= copiedPersonalDateUpperBound));
         return records;
     }
 
@@ -226,7 +220,7 @@ public class PersonalNotes :
         if (item is PersonalNotesRecord record)
         {
             EditNotes = record.Notes;
-            EditPersonalDate = record.PersonalDate?.LocalDateTime;
+            EditPersonalDate = record.PersonalDate?.DateTime;
         }
     }
 
@@ -269,7 +263,7 @@ public class PersonalNotes :
                     ? null
                     : editNotes;
                 modFilePlayerRecord.PersonalDate = editPersonalDate is { } nonNullEditPersonalDate
-                    ? nonNullEditPersonalDate.ToUniversalTime()
+                    ? nonNullEditPersonalDate
                     : null;
                 if (!modFilePlayerRecord.ModFilePlayerRecordPaths.Any(mfprp => mfprp.Path == record.ModsFolderPath))
                     modFilePlayerRecord.ModFilePlayerRecordPaths.Add(new(modFilePlayerRecord) { Path = record.ModsFolderPath });
@@ -344,19 +338,19 @@ public class PersonalNotes :
             }
             ModFilesDateLowerBound = await pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
                 && minLastWrite != default
-                ? minLastWrite.LocalDateTime
+                ? minLastWrite.DateTime
                 : null;
             ModFilesDateUpperBound = await pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
                 && maxLastWrite != default
-                ? maxLastWrite.LocalDateTime
+                ? maxLastWrite.DateTime
                 : null;
             PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mfpr => mfpr.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
                 && minPersonalDate != default
-                ? minPersonalDate.LocalDateTime
+                ? minPersonalDate.DateTime
                 : null;
             PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mfpr => mfpr.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
                 && maxPersonalDate != default
-                ? maxPersonalDate.LocalDateTime
+                ? maxPersonalDate.DateTime
                 : null;
             return new TableData<PersonalNotesRecord>
             {
@@ -411,7 +405,6 @@ public class PersonalNotes :
     public async Task SetAllPersonalDatesAsync()
     {
         var copiedBatchPersonalDate = batchPersonalDate;
-        var copiedBatchPersonalDateUtc = copiedBatchPersonalDate?.ToUniversalTime();
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).AsQueryable())
             .Include(mf => mf.ModFileHash)
@@ -421,11 +414,11 @@ public class PersonalNotes :
             .ConfigureAwait(false))
         {
             if (modFileHash.ModFilePlayerRecords.Count is 0
-                && copiedBatchPersonalDateUtc is not null)
+                && copiedBatchPersonalDate is not null)
                 modFileHash.ModFilePlayerRecords.Add(new ModFilePlayerRecord());
             foreach (var modFilePlayerRecord in modFileHash.ModFilePlayerRecords)
             {
-                modFilePlayerRecord.PersonalDate = copiedBatchPersonalDateUtc;
+                modFilePlayerRecord.PersonalDate = copiedBatchPersonalDate;
                 if (modFilePlayerRecord.Id != default
                     && string.IsNullOrEmpty(modFilePlayerRecord.Notes)
                     && modFilePlayerRecord.PersonalDate is null)
