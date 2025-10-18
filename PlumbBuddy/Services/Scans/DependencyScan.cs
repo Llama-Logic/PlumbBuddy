@@ -370,7 +370,7 @@ public sealed class DependencyScan :
                     string.Format(AppText.Scan_Dependency_FileNeedsDependency_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
                     new()
                     {
-                        Label = string.Format(AppText.Scan_Dependency_FileNeedsDependency_Download_Label),
+                        Label = string.Format(AppText.Scan_Dependency_FileNeedsDependency_Download_Label, modWithMissingDependencyMod.DependencyName),
                         Icon = MaterialDesignIcons.Normal.Web,
                         Color = MudBlazor.Color.Primary,
                         Data = "downloadDependency",

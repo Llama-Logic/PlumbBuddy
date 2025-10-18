@@ -19,8 +19,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.7.16</ApplicationDisplayVersion>
-        <ApplicationVersion>1.7.16</ApplicationVersion>
+        <ApplicationDisplayVersion>1.7.17</ApplicationDisplayVersion>
+        <ApplicationVersion>1.7.17</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -98,12 +98,12 @@
         <PackageReference Include="LlamaLogic.Packages" Version="3.5.2" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.117.227" />
         <PackageReference Include="LlamaLogic.ValveDataFormat" Version="1.0.3" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.10" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.19" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.100" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.10" />
         <PackageReference Include="MudBlazor" Version="8.13.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="8.11.0" />
         <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0" />
@@ -130,12 +130,12 @@
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="System.Private.Uri" Version="4.3.2" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-        <PackageReference Include="TimeZoneConverter" Version="7.0.0" />
+        <PackageReference Include="TimeZoneConverter" Version="7.1.0" />
         <PackageReference Include="YamlDotNet" Version="16.3.0" />
     </ItemGroup>
 
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
-        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205">
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.217">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
