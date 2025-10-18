@@ -302,10 +302,13 @@ partial class SettingsDialog
                 (
                     mf =>
                     mf.FoundAbsent == null
-                    && mf.FileType == ModsDirectoryFileType.Package // if it's a package
-                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
-                    || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
-                    && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1 // and 1 folder deep or less
+                    &&
+                    (
+                        mf.FileType == ModsDirectoryFileType.Package // if it's a package
+                        && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
+                        || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
+                        && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1
+                    )// and 1 folder deep or less
                 )
                 .OrderBy(mf => mf.Path) // put them in order like a gentleman
                 .Select(mf => mf.Path.Replace("\\", "/")) // MH thinks in POSIX
