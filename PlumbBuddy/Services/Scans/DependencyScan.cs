@@ -100,7 +100,7 @@ public sealed class DependencyScan :
                 [
                     ..modWithMissingPacks.MissingPackCodes.Select(missingPackCode => new ScanIssueResolution
                     {
-                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, publicCatalogs.PackCatalog is { } packCatalog && packCatalog.TryGetValue(missingPackCode, out var englishName) ? englishName : missingPackCode),
+                        Label = string.Format(AppText.Scan_Dependency_RequiredPack_HelpMePurchase_Label, publicCatalogs.PackCatalog is { } packCatalog && packCatalog.TryGetValue(missingPackCode, out var missingPack) ? missingPack.EnglishName : missingPackCode),
                         Icon = MaterialDesignIcons.Normal.Store,
                         Color = MudBlazor.Color.Primary,
                         Data = $"purchase-{missingPackCode}"
