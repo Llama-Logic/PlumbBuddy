@@ -86,7 +86,7 @@ public abstract class SettingScan :
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        if (await pbDbContext.ModFiles.AnyAsync(mf => mf.Path != null && mf.FileType == modDirectoryFileType).ConfigureAwait(false)
+        if (await pbDbContext.ModFiles.AnyAsync(mf => mf.FoundAbsent == null && mf.FileType == modDirectoryFileType).ConfigureAwait(false)
             && AreGameOptionsUndesirable(smartSimObserver))
             yield return GenerateUndesirableScanIssue();
         else

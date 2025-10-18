@@ -541,7 +541,7 @@ public partial class Archivist :
                 newSnapshot.WasLive = true;
                 using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 await foreach (var modFile in pbDbContext.ModFiles
-                    .Where(mf => mf.FileType == ModsDirectoryFileType.Package || mf.FileType == ModsDirectoryFileType.ScriptArchive)
+                    .Where(mf => mf.FoundAbsent == null && mf.FileType == ModsDirectoryFileType.Package || mf.FileType == ModsDirectoryFileType.ScriptArchive)
                     .Include(mf => mf.ModFileHash)
                     .AsAsyncEnumerable())
                 {

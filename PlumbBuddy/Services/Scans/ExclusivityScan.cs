@@ -34,17 +34,18 @@ public class ExclusivityScan :
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var (exclusivity, conflictedMods) in pbDbContext.ModExclusivities
-            .Where(me => me.SpecifiedByModFileManifests.Count(mfm => mfm.ModFileHash.ModFiles.Any()) > 1)
+            .Where(me => me.SpecifiedByModFileManifests.Count(mfm => mfm.ModFileHash.ModFiles.Any(mf => mf.FoundAbsent == null)) > 1)
             .Select(me => ValueTuple.Create
             (
                 me.Name,
                 me.SpecifiedByModFileManifests!
-                    .Where(mfm => mfm.ModFileHash.ModFiles.Any())
+                    .Where(mfm => mfm.ModFileHash.ModFiles.Any(mf => mf.FoundAbsent == null))
                     .Select(mfm => new
                     {
                         mfm.Name,
                         Creators = mfm.Creators.Select(c => c.Name).ToList(),
                         FilePaths = mfm.ModFileHash.ModFiles
+                            .Where(mf => mf.FoundAbsent == null)
                             .Select(mf => mf.Path!)
                             .ToList()
                     }).ToList()

@@ -182,9 +182,9 @@ public partial class SmartSimObserver :
                 {
                     using var pbDbContext = pbDbContextFactory.CreateDbContext();
                     if (!IsModsDisabledGameSettingOn
-                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.Package)
+                        && pbDbContext.ModFiles.Any(mf => mf.FoundAbsent == null && mf.FileType == ModsDirectoryFileType.Package)
                         || IsScriptModsEnabledGameSettingOn
-                        && pbDbContext.ModFiles.Any(mf => mf.FileType == ModsDirectoryFileType.ScriptArchive))
+                        && pbDbContext.ModFiles.Any(mf => mf.FoundAbsent == null && mf.FileType == ModsDirectoryFileType.ScriptArchive))
                     {
                         superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.SmartSimObserver_Success_OfferPatchDayModUpdatesHelp, truncatedLastGameVersion, truncatedGameVersion)), Severity.Success, options =>
                         {
@@ -806,10 +806,10 @@ public partial class SmartSimObserver :
             var manifestedModFiles = new List<GlobalModsManifestModelManifestedModFile>();
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             foreach (var modFileHashElements in await pbDbContext.ModFileHashes
-                .Where(mfh => mfh.ModFiles.Any() && mfh.ModFileManifests.Any())
+                .Where(mfh => mfh.ModFiles.Any(mf => mf.FoundAbsent == null) && mfh.ModFileManifests.Any())
                 .Select(mfh => new
                 {
-                    Paths = mfh.ModFiles.Select(mf => mf.Path!).ToList(),
+                    Paths = mfh.ModFiles.Where(mf => mf.FoundAbsent == null).Select(mf => mf.Path!).ToList(),
                     Manifests = mfh.ModFileManifests.Select(mfm => new
                     {
                         mfm.Key,

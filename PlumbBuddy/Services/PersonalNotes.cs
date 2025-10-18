@@ -230,7 +230,7 @@ public class PersonalNotes :
         {
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var modFileHash = await pbDbContext.ModFiles
-                .Where(mf => mf.Path == record.ModsFolderPath)
+                .Where(mf => mf.FoundAbsent == null && mf.Path == record.ModsFolderPath)
                 .Select(mf => mf.ModFileHash)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -281,7 +281,7 @@ public class PersonalNotes :
         try
         {
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync(token).ConfigureAwait(false);
-            var recordsInScope = pbDbContext.ModFiles.AsQueryable();
+            var recordsInScope = pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).AsQueryable();
             if (state.SortLabel is { } sortLabel
                 && !string.IsNullOrWhiteSpace(sortLabel)
                 && state.SortDirection is { } sortDirection
@@ -336,19 +336,19 @@ public class PersonalNotes :
                     dbRecord.ModFilePlayerRecord?.PersonalDate
                 ));
             }
-            ModFilesDateLowerBound = await pbDbContext.ModFiles.MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
+            ModFilesDateLowerBound = await pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).MinAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } minLastWrite
                 && minLastWrite != default
                 ? minLastWrite.LocalDateTime
                 : null;
-            ModFilesDateUpperBound = await pbDbContext.ModFiles.MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
+            ModFilesDateUpperBound = await pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).MaxAsync(mf => mf.LastWrite, token).ConfigureAwait(false) is { } maxLastWrite
                 && maxLastWrite != default
                 ? maxLastWrite.LocalDateTime
                 : null;
-            PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
+            PlayerDataDateLowerBound = await pbDbContext.ModFilePlayerRecords.MinAsync(mfpr => mfpr.PersonalDate, token).ConfigureAwait(false) is { } minPersonalDate
                 && minPersonalDate != default
                 ? minPersonalDate.LocalDateTime
                 : null;
-            PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mf => mf.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
+            PlayerDataDateUpperBound = await pbDbContext.ModFilePlayerRecords.MaxAsync(mfpr => mfpr.PersonalDate, token).ConfigureAwait(false) is { } maxPersonalDate
                 && maxPersonalDate != default
                 ? maxPersonalDate.LocalDateTime
                 : null;
@@ -379,7 +379,7 @@ public class PersonalNotes :
     {
         var copiedBatchNotes = batchNotes;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.AsQueryable())
+        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).AsQueryable())
             .Include(mf => mf.ModFileHash)
             .ThenInclude(mfh => mfh.ModFilePlayerRecords)
             .Select(mf => mf.ModFileHash)
@@ -406,7 +406,7 @@ public class PersonalNotes :
     {
         var copiedBatchPersonalDate = batchPersonalDate;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.AsQueryable())
+        await foreach (var modFileHash in ApplyFilters(pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null).AsQueryable())
             .Include(mf => mf.ModFileHash)
             .ThenInclude(mfh => mfh.ModFilePlayerRecords)
             .Select(mf => mf.ModFileHash)

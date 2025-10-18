@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlumbBuddy.Data;
 
@@ -10,9 +11,11 @@ using PlumbBuddy.Data;
 namespace PlumbBuddy.Data.Migrations
 {
     [DbContext(typeof(PbDbContext))]
-    partial class PbDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251018005046_ModelV19")]
+    partial class ModelV19
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -369,7 +372,7 @@ namespace PlumbBuddy.Data.Migrations
                     b.Property<int>("FileType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long?>("FoundAbsent")
+                    b.Property<bool>("IsOnDisk")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("LastWrite")

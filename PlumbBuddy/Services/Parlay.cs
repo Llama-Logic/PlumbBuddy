@@ -364,7 +364,7 @@ public sealed partial class Parlay :
             await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
             var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             await foreach (var packageRecord in pbDbContext.ModFiles
-                .Where(mf => !mf.Path.EndsWith(".l10n.package")
+                .Where(mf => mf.FoundAbsent == null && !mf.Path.EndsWith(".l10n.package")
                     && mf.ModFileHash.Resources.Any(r => r.KeyType == signedStringTableResourceType))
                 .Select(mf => new
                 {

@@ -98,7 +98,7 @@ public class WrongGameVersionScan :
         var anyCheeseSlidOffTheCracker = false;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
         await foreach (var record in pbDbContext.ModFiles
-            .Where(mf => mf.Path != null && mf.FileType == ModsDirectoryFileType.Package && (mf.ModFileHash.DataBasePackedFileMajorVersion != 2 || mf.ModFileHash.DataBasePackedFileMinorVersion != 1))
+            .Where(mf => mf.FoundAbsent == null && mf.FileType == ModsDirectoryFileType.Package && (mf.ModFileHash.DataBasePackedFileMajorVersion != 2 || mf.ModFileHash.DataBasePackedFileMinorVersion != 1))
             .Select(mf => new { ModFile = mf, mf.ModFileHash })
             .AsAsyncEnumerable())
         {

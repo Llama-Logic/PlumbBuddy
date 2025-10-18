@@ -182,7 +182,7 @@ public abstract class DepthScan :
     {
         var anyLostInTheAbyss = false;
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-        await foreach (var offendingModFile in pbDbContext.ModFiles.Where(mf => mf.Path != null && mf.FileType == modsDirectoryFileType && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length > maximumDepth).AsAsyncEnumerable())
+        await foreach (var offendingModFile in pbDbContext.ModFiles.Where(mf => mf.FoundAbsent == null && mf.FileType == modsDirectoryFileType && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length > maximumDepth).AsAsyncEnumerable())
         {
             anyLostInTheAbyss = true;
             yield return GenerateSickScanIssue(new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", offendingModFile.Path!)), offendingModFile);

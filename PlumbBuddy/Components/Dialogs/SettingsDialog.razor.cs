@@ -301,7 +301,8 @@ partial class SettingsDialog
                 .Where
                 (
                     mf =>
-                    mf.FileType == ModsDirectoryFileType.Package // if it's a package
+                    mf.FoundAbsent == null
+                    && mf.FileType == ModsDirectoryFileType.Package // if it's a package
                     && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 5 // and 5 folders deep or less
                     || mf.FileType == ModsDirectoryFileType.ScriptArchive // or it's a script mod
                     && mf.Path.Length - mf.Path.Replace("/", string.Empty).Replace("\\", string.Empty).Length <= 1 // and 1 folder deep or less

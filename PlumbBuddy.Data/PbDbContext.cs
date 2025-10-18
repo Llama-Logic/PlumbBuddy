@@ -102,6 +102,9 @@ public class PbDbContext :
         modelBuilder.Entity<ModFile>()
             .Property(e => e.LastWrite)
             .HasConversion(dtoConverter);
+        modelBuilder.Entity<ModFile>()
+            .Property(e => e.FoundAbsent)
+            .HasConversion(nullableDtoConverter);
         modelBuilder.Entity<ModFileHash>()
             .Property(e => e.Sha256)
             .HasMaxLength(32)

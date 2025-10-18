@@ -822,7 +822,8 @@ public partial class ProxyHost :
             if (await pbDbContext.ModFiles.Where
                 (
                     mf =>
-                           mf.FileType == ModsDirectoryFileType.ScriptArchive
+                           mf.FoundAbsent == null
+                        && mf.FileType == ModsDirectoryFileType.ScriptArchive
                         && mf.ModFileHash.ModFileManifests.Any
                         (
                             mfm =>

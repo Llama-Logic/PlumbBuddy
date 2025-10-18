@@ -15,7 +15,6 @@ public interface ISmartSimObserver :
     bool IsSteamInstallation { get; }
     IReadOnlyList<ScanIssue> ScanIssues { get; }
 
-
     Task<bool> ClearCacheAsync();
     Task HelpWithPackPurchaseAsync(string packCode, IDialogService dialogService, IReadOnlyList<string>? creators, string? electronicArtsPromoCode);
     Task OpenDownloadsFolderAsync();

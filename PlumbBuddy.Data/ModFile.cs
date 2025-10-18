@@ -1,7 +1,6 @@
 namespace PlumbBuddy.Data;
 
 [Index(nameof(Path), nameof(Creation), nameof(LastWrite), nameof(Size))]
-[Index(nameof(Path), IsUnique = true)]
 public class ModFile(ModFileHash modFileHash)
 {
     ModFile() :
@@ -27,4 +26,6 @@ public class ModFile(ModFileHash modFileHash)
     public long Size { get; set; }
 
     public ModsDirectoryFileType FileType { get; set; }
+
+    public DateTimeOffset? FoundAbsent { get; set; }
 }
