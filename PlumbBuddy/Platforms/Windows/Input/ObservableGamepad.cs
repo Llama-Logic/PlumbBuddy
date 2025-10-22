@@ -63,8 +63,8 @@ public sealed partial class ObservableGamepad :
     ~ObservableGamepad() =>
         Dispose(false);
 
+    Timer? vibrateTimeout;
     readonly int xInputSlot;
-    CancellationTokenSource? lastVibrateCallCts;
 
     public IReadOnlyList<IObservableButton> Buttons { get; }
 
@@ -95,19 +95,8 @@ public sealed partial class ObservableGamepad :
             Gamepad.ButtonUp -= HandleGamepadButtonChanged;
             Gamepad.ThumbstickMoved -= HandleGamepadThumbstickMoved;
             Gamepad.TriggerMoved -= HandleGamepadTriggerMoved;
-            if (lastVibrateCallCts is { } previousVibrateCallCts)
-            {
-                try
-                {
-                    previousVibrateCallCts.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // alright then...
-                }
-                previousVibrateCallCts.Dispose();
-                previousVibrateCallCts = null;
-            }
+            vibrateTimeout?.Dispose();
+            XInputTrySetVibration(xInputSlot, 0);
             using var xInputSlotsLockHeld = xInputSlotsLock.Lock();
             xInputSlots[xInputSlot] = null;
         }
@@ -137,55 +126,23 @@ public sealed partial class ObservableGamepad :
         Updated?.Invoke(this, EventArgs.Empty);
     }
 
-    public bool Vibrate(double intensity, TimeSpan duration)
+    public async Task<bool> VibrateAsync(double intensity, TimeSpan duration)
     {
+        if (intensity is < 0 or > 1)
+            return false;
         if (duration < TimeSpan.Zero || duration > TimeSpan.FromSeconds(30))
             return false;
         var xInputSlot = this.xInputSlot;
         if (xInputSlot is < 0 or >= 4)
             return false;
-        if (lastVibrateCallCts is { } previousVibrateCallCts)
-        {
-            try
-            {
-                previousVibrateCallCts.Cancel();
-            }
-            catch (ObjectDisposedException)
-            {
-                // alright then...
-            }
-            previousVibrateCallCts.Dispose();
-            previousVibrateCallCts = null;
-        }
+        if (this.vibrateTimeout is { } vibrateTimeout)
+            await vibrateTimeout.DisposeAsync().ConfigureAwait(false);
         var isVibrating = XInputTrySetVibration(xInputSlot, intensity);
-        if (isVibrating)
-        {
-            var vibrateCallCts = new CancellationTokenSource(duration);
-            lastVibrateCallCts = vibrateCallCts;
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(duration, vibrateCallCts.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    // another call has come along, off into the wild blue yonder, green thread...
-                    return;
-                }
-                try
-                {
-                    vibrateCallCts.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // another call has come along, off into the wild blue yonder, green thread...
-                    return;
-                }
-                vibrateCallCts.Dispose();
-                XInputTrySetVibration(xInputSlot, 0);
-            });
-        }
+        if (isVibrating && intensity > 0)
+            this.vibrateTimeout = new(VibrateTimeoutCallback, null, duration, Timeout.InfiniteTimeSpan);
         return isVibrating;
     }
+
+    void VibrateTimeoutCallback(object? state) =>
+        XInputTrySetVibration(xInputSlot, 0);
 }

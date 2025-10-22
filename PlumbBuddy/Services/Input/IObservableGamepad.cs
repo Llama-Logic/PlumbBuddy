@@ -11,5 +11,5 @@ public interface IObservableGamepad :
     event EventHandler? Updated;
 
     float ApplyDeadzone(float raw);
-    bool Vibrate(double intensity, TimeSpan duration);
+    Task<bool> VibrateAsync(double intensity, TimeSpan duration);
 }

@@ -122,19 +122,19 @@ public sealed class ObservableGamepad :
         gamepadInterop.RaiseUpdated();
     }
 
-    public bool Vibrate(double intensity, TimeSpan duration)
+    public Task<bool> VibrateAsync(double intensity, TimeSpan duration)
     {
         if (duration < TimeSpan.Zero || duration > TimeSpan.FromSeconds(30))
-            return false;
+            return Task.FromResult(false);
         if (this.hapticEngine.Value is not { } hapticEngine)
-            return false;
+            return Task.FromResult(false);
         if (hapticPatternPlayer is not null
             && !hapticPatternPlayer.Stop(0, out _))
-            return false;
+            return Task.FromResult(false);
         hapticPatternPlayer?.Dispose();
         hapticPatternPlayer = null;
         if (intensity == default)
-            return true;
+            return Task.FromResult(true);
 #pragma warning disable CA2000 // Dispose objects before losing scope
         using var hapticEvent = new CHHapticEvent
         (
@@ -150,7 +150,7 @@ public sealed class ObservableGamepad :
         using var pattern = new CHHapticPattern([hapticEvent], Array.Empty<CHHapticDynamicParameter>(), out _);
         hapticPatternPlayer = hapticEngine.CreatePlayer(pattern, out _);
         if (hapticPatternPlayer is null)
-            return false;
-        return hapticPatternPlayer.Start(0, out _);
+            return Task.FromResult(false);
+        return Task.FromResult(hapticPatternPlayer.Start(0, out _));
     }
 }
