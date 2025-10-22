@@ -116,7 +116,7 @@ public class WrongGameVersionScan :
                     Origin = this,
                     Type = ScanIssueType.Dead,
                     Data = modFile.Path,
-                    //GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthWrongGameVersion{settings.Type}", UriKind.Absolute),
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthOtherGameScan{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()
@@ -153,7 +153,7 @@ public class WrongGameVersionScan :
                     Origin = this,
                     Type = ScanIssueType.Uncomfortable,
                     Data = modFile.Path,
-                    //GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthWrongGameVersion{settings.Type}", UriKind.Absolute),
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthOtherGameScan{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()
@@ -190,7 +190,7 @@ public class WrongGameVersionScan :
                     Origin = this,
                     Type = ScanIssueType.Uncomfortable,
                     Data = modFile.Path,
-                    //GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthWrongGameVersion{settings.Type}", UriKind.Absolute),
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthOtherGameScan{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()
@@ -226,7 +226,7 @@ public class WrongGameVersionScan :
                     Origin = this,
                     Type = ScanIssueType.Dead,
                     Data = modFile.Path,
-                    //GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthWrongGameVersion{settings.Type}", UriKind.Absolute),
+                    GuideUrl = new($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuideModHealthOtherGameScan{settings.Type}", UriKind.Absolute),
                     Resolutions =
                     [
                         new()
