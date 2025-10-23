@@ -83,6 +83,9 @@
             <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Disabled="@(isLoading || isApplying)" Label="@(AppText.PackSelectorDialog_UsePublicPackCatalog_Label)" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
         </MudTooltip>
         <MudSpacer />
+        <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info" Placement="Placement.Top">
+            <MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuidePackSelector{Settings.Type}")" />
+        </MudTooltip>
         <MudButton Disabled="@isApplying" OnClick="CancelOnClickHandler">
             @MarkupLocalizer[nameof(AppText.Common_Cancel)]
         </MudButton>

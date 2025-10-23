@@ -1,3 +1,5 @@
+using Microsoft.Maui.Controls;
+
 namespace PlumbBuddy.Components.Dialogs;
 
 partial class PackSelectorDialog

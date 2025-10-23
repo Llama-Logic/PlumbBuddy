@@ -3,16 +3,20 @@
 @inject IModsDirectoryCataloger ModsDirectoryCataloger
 @inject IPersonalNotes PersonalNotes
 @inject IPlatformFunctions PlatformFunctions
+@inject ISettings Settings
 @inject ISuperSnacks SuperSnacks
 
 <MudTable @ref="@recordsTable" CanCancelEdit Class="rounded my-0 break-words" Dense EditButtonPosition="TableEditButtonPosition.End" FixedFooter FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 216px)" Hover OnCancelEditClick="@(e => recordsTable!.SetSelectedItem(null))" OnPreviewEditClick="PersonalNotes.HandleRecordOnPreviewEditClick" Outlined RowEditCommit="PersonalNotes.HandleRecordRowEditCommit" ServerData="PersonalNotes.LoadRecordsAsync">
     <ToolBarContent>
-        <MudStack Row Style="width: 100%;">
+        <MudStack Row AlignItems="AlignItems.Center" Style="width: 100%;">
             <MudTextField @bind-Value="@Binding(() => PersonalNotes.SearchText).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.Magnify" Class="flex-grow-1" Clearable DebounceInterval="250" Label="@(AppText.Common_Search)" Variant="Variant.Filled" />
             <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.FileDateLowerBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarStart" Class="flex-grow-0" Clearable Color="Color.Primary" IsDateDisabledFunc="@((DateTime dt) => dt < PersonalNotes.ModFilesDateLowerBound || dt > PersonalNotes.ModFilesDateUpperBound)" Label="@(AppText.PersonalNotes_FromFileDate_Label)" Variant="Variant.Filled" />
             <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.FileDateUpperBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarEnd" Class="flex-grow-0" Clearable Color="Color.Primary" IsDateDisabledFunc="@((DateTime dt) => dt < PersonalNotes.ModFilesDateLowerBound || dt > PersonalNotes.ModFilesDateUpperBound)" Label="@(AppText.PersonalNotes_ToFileDate_Label)" Variant="Variant.Filled" />
             <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.PersonalDateLowerBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarStart" Class="flex-grow-0" Clearable Color="Color.Primary" IsDateDisabledFunc="@((DateTime dt) => dt < PersonalNotes.PlayerDataDateLowerBound || dt > PersonalNotes.PlayerDataDateUpperBound)" Label="@(AppText.PersonalNotes_FromPersonalDate_Label)" Variant="Variant.Filled" />
             <MudDatePicker @bind-Date="@Binding(() => PersonalNotes.PersonalDateUpperBound).Value" Adornment="Adornment.Start" AdornmentColor="Color.Primary" AdornmentIcon="@MaterialDesignIcons.Normal.CalendarEnd" Class="flex-grow-0" Clearable Color="Color.Primary" IsDateDisabledFunc="@((DateTime dt) => dt < PersonalNotes.PlayerDataDateLowerBound || dt > PersonalNotes.PlayerDataDateUpperBound)" Label="@(AppText.PersonalNotes_ToPersonalDate_Label)" Variant="Variant.Filled" />
+            <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info" Placement="Placement.Left">
+                <MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuidePersonalNotes{Settings.Type}")" />
+            </MudTooltip>
         </MudStack>
     </ToolBarContent>
     <HeaderContent>
