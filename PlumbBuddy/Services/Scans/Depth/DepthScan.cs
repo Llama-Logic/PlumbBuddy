@@ -103,7 +103,7 @@ public abstract class DepthScan :
                 var conflicts = originEntriesByConflicted[true].ToImmutableArray();
                 if (conflicts.Any())
                 {
-                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard, file.Name, targetDirectory.FullName, string.Join(Environment.NewLine, conflicts.Select(conflict => string.Format(AppText.Common_BulletListItem, conflict.Name))))), Severity.Error, options =>
+                    superSnacks.OfferRefreshments(new MarkupString(string.Format(AppText.Scan_Depth_MoveCloserToModsRoot_Error_OverwriteGuard, file.Name, targetDirectory.FullName, string.Join(Environment.NewLine, conflicts.Take(5).Select(conflict => string.Format(AppText.Common_BulletListItem, conflict.Name)).Concat(conflicts.Length <= 5 ? [] : [string.Format(AppText.Common_BulletListItemsRemaining, AppText.Common_BulletListItemsRemaining_Other.ToQuantity(conflicts.Length - 5))])))), Severity.Error, options =>
                     {
                         options.Icon = MaterialDesignIcons.Normal.FolderAlert;
                         options.Action = AppText.Common_ShowMe;

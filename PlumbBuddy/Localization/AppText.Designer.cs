@@ -927,11 +927,29 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;li&gt;&amp;bull; {0}&lt;/li&gt;.
+        ///   Looks up a localized string similar to &lt;li&gt;{0}&lt;/li&gt;.
         /// </summary>
         internal static string Common_BulletListItem {
             get {
                 return ResourceManager.GetString("Common_BulletListItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;li&gt;&lt;em&gt;and {0}&lt;/em&gt;&lt;/li&gt;.
+        /// </summary>
+        internal static string Common_BulletListItemsRemaining {
+            get {
+                return ResourceManager.GetString("Common_BulletListItemsRemaining", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to other.
+        /// </summary>
+        internal static string Common_BulletListItemsRemaining_Other {
+            get {
+                return ResourceManager.GetString("Common_BulletListItemsRemaining_Other", resourceCulture);
             }
         }
         

@@ -2018,7 +2018,7 @@ I don't want to accidentally cause you to lose important files! You may need to 
     <comment>{0} = The Name of the Mod File; {1} = The Path to the Target Directory; {2} = The List of Pre-Existing Files</comment>
   </data>
   <data name="Common_BulletListItem" xml:space="preserve">
-    <value>&lt;li&gt;&amp;bull; {0}&lt;/li&gt;</value>
+    <value>&lt;li&gt;{0}&lt;/li&gt;</value>
     <comment>{0} = The Text of the Bullet List Item</comment>
   </data>
   <data name="Scan_Depth_MoveCloserToModsRoot_Success" xml:space="preserve">
@@ -3621,5 +3621,12 @@ Okay, so... you're hilarious. 😏 But, let's be honest, EA is not *this* cool. 
   </data>
   <data name="Home_PersonalNotes_Label" xml:space="preserve">
     <value>Personal Notes</value>
+  </data>
+  <data name="Common_BulletListItemsRemaining" xml:space="preserve">
+    <value>&lt;li&gt;&lt;em&gt;and {0}&lt;/em&gt;&lt;/li&gt;</value>
+    <comment>{0} = The number of remaining items</comment>
+  </data>
+  <data name="Common_BulletListItemsRemaining_Other" xml:space="preserve">
+    <value>other</value>
   </data>
 </root>
