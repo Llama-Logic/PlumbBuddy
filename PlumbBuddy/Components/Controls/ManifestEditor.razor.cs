@@ -61,6 +61,7 @@ partial class ManifestEditor
     string electronicArtsPromoCode = string.Empty;
     IReadOnlyList<string> features = [];
     ChipSetField? featuresChipSetField;
+    string fundingUrl = string.Empty;
     int hashingLevel = 1;
     IReadOnlyList<string> incompatiblePacks = [];
     ChipSetField? incompatibleChipSetField;
@@ -474,6 +475,7 @@ partial class ManifestEditor
                     {
                         Description = description,
                         ElectronicArtsPromoCode = string.IsNullOrWhiteSpace(electronicArtsPromoCode) ? null : electronicArtsPromoCode,
+                        FundingUrl = Uri.TryCreate(fundingUrl, UriKind.Absolute, out var parsedFundingUrl) ? parsedFundingUrl : null,
                         Hash = hash,
                         MessageToTranslators = string.IsNullOrWhiteSpace(component.MessageToTranslators) ? null : component.MessageToTranslators,
                         Name = string.IsNullOrWhiteSpace(component.Name) ? name : component.Name,
@@ -891,6 +893,7 @@ partial class ManifestEditor
                     creators = selectStepFileAddManifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
                     creatorsChipSetField?.Refresh();
                     url = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
+                    fundingUrl = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.FundingUrl is not null)?.FundingUrl?.ToString() ?? string.Empty;
                     requiredPacks = selectStepFileAddManifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     requiredPacksChipSetField?.Refresh();
                     recommendedPacks.AddRange(selectStepFileAddManifests.SelectMany(manifest => manifest.RecommendedPacks).DistinctBy(recommendedPack => recommendedPack.PackCode).Select(recommendedPack => new RecommendedPack(PublicCatalogs, recommendedPack.PackCode, recommendedPack.Reason)));
@@ -1094,6 +1097,17 @@ partial class ManifestEditor
         try
         {
             await Browser.OpenAsync(url, BrowserLaunchMode.External);
+        }
+        catch
+        {
+        }
+    }
+
+    async Task HandleOpenFundingUrlInBrowserAsync()
+    {
+        try
+        {
+            await Browser.OpenAsync(fundingUrl, BrowserLaunchMode.External);
         }
         catch
         {
@@ -1401,6 +1415,7 @@ partial class ManifestEditor
         recommendedPacks.Clear();
         await (requiredPacksChipSetField?.ClearAsync() ?? Task.CompletedTask);
         await (requirementsStepForm?.ResetAsync() ?? Task.CompletedTask);
+        fundingUrl = string.Empty;
         url = string.Empty;
         await (creatorsChipSetField?.ClearAsync() ?? Task.CompletedTask);
         description = string.Empty;

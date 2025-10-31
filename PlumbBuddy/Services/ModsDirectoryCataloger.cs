@@ -208,6 +208,7 @@ public class ModsDirectoryCataloger :
                     modFileManifestModel.ElectronicArtsPromoCode
                 ).ConfigureAwait(false)
                 : null,
+            FundingUrl = modFileManifestModel.FundingUrl,
             Key = key,
             MessageToTranslators = modFileManifestModel.MessageToTranslators,
             Name = modFileManifestModel.Name ?? string.Empty,

@@ -122,6 +122,9 @@ public class PbDbContext :
         modelBuilder.Entity<ModFileManifest>()
             .Property(e => e.TranslationSubmissionUrl)
             .HasConversion(nullableUriValueConverter);
+        modelBuilder.Entity<ModFileManifest>()
+            .Property(e => e.FundingUrl)
+            .HasConversion(nullableUriValueConverter);
         modelBuilder.Entity<ModFilePlayerRecord>()
             .Property(e => e.PersonalDate)
             .HasConversion(nullableDtoConverter);

@@ -900,6 +900,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Support Creator.
+        /// </summary>
+        internal static string CatalogDisplay_SupportCreator {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_SupportCreator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here to see how you can show your support for {0} in the creation of {1}..
+        /// </summary>
+        internal static string CatalogDisplay_SupportCreator_Tip {
+            get {
+                return ResourceManager.GetString("CatalogDisplay_SupportCreator_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mods appear in your Catalog when creators have included manifests in them..
         /// </summary>
         internal static string CatalogDisplay_UserAssistanceNote {
@@ -3499,6 +3517,24 @@ namespace PlumbBuddy.Localization {
         internal static string ManifestEditor_Details_DownloadPageUrl_Label {
             get {
                 return ResourceManager.GetString("ManifestEditor_Details_DownloadPageUrl_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Have you set up a place for players who want to support your mods can do so? Can they subscribe to your Patreon or buy you a Ko-fi? If so, give me the URL where they can do that here and I&apos;ll give it to interested players..
+        /// </summary>
+        internal static string ManifestEditor_Details_FundingUrl_HelperText {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_FundingUrl_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Funding URL.
+        /// </summary>
+        internal static string ManifestEditor_Details_FundingUrl_Label {
+            get {
+                return ResourceManager.GetString("ManifestEditor_Details_FundingUrl_Label", resourceCulture);
             }
         }
         

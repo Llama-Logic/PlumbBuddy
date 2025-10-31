@@ -124,6 +124,8 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
 
     public ICollection<ModFileManifestTranslator> Translators { get; } = [];
 
+    public Uri? FundingUrl { get; set; }
+
     /// <summary>
     /// Convert this entity to its LLP model equivalent
     /// </summary>
@@ -135,7 +137,8 @@ public class ModFileManifest(ModFileHash modFileHash, ModFileManifestHash inscri
             ContactUrl = ContactUrl,
             Description = Description,
             ElectronicArtsPromoCode = ElectronicArtsPromoCode?.Code,
-            Hash = (InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()).ToImmutableArray(),
+            FundingUrl = FundingUrl,
+            Hash = [..InscribedModFileManifestHash?.Sha256 ?? Enumerable.Empty<byte>()],
             MessageToTranslators = MessageToTranslators,
             Name = Name,
             TuningFullInstance = TuningFullInstance is null ? 0UL : unchecked((ulong)TuningFullInstance),

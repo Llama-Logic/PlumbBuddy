@@ -13,6 +13,7 @@
 		@if (Observed(() => Catalog.Mods) is { } mods && Observed(() => Catalog.SelectedModKey) is { } selectedModKey && mods.TryGetValue(selectedModKey, out var selectedMod))
 		{
 			var modSearchText = Observed(() => Catalog.ModsSearchText);
+			var fundingUrl = selectedMod.Select(t => t.Manifest.FundingUrl).Where(u => u is not null).Cast<Uri>().GroupBy(u => u.ToString()).OrderByDescending(g => g.Count())?.FirstOrDefault()?.FirstOrDefault();
 			var version = selectedMod.Select(t => t.Manifest.Version).Where(v => !string.IsNullOrWhiteSpace(v)).Cast<string>().GroupBy(v => v).OrderByDescending(g => g.Key)?.FirstOrDefault()?.Key;
 			var description = selectedMod.Select(t => t.Manifest.Description).Where(d => !string.IsNullOrWhiteSpace(d)).Cast<string>().GroupBy(d => d).OrderByDescending(g => g.Count())?.FirstOrDefault()?.Key;
 			var hashHex = selectedMod.Select(t => t.Manifest.Hash).First().ToHexString();
@@ -74,6 +75,18 @@
                             </MudChip>
                         </MudTooltip>
                     </MudItem>
+                    @if (fundingUrl is not null)
+                    {
+                        <MudItem>
+                            <MudTooltip Arrow Text="@StringLocalizer["CatalogDisplay_SupportCreator_Tip", creators.Humanize(), selectedModKey.Name]" Color="Color.Primary">
+                                <MudChip T="string" Class="ma-0" Color="Color.Primary" Icon="@MaterialDesignIcons.Normal.HandCoin" Label="true" OnClick="@(() => LaunchUrlAsync(fundingUrl))">
+                                    <ChildContent>
+                                        @MarkupLocalizer[nameof(AppText.CatalogDisplay_SupportCreator)]
+                                    </ChildContent>
+                                </MudChip>
+                            </MudTooltip>
+                        </MudItem>
+                    }
 					@foreach (var requiredPackCode in requiredPackCodes)
 					{
                         <MudItem>
