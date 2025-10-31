@@ -3227,9 +3227,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn&apos;t be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.
-        ///
-        ///If you don&apos;t have one, but you&apos;re interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [d [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Your mod requires or recommends packs which some players may not have, but might purchase specifically to use with your mod. If you give me your **EA Promo Code** on the **Requirements** step, I will give it to players who notice they do not have packs your mod is referencing..
         /// </summary>
         internal static string ManifestEditor_Confirm_Note_BlankPromoCode {
             get {
@@ -8814,7 +8812,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An Opportunity Has Presented Itself....
+        ///   Looks up a localized string similar to Copy EA Promo Code to Clipboard?.
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption {
             get {
@@ -8829,7 +8827,7 @@ namespace PlumbBuddy.Localization {
         ///
         ///Since you&apos;re interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?
         ///
-        ///Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!.
+        ///Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you..
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Text {
             get {
@@ -8838,7 +8836,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thanks for Supporting Creators! 🥰.
+        ///   Looks up a localized string similar to EA Promo Code Copied to Clipboard.
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Caption {
             get {
@@ -8847,10 +8845,10 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;ve just copied this Promo Code to your computer&apos;s clipboard:
+        ///   Looks up a localized string similar to I&apos;ve just copied this Promo Code for {1} to your clipboard:
         ///`{0}`
         ///
-        ///You can now just paste it right in to the Promo Code field during check-out and help support {1}!.
+        ///You can now just paste it right in to the Promo Code field during check-out..
         /// </summary>
         internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Text {
             get {

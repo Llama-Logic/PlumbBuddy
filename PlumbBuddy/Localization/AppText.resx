@@ -840,9 +840,7 @@ From the available **Manifest Snippet Tuning Resource Names**, I selected `{1}`.
     <comment>This text is in Markdown. {0} = Required Mod Name</comment>
   </data>
   <data name="ManifestEditor_Confirm_Note_BlankPromoCode" xml:space="preserve">
-    <value>Your mod requires packs which some players may not have, but might purchase specifically to use with *your mod*, and yet, you have not given me an **EA Promo Code**. If you do have one, you really shouldn't be leaving money on the table like this, friend. Consider doing yourself a solid, heading back to the **Requirements** step, and filling in that code.
-
-If you don't have one, but you're interested in getting a commission for all the packs your awesome mod is about to help EA sell, please allow me to [direct you to where that journey begins](https://creatornetwork.ea.com/).</value>
+    <value>Your mod requires or recommends packs which some players may not have, but might purchase specifically to use with your mod. If you give me your **EA Promo Code** on the **Requirements** step, I will give it to players who notice they do not have packs your mod is referencing.</value>
     <comment>This text is in Markdown.</comment>
   </data>
   <data name="ManifestComponentEditor_IsRequired_Label" xml:space="preserve">
@@ -2377,20 +2375,20 @@ Click me to start Guided Support for the PlumbBuddy Discord and we can get that 
 
 Since you're interested in **{2}** because of how it works with this mod, would you like to support {0} by entering this Promo Code at check-out?
 
-Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!</value>
+Doing so **will not cost you any more**, but it will cause {0} to earn a commission on your purchase. If you want, I can copy it into your clipboard for you.</value>
     <comment>This text is in Markdown. {0} = List of Creators; {1} = EA Promo Code; {2} = Pack Code</comment>
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_PresentOpportunity_Caption" xml:space="preserve">
-    <value>An Opportunity Has Presented Itself...</value>
+    <value>Copy EA Promo Code to Clipboard?</value>
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Caption" xml:space="preserve">
-    <value>Thanks for Supporting Creators! 🥰</value>
+    <value>EA Promo Code Copied to Clipboard</value>
   </data>
   <data name="SmartSimObserver_HelpWithPackPurchase_Thanks_Text" xml:space="preserve">
-    <value>I've just copied this Promo Code to your computer's clipboard:
+    <value>I've just copied this Promo Code for {1} to your clipboard:
 `{0}`
 
-You can now just paste it right in to the Promo Code field during check-out and help support {1}!</value>
+You can now just paste it right in to the Promo Code field during check-out.</value>
     <comment>This text is in Markdown. {0} = EA Promo Code; {1} = List of Creators</comment>
   </data>
   <data name="SmartSimObserver_OpenDownloadsFolder_Error_Text" xml:space="preserve">
@@ -3407,7 +3405,7 @@ More detailed technical information is available in my log.</value>
 
 Since you're interested in purchasing a pack originally made by a community mod creator with a Promo Code, would you like to support them by entering their Promo Code at check-out?
 
-Doing so **will not cost you any more**, but it will cause the creator to earn a commission on your purchase. If you want, I can copy it into your clipboard for you right now!</value>
+Doing so **will not cost you any more**, but it will cause the creator to earn a commission on your purchase. If you want, I can copy it into your clipboard for you.</value>
     <comment>This text is in Markdown. {0} = EA Promo Code; {1} = Pack Code</comment>
   </data>
   <data name="SmartSimObserver_HelpWithCreatorKitPackPurchase_Thanks_Text" xml:space="preserve">

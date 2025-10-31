@@ -212,7 +212,6 @@ partial class PackSelectorDialog
                     packs = packGroup.packs;
                 else
                 {
-                    var isCreator = !string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode);
                     packs = [];
                     packGroups.Add
                     (
@@ -225,11 +224,11 @@ partial class PackSelectorDialog
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.SubType is PackDescriptionSubType.Full
                             ? AppText.PackSelectorDialog_PackType_Stuff
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is null
-                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorCombinationKit : AppText.PackSelectorDialog_PackType_CombinationKit)
+                            ? (packCatalogEntry.IsCreatorContent ? AppText.PackSelectorDialog_PackType_CreatorCombinationKit : AppText.PackSelectorDialog_PackType_CombinationKit)
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is PackDescriptionKitType.CAS
-                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorCreateASimKit : AppText.PackSelectorDialog_PackType_CreateASimKit)
+                            ? (packCatalogEntry.IsCreatorContent ? AppText.PackSelectorDialog_PackType_CreatorCreateASimKit : AppText.PackSelectorDialog_PackType_CreateASimKit)
                             : packCatalogEntry.Type is PackDescriptionType.Stuff && packCatalogEntry.KitType is PackDescriptionKitType.BuildBuy
-                            ? (isCreator ? AppText.PackSelectorDialog_PackType_CreatorBuildAndBuyKit : AppText.PackSelectorDialog_PackType_BuildAndBuyKit)
+                            ? (packCatalogEntry.IsCreatorContent ? AppText.PackSelectorDialog_PackType_CreatorBuildAndBuyKit : AppText.PackSelectorDialog_PackType_BuildAndBuyKit)
                             : AppText.PackSelectorDialog_PackType_Free,
                             packs
                         )

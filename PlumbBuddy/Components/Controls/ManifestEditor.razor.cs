@@ -1350,7 +1350,7 @@ partial class ManifestEditor
             messages.Add
             ((
                 Severity.Normal,
-                (string?)MaterialDesignIcons.Normal.AccountCash,
+                (string?)MaterialDesignIcons.Normal.Sale,
                 StringLocalizer["ManifestEditor_Confirm_Note_BlankPromoCode"].Value
             ));
         messages.AddRange(incompatiblePacks
