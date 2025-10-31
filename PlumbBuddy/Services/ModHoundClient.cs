@@ -14,12 +14,13 @@ public class ModHoundClient :
     const string visitorTaskStatusUrlFormat = "/visitor/task-status/{0}";
     static readonly JsonSerializerOptions visitorLoadDirectoryRequestBodyJsonSerializerOptions = new() { WriteIndented = false };
 
-    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, IPublicCatalogs publicCatalogs, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
+    public ModHoundClient(ILogger<ModHoundClient> logger, IPlatformFunctions platformFunctions, IPublicCatalogs publicCatalogs, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, ISmartSimObserver smartSimObserver, IModsDirectoryCataloger modsDirectoryCataloger, ISuperSnacks superSnacks, IBlazorFramework blazorFramework)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(publicCatalogs);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(smartSimObserver);
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
         ArgumentNullException.ThrowIfNull(superSnacks);
@@ -29,6 +30,7 @@ public class ModHoundClient :
         this.publicCatalogs = publicCatalogs;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
+        this.smartSimObserver = smartSimObserver;
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.superSnacks = superSnacks;
         this.blazorFramework = blazorFramework;
@@ -70,6 +72,7 @@ public class ModHoundClient :
     readonly AsyncLock selectedReportMissingRequirementsRecordsLock;
     string? selectedReportSection;
     readonly ISettings settings;
+    readonly ISmartSimObserver smartSimObserver;
     string? status;
     readonly ISuperSnacks superSnacks;
     int? unknownStatusCount;
@@ -339,6 +342,8 @@ public class ModHoundClient :
             Status = AppText.ModHoundClient_Status_WaitingForModsDirectoryCataloger;
             RequestPhase = 1;
             await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+            if (await smartSimObserver.CheckIfGameIsRunningAsync().ConfigureAwait(false))
+                return;
             Status = AppText.ModHoundClient_Status_PreparingRequest;
             using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var files = (await pbDbContext.ModFiles // get me dem mod files MDC

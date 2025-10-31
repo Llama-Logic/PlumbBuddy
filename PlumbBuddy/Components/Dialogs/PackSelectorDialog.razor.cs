@@ -99,6 +99,12 @@ partial class PackSelectorDialog
     {
         isApplying = true;
         StateHasChanged();
+        if (await SmartSimObserver.CheckIfGameIsRunningAsync().ConfigureAwait(false))
+        {
+            isApplying = false;
+            StateHasChanged();
+            return;
+        }
         var commandLineArgumentsLine = SmartSimObserver.IsSteamInstallation
             ? await Steam.GetTS4ConfiguredCommandLineArgumentsAsync()
             : await ElectronicArtsApp.GetTS4ConfiguredCommandLineArgumentsAsync();

@@ -344,6 +344,14 @@ public partial class SmartSimObserver :
         }
     }
 
+    public async Task<bool> CheckIfGameIsRunningAsync()
+    {
+        var gameIsRunning = await platformFunctions.GetGameProcessAsync(new(settings.InstallationFolderPath)).ConfigureAwait(false) is not null;
+        if (gameIsRunning)
+            NoticeIfGameIsRunning();
+        return gameIsRunning;
+    }
+
     bool CatalogIfInModsDirectory(string userDataDirectoryRelativePath, out bool wasIntegrationChange)
     {
         if (modsDirectoryRelativePathPattern.IsMatch(userDataDirectoryRelativePath))
@@ -386,7 +394,7 @@ public partial class SmartSimObserver :
     {
         try
         {
-            if (await platformFunctions.GetGameProcessAsync(new(settings.InstallationFolderPath)) is not null)
+            if (await CheckIfGameIsRunningAsync().ConfigureAwait(false))
             {
                 superSnacks.OfferRefreshments
                 (
