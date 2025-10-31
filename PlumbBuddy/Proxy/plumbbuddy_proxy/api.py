@@ -318,8 +318,9 @@ class Gamepad:
     A PlumbBuddy Runtime Mod Integration Gamepad
     """
 
-    def __init__(self, index: int, buttons: Sequence[Tuple[str, bool]], thumbsticks: Sequence[Tuple[float, float, float, float]], triggers: Sequence[float]):
+    def __init__(self, index: int, name: str, buttons: Sequence[Tuple[str, bool]], thumbsticks: Sequence[Tuple[float, float, float, float]], triggers: Sequence[float]):
         self._index = index
+        self._name = name
         self._dispatch_disconnected: Callable[[Gamepad], None] = lambda _: None
         def set_dispatch_disconnected(dispatch: Callable[[Gamepad], None]):
             self._dispatch_disconnected = dispatch
@@ -384,6 +385,14 @@ class Gamepad:
         """
 
         return self._index_changed
+    
+    @property
+    def name(self) -> str:
+        """
+        Gets the name of the gamepad as reported by the host operating system
+        """
+
+        return self._name
     
     @property
     def thumbstick_count(self) -> int:
@@ -836,7 +845,7 @@ class Gateway:
             button._raise_changed(message['pressed'])
             return
         if message_type == 'gamepad_connected':
-            gamepad = Gamepad(message['index'], message['buttons'], message['thumbsticks'], message['triggers'])
+            gamepad = Gamepad(message['index'], message['name'], message['buttons'], message['thumbsticks'], message['triggers'])
             self._gamepads.insert(gamepad.index, gamepad)
             for additional_gamepad in self._gamepads[gamepad.index + 1:]:
                 additional_gamepad._raise_index_changed(additional_gamepad.index + 1)
@@ -871,7 +880,7 @@ class Gateway:
                     additional_gamepad._raise_index_changed(additional_gamepad.index - 1)
                 gamepad._raise_disconnected()
             for new_gamepad in message['gamepads']:
-                gamepad = Gamepad(len(self._gamepads), new_gamepad['buttons'], new_gamepad['thumbsticks'], new_gamepad['triggers'])
+                gamepad = Gamepad(len(self._gamepads), new_gamepad['name'], new_gamepad['buttons'], new_gamepad['thumbsticks'], new_gamepad['triggers'])
                 self._gamepads.append(gamepad)
                 self._dispatch_gamepad_connected(gamepad)
             return

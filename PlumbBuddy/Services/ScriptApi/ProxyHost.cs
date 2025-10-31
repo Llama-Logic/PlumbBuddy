@@ -53,6 +53,7 @@ public partial class ProxyHost :
         new()
         {
             Index = index,
+            Name = gamepad.Name,
             Buttons = gamepad.Buttons.Select(button => new List<object>([button.Name, button.Pressed]).AsReadOnly()).ToList().AsReadOnly(),
             Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new List<object>([thumbstick.X, thumbstick.Y, thumbstick.Direction, thumbstick.Position]).AsReadOnly()).ToList().AsReadOnly(),
             Triggers = gamepad.Triggers.Select(trigger => trigger.Position).ToList().AsReadOnly(),
@@ -141,6 +142,8 @@ public partial class ProxyHost :
         saveSpecificDataStoragePropagationLock = new();
         pendingSaveSpecificDataStorageInitialization = true;
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
+        wiredGamepadsLock = new();
+        wiredGamepads = [];
         foreach (var gamepad in this.gamepadInterop.Gamepads)
             WireGamepad(gamepad);
         ((INotifyCollectionChanged)this.gamepadInterop.Gamepads).CollectionChanged += HandleGamepadInteropGamepadsCollectionChanged;
@@ -193,6 +196,8 @@ public partial class ProxyHost :
     ulong saveSpecificDataStorageSnapshotSimNow;
     ulong saveSpecificDataStorageSnapshotSlotId;
     readonly ISettings settings;
+    readonly HashSet<IObservableGamepad> wiredGamepads;
+    readonly AsyncLock wiredGamepadsLock;
 
     public bool IsBridgedUiDevelopmentModeEnabled
     {
@@ -307,6 +312,7 @@ public partial class ProxyHost :
     IReadOnlyList<GamepadsResetMessageGamepad> CreateGamepadsResetMessageGamepadList() =>
         gamepadInterop.Gamepads.Select(gamepad => new GamepadsResetMessageGamepad
         {
+            Name = gamepad.Name,
             Buttons = gamepad.Buttons.Select(button => new List<object>([button.Name, button.Pressed]).AsReadOnly()).ToList().AsReadOnly(),
             Thumbsticks = gamepad.Thumbsticks.Select(thumbstick => new List<object>([thumbstick.X, thumbstick.Y, thumbstick.Direction, thumbstick.Position]).AsReadOnly()).ToList().AsReadOnly(),
             Triggers = gamepad.Triggers.Select(trigger => trigger.Position).ToList().AsReadOnly()
@@ -593,6 +599,12 @@ public partial class ProxyHost :
                     WireGamepad(newGamepad);
                 break;
             case NotifyCollectionChangedAction.Reset:
+                using (var wiredGamepadsLockHeld = wiredGamepadsLock.Lock())
+                {
+                    foreach (var oldGamepad in wiredGamepads)
+                        UnwireGamepad(oldGamepad, false);
+                    wiredGamepads.Clear();
+                }
                 var gamepadsList = CreateGamepadsResetMessageGamepadList();
                 var proxyResetMessage = new GamepadsResetMessage
                 {
@@ -1708,13 +1720,19 @@ public partial class ProxyHost :
         return (new(ResourceType.SaveSpecificRelationalDataStorage, 0x80000000, 0), zipFileStream.WrittenMemory);
     }
 
-    void UnwireGamepad(IObservableGamepad newGamepad)
+    void UnwireGamepad(IObservableGamepad oldGamepad, bool acquireLock = true)
     {
-        foreach (var gamepadButton in newGamepad.Buttons)
+        if (acquireLock)
+        {
+            using var wiredGamepadsLockHeld = wiredGamepadsLock.Lock();
+            if (!wiredGamepads.Remove(oldGamepad))
+                return;
+        }
+        foreach (var gamepadButton in oldGamepad.Buttons)
             gamepadButton.ButtonUpdated -= HandleGamepadButtonButtonUpdated;
-        foreach (var gamepadThumbstick in newGamepad.Thumbsticks)
+        foreach (var gamepadThumbstick in oldGamepad.Thumbsticks)
             gamepadThumbstick.ThumbstickUpdated -= HandleGamepadThumbstickThumbstickUpdated;
-        foreach (var gamepadTrigger in newGamepad.Triggers)
+        foreach (var gamepadTrigger in oldGamepad.Triggers)
             gamepadTrigger.TriggerUpdated -= HandleGamepadTriggerTriggerUpdated;
     }
 
@@ -1723,6 +1741,12 @@ public partial class ProxyHost :
 
     void WireGamepad(IObservableGamepad newGamepad)
     {
+        using (var wiredGamepadsLockHeld = wiredGamepadsLock.Lock())
+        {
+            if (wiredGamepads.Contains(newGamepad))
+                return;
+            wiredGamepads.Add(newGamepad);
+        }
         foreach (var gamepadButton in newGamepad.Buttons)
             gamepadButton.ButtonUpdated += HandleGamepadButtonButtonUpdated;
         foreach (var gamepadThumbstick in newGamepad.Thumbsticks)

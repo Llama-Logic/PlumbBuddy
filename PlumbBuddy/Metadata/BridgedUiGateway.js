@@ -380,11 +380,13 @@
         #disconnected;
         #index;
         #indexChanged;
+        #name;
         #thumbsticks;
         #triggers;
 
-        constructor(index, buttons, thumbsticks, triggers, receiveChangers) {
+        constructor(index, name, buttons, thumbsticks, triggers, receiveChangers) {
             this.#index = index;
+            this.#name = name;
             const buttonChangers = {};
             this.#buttons = Object.fromEntries(buttons.map(button => {
                 const name = button[0];
@@ -448,6 +450,14 @@
          */
         get indexChanged() {
             return this.#indexChanged;
+        }
+
+        /**
+         * Gets the name of the gamepad as reported by the host operating system
+         * @returns {String}
+         */
+        get name() {
+            return this.#name;
         }
 
         /**
@@ -1034,7 +1044,7 @@
             } else if (message.type === 'gamepadButtonChanged') {
                 gamepadChangers[message.index].buttonChangers[message.name](message.pressed);
             } else if (message.type === 'gamepadConnected') {
-                const gamepad = new Gamepad(message.index, message.buttons, message.thumbsticks, message.triggers, changers => gamepadChangers.splice(message.index, 0, changers));
+                const gamepad = new Gamepad(message.index, message.name, message.buttons, message.thumbsticks, message.triggers, changers => gamepadChangers.splice(message.index, 0, changers));
                 gamepads.splice(message.index, 0, gamepad);
                 for (let i = message.index + 1; i < gamepadChangers.length; ++i) {
                     gamepadChangers[i].indexChanger(i);
@@ -1067,7 +1077,7 @@
                     removedChangers.disconnect();
                 }
                 message.gamepads.forEach(element => {
-                    const gamepad = new Gamepad(gamepads.length, element.buttons, element.thumbsticks, element.triggers, changers => gamepadChangers.push(changers));
+                    const gamepad = new Gamepad(gamepads.length, element.name, element.buttons, element.thumbsticks, element.triggers, changers => gamepadChangers.push(changers));
                     gamepads.push(gamepad);
                     dispatchGamepadConnected(gamepad);
                 });
