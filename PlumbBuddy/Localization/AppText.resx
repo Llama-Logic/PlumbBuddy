@@ -1952,7 +1952,7 @@ Your game is not going to be able to start with this file here. Let's move it to
     <value>Move it to the Downloads folder</value>
   </data>
   <data name="Scan_Corrupt_Found_StopTellingMe_CautionText" xml:space="preserve">
-    <value>I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn't change that. If you don't believe me, just trying launching your game right now. You're in for a rude surprise.</value>
+    <value>I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn't change that. If you don't believe me, just trying launching your game right now. You just might in for a rude surprise.</value>
   </data>
   <data name="Scan_Corrupt_Package_NoneFound_Caption" xml:space="preserve">
     <value>No Packages are Corrupt</value>
@@ -3639,5 +3639,14 @@ Okay, so... you're hilarious. 😏 But, let's be honest, EA is not *this* cool. 
   <data name="CatalogDisplay_SupportCreator_Tip" xml:space="preserve">
     <value>Click here to see how you can show your support for {0} in the creation of {1}.</value>
     <comment>{0} = Creator Name, {1} = Mod Name</comment>
+  </data>
+  <data name="ScansToggler_ScanForWrongGameVersionSC_Label" xml:space="preserve">
+    <value>...a mod file for SimCity (2013)</value>
+  </data>
+  <data name="ScansToggler_ScanForWrongGameVersionTS2_Label" xml:space="preserve">
+    <value>...a mod file for The Sims 2</value>
+  </data>
+  <data name="ScansToggler_ScanForWrongGameVersionTS3_Label" xml:space="preserve">
+    <value>...a mod file for The Sims 3</value>
   </data>
 </root>

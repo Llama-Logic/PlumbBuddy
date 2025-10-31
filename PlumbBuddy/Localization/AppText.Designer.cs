@@ -6384,7 +6384,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn&apos;t change that. If you don&apos;t believe me, just trying launching your game right now. You&apos;re in for a rude surprise..
+        ///   Looks up a localized string similar to I understand that this might be annoying, but this file is *really* no good. And turning this scan off doesn&apos;t change that. If you don&apos;t believe me, just trying launching your game right now. You just might in for a rude surprise..
         /// </summary>
         internal static string Scan_Corrupt_Found_StopTellingMe_CautionText {
             get {
@@ -8283,6 +8283,33 @@ namespace PlumbBuddy.Localization {
         internal static string ScansToggler_ScanForWrongGameVersion_Label {
             get {
                 return ResourceManager.GetString("ScansToggler_ScanForWrongGameVersion_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a mod file for SimCity (2013).
+        /// </summary>
+        internal static string ScansToggler_ScanForWrongGameVersionSC_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForWrongGameVersionSC_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a mod file for The Sims 2.
+        /// </summary>
+        internal static string ScansToggler_ScanForWrongGameVersionTS2_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForWrongGameVersionTS2_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ...a mod file for The Sims 3.
+        /// </summary>
+        internal static string ScansToggler_ScanForWrongGameVersionTS3_Label {
+            get {
+                return ResourceManager.GetString("ScansToggler_ScanForWrongGameVersionTS3_Label", resourceCulture);
             }
         }
         

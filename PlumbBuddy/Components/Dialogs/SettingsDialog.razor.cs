@@ -103,6 +103,12 @@ partial class SettingsDialog
 
     bool ScanForWrongGameVersion { get; set; }
 
+    bool ScanForWrongGameVersionSC { get; set; }
+
+    bool ScanForWrongGameVersionTS2 { get; set; }
+
+    bool ScanForWrongGameVersionTS3 { get; set; }
+
     bool ShowSystemTrayIcon { get; set; }
 
     [Inject]
@@ -225,6 +231,9 @@ partial class SettingsDialog
         ScanForScriptModsDisabled = Settings.ScanForScriptModsDisabled;
         ScanForShowModsListAtStartupEnabled = Settings.ScanForShowModsListAtStartupEnabled;
         ScanForWrongGameVersion = Settings.ScanForWrongGameVersion;
+        ScanForWrongGameVersionSC = Settings.ScanForWrongGameVersionSC;
+        ScanForWrongGameVersionTS2 = Settings.ScanForWrongGameVersionTS2;
+        ScanForWrongGameVersionTS3 = Settings.ScanForWrongGameVersionTS3;
         ShowSystemTrayIcon = Settings.ShowSystemTrayIcon;
         Type = Settings.Type;
     }
@@ -282,6 +291,9 @@ partial class SettingsDialog
         Settings.ScanForScriptModsDisabled = ScanForScriptModsDisabled;
         Settings.ScanForShowModsListAtStartupEnabled = ScanForShowModsListAtStartupEnabled;
         Settings.ScanForWrongGameVersion = ScanForWrongGameVersion;
+        Settings.ScanForWrongGameVersionSC = ScanForWrongGameVersionSC;
+        Settings.ScanForWrongGameVersionTS2 = ScanForWrongGameVersionTS2;
+        Settings.ScanForWrongGameVersionTS3 = ScanForWrongGameVersionTS3;
         Settings.ShowSystemTrayIcon = ShowSystemTrayIcon;
         Settings.Type = Type;
         Settings.UserDataFolderPath = UserDataFolderPath;

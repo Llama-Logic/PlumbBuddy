@@ -1374,9 +1374,8 @@ public partial class SmartSimObserver :
                 initializationChange |= checkScanInitialization(settings.ScanForCacheStaleness, typeof(ICacheStalenessScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMultipleModVersions, typeof(IMultipleModVersionsScan));
                 initializationChange |= checkScanInitialization(settings.ScanForMismatchedInscribedHashes, typeof(IMismatchedInscribedHashesScan));
-                initializationChange |= checkScanInitialization(settings.ScanForWrongGameVersion, typeof(IWrongGameVersionScan));
-                if (initializationChange)
-                    Scan();
+                initializationChange |= checkScanInitialization(settings.ScanForWrongGameVersion || settings.ScanForWrongGameVersionSC || settings.ScanForWrongGameVersionTS2 || settings.ScanForWrongGameVersionTS3, typeof(IWrongGameVersionScan));
+                Scan();
             }
         }
         catch (Exception ex)

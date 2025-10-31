@@ -18,6 +18,9 @@ partial class ScansToggler
         ];
         foundScanLabelByName = new Dictionary<string, string>
         {
+            { nameof(ScanForWrongGameVersionTS2), AppText.ScansToggler_ScanForWrongGameVersionTS2_Label },
+            { nameof(ScanForWrongGameVersionTS3), AppText.ScansToggler_ScanForWrongGameVersionTS3_Label },
+            { nameof(ScanForWrongGameVersionSC), AppText.ScansToggler_ScanForWrongGameVersionSC_Label },
             { nameof(ScanForWrongGameVersion), AppText.ScansToggler_ScanForWrongGameVersion_Label },
             { nameof(ScanForInvalidModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidModSubdirectoryDepth_Label },
             { nameof(ScanForInvalidScriptModSubdirectoryDepth), AppText.ScansToggler_ScanForInvalidScriptModSubdirectoryDepth_Label },
@@ -30,6 +33,9 @@ partial class ScansToggler
         }.ToImmutableDictionary();
         foundScanLabels =
         [
+            foundScanLabelByName[nameof(ScanForWrongGameVersionTS2)],
+            foundScanLabelByName[nameof(ScanForWrongGameVersionTS3)],
+            foundScanLabelByName[nameof(ScanForWrongGameVersionSC)],
             foundScanLabelByName[nameof(ScanForWrongGameVersion)],
             foundScanLabelByName[nameof(ScanForInvalidModSubdirectoryDepth)],
             foundScanLabelByName[nameof(ScanForInvalidScriptModSubdirectoryDepth)],
@@ -199,6 +205,24 @@ partial class ScansToggler
     [Parameter]
     public EventCallback<bool> ScanForWrongGameVersionChanged { get; set; }
 
+    [Parameter]
+    public bool ScanForWrongGameVersionSC { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForWrongGameVersionSCChanged { get; set; }
+
+    [Parameter]
+    public bool ScanForWrongGameVersionTS2 { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForWrongGameVersionTS2Changed { get; set; }
+
+    [Parameter]
+    public bool ScanForWrongGameVersionTS3 { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ScanForWrongGameVersionTS3Changed { get; set; }
+
     IEnumerable<string> SelectedAnalysisScans
     {
         get => GetSelectedScans(analysisScanLabelByName);
@@ -245,6 +269,9 @@ partial class ScansToggler
         ScanForScriptModsDisabled = false;
         ScanForShowModsListAtStartupEnabled = false;
         ScanForWrongGameVersion = false;
+        ScanForWrongGameVersionSC = false;
+        ScanForWrongGameVersionTS2 = false;
+        ScanForWrongGameVersionTS3 = false;
         StateHasChanged();
     }
 
@@ -270,6 +297,9 @@ partial class ScansToggler
         ScanForScriptModsDisabled = true;
         ScanForShowModsListAtStartupEnabled = true;
         ScanForWrongGameVersion = true;
+        ScanForWrongGameVersionSC = true;
+        ScanForWrongGameVersionTS2 = true;
+        ScanForWrongGameVersionTS3 = true;
         StateHasChanged();
     }
 
@@ -304,6 +334,9 @@ partial class ScansToggler
         ScanForScriptModsDisabled = ScanAttribute.Get(typeof(IScriptModSettingScan))?.IsEnabledByDefault ?? false;
         ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
         ScanForWrongGameVersion = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+        ScanForWrongGameVersionSC = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+        ScanForWrongGameVersionTS2 = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+        ScanForWrongGameVersionTS3 = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
         StateHasChanged();
     }
 

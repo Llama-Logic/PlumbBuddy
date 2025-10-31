@@ -43,6 +43,9 @@ public interface ISettings :
     bool ScanForScriptModsDisabled { get; set; }
     bool ScanForShowModsListAtStartupEnabled { get; set; }
     bool ScanForWrongGameVersion { get; set; }
+    bool ScanForWrongGameVersionSC { get; set; }
+    bool ScanForWrongGameVersionTS2 { get; set; }
+    bool ScanForWrongGameVersionTS3 { get; set; }
     bool ShowSystemTrayIcon { get; set; }
     bool ShowThemeManager { get; set; }
     Version? SkipUpdateVersion { get; set; }

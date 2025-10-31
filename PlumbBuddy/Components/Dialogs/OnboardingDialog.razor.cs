@@ -175,6 +175,24 @@ partial class OnboardingDialog
         set => Settings.ScanForWrongGameVersion = value;
     }
 
+    bool ScanForWrongGameVersionSC
+    {
+        get => Settings.ScanForWrongGameVersion;
+        set => Settings.ScanForWrongGameVersion = value;
+    }
+
+    bool ScanForWrongGameVersionTS2
+    {
+        get => Settings.ScanForWrongGameVersion;
+        set => Settings.ScanForWrongGameVersion = value;
+    }
+
+    bool ScanForWrongGameVersionTS3
+    {
+        get => Settings.ScanForWrongGameVersion;
+        set => Settings.ScanForWrongGameVersion = value;
+    }
+
     bool ShowSystemTrayIcon
     {
         get => Settings.ShowSystemTrayIcon;
@@ -315,6 +333,9 @@ partial class OnboardingDialog
                 Settings.ScanForMutuallyExclusiveMods = true;
                 Settings.ScanForShowModsListAtStartupEnabled = false;
                 Settings.ScanForWrongGameVersion = false;
+                Settings.ScanForWrongGameVersionSC = false;
+                Settings.ScanForWrongGameVersionTS2 = false;
+                Settings.ScanForWrongGameVersionTS3 = false;
                 break;
             default:
                 Settings.OfferPatchDayModUpdatesHelp = value is UserType.Casual;
@@ -338,6 +359,9 @@ partial class OnboardingDialog
                 Settings.ScanForMutuallyExclusiveMods = ScanAttribute.Get(typeof(IExclusivityScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForShowModsListAtStartupEnabled = ScanAttribute.Get(typeof(IShowModListStartupSettingScan))?.IsEnabledByDefault ?? false;
                 Settings.ScanForWrongGameVersion = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForWrongGameVersionSC = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForWrongGameVersionTS2 = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
+                Settings.ScanForWrongGameVersionTS3 = ScanAttribute.Get(typeof(IWrongGameVersionScan))?.IsEnabledByDefault ?? false;
                 break;
         }
     }

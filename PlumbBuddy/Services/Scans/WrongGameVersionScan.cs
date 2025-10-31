@@ -89,6 +89,21 @@ public class WrongGameVersionScan :
                 settings.ScanForWrongGameVersion = false;
                 return Task.CompletedTask;
             }
+            if (resolutionCmd is "stopTellingMeSc")
+            {
+                settings.ScanForWrongGameVersionSC = false;
+                return Task.CompletedTask;
+            }
+            if (resolutionCmd is "stopTellingMeTs2")
+            {
+                settings.ScanForWrongGameVersionTS2 = false;
+                return Task.CompletedTask;
+            }
+            if (resolutionCmd is "stopTellingMeTs3")
+            {
+                settings.ScanForWrongGameVersionTS3 = false;
+                return Task.CompletedTask;
+            }
         }
         return Task.CompletedTask;
     }
@@ -102,12 +117,15 @@ public class WrongGameVersionScan :
             .Select(mf => new { ModFile = mf, mf.ModFileHash })
             .AsAsyncEnumerable())
         {
-            anyCheeseSlidOffTheCracker = true;
             var modFile = record.ModFile;
             var modFileHash = record.ModFileHash;
             var file = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Mods", modFile.Path!));
-            if (modFileHash.DataBasePackedFileMajorVersion is 1
-                && modFileHash.DataBasePackedFileMinorVersion is 1)
+            var isTs2 = modFileHash.DataBasePackedFileMajorVersion is 1 && modFileHash.DataBasePackedFileMinorVersion is 1;
+            var isTs3 = modFileHash.DataBasePackedFileMajorVersion is 2 && modFileHash.DataBasePackedFileMinorVersion is 0;
+            var isSc = modFileHash.DataBasePackedFileMajorVersion is 3 && modFileHash.DataBasePackedFileMinorVersion is 0;
+            if (settings.ScanForWrongGameVersionTS2 && isTs2)
+            {
+                anyCheeseSlidOffTheCracker = true;
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
@@ -139,12 +157,14 @@ public class WrongGameVersionScan :
                             Label = AppText.Scan_Common_StopTellingMe_Label,
                             CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
                             CautionText = AppText.Scan_Corrupt_Found_StopTellingMe_CautionText,
-                            Data = "stopTellingMe"
+                            Data = "stopTellingMeTs2"
                         }
                     ]
                 };
-            else if (modFileHash.DataBasePackedFileMajorVersion is 2
-                && modFileHash.DataBasePackedFileMinorVersion is 0)
+            }
+            else if (settings.ScanForWrongGameVersionTS3 && isTs3)
+            {
+                anyCheeseSlidOffTheCracker = true;
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
@@ -176,12 +196,14 @@ public class WrongGameVersionScan :
                             Label = AppText.Scan_Common_StopTellingMe_Label,
                             CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
                             CautionText = AppText.Scan_Corrupt_Found_StopTellingMe_CautionText,
-                            Data = "stopTellingMe"
+                            Data = "stopTellingMeTs3"
                         }
                     ]
                 };
-            else if (modFileHash.DataBasePackedFileMajorVersion is 3
-                && modFileHash.DataBasePackedFileMinorVersion is 0)
+            }
+            else if (settings.ScanForWrongGameVersionSC && isSc)
+            {
+                anyCheeseSlidOffTheCracker = true;
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
@@ -213,11 +235,14 @@ public class WrongGameVersionScan :
                             Label = AppText.Scan_Common_StopTellingMe_Label,
                             CautionCaption = AppText.Scan_Common_StopTellingMe_CautionCaption,
                             CautionText = AppText.Scan_Corrupt_Found_StopTellingMe_CautionText,
-                            Data = "stopTellingMe"
+                            Data = "stopTellingMeSc"
                         }
                     ]
                 };
-            else
+            }
+            else if (settings.ScanForWrongGameVersion && !(isTs2 || isTs3 || isSc))
+            {
+                anyCheeseSlidOffTheCracker = true;
                 yield return new()
                 {
                     Icon = MaterialDesignIcons.Normal.PackageVariantRemove,
@@ -253,6 +278,7 @@ public class WrongGameVersionScan :
                         }
                     ]
                 };
+            }
         }
         if (!anyCheeseSlidOffTheCracker)
             yield return new()

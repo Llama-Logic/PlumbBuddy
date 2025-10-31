@@ -501,6 +501,42 @@ class Settings :
         }
     }
 
+    public bool ScanForWrongGameVersionSC
+    {
+        get => preferences.Get(nameof(ScanForWrongGameVersionSC), true);
+        set
+        {
+            if (ScanForWrongGameVersionSC == value)
+                return;
+            preferences.Set(nameof(ScanForWrongGameVersionSC), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ScanForWrongGameVersionTS2
+    {
+        get => preferences.Get(nameof(ScanForWrongGameVersionTS2), true);
+        set
+        {
+            if (ScanForWrongGameVersionTS2 == value)
+                return;
+            preferences.Set(nameof(ScanForWrongGameVersionTS2), value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ScanForWrongGameVersionTS3
+    {
+        get => preferences.Get(nameof(ScanForWrongGameVersionTS3), true);
+        set
+        {
+            if (ScanForWrongGameVersionTS3 == value)
+                return;
+            preferences.Set(nameof(ScanForWrongGameVersionTS3), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ShowSystemTrayIcon
     {
         get => preferences.Get(nameof(ShowSystemTrayIcon), false);
