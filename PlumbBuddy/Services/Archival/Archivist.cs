@@ -1,4 +1,3 @@
-using System.Threading;
 using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services.Archival;
@@ -454,7 +453,7 @@ public partial class Archivist :
                         var content =
                               explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
                             ? await package.GetRawAsync(key).ConfigureAwait(false)
-                            : await package.GetAsync(key).ConfigureAwait(false);
+                            : await package.GetAsync(key, true).ConfigureAwait(false);
                         var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
                         var compressionType = explicitCompressionMode switch
                         {
@@ -469,7 +468,7 @@ public partial class Archivist :
                         {
                             try
                             {
-                                var png = await package.GetTranslucentJpegAsPngAsync(key).ConfigureAwait(false);
+                                var png = await package.GetTranslucentJpegAsPngAsync(key, true).ConfigureAwait(false);
                                 newSnapshot.Thumbnail = MemoryMarshal.TryGetArray(png, out var segment) && segment.Array is { } array
                                     ? array
                                     : png.ToArray();

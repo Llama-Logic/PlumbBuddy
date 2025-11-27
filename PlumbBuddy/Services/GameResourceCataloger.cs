@@ -59,7 +59,15 @@ public partial class GameResourceCataloger :
         if (resourceFileTypeByResourceType.TryGetValue(key.Type, out var resourceFileType)
             && resourceFileType is ResourceFileType.DirectDrawSurfaceAsPortableNetworkGraphic)
             key = new(ResourceType.DSTImage, key.Group, key.FullInstance);
-        return await DirectDrawSurface.GetPngDataFromDiffuseSurfaceTextureDataAsync(await GetRawResourceAsync(key).ConfigureAwait(false)).ConfigureAwait(false);
+        try
+        {
+            return await DirectDrawSurface.GetPngDataFromDiffuseSurfaceTextureDataAsync(await GetRawResourceAsync(key).ConfigureAwait(false)).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "caller attempted to retrieve DST {Key}, which could not be found -OR- could not be transcoded to PNG", key);
+            return ReadOnlyMemory<byte>.Empty;
+        }
     }
 
     public async Task<IReadOnlyList<(byte locale, uint locKey, string value)>> GetLocalizedStringsAsync(IEnumerable<uint> locKeys, IEnumerable<byte> locales)

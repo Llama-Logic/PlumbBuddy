@@ -1,7 +1,6 @@
-using Microsoft.Maui.Controls;
-
 namespace PlumbBuddy.Components.Dialogs;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class PackSelectorDialog
 {
     static readonly Dictionary<string, string> cachedBase64PackIcons = [];
@@ -99,7 +98,7 @@ partial class PackSelectorDialog
     {
         isApplying = true;
         StateHasChanged();
-        if (await SmartSimObserver.CheckIfGameIsRunningAsync().ConfigureAwait(false))
+        if (await SmartSimObserver.CheckIfGameIsRunningAsync())
         {
             isApplying = false;
             StateHasChanged();
@@ -186,6 +185,7 @@ partial class PackSelectorDialog
     void ReloadPackGroups() =>
         _ = StaticDispatcher.DispatchAsync(ReloadPackGroupsAsync);
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ReloadPackGroupsAsync()
     {
         PackGroups.Clear();

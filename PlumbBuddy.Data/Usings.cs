@@ -1,11 +1,9 @@
 global using LlamaLogic.Packages;
 global using LlamaLogic.Packages.Models.ModFileManifest;
-global using Microsoft.Data.Sqlite;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Design;
 global using Microsoft.EntityFrameworkCore.Diagnostics;
 global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-global using System.Collections.Immutable;
 global using System.Collections.ObjectModel;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;

@@ -1,5 +1,6 @@
 namespace PlumbBuddy.Services;
 
+[SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
 public class PersonalNotes :
     IPersonalNotes
 {
