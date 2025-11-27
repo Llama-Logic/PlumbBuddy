@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\Common\AppProject.props" />
+
+    <PropertyGroup>
+        <AssemblyName>pb</AssemblyName>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <OutputType>Exe</OutputType>
+        <PublishSingleFile>true</PublishSingleFile>
+        <TargetFramework>net8.0</TargetFramework>
+        <Version>1.8.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="LlamaLogic.Packages" Version="3.6.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-rc.2.25502.107" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.Extensions.DependencyInjection" />
+        <Using Include="System.CommandLine" />
+        <Using Include="System.CommandLine.Parsing" />
+        <Using Include="System.Runtime.InteropServices" />
+    </ItemGroup>
+
+</Project>

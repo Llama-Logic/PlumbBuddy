@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlumbBuddy", "PlumbBuddy\Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlumbBuddy.Data.Chronicle", "PlumbBuddy.Data.Chronicle\PlumbBuddy.Data.Chronicle.csproj", "{D05F55CA-5A8A-4BA1-A266-6A14329576AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlumbBuddy.Terminal", "PlumbBuddy.Terminal\PlumbBuddy.Terminal.csproj", "{9A0C0A41-5725-4799-9C38-68067B97AF23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlumbBuddy.Logic", "PlumbBuddy.Logic\PlumbBuddy.Logic.csproj", "{4276BC6C-AEAA-49B9-91DC-DFC73F67E6BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{D05F55CA-5A8A-4BA1-A266-6A14329576AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D05F55CA-5A8A-4BA1-A266-6A14329576AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D05F55CA-5A8A-4BA1-A266-6A14329576AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A0C0A41-5725-4799-9C38-68067B97AF23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0C0A41-5725-4799-9C38-68067B97AF23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0C0A41-5725-4799-9C38-68067B97AF23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0C0A41-5725-4799-9C38-68067B97AF23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4276BC6C-AEAA-49B9-91DC-DFC73F67E6BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4276BC6C-AEAA-49B9-91DC-DFC73F67E6BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4276BC6C-AEAA-49B9-91DC-DFC73F67E6BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4276BC6C-AEAA-49B9-91DC-DFC73F67E6BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
