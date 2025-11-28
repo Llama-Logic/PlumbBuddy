@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services.Archival;
+namespace PlumbBuddy.Services.Protobuf;
 
 [ProtoContract]
-public sealed class ArchivistSaveSlotData :
+public sealed class SaveSlotData :
     IExtensible
 {
     IExtension? extensionData;
@@ -15,7 +15,7 @@ public sealed class ArchivistSaveSlotData :
     public ulong ActiveHouseholdId { get; set; }
 
     [ProtoMember(8, Name = "gameplay_data")]
-    public ArchivistGameplaySaveSlotData? GameplayData { get; set; }
+    public GameplaySaveSlotData? GameplayData { get; set; }
 
     [ProtoMember(1, Name = "slot_id", DataFormat = DataFormat.FixedSize)]
     public ulong SlotId { get; set; }

@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services.Archival;
+namespace PlumbBuddy.Services.Protobuf;
 
 [ProtoContract]
-public sealed class ArchivistSaveGameData :
+public sealed class SaveGameData :
     IExtensible
 {
     IExtension? extensionData;
@@ -12,20 +12,24 @@ public sealed class ArchivistSaveGameData :
         Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 
     [ProtoMember(2, Name = "save_slot")]
-    public ArchivistSaveSlotData? SaveSlot { get; set; }
+    public SaveSlotData? SaveSlot { get; set; }
 
     [ProtoMember(3, Name = "account")]
-    public ArchivistAccountData? Account { get; set; }
+    public AccountData? Account { get; set; }
 
     [ProtoMember(4, Name = "neighborhoods")]
     [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
-    public List<ArchivistNeighborhoodData> Neighborhoods { get; } = [];
+    public List<NeighborhoodData> Neighborhoods { get; } = [];
 
     [ProtoMember(5, Name = "households")]
     [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
-    public List<ArchivistHouseholdData> Households { get; } = [];
+    public List<HouseholdData> Households { get; } = [];
+
+    [ProtoMember(6, Name = @"sims")]
+    [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
+    public List<SimData> Sims { get; } = [];
 
     [ProtoMember(7, Name = "zones")]
     [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
-    public List<ArchivistZoneData> Zones { get; } = [];
+    public List<ZoneData> Zones { get; } = [];
 }

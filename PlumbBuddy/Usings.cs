@@ -52,6 +52,7 @@ global using PlumbBuddy.Models;
 global using PlumbBuddy.Services;
 global using PlumbBuddy.Services.Archival;
 global using PlumbBuddy.Services.Input;
+global using PlumbBuddy.Services.Protobuf;
 global using PlumbBuddy.Services.Scans;
 global using PlumbBuddy.Services.Scans.Corrupt;
 global using PlumbBuddy.Services.Scans.Depth;

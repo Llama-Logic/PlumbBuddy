@@ -1,9 +1,9 @@
 using ProtoBuf;
 
-namespace PlumbBuddy.Services.Archival;
+namespace PlumbBuddy.Services.Protobuf;
 
 [ProtoContract]
-public sealed class ArchivistGameplaySaveSlotData :
+public sealed class GameplaySaveSlotData :
     IExtensible
 {
     IExtension? extensionData;
@@ -13,7 +13,7 @@ public sealed class ArchivistGameplaySaveSlotData :
         Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 
     [ProtoMember(3, Name = "camera_data")]
-    public ArchivistGameplayCameraData? CameraData { get; set; }
+    public GameplayCameraData? CameraData { get; set; }
 
     [ProtoMember(1, Name = "world_game_time")]
     public ulong WorldGameTime
@@ -27,4 +27,7 @@ public sealed class ArchivistGameplaySaveSlotData :
 
     public void ResetWorldGameTime() =>
         worldGameTime = null;
+
+    [ProtoMember(13, Name = @"relationship_service")]
+    public PersistableRelationshipService? RelationshipService { get; set; }
 }

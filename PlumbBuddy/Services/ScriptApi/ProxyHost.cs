@@ -1,3 +1,4 @@
+using PlumbBuddy.Services.Protobuf;
 using SQLitePCL;
 using Serializer = ProtoBuf.Serializer;
 
@@ -471,9 +472,10 @@ public partial class ProxyHost :
         }
     }
 
-    public Task ForegroundPlumbBuddyAsync() =>
+    public Task ForegroundPlumbBuddyAsync(bool pauseGame = false) =>
         SendMessageToProxyAsync(new ForegroundPlumbBuddyMessage
         {
+            PauseGame = pauseGame,
             Type = nameof(HostMessageType.ForegroundPlumbbuddy).Underscore().ToLowerInvariant()
         });
 
@@ -717,7 +719,7 @@ public partial class ProxyHost :
                     if (saveGameDataKeys.Length is <= 0 or >= 2)
                         return;
                     var saveGameDataKey = saveGameDataKeys[0];
-                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                    var saveGameData = Serializer.Deserialize<SaveGameData>(await savePackage.GetAsync(saveGameDataKey).ConfigureAwait(false));
                     if (saveGameData is null
                         || saveGameData.Account is not { } account
                         || account.NucleusId != saveNucleusId
@@ -1310,7 +1312,7 @@ public partial class ProxyHost :
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
                     continue;
                 var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
+                var saveGameData = Serializer.Deserialize<SaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
                 if (saveGameData is null)
                     continue;
                 if (saveGameData.Account is not { } account
@@ -1371,7 +1373,7 @@ public partial class ProxyHost :
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
                     continue;
                 var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
+                var saveGameData = Serializer.Deserialize<SaveGameData>(await savePackage.GetAsync(saveGameDataKey, cancellationToken: cancellationToken).ConfigureAwait(false));
                 if (saveGameData is null)
                     continue;
                 if (saveGameData.Account is not { } account

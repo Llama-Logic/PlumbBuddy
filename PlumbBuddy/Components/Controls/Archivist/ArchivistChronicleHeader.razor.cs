@@ -2,6 +2,20 @@ namespace PlumbBuddy.Components.Controls.Archivist;
 
 partial class ArchivistChronicleHeader
 {
+    public static string GetDefectTypeIcon(SavePackageSnapshotDefectType type) =>
+        type switch
+        {
+            SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship => MaterialDesignIcons.Normal.FamilyTree,
+            _ => string.Empty
+        };
+
+    public static string GetDefectTypeLabel(SavePackageSnapshotDefectType type) =>
+        type switch
+        {
+            SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship => AppText.Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Label,
+            _ => throw new NotSupportedException($"unsupported type {type}")
+        };
+
     bool isEditingChronicle;
 
     [Parameter]

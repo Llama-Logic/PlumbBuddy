@@ -5,7 +5,7 @@ from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
 from plumbbuddy_proxy import logger
 import os
-from clock import ServerClock
+from clock import ClockSpeedMode, ServerClock
 from datetime import timedelta
 import services
 import subprocess
@@ -838,6 +838,11 @@ class Gateway:
             return
         if message_type == 'foreground_plumbbuddy':
             _try_to_foreground_plumbbuddy()
+            if message['pause_game']:
+                try:
+                    services.game_clock_service().set_clock_speed(ClockSpeedMode.PAUSED)
+                except:
+                    pass
             return
         if message_type == 'gamepad_button_changed':
             gamepad = self.get_gamepad(message['index'])

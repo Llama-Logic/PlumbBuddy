@@ -14,9 +14,11 @@ public class ChronicleDbContext :
     }
 
     public DbSet<ChroniclePropertySet> ChroniclePropertySets { get; set; }
+    public DbSet<DisabledSavePackageSnapshotDefectType> DisabledSavePackageSnapshotDefectTypes { get; set; }
     public DbSet<KnownSavePackageHash> KnownSavePackageHashes { get; set; }
     public DbSet<ResourceSnapshotDelta> ResourceSnapshotDeltas { get; set; }
     public DbSet<SavePackageResource> SavePackageResources { get; set; }
+    public DbSet<SavePackageSnapshotDefect> SavePackageSnapshotDefects { get; set; }
     public DbSet<SavePackageSnapshot> SavePackageSnapshots { get; set; }
     public DbSet<SnapshotModFile> SnapshotModFiles { get; set; }
 

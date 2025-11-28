@@ -25,6 +25,12 @@
 	</MudTd>
 	<MudTd>
 		<MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Spacing="1">
+            @if (Observed(() => snapshot.SnapshotDefects)?.Any() ?? false)
+            {
+                <MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_DefectsPresent_Tip)" Color="Color.Warning">
+				    <MudToggleIconButton @bind-Toggled="@(Binding(() => snapshot.ShowDetails).Value)" Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.ContentSaveAlert" Size="Size.Small" />
+			    </MudTooltip>
+            }
 			@if (snapshot.WasLive)
 			{
 				<MudTooltip Arrow Text="@(AppText.Archivist_Snapshot_Tag_Live_Tip)">

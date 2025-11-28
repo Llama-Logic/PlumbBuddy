@@ -24,6 +24,8 @@ public class SavePackageSnapshot
 
     public ICollection<SnapshotModFile> ModFiles { get; } = [];
 
+    public ICollection<SavePackageSnapshotDefect> Defects { get; } = [];
+
     [Required]
     public string Label { get; set; } = string.Empty;
 

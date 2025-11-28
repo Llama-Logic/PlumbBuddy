@@ -3649,4 +3649,32 @@ Okay, so... you're hilarious. 😏 But, let's be honest, EA is not *this* cool. 
   <data name="ScansToggler_ScanForWrongGameVersionTS3_Label" xml:space="preserve">
     <value>...a mod file for The Sims 3</value>
   </data>
+  <data name="Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description" xml:space="preserve">
+    <value>The following sims in this snapshot are considered siblings *and* have a romantic relationship track.
+
+&gt; {0} {1}&lt;br /&gt; {2}&lt;br /&gt; {3}, {4}
+
+&gt; {5} {6}&lt;br /&gt; {7}&lt;br /&gt; {8}, {9}
+
+EA has publicly asked for help in fixing a game bug in which this can happen accidentally. If you didn't cause this intentionally, please consider [contacting us on Discord](http://discord.gg/XKbMEEfRde). We can help you verify that you experienced the bug for which EA is looking and coordinate getting your save to them to examine and potentially fix the bug! *Serious* community street cred could be available, if you're interested. 😏 Or, if you'd like to remain anonymous, that's fine. You'll still get the pride of knowing you provided crucial information to solve a problem in tons of peoples' games. 💖</value>
+    <comment>{0} = Sim A First Name; {1} = Sim A Last Name; {2} = Sim A Household Name; {3} = Sim A Home Zone; {4} Sim A Home Neighborhood; {5} = Sim B First Name; {6} = Sim B Last Name; {7} = Sim B Household Name; {8} = Sim B Home Zone; {9} = Sim B Home Neighborhood</comment>
+  </data>
+  <data name="Archivist_SnapshotDefect_Snack" xml:space="preserve">
+    <value>Sorry to interrupt, but while archiving the save which just appeared, I found something wrong with it.  I'd like to show it to you right now. This could be important. Please click this warning.</value>
+  </data>
+  <data name="Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Label" xml:space="preserve">
+    <value>Siblings with Romantic Relationship</value>
+  </data>
+  <data name="Archivist_Snapshot_DefectsPresent_Tip" xml:space="preserve">
+    <value>I've found some problems with this snapshot. Click here to learn more.</value>
+  </data>
+  <data name="Archivist_Chronicle_WatchedSnapshotDefects_Label" xml:space="preserve">
+    <value>Watch for Save Defects</value>
+  </data>
+  <data name="Archivist_Chronicle_WatchedSnapshotDefects_HelperText" xml:space="preserve">
+    <value>You can toggle watching for certain defects on or off specifically for this chronicle. This can be useful if you've triggered any of them purposefully.</value>
+  </data>
+  <data name="Archivist_Disabled_Snack" xml:space="preserve">
+    <value>Archivist could be checking your saves for known defects and helping with them, but it's currently disabled. Click here to open Archivist.</value>
+  </data>
 </root>

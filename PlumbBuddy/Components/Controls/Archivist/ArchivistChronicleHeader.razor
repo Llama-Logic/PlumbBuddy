@@ -53,6 +53,14 @@
 						</MudStack>
 					</MudStack>
 				</MudField>
+                <MudField Adornment="Adornment.Start" AdornmentIcon="@MaterialDesignIcons.Normal.ContentSaveAlert" HelperText="@(AppText.Archivist_Chronicle_WatchedSnapshotDefects_HelperText)" Label="@(AppText.Archivist_Chronicle_WatchedSnapshotDefects_Label)">
+                    <MudChipSet @bind-SelectedValues="@Binding(() => chronicle.WatchedSnapshotDefects).Value" Color="Color.Dark" IconColor="Color.Warning" SelectedColor="Color.Secondary" SelectionMode="SelectionMode.MultiSelection" Variant="Variant.Filled">
+                        @foreach (var defectType in Enum.GetValues<SavePackageSnapshotDefectType>().Except([SavePackageSnapshotDefectType.None]).OrderBy(d => GetDefectTypeLabel(d)))
+                        {
+                            <MudChip Icon="@GetDefectTypeIcon(defectType)" Text="@GetDefectTypeLabel(defectType)" Value="@defectType" />
+                        }
+                    </MudChipSet>
+                </MudField>
 			}
 			else
 			{
