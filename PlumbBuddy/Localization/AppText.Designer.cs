@@ -340,7 +340,7 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Archivist could be checking your saves for known defects and helping with them, but it&apos;s currently disabled. Click here to open Archivist..
+        ///   Looks up a localized string similar to Archivist could be checking your saves for known defects and helping with them, but it&apos;s currently disabled or not automatically taking snapshots. Click here to open Archivist..
         /// </summary>
         internal static string Archivist_Disabled_Snack {
             get {
@@ -690,11 +690,11 @@ namespace PlumbBuddy.Localization {
         /// <summary>
         ///   Looks up a localized string similar to The following sims in this snapshot are considered siblings *and* have a romantic relationship track.
         ///
-        ///&gt; {0} {1}&lt;br /&gt; {2}&lt;br /&gt; {3}, {4}
+        ///&gt; {0} {1} ({2})&lt;br /&gt; {3}&lt;br /&gt; {4}, {5}
         ///
-        ///&gt; {5} {6}&lt;br /&gt; {7}&lt;br /&gt; {8}, {9}
+        ///&gt; {6} {7} ({8})&lt;br /&gt; {9}&lt;br /&gt; {10}, {11}
         ///
-        ///EA has publicly asked for help in fixing a game bug in which this can happen accidentally. If you didn&apos;t cause this intentionally, please consider [contacting us on Discord](http://discord.gg/XKbMEEfRde). We can help you verify that you experienced the bug for which EA is looking and coordinate getting your save to them to examin [rest of string was truncated]&quot;;.
+        ///EA has publicly asked for help in fixing a game bug in which this can happen accidentally. If you didn&apos;t cause this intentionally, please consider [contacting us on Discord](http://discord.gg/XKbMEEfRde). We can help you verify that you experienced the bug for which EA is looking and coordinate getting your save to  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description {
             get {

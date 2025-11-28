@@ -50,12 +50,7 @@ public partial class Archivist :
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         if (this.settings.ArchivistEnabled)
             ConnectToFolders();
-        else
-            this.superSnacks.OfferRefreshments(new MarkupString(AppText.Archivist_Disabled_Snack), Severity.Info, options =>
-            {
-                options.Icon = MaterialDesignIcons.Normal.ContentSaveCheck;
-                options.OnClick = async _ => this.userInterfaceMessaging.ShowArchivist();
-            });
+        WarnIfDisabled();
     }
 
     ~Archivist() =>
@@ -320,6 +315,8 @@ public partial class Archivist :
             else
                 DisconnectFromFolders();
         }
+        else if (e.PropertyName is nameof(ISettings.Onboarded))
+            WarnIfDisabled();
         else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
         {
             if (settings.ArchivistEnabled)
@@ -443,84 +440,76 @@ public partial class Archivist :
                 Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
                 OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false)
             };
-            var lazyIndexedRelationships = new Lazy<ImmutableDictionary<RelationshipKey, PersistableServiceRelationship>>
-            (
-                () =>
-                    saveSlot.GameplayData is { } gameplayData
-                    && gameplayData.RelationshipService is { } relationshipService
-                    && relationshipService.Relationships is { Count: > 0 } relationships
-                    ? relationships.ToImmutableDictionary(r => new RelationshipKey(r.SimIdA, r.SimIdB))
-                    : ImmutableDictionary<RelationshipKey, PersistableServiceRelationship>.Empty
-            );
-            var disabledSavePackageSnapshotDefectTypes = (await chronicleDbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).ToImmutableHashSet();
-            if (!disabledSavePackageSnapshotDefectTypes.Contains(SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship))
+            DiagnosticStatus = $"{fileInfo.Name} / Indexing Relationships";
+            var indexedRelationships = saveSlot.GameplayData is { } gameplayData
+                && gameplayData.RelationshipService is { } relationshipService
+                && relationshipService.Relationships is { Count: > 0 } relationships
+                ? relationships.ToImmutableDictionary(r => new RelationshipKey(r.SimIdA, r.SimIdB))
+                : ImmutableDictionary<RelationshipKey, PersistableServiceRelationship>.Empty;
+            DiagnosticStatus = $"{fileInfo.Name} / Checking for Siblings With Romantic Relationships";
+            var sims = saveGameData.Sims.ToImmutableDictionary(sd => sd.SimId);
+            var households = saveGameData.Households.ToImmutableDictionary(hd => hd.HouseholdId);
+            var zones = saveGameData.Zones.ToImmutableDictionary(zd => zd.ZoneId);
+            var neighborhoods = saveGameData.Neighborhoods.ToImmutableDictionary(nd => nd.NeighborhoodId);
+            foreach (var (mom, children) in saveGameData.Sims
+                .SelectMany
+                (
+                    sd => sd.Attributes
+                        ?.GenealogyTracker
+                        ?.FamilyRelations
+                        .Where(fr => fr.RelationType is RelationshipIndex.RelationshipMother)
+                        .Select(fr => (mother: fr.SimId, child: sd.SimId))
+                        ?? Enumerable.Empty<(ulong mother, ulong child)>()
+                )
+                .GroupBy(motherhood => motherhood.mother)
+                .Where(g => g.Count() > 1)
+                .Select(g => (mom: g.Key, children: g.Select(motherhood => motherhood.child).ToImmutableArray())))
             {
-                if (lazyIndexedRelationships.Value is { Count: > 0 } indexedRelationships)
-                {
-                    DiagnosticStatus = $"{fileInfo.Name} / Checking for Siblings With Romantic Relationships";
-                    var sims = saveGameData.Sims.ToImmutableDictionary(sd => sd.SimId);
-                    var households = saveGameData.Households.ToImmutableDictionary(hd => hd.HouseholdId);
-                    var zones = saveGameData.Zones.ToImmutableDictionary(zd => zd.ZoneId);
-                    var neighborhoods = saveGameData.Neighborhoods.ToImmutableDictionary(nd => nd.NeighborhoodId);
-                    foreach (var (mom, children) in saveGameData.Sims
-                        .SelectMany
-                        (
-                            sd => sd.Attributes
-                                ?.GenealogyTracker
-                                ?.FamilyRelations
-                                .Where(fr => fr.RelationType is RelationshipIndex.RelationshipMother)
-                                .Select(fr => (mother: fr.SimId, child: sd.SimId))
-                                ?? Enumerable.Empty<(ulong mother, ulong child)>()
-                        )
-                        .GroupBy(motherhood => motherhood.mother)
-                        .Where(g => g.Count() > 1)
-                        .Select(g => (mom: g.Key, children: g.Select(motherhood => motherhood.child).ToImmutableArray())))
+                for (var siblingAIndex = 0; siblingAIndex < children.Length - 1; ++siblingAIndex)
+                    for (var siblingBIndex = siblingAIndex + 1; siblingBIndex < children.Length; ++siblingBIndex)
                     {
-                        for (var siblingAIndex = 0; siblingAIndex < children.Length - 1; ++siblingAIndex)
-                            for (var siblingBIndex = siblingAIndex + 1; siblingBIndex < children.Length; ++siblingBIndex)
-                            {
-                                var siblingAId = children[siblingAIndex];
-                                var siblingBId = children[siblingBIndex];
-                                if (indexedRelationships.TryGetValue(new RelationshipKey(siblingAId, siblingBId), out var relationship)
-                                    && relationship.BidirectionalRelationshipData is { } bidirectional
-                                    && bidirectional.Tracks.Any(t => t.TrackId is 0x410B))
-                                {
-                                    var siblingA = sims.TryGetValue(siblingAId, out var siblingAValue) ? siblingAValue : null;
-                                    var siblingAHousehold = households.TryGetValue(siblingA?.HouseholdId ?? 0, out var siblingAHouseholdValue) ? siblingAHouseholdValue : null;
-                                    var siblingAHomeZone = zones.TryGetValue(siblingAHousehold?.HomeZone ?? 0, out var siblingAHomeZoneValue) ? siblingAHomeZoneValue : null;
-                                    var siblingAHomeNeighborhood = neighborhoods.TryGetValue(siblingAHomeZone?.NeighborhoodId ?? 0, out var siblingAHomeNeighborhoodValue) ? siblingAHomeNeighborhoodValue : null;
-                                    var siblingB = sims.TryGetValue(siblingBId, out var siblingBValue) ? siblingBValue : null;
-                                    var siblingBHousehold = households.TryGetValue(siblingB?.HouseholdId ?? 0, out var siblingBHouseholdValue) ? siblingBHouseholdValue : null;
-                                    var siblingBHomeZone = zones.TryGetValue(siblingBHousehold?.HomeZone ?? 0, out var siblingBHomeZoneValue) ? siblingBHomeZoneValue : null;
-                                    var siblingBHomeNeighborhood = neighborhoods.TryGetValue(siblingBHomeZone?.NeighborhoodId ?? 0, out var siblingBHomeNeighborhoodValue) ? siblingBHomeNeighborhoodValue : null;
-                                    newSnapshot.Defects.Add
+                        var siblingAId = children[siblingAIndex];
+                        var siblingBId = children[siblingBIndex];
+                        if (indexedRelationships.TryGetValue(new RelationshipKey(siblingAId, siblingBId), out var relationship)
+                            && relationship.BidirectionalRelationshipData is { } bidirectional
+                            && bidirectional.Tracks.Any(t => t.TrackId is 0x410B))
+                        {
+                            var siblingA = sims.TryGetValue(siblingAId, out var siblingAValue) ? siblingAValue : null;
+                            var siblingAHousehold = households.TryGetValue(siblingA?.HouseholdId ?? 0, out var siblingAHouseholdValue) ? siblingAHouseholdValue : null;
+                            var siblingAHomeZone = zones.TryGetValue(siblingAHousehold?.HomeZone ?? 0, out var siblingAHomeZoneValue) ? siblingAHomeZoneValue : null;
+                            var siblingAHomeNeighborhood = neighborhoods.TryGetValue(siblingAHomeZone?.NeighborhoodId ?? 0, out var siblingAHomeNeighborhoodValue) ? siblingAHomeNeighborhoodValue : null;
+                            var siblingB = sims.TryGetValue(siblingBId, out var siblingBValue) ? siblingBValue : null;
+                            var siblingBHousehold = households.TryGetValue(siblingB?.HouseholdId ?? 0, out var siblingBHouseholdValue) ? siblingBHouseholdValue : null;
+                            var siblingBHomeZone = zones.TryGetValue(siblingBHousehold?.HomeZone ?? 0, out var siblingBHomeZoneValue) ? siblingBHomeZoneValue : null;
+                            var siblingBHomeNeighborhood = neighborhoods.TryGetValue(siblingBHomeZone?.NeighborhoodId ?? 0, out var siblingBHomeNeighborhoodValue) ? siblingBHomeNeighborhoodValue : null;
+                            newSnapshot.Defects.Add
+                            (
+                                new
+                                (
+                                    newSnapshot,
+                                    string.Format
                                     (
-                                        new
-                                        (
-                                            newSnapshot,
-                                            string.Format
-                                            (
-                                                AppText.Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description,
-                                                siblingA?.FirstName ?? "?",
-                                                siblingA?.LastName ?? "?",
-                                                siblingAHousehold?.Name ?? "?",
-                                                siblingAHomeZone?.Name ?? "?",
-                                                siblingAHomeNeighborhood?.Name ?? "?",
-                                                siblingB?.FirstName ?? "?",
-                                                siblingB?.LastName ?? "?",
-                                                siblingBHousehold?.Name ?? "?",
-                                                siblingBHomeZone?.Name ?? "?",
-                                                siblingBHomeNeighborhood?.Name ?? "?"
-                                            )
-                                        )
-                                        {
-                                            SavePackageSnapshotDefectType = SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship
-                                        }
-                                    );
+                                        AppText.Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description,
+                                        siblingA?.FirstName ?? "?",
+                                        siblingA?.LastName ?? "?",
+                                        siblingAId,
+                                        siblingAHousehold?.Name ?? "?",
+                                        siblingAHomeZone?.Name ?? "?",
+                                        siblingAHomeNeighborhood?.Name ?? "?",
+                                        siblingB?.FirstName ?? "?",
+                                        siblingB?.LastName ?? "?",
+                                        siblingBId,
+                                        siblingBHousehold?.Name ?? "?",
+                                        siblingBHomeZone?.Name ?? "?",
+                                        siblingBHomeNeighborhood?.Name ?? "?"
+                                    )
+                                )
+                                {
+                                    SavePackageSnapshotDefectType = SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship
                                 }
-                            }
+                            );
+                        }
                     }
-                }
             }
             var contextLock = new AsyncLock();
             using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
@@ -711,9 +700,9 @@ public partial class Archivist :
                 await chronicle.ReloadScalarsAsync().ConfigureAwait(false);
                 viewSnapshot = await chronicle.LoadSnapshotAsync(newSnapshot).ConfigureAwait(false);
             }
-            var disabled = (await chronicleDbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).ToImmutableHashSet();
+            var disabledSavePackageSnapshotDefectTypes = (await chronicleDbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).ToImmutableHashSet();
             if (newSnapshot is not null
-                && newSnapshot.Defects.Any(d => !disabled.Contains(d.SavePackageSnapshotDefectType)))
+                && newSnapshot.Defects.Any(d => !disabledSavePackageSnapshotDefectTypes.Contains(d.SavePackageSnapshotDefectType)))
             {
                 superSnacks.OfferRefreshments(new MarkupString(AppText.Archivist_SnapshotDefect_Snack), Severity.Warning, options =>
                 {
@@ -975,5 +964,21 @@ public partial class Archivist :
         );
         if (!appLifecycleManager.IsVisible)
             await platformFunctions.SendLocalNotificationAsync(AppText.Archivist_Notification_CannotConnectToArchivesFolder_Caption, AppText.Archivist_Notification_CannotConnectToArchivesFolder_Test).ConfigureAwait(false);
+    }
+
+    void WarnIfDisabled() =>
+        _ = Task.Run(WarnIfDisabledAsync);
+
+    async Task WarnIfDisabledAsync()
+    {
+        if (!settings.Onboarded || settings.ArchivistEnabled && settings.ArchivistAutoIngestSaves)
+            return;
+        await Task.Delay(500).ConfigureAwait(false);
+        await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+        superSnacks.OfferRefreshments(new MarkupString(AppText.Archivist_Disabled_Snack), Severity.Info, options =>
+        {
+            options.Icon = MaterialDesignIcons.Normal.ContentSaveCheck;
+            options.OnClick = async _ => userInterfaceMessaging.ShowArchivist();
+        });
     }
 }
