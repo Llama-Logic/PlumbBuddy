@@ -17,6 +17,8 @@ partial class ArchivistChronicleHeader
         };
 
     bool isEditingChronicle;
+    readonly CollectionObserver collectionObserver = new();
+    IObservableCollectionQuery<Snapshot>? snapshots;
 
     [Parameter]
     public Chronicle? Chronicle { get; set; }
@@ -36,6 +38,22 @@ partial class ArchivistChronicleHeader
                 Archivist.SnapshotsSearchText = string.Empty;
         }
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+            snapshots?.Dispose();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        snapshots?.Dispose();
+        if (Chronicle is { } chronicle)
+            snapshots = collectionObserver.ObserveReadOnlyList(chronicle.Snapshots).ObserveUsingSynchronizationContextEventually(MainThreadDetails.SynchronizationContext);
+    }
+
     async Task ReapplyEnhancementsAsync(Chronicle chronicle)
     {
         if (!await DialogService.ShowCautionDialogAsync(AppText.Archivist_ReapplyEnhancements_Caution_Caption, AppText.Archivist_ReapplyEnhancements_Caution_Text).ConfigureAwait(false))

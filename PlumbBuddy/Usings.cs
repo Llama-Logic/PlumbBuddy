@@ -11,6 +11,7 @@ global using CsvHelper;
 global using CsvHelper.Configuration;
 global using Epiforge.Extensions.Collections;
 global using Epiforge.Extensions.Collections.ObjectModel;
+global using Epiforge.Extensions.Expressions.Observable.Query;
 global using H.NotifyIcon;
 global using Humanizer;
 global using Humanizer.Bytes;

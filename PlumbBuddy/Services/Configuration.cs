@@ -4,6 +4,9 @@ static class Configuration
 {
     public static IServiceCollection AddPlumbBuddyServices(this IServiceCollection services)
     {
+        if (SynchronizationContext.Current is not { } syncContext)
+            throw new InvalidOperationException("no sync context available on thread");
+        services.AddSingleton<IMainThreadDetails, MainThreadDetails>(_ => new(syncContext));
         services.AddSingleton<IBlazorFramework, BlazorFramework>();
         services.AddSingleton<ICustomThemes, CustomThemes>();
         services.AddSingleton<ISettings, Settings>();
