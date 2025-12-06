@@ -15,7 +15,7 @@ class AppLifecycleManager :
 {
     public AppLifecycleManager(MauiWinUIApplication app, ExtendedActivationKind extendedActivationKind)
     {
-        if (extendedActivationKind is ExtendedActivationKind.StartupTask)
+        if (extendedActivationKind is ExtendedActivationKind.StartupTask && new Services.Settings(Preferences.Default).Onboarded)
         {
             HideMainWindowAtLaunch = true;
             startupTaskTrap = new(false);

@@ -3677,4 +3677,14 @@ EA has publicly asked for help in fixing a game bug in which this can happen acc
   <data name="Archivist_Disabled_Snack" xml:space="preserve">
     <value>Archivist could be checking your saves for known defects and helping with them, but it's currently disabled or not automatically taking snapshots. Click here to open Archivist.</value>
   </data>
+  <data name="SmartSimObserver_NoScanIssues_Caption" xml:space="preserve">
+    <value>Nothing to Report</value>
+  </data>
+  <data name="SmartSimObserver_NoScanIssues_Description" xml:space="preserve">
+    <value>I found nothing wrong with your game or mods, but that might have to do with you having disabled almost every scan. You can turn them back on in **Settings**.</value>
+    <comment>This text is in Markdown.</comment>
+  </data>
+  <data name="SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label" xml:space="preserve">
+    <value>Open Mod Health Settings</value>
+  </data>
 </root>

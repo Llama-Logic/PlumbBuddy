@@ -8989,6 +8989,33 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nothing to Report.
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found nothing wrong with your game or mods, but that might have to do with you having disabled almost every scan. You can turn them back on in **Settings**..
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_Description {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Mod Health Settings.
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Major Game Update Detected.
         /// </summary>
         internal static string SmartSimObserver_Notification_OfferPatchDayModUpdatesHelp_Caption {

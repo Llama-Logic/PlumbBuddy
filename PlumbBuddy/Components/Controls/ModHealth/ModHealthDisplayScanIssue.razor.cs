@@ -13,6 +13,15 @@ partial class ModHealthDisplayScanIssue
             && resolution.CautionText is { } cautionText
             && !await DialogService.ShowCautionDialogAsync(cautionCaption, cautionText))
             return;
-        await issue.Origin.ResolveIssueAsync(issueData, resolution.Data);
+        if (issue.Origin is { } origin)
+        {
+            await origin.ResolveIssueAsync(issueData, resolution.Data);
+            return;
+        }
+        if (issueData is "no-scan-issues" && resolution.Data is "open-mod-health-settings")
+        {
+            await DialogService.ShowSettingsDialogAsync(3).ConfigureAwait(false);
+            return;
+        }
     }
 }

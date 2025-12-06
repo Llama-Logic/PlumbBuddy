@@ -7,7 +7,7 @@ public class ScanIssue
     public required string Description { get; init; }
     public Uri? GuideUrl { get; init; }
     public required string Icon { get; init; }
-    public required IScan Origin { get; init; }
+    public IScan? Origin { get; init; }
     public IReadOnlyList<ScanIssueResolution>? Resolutions { get; init; }
     public ScanIssueType Type { get; init; }
 }

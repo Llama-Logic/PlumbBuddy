@@ -61,6 +61,7 @@ global using PlumbBuddy.Services.Scans.LooseArchive;
 global using PlumbBuddy.Services.Scans.Missing;
 global using PlumbBuddy.Services.Scans.Setting;
 global using PlumbBuddy.Services.ScriptApi;
+global using PlumbBuddy.Services.Translation;
 global using Serilog;
 global using Serilog.Events;
 global using Sharpnado.Tabs;

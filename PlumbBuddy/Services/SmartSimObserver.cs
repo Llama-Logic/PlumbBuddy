@@ -1284,7 +1284,22 @@ public partial class SmartSimObserver :
                     }
                 })).ConfigureAwait(false);
             }
-            ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+            ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption), ..scanIssues.IsEmpty ? [new ScanIssue()
+            {
+                Caption = AppText.SmartSimObserver_NoScanIssues_Caption,
+                Data = "no-scan-issues",
+                Description = AppText.SmartSimObserver_NoScanIssues_Description,
+                Icon = MaterialDesignIcons.Normal.FlaskEmptyOff,
+                Resolutions =
+                [
+                    new()
+                    {
+                        Data = "open-mod-health-settings",
+                        Icon = MaterialDesignIcons.Normal.Cog,
+                        Label = AppText.SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label
+                    }
+                ]
+            }] : Enumerable.Empty<ScanIssue>()];
             var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
             if (attentionWorthyScanIssues.Length is > 0)
             {
