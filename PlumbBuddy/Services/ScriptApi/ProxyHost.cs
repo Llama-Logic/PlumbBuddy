@@ -1,4 +1,6 @@
+using Microsoft.Maui.Media;
 using PlumbBuddy.Services.Protobuf;
+using PlumbBuddy.Services.ScriptApi;
 using SQLitePCL;
 using Serializer = ProtoBuf.Serializer;
 
@@ -883,7 +885,7 @@ public partial class ProxyHost :
                 IsClientConnected = !connectedClients.IsEmpty;
                 ProxyConnected?.Invoke(this, EventArgs.Empty);
                 _ = Task.Run(() => EscortClientAsync(client));
-                await SendMessageToProxyAsync(new SendLoadedSaveIdentifiersMessage
+                await SendMessageToProxyAsync(new HostMessageBase
                 {
                     Type = nameof(HostMessageType.SendLoadedSaveIdentifiers).Underscore().ToLowerInvariant()
                 }).ConfigureAwait(false);
@@ -1031,13 +1033,13 @@ public partial class ProxyHost :
                 if (!messageRoot.TryGetProperty("announcement", out var announcement) || fromBridgedUiUniqueId is not { } announcerUniqueId)
                     return;
                 var dynamicAnnouncement = JsonSerializer.Deserialize<dynamic>(announcement.GetRawText(), jsonSerializerOptions);
-                await SendMessageToProxyAsync(new
+                await SendMessageToProxyAsync(new BridgedUiAnnouncementMessage
                 {
                     Type = nameof(HostMessageType.BridgedUiAnnouncement).Underscore().ToLowerInvariant(),
                     UniqueId = announcerUniqueId.ToString("n").ToLowerInvariant(),
                     Announcement = dynamicAnnouncement
                 }).ConfigureAwait(false);
-                SendMessageToBridgedUis(new
+                SendMessageToBridgedUis(new BridgedUiAnnouncementMessage()
                 {
                     Type = nameof(HostMessageType.BridgedUiAnnouncement).Camelize(),
                     UniqueId = announcerUniqueId.ToString("n").ToLowerInvariant(),
@@ -1129,30 +1131,29 @@ public partial class ProxyHost :
                     }
                 }
                 break;
-            case ComponentMessageType.ListScreenshots when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotsList:
-                var listScreenshotsResponseMessage = new ListScreenshotsResponseMessage()
+            case ComponentMessageType.GetScreenshotDetails when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotMetadata:
+                if (TryParseMessage<GetScreenshotDetailsMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "get screenshot details", out var getScreenshotMetadataMessage))
                 {
-                    Type = nameof(HostMessageType.ListScreenshotsResponse).Camelize()
-                };
-                var screenshotsFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots"));
-                if (screenshotsFolder.Exists)
-                    foreach (var pngFile in screenshotsFolder.GetFiles("*.png", SearchOption.TopDirectoryOnly))
+                    var response = new GetScreenshotDetailsResponseMessage()
                     {
-                        var screenshot = new ListScreenshotsResponseMessageScreenshot
+                        Type = nameof(HostMessageType.GetScreenshotDetailsResponse).Camelize(),
+                        Name = getScreenshotMetadataMessage.Name
+                    };
+                    var screenshotFile = new FileInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots", getScreenshotMetadataMessage.Name));
+                    if (screenshotFile.Exists)
+                    {
+                        try
                         {
-                            Attributes = pngFile.Attributes,
-                            CreationTime = pngFile.CreationTime,
-                            CreationTimeUtc = pngFile.CreationTimeUtc,
-                            LastAccessTime = pngFile.LastAccessTime,
-                            LastAccessTimeUtc = pngFile.LastAccessTimeUtc,
-                            LastWriteTime = pngFile.LastWriteTime,
-                            LastWriteTimeUtc = pngFile.LastWriteTimeUtc,
-                            Name = pngFile.Name,
-                            Size = pngFile.Length,
-                            UnixFileMode = pngFile.UnixFileMode
-                        };
-                        using (var pngFileStream = pngFile.OpenRead())
-                        {
+                            response.Attributes = screenshotFile.Attributes;
+                            response.CreationTime = screenshotFile.CreationTime;
+                            response.CreationTimeUtc = screenshotFile.CreationTimeUtc;
+                            response.LastAccessTime = screenshotFile.LastAccessTime;
+                            response.LastAccessTimeUtc = screenshotFile.LastAccessTimeUtc;
+                            response.LastWriteTime = screenshotFile.LastWriteTime;
+                            response.LastWriteTimeUtc = screenshotFile.LastWriteTimeUtc;
+                            response.Size = screenshotFile.Length;
+                            response.UnixFileMode = screenshotFile.UnixFileMode;
+                            using var pngFileStream = screenshotFile.OpenRead();
                             var signatureArray = ArrayPool<byte>.Shared.Rent(8);
                             var uintArray = ArrayPool<byte>.Shared.Rent(4);
                             var ushortArray = ArrayPool<byte>.Shared.Rent(2);
@@ -1175,7 +1176,7 @@ public partial class ProxyHost :
                                             continue;
                                         }
                                         await pngFileStream.ReadExactlyAsync(uintMemory[..4]).ConfigureAwait(false);
-                                        screenshot.MetadataVersion = MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
+                                        response.MetadataVersion = MemoryMarshal.Read<uint>(uintMemory.Span[..4]);
                                         await pngFileStream.ReadExactlyAsync(ushortMemory[..2]).ConfigureAwait(false);
                                         var keyValuePairs = MemoryMarshal.Read<ushort>(ushortMemory.Span[..2]);
                                         while (keyValuePairs-- > 0)
@@ -1207,7 +1208,7 @@ public partial class ProxyHost :
                                             {
                                                 ArrayPool<byte>.Shared.Return(valueArray);
                                             }
-                                            screenshot.Metadata.Add(key, value);
+                                            response.Metadata.Add(key, value);
                                         }
                                         break;
                                     }
@@ -1219,9 +1220,26 @@ public partial class ProxyHost :
                                 ArrayPool<byte>.Shared.Return(ushortArray);
                             }
                         }
-                        listScreenshotsResponseMessage.Screenshots.Add(screenshot);
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "getting screenshot metadata for {ScreenshotName}", getScreenshotMetadataMessage.Name);
+                        }
                     }
-                SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotsList, JsonSerializer.Serialize(listScreenshotsResponseMessage, bridgedUiJsonSerializerOptions));
+                    SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotMetadata, response);
+                }
+                break;
+            case ComponentMessageType.ListScreenshots when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotsList:
+                {
+                    var listScreenshotsResponseMessage = new ListScreenshotsResponseMessage()
+                    {
+                        Type = nameof(HostMessageType.ListScreenshotsResponse).Camelize()
+                    };
+                    var screenshotsFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots"));
+                    if (screenshotsFolder.Exists)
+                        foreach (var pngFile in screenshotsFolder.GetFiles("*.png", SearchOption.TopDirectoryOnly))
+                            listScreenshotsResponseMessage.Screenshots.Add(pngFile.Name);
+                    SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotsList, listScreenshotsResponseMessage);
+                }
                 break;
             case ComponentMessageType.LookUpLocalizedStrings:
                 if (TryParseMessage<LookUpLocalizedStringsMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "look up localized strings", out var lookUpLocalizedStringsMessage))
@@ -1605,7 +1623,7 @@ public partial class ProxyHost :
         pendingSaveSpecificDataStorageInitialization = true;
     }
 
-    async Task SendGamepadMessageAsync(object proxyMessage, object bridgedUiMessage)
+    async Task SendGamepadMessageAsync(HostMessageBase proxyMessage, HostMessageBase bridgedUiMessage)
     {
         foreach (var client in gamepadMessagingEnrolledClients.Keys)
             await SendMessageToSpecificProxyAsync(client, proxyMessage).ConfigureAwait(false);
@@ -1613,31 +1631,31 @@ public partial class ProxyHost :
             SendMessageToSpecificBridgedUi(uniqueId, bridgedUiMessage);
     }
 
-    void SendMessageToBridgedUis(object message)
+    void SendMessageToBridgedUis(HostMessageBase message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
         BridgedUiMessageSent?.Invoke(this, new()
         {
-            MessageJson = JsonSerializer.Serialize(message, bridgedUiJsonSerializerOptions)
+            MessageJson = JsonSerializer.Serialize<object>(message, bridgedUiJsonSerializerOptions)
         });
     }
 
-    void SendMessageToSpecificBridgedUi(Guid uniqueId, object message)
+    void SendMessageToSpecificBridgedUi(Guid uniqueId, HostMessageBase message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
         SpecificBridgedUiMessageSent?.Invoke(this, new()
         {
-            MessageJson = JsonSerializer.Serialize(message, bridgedUiJsonSerializerOptions),
+            MessageJson = JsonSerializer.Serialize<object>(message, bridgedUiJsonSerializerOptions),
             UniqueId = uniqueId
         });
     }
 
-    async Task SendMessageToProxyAsync(object message)
+    async Task SendMessageToProxyAsync(HostMessageBase message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
         if (connectedClients.IsEmpty)
             return;
-        var serializedMessageBytes = JsonSerializer.SerializeToUtf8Bytes(message, proxyJsonSerializerOptions);
+        var serializedMessageBytes = JsonSerializer.SerializeToUtf8Bytes<object>(message, proxyJsonSerializerOptions);
         Memory<byte> serializedMessageSizeBytes = new byte[4];
         var serializedMessageSize = BinaryPrimitives.ReverseEndianness(serializedMessageBytes.Length);
         MemoryMarshal.Write(serializedMessageSizeBytes.Span, in serializedMessageSize);
@@ -1664,12 +1682,12 @@ public partial class ProxyHost :
         }
     }
 
-    async Task SendMessageToSpecificProxyAsync(TcpClient client, object message)
+    async Task SendMessageToSpecificProxyAsync(TcpClient client, HostMessageBase message)
     {
         ObjectDisposedException.ThrowIf(cancellationToken.IsCancellationRequested, this);
         if (!connectedClients.TryGetValue(client, out var clientWriteLock))
             return;
-        var serializedMessageBytes = JsonSerializer.SerializeToUtf8Bytes(message, proxyJsonSerializerOptions);
+        var serializedMessageBytes = JsonSerializer.SerializeToUtf8Bytes<object>(message, proxyJsonSerializerOptions);
         Memory<byte> serializedMessageSizeBytes = new byte[4];
         var serializedMessageSize = BinaryPrimitives.ReverseEndianness(serializedMessageBytes.Length);
         MemoryMarshal.Write(serializedMessageSizeBytes.Span, in serializedMessageSize);

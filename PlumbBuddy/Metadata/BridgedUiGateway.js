@@ -766,6 +766,7 @@
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
     let promisedScreenshotList = null;
+    const promisedScreenshotDetails = {};
     const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
@@ -891,6 +892,25 @@
                 dispatches
             };
             return dataStore;
+        }
+
+        /**
+         * Requests the details for the specified screenshot
+         * @param {String} the name of the screenshot
+         * @returns {Promise} a promise that will resolve with the details for the specified screenshot
+         */
+        getScreenshotDetails(screenshotName) {
+            const alreadyPromised = promisedScreenshotDetails[screenshotName];
+            if (alreadyPromised) {
+                return alreadyPromised.promise;
+            }
+            const madePromise = makePromise();
+            promisedScreenshotDetails[screenshotName] = madePromise;
+            sendMessageToPlumbBuddy({
+                type: 'getScreenshotDetails',
+                name: screenshotName,
+            });
+            return madePromise.promise;
         }
 
         /**
@@ -1081,6 +1101,15 @@
                     gamepads.push(gamepad);
                     dispatchGamepadConnected(gamepad);
                 });
+            } else if (message.type === 'getScreenshotDetailsResponse') {
+                const screenshotName = message.name;
+                const promised = promisedScreenshotDetails[screenshotName];
+                if (!promised) {
+                    return;
+                }
+                delete message.type;
+                promised.resolve(message);
+                delete promisedScreenshotDetails[screenshotName];
             } else if (message.type === 'listScreenshotsResponse') {
                 if (!promisedScreenshotList) {
                     return;

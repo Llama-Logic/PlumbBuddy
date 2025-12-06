@@ -1,6 +1,7 @@
 namespace PlumbBuddy.Services.ScriptApi;
 
-public class RelationalDataStorageQueryResultsMessage
+public class RelationalDataStorageQueryResultsMessage :
+    HostMessageBase
 {
     public int ErrorCode { get; set; }
     public string? ErrorMessage { get; set; }
@@ -10,6 +11,5 @@ public class RelationalDataStorageQueryResultsMessage
     public Guid QueryId { get; set; }
     public IList<RelationalDataStorageQueryRecordSet> RecordSets { get; } = [];
     public string? Tag { get; set; }
-    public required string Type { get; set; }
     public Guid UniqueId { get; set; }
 }

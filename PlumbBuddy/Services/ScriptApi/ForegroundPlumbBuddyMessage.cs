@@ -1,7 +1,7 @@
 namespace PlumbBuddy.Services.ScriptApi;
 
-public class ForegroundPlumbBuddyMessage
+public class ForegroundPlumbBuddyMessage :
+    HostMessageBase
 {
     public bool PauseGame { get; set; }
-    public required string Type { get; set; }
 }

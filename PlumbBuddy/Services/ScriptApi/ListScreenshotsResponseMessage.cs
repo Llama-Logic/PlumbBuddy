@@ -3,5 +3,5 @@ namespace PlumbBuddy.Services.ScriptApi;
 public class ListScreenshotsResponseMessage :
     HostMessageBase
 {
-    public IList<ListScreenshotsResponseMessageScreenshot> Screenshots { get; } = [];
+    public IList<string> Screenshots { get; } = [];
 }
