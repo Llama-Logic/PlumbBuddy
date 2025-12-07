@@ -1228,16 +1228,16 @@ public partial class ProxyHost :
                     SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotMetadata, response);
                 }
                 break;
-            case ComponentMessageType.ListScreenshots when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotsList:
+            case ComponentMessageType.ListScreenshotNames when fromBridgedUiUniqueId is { } bridgedUiRequestingScreenshotsList:
                 {
-                    var listScreenshotsResponseMessage = new ListScreenshotsResponseMessage()
+                    var listScreenshotsResponseMessage = new ListScreenshotNamesResponseMessage()
                     {
-                        Type = nameof(HostMessageType.ListScreenshotsResponse).Camelize()
+                        Type = nameof(HostMessageType.ListScreenshotNamesResponse).Camelize()
                     };
                     var screenshotsFolder = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "Screenshots"));
                     if (screenshotsFolder.Exists)
                         foreach (var pngFile in screenshotsFolder.GetFiles("*.png", SearchOption.TopDirectoryOnly))
-                            listScreenshotsResponseMessage.Screenshots.Add(pngFile.Name);
+                            listScreenshotsResponseMessage.Names.Add(pngFile.Name);
                     SendMessageToSpecificBridgedUi(bridgedUiRequestingScreenshotsList, listScreenshotsResponseMessage);
                 }
                 break;

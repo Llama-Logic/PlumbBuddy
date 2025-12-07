@@ -17,7 +17,7 @@ public enum HostMessageType
     GamepadThumbstickChanged,
     GamepadTriggerChanged,
     GetScreenshotDetailsResponse,
-    ListScreenshotsResponse,
+    ListScreenshotNamesResponse,
     LookUpLocalizedStringsResponse,
     RelationalDataStorageQueryResults,
     ScreenshotsChanged,

@@ -11,7 +11,7 @@ public enum ComponentMessageType
     ForegroundGame,
     GameServiceEvent,
     GetScreenshotDetails,
-    ListScreenshots,
+    ListScreenshotNames,
     LookUpLocalizedStrings,
     OpenUrl,
     QueryRelationalDataStorage,

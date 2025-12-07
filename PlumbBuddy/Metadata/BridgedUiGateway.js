@@ -765,7 +765,7 @@
     const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
-    let promisedScreenshotList = null;
+    let promisedScreenshotNamesList = null;
     const promisedScreenshotDetails = {};
     const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
@@ -941,19 +941,45 @@
         }
 
         /**
-         * Requests a list of the screenshots currently in the player's Screenshots folder
+         * Requests a list of the names of screenshots currently in the player's Screenshots folder
          * @returns {Promise} a promise that will resolve with the list of screenshots currently in the player's Screenshots folder
          */
-        listScreenshots() {
-            if (promisedScreenshotList) {
-                return promisedScreenshotList.promise;
+        listScreenshotNames() {
+            if (promisedScreenshotNamesList) {
+                return promisedScreenshotNamesList.promise;
             }
             const madePromise = makePromise();
-            promisedScreenshotList = madePromise;
+            promisedScreenshotNamesList = madePromise;
             sendMessageToPlumbBuddy({
-                type: 'listScreenshots'
+                type: 'listScreenshotNames'
             });
-            return promisedScreenshotList.promise;
+            return promisedScreenshotNamesList.promise;
+        }
+
+        /**
+         * Requests a list of the screenshots, including their details, currently in the player's Screenshots folder
+         * @param {Function} progressCallback (optional) a callback function which will be invoked with three parameters: (1) the total number of screenshots being listed; (2) the current number of screenshots which have been loaded; (3) the screenshot that was just loaded, if there is one
+         * @returns {Promise} a promise that will resolve with the list of screenshots currently in the player's Screenshots folder
+         */
+        async listScreenshots(progressCallback = null) {
+            const callerWantsProgress = typeof progressCallback === 'function' || progressCallback instanceof Function;
+            const screenshotNames = await this.listScreenshotNames();
+            if (!Array.isArray(screenshotNames)) {
+                return;
+            }
+            const totalScreenshots = screenshotNames.length;
+            if (callerWantsProgress) {
+                progressCallback(screenshotNames.length, 0);
+            }
+            const result = [];
+            for (let i = 0; i < totalScreenshots; ++i) {
+                const screenshotDetails = await this.getScreenshotDetails(screenshotNames[i]);
+                result.push(screenshotDetails);
+                if (callerWantsProgress) {
+                    progressCallback(screenshotNames.length, i + 1, screenshotDetails);
+                }
+            }
+            return result;
         }
 
         /**
@@ -1110,12 +1136,12 @@
                 delete message.type;
                 promised.resolve(message);
                 delete promisedScreenshotDetails[screenshotName];
-            } else if (message.type === 'listScreenshotsResponse') {
-                if (!promisedScreenshotList) {
+            } else if (message.type === 'listScreenshotNamesResponse') {
+                if (!promisedScreenshotNamesList) {
                     return;
                 }
-                promisedScreenshotList.resolve(message.screenshots);
-                promisedScreenshotList = null;
+                promisedScreenshotNamesList.resolve(message.names);
+                promisedScreenshotNamesList = null;
             } else if (message.type === 'lookUpLocalizedStringsResponse') {
                 const lookUpId = sanitizeUuid(message.lookUpId);
                 const promisedLookUp = promisedStringTableEntriesLookUps[lookUpId];
