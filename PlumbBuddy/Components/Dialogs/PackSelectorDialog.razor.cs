@@ -8,8 +8,6 @@ partial class PackSelectorDialog
     [GeneratedRegex(@"\-disablepacks:(?<packCodes>[^\s]*)")]
     private static partial Regex GetDisablePacksCommandLineArgumentPattern();
 
-    decimal disabledDlcTotalRetailUsd;
-    decimal enabledDlcTotalRetailUsd;
     bool isApplying = false;
     bool isLoading = true;
 
