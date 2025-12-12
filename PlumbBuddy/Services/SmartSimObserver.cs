@@ -408,9 +408,6 @@ public partial class SmartSimObserver :
                 );
                 return false;
             }
-            var saveScratchDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves", "scratch"));
-            if (saveScratchDirectory.Exists)
-                saveScratchDirectory.Delete(true);
             foreach (var cacheComponent in cacheComponents)
             {
                 var retries = 20;
