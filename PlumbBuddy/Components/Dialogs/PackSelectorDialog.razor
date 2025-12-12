@@ -86,7 +86,7 @@
                     <MudChip T="string" Class="mx-0" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.CurrencyUsd" Text="@string.Format(new CultureInfo("en-US"), AppText.PackSelectorDialog_TotalEnabledContent_Label, EnabledDlcTotalRetailUsd)" Style="@(EnabledDlcTotalRetailUsd is 0 ? "opacity: .2;" : string.Empty)" />
                 </MudItem>
                 <MudItem Class="flex-grow-1">
-                    <MudProgressLinear Color="Color.Success" Size="Size.Large" Rounded Striped Max="@((double)EnabledDlcTotalRetailUsd + (double)DisabledDlcTotalRetailUsd)" Value="@((double)EnabledDlcTotalRetailUsd)" />
+                    <MudProgressLinear Color="Color.Success" Size="Size.Large" Rounded Max="@((double)EnabledDlcTotalRetailUsd + (double)DisabledDlcTotalRetailUsd)" Value="@((double)EnabledDlcTotalRetailUsd)" />
                 </MudItem>
                 <MudItem>
                     <MudChip T="string" Class="mx-0" Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.CurrencyUsdOff" Text="@string.Format(new CultureInfo("en-US"), AppText.PackSelectorDialog_TotalDisabledContent_Label, DisabledDlcTotalRetailUsd)" Style="@(DisabledDlcTotalRetailUsd is 0 ? "opacity: .2;" : string.Empty)" />
