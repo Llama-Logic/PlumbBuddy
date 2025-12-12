@@ -3687,4 +3687,16 @@ EA has publicly asked for help in fixing a game bug in which this can happen acc
   <data name="SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label" xml:space="preserve">
     <value>Open Mod Health Settings</value>
   </data>
+  <data name="OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label" xml:space="preserve">
+    <value>Show the retail cost of DLC in USD</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip" xml:space="preserve">
+    <value>Whenever DLC is being listed in some way, I'll show you the combined retail cost of it in US dollars, as if you had purchased it at full price.</value>
+  </data>
+  <data name="PackSelectorDialog_TotalDisabledContent_Label" xml:space="preserve">
+    <value>Total Retail Value of Disabled Content: {0:c}</value>
+  </data>
+  <data name="PackSelectorDialog_TotalEnabledContent_Label" xml:space="preserve">
+    <value>Total Retail Value of Enabled Content: {0:c}</value>
+  </data>
 </root>

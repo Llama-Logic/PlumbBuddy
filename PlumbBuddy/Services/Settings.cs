@@ -537,6 +537,18 @@ class Settings :
         }
     }
 
+    public bool ShowDlcRetailUsd
+    {
+        get => preferences.Get(nameof(ShowDlcRetailUsd), false);
+        set
+        {
+            if (ShowDlcRetailUsd == value)
+                return;
+            preferences.Set(nameof(ShowDlcRetailUsd), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool ShowSystemTrayIcon
     {
         get => preferences.Get(nameof(ShowSystemTrayIcon), false);

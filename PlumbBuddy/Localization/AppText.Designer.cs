@@ -5575,6 +5575,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show the retail cost of DLC in USD.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whenever DLC is being listed in some way, I&apos;ll show you the combined retail cost of it in US dollars, as if you had purchased it at full price..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show an icon in the system tray.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label {
@@ -5831,6 +5849,24 @@ namespace PlumbBuddy.Localization {
         internal static string PackSelectorDialog_Status_Examining {
             get {
                 return ResourceManager.GetString("PackSelectorDialog_Status_Examining", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total Retail Value of Disabled Content: {0:c}.
+        /// </summary>
+        internal static string PackSelectorDialog_TotalDisabledContent_Label {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_TotalDisabledContent_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total Retail Value of Enabled Content: {0:c}.
+        /// </summary>
+        internal static string PackSelectorDialog_TotalEnabledContent_Label {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_TotalEnabledContent_Label", resourceCulture);
             }
         }
         

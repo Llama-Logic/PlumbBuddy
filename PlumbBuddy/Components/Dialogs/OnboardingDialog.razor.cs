@@ -193,6 +193,12 @@ partial class OnboardingDialog
         set => Settings.ScanForWrongGameVersion = value;
     }
 
+    bool ShowDlcRetailUsd
+    {
+        get => Settings.ShowDlcRetailUsd;
+        set => Settings.ShowDlcRetailUsd = value;
+    }
+
     bool ShowSystemTrayIcon
     {
         get => Settings.ShowSystemTrayIcon;
