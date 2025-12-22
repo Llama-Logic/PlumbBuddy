@@ -140,6 +140,7 @@ public class Snapshot :
     string? notes;
     ImmutableArray<byte> originalPackageSha256 = [];
     bool showDetails;
+    IReadOnlyList<SnapshotDefect>? snapshotDefects;
     string? thumbnailUri;
 
     public string? ActiveHouseholdName { get; private set; }
@@ -218,6 +219,16 @@ public class Snapshot :
         }
     }
 
+    public IReadOnlyList<SnapshotDefect>? SnapshotDefects
+    {
+        get => snapshotDefects;
+        private set
+        {
+            snapshotDefects = value;
+            OnPropertyChanged();
+        }
+    }
+
     [SuppressMessage("Design", "CA1056: URI-like properties should not be strings")]
     public string? ThumbnailUri
     {
@@ -267,7 +278,7 @@ public class Snapshot :
                 if (saveGameDataKeys.Length is <= 0 or >= 2)
                     throw new FormatException("save package contains invalid number of save game data resources");
                 var saveGameDataKey = saveGameDataKeys[0];
-                var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
                 var compressionMode = package.GetExplicitCompressionMode(saveGameDataKey);
                 var slotId = GetOpenSlot(settings);
                 if (saveGameData.Account is not  { } account)
@@ -436,6 +447,7 @@ public class Snapshot :
     async Task LoadAllAsync(SavePackageSnapshot savePackageSnapshot)
     {
         await ReloadScalarsAsync(savePackageSnapshot).ConfigureAwait(false);
+        await ReloadDefectsAsync().ConfigureAwait(false);
         firstLoadComplete.SetResult();
     }
 
@@ -459,6 +471,19 @@ public class Snapshot :
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    public async Task ReloadDefectsAsync(IReadOnlyList<SavePackageSnapshotDefectType>? disabled = null)
+    {
+        var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        disabled ??= (await dbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).AsReadOnly();
+        SnapshotDefects = (await dbContext.SavePackageSnapshotDefects
+            .Where(d => d.SavePackageSnapshotId == SavePackageSnapshotId && !disabled.Contains(d.SavePackageSnapshotDefectType))
+            .ToListAsync()
+            .ConfigureAwait(false))
+            .Select(d => new SnapshotDefect { Description = d.Description, Type = d.SavePackageSnapshotDefectType })
+            .ToList()
+            .AsReadOnly();
+    }
 
     public async Task ReloadScalarsAsync(SavePackageSnapshot? savePackageSnapshot = null)
     {
@@ -545,7 +570,7 @@ public class Snapshot :
                 var keys = await package.GetKeysAsync().ConfigureAwait(false);
                 foreach (var key in keys.Where(k => k.Type is ResourceType.SaveGameData))
                 {
-                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(key).ConfigureAwait(false));
+                    var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(key).ConfigureAwait(false));
                     (saveGameData.SaveSlot ??= new()).SlotName = string.IsNullOrWhiteSpace(chronicle.GameNameOverride)
                         ? $"{chronicle.Name}: {Label}"
                         : chronicle.GameNameOverride.Trim();

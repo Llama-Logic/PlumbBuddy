@@ -19,7 +19,7 @@ public interface IProxyHost :
     bool IsClientConnected { get; }
 
     void DestroyBridgedUi(Guid uniqueId);
-    Task ForegroundPlumbBuddyAsync();
+    Task ForegroundPlumbBuddyAsync(bool pauseGame = false);
     Task NotifyScreenshotsChangedAsync();
     Task ProcessMessageFromBridgedUiAsync(Guid uniqueId, string messageJson);
     Task WaitForSavesAccessAsync(CancellationToken cancellationToken = default);

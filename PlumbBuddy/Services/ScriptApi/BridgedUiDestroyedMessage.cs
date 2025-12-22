@@ -1,7 +1,7 @@
 namespace PlumbBuddy.Services.ScriptApi;
 
-public class BridgedUiDestroyedMessage
+public class BridgedUiDestroyedMessage :
+    HostMessageBase
 {
-    public required string Type { get; set; }
     public Guid UniqueId { get; set; }
 }

@@ -1,4 +1,4 @@
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Translation;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 [SuppressMessage("Maintainability", "CA1724: Type names should not match namespaces")]
@@ -595,8 +595,10 @@ public sealed partial class Parlay :
                 && !repurposedLanguages.TryAdd(repurposingMaxisLocale.Name, translationLocale.Name))
                 repurposedLanguages[repurposingMaxisLocale.Name] = translationLocale.Name;
             var translationStbl = new StringTableModel();
-            foreach (var (hash, originalAndTranslation) in stringTableEntries)
+            foreach (var hash in (await originalPackage.GetStringTableAsync(originalStringTableKey).ConfigureAwait(false)).KeyHashes)
             {
+                if (!stringTableEntries.TryGetValue(hash, out var originalAndTranslation))
+                    continue;
                 var (_, translation) = originalAndTranslation;
                 if (!string.IsNullOrWhiteSpace(translation))
                     translationStbl.Set(hash, translation);

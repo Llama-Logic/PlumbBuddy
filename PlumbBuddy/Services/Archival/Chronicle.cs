@@ -45,6 +45,7 @@ public class Chronicle :
     ulong nucleusId;
     readonly ObservableCollection<Snapshot> snapshots;
     ImmutableArray<byte> thumbnail = [];
+    IReadOnlyCollection<SavePackageSnapshotDefectType>? watchedSnapshotDefects;
 
     public IArchivist Archivist =>
         archivist;
@@ -160,6 +161,18 @@ public class Chronicle :
         }
     }
 
+    public IReadOnlyCollection<SavePackageSnapshotDefectType>? WatchedSnapshotDefects
+    {
+        get => watchedSnapshotDefects;
+        set
+        {
+            value ??= [];
+            watchedSnapshotDefects = value;
+            OnPropertyChanged();
+            _ = Task.Run(RefreshWatchedSnapshotDefects);
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public async Task BrowseForCustomThumbnailAsync(IDialogService dialogService)
@@ -226,12 +239,13 @@ public class Chronicle :
     {
         await ReloadScalarsAsync().ConfigureAwait(false);
         using var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        watchedSnapshotDefects = Enum.GetValues<SavePackageSnapshotDefectType>().Except([SavePackageSnapshotDefectType.None]).Except(await dbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).ToList().AsReadOnly();
         await foreach (var savePackageSnapshot in dbContext.SavePackageSnapshots.Include(sps => sps.OriginalSavePackageHash).Include(sps => sps.EnhancedSavePackageHash).AsAsyncEnumerable())
             await LoadSnapshotAsync(savePackageSnapshot).ConfigureAwait(false);
         firstLoadComplete.SetResult();
     }
 
-    public async Task LoadSnapshotAsync(SavePackageSnapshot savePackageSnapshot)
+    public async Task<Snapshot?> LoadSnapshotAsync(SavePackageSnapshot savePackageSnapshot)
     {
         ArgumentNullException.ThrowIfNull(savePackageSnapshot);
         try
@@ -242,11 +256,13 @@ public class Chronicle :
             LatestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Max();
             if (snapshots.Count is 1)
                 EarliestLastWriteTime = snapshots.Select(s => s.LastWriteTime).Min();
+            return snapshot;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "encountered unexpected unhandled exception while loading snapshot {SnapshotId} for nucleus ID {NucleusId}, created {Created}", savePackageSnapshot.Id, nucleusId, created);
         }
+        return null;
     }
 
     public async Task ReloadScalarsAsync()
@@ -303,6 +319,37 @@ public class Chronicle :
         {
             logger.LogError(ex, "encountered unexpected unhandled exception while reloading scalars for nucleus ID {NucleusId}, created {Created}", nucleusId, created);
         }
+    }
+
+    async Task RefreshWatchedSnapshotDefects()
+    {
+        var wsd = watchedSnapshotDefects ?? [];
+        var dbContext = await dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await dbContext.DisabledSavePackageSnapshotDefectTypes
+            .Where(dspsdt => wsd.Contains(dspsdt.SavePackageSnapshotDefectType))
+            .ExecuteDeleteAsync()
+            .ConfigureAwait(false);
+        await dbContext.DisabledSavePackageSnapshotDefectTypes.AddRangeAsync
+        (
+            Enum.GetValues<SavePackageSnapshotDefectType>()
+                .Except([SavePackageSnapshotDefectType.None])
+                .Except(wsd)
+                .Except
+                (
+                    await dbContext.DisabledSavePackageSnapshotDefectTypes
+                        .Select(dspsdt => dspsdt.SavePackageSnapshotDefectType)
+                        .ToListAsync()
+                        .ConfigureAwait(false)
+                )
+                .Select(spsdt => new DisabledSavePackageSnapshotDefectType
+                {
+                    SavePackageSnapshotDefectType = spsdt
+                })
+        ).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync().ConfigureAwait(false);
+        var disabled = (await dbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).AsReadOnly();
+        foreach (var snapshot in snapshots)
+            await snapshot.ReloadDefectsAsync(disabled).ConfigureAwait(false);
     }
 
     public async Task SetThumbnailAsync(IDialogService dialogService, Image<Rgba32> thumbnail)

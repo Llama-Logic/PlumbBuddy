@@ -2,7 +2,23 @@ namespace PlumbBuddy.Components.Controls.Archivist;
 
 partial class ArchivistChronicleHeader
 {
+    public static string GetDefectTypeIcon(SavePackageSnapshotDefectType type) =>
+        type switch
+        {
+            SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship => MaterialDesignIcons.Normal.FamilyTree,
+            _ => string.Empty
+        };
+
+    public static string GetDefectTypeLabel(SavePackageSnapshotDefectType type) =>
+        type switch
+        {
+            SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship => AppText.Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Label,
+            _ => throw new NotSupportedException($"unsupported type {type}")
+        };
+
     bool isEditingChronicle;
+    readonly CollectionObserver collectionObserver = new();
+    IObservableCollectionQuery<Snapshot>? snapshots;
 
     [Parameter]
     public Chronicle? Chronicle { get; set; }
@@ -22,6 +38,22 @@ partial class ArchivistChronicleHeader
                 Archivist.SnapshotsSearchText = string.Empty;
         }
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+            snapshots?.Dispose();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        snapshots?.Dispose();
+        if (Chronicle is { } chronicle)
+            snapshots = collectionObserver.ObserveReadOnlyList(chronicle.Snapshots).ObserveUsingSynchronizationContextEventually(MainThreadDetails.SynchronizationContext);
+    }
+
     async Task ReapplyEnhancementsAsync(Chronicle chronicle)
     {
         if (!await DialogService.ShowCautionDialogAsync(AppText.Archivist_ReapplyEnhancements_Caution_Caption, AppText.Archivist_ReapplyEnhancements_Caution_Text).ConfigureAwait(false))

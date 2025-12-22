@@ -43,7 +43,7 @@
             <MudGrid Justify="Justify.Center" Spacing="2">
                 <MudItem>
                     <MudCheckBox T="bool?" Color="Color.Primary" Disabled="@isApplying" TriState Value="@AllPacks" ValueChanged="@((Action<bool?>)(isChecked => AllGroupsValueChangedHandler(isChecked)))">
-                        <MudMarkdown Value="@StringLocalizer[nameof(AppText.PackSelectorDialog_SelectAll), AppText.PackSelectorDialog_SelectAll_Global]" />
+                        <MudMarkdown Value="@string.Format(new CultureInfo("en-US"), Settings.ShowDlcRetailUsd && PublicCatalogs.PackCatalog is not null ? "{0} ({1:c})" : "{0}", StringLocalizer[nameof(AppText.PackSelectorDialog_SelectAll), AppText.PackSelectorDialog_SelectAll_Global], PackGroups.Sum(pg => pg.TotalRetailUsd))" />
                     </MudCheckBox>
                 </MudItem>
             </MudGrid>
@@ -58,7 +58,7 @@
                 <MudGrid Justify="Justify.Center" Spacing="2">
                     <MudItem>
                         <MudCheckBox T="bool?" Color="Color.Primary" Disabled="@isApplying" TriState Value="@packGroup.IsChecked" ValueChanged="@((Action<bool?>)(isChecked => GroupValueChangedHandler(packGroup, isChecked)))">
-                            <MudMarkdown Value="@StringLocalizer[nameof(AppText.PackSelectorDialog_SelectAll), @packGroup.Name]" />
+                            <MudMarkdown Value="@string.Format(new CultureInfo("en-US"), Settings.ShowDlcRetailUsd && PublicCatalogs.PackCatalog is not null ? "{0} ({1:c})" : "{0}", StringLocalizer[nameof(AppText.PackSelectorDialog_SelectAll), @packGroup.Name], packGroup.TotalRetailUsd)" />
                         </MudCheckBox>
                     </MudItem>
                 </MudGrid>
@@ -79,29 +79,52 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudTooltip Text="@(AppText.PackSelectorDialog_UsePublicPackCatalog_Tip)" Color="Color.Primary" Placement="Placement.Top" Arrow>
-            <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Disabled="@(isLoading || isApplying)" Label="@(AppText.PackSelectorDialog_UsePublicPackCatalog_Label)" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
-        </MudTooltip>
-        <MudSpacer />
-        <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info" Placement="Placement.Top">
-            <MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Class="my-n4" Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuidePackSelector{Settings.Type}")" />
-        </MudTooltip>
-        <MudButton Disabled="@isApplying" OnClick="CancelOnClickHandler">
-            @MarkupLocalizer[nameof(AppText.Common_Cancel)]
-        </MudButton>
-        @{
-            var okTip = AppText.PackSelectorDialog_Ok_Tip;
-            if (isLoading)
-                okTip = AppText.PackSelectorDialog_Ok_Tip_Loading;
-            else if (isApplying)
-                okTip = AppText.PackSelectorDialog_Ok_Tip_Applying;
-            else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
-                okTip = AppText.PackSelectorDialog_Ok_Tip_GameIsRunning;
-        }
-        <MudTooltip Arrow Color="Color.Primary" Placement="Placement.Top" Text="@okTip">
-            <MudButton Color="Color.Primary" Disabled="@(isLoading || isApplying || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" OnClick="OkOnClickHandlerAsync">
-                @MarkupLocalizer[nameof(AppText.Common_Ok)]
-            </MudButton>
-        </MudTooltip>
+        <MudGrid Spacing="1" Class="align-center">
+            @if (!isLoading && Settings.ShowDlcRetailUsd && PublicCatalogs.PackCatalog is not null)
+            {
+                <MudItem>
+                    <MudChip T="string" Class="mx-0" Color="Color.Success" Icon="@MaterialDesignIcons.Normal.CurrencyUsd" Text="@string.Format(new CultureInfo("en-US"), AppText.PackSelectorDialog_TotalEnabledContent_Label, EnabledDlcTotalRetailUsd)" Style="@(EnabledDlcTotalRetailUsd is 0 ? "opacity: .2;" : string.Empty)" />
+                </MudItem>
+                <MudItem Class="flex-grow-1">
+                    <MudProgressLinear Color="Color.Success" Size="Size.Large" Rounded Max="@((double)EnabledDlcTotalRetailUsd + (double)DisabledDlcTotalRetailUsd)" Value="@((double)EnabledDlcTotalRetailUsd)" />
+                </MudItem>
+                <MudItem>
+                    <MudChip T="string" Class="mx-0" Color="Color.Warning" Icon="@MaterialDesignIcons.Normal.CurrencyUsdOff" Text="@string.Format(new CultureInfo("en-US"), AppText.PackSelectorDialog_TotalDisabledContent_Label, DisabledDlcTotalRetailUsd)" Style="@(DisabledDlcTotalRetailUsd is 0 ? "opacity: .2;" : string.Empty)" />
+                </MudItem>
+                <MudFlexBreak />
+            }
+            <MudItem>
+                <MudTooltip Text="@(AppText.PackSelectorDialog_UsePublicPackCatalog_Tip)" Color="Color.Primary" Placement="Placement.Top" Arrow>
+                    <MudSwitchM3 @bind-Value="@UsePublicPackCatalog" Disabled="@(isLoading || isApplying)" Label="@(AppText.PackSelectorDialog_UsePublicPackCatalog_Label)" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CloudSync" ThumbOffIcon="@MaterialDesignIcons.Outline.CloudOff" />
+                </MudTooltip>
+            </MudItem>
+            <MudSpacer />
+            <MudItem>
+                <MudTooltip Arrow Text="@(AppText.Tooltip_GuideLink)" Color="Color.Info" Placement="Placement.Top">
+                    <MudIconButton Icon="@MaterialDesignIcons.Outline.HelpCircle" Color="Color.Info" Href="@($"https://plumbbuddy.app/redirect?to=PlumbBuddyInAppGuidePackSelector{Settings.Type}")" />
+                </MudTooltip>
+            </MudItem>
+            <MudItem>
+                <MudButton Disabled="@isApplying" OnClick="CancelOnClickHandler">
+                    @MarkupLocalizer[nameof(AppText.Common_Cancel)]
+                </MudButton>
+            </MudItem>
+            @{
+                var okTip = AppText.PackSelectorDialog_Ok_Tip;
+                if (isLoading)
+                    okTip = AppText.PackSelectorDialog_Ok_Tip_Loading;
+                else if (isApplying)
+                    okTip = AppText.PackSelectorDialog_Ok_Tip_Applying;
+                else if (ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)
+                    okTip = AppText.PackSelectorDialog_Ok_Tip_GameIsRunning;
+            }
+            <MudItem>
+                <MudTooltip Arrow Color="Color.Primary" Placement="Placement.Top" Text="@okTip">
+                    <MudButton Color="Color.Primary" Disabled="@(isLoading || isApplying || ModsDirectoryCataloger.State is ModsDirectoryCatalogerState.Sleeping)" OnClick="OkOnClickHandlerAsync">
+                        @MarkupLocalizer[nameof(AppText.Common_Ok)]
+                    </MudButton>
+                </MudTooltip>
+            </MudItem>
+        </MudGrid>
     </DialogActions>
 </MudDialog>

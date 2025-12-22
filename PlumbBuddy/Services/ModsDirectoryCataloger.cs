@@ -6,6 +6,7 @@ public class ModsDirectoryCataloger :
 {
     const int estimateBackwardSample = 64;
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     public static async ValueTask<(bool success, ModsDirectoryFileType fileType)> CatalogResourcesAndManifestsAsync(Microsoft.Extensions.Logging.ILogger logger, PbDbContext pbDbContext, FileInfo fileInfo, ModFileHash modFileHash, ModsDirectoryFileType fileType)
     {
         ArgumentNullException.ThrowIfNull(pbDbContext);
@@ -599,6 +600,7 @@ public class ModsDirectoryCataloger :
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ProcessPathsQueueAsync()
     {

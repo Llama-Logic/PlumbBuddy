@@ -15,7 +15,7 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
 
             modelBuilder.Entity("PlumbBuddy.Data.Chronicle.ChroniclePropertySet", b =>
                 {
@@ -67,6 +67,16 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ChroniclePropertySets");
+                });
+
+            modelBuilder.Entity("PlumbBuddy.Data.Chronicle.DisabledSavePackageSnapshotDefectType", b =>
+                {
+                    b.Property<int>("SavePackageSnapshotDefectType")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("SavePackageSnapshotDefectType");
+
+                    b.ToTable("DisabledSavePackageSnapshotDefectTypes");
                 });
 
             modelBuilder.Entity("PlumbBuddy.Data.Chronicle.KnownSavePackageHash", b =>
@@ -194,6 +204,29 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                     b.ToTable("SavePackageSnapshots");
                 });
 
+            modelBuilder.Entity("PlumbBuddy.Data.Chronicle.SavePackageSnapshotDefect", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SavePackageSnapshotDefectType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("SavePackageSnapshotId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SavePackageSnapshotId");
+
+                    b.ToTable("SavePackageSnapshotDefects");
+                });
+
             modelBuilder.Entity("PlumbBuddy.Data.Chronicle.SnapshotModFile", b =>
                 {
                     b.Property<long>("Id")
@@ -288,6 +321,17 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
                     b.Navigation("OriginalSavePackageHash");
                 });
 
+            modelBuilder.Entity("PlumbBuddy.Data.Chronicle.SavePackageSnapshotDefect", b =>
+                {
+                    b.HasOne("PlumbBuddy.Data.Chronicle.SavePackageSnapshot", "SavePackageSnapshot")
+                        .WithMany("Defects")
+                        .HasForeignKey("SavePackageSnapshotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SavePackageSnapshot");
+                });
+
             modelBuilder.Entity("SavePackageResourceSavePackageSnapshot", b =>
                 {
                     b.HasOne("PlumbBuddy.Data.Chronicle.SavePackageResource", null)
@@ -325,6 +369,8 @@ namespace PlumbBuddy.Data.Chronicle.Migrations
 
             modelBuilder.Entity("PlumbBuddy.Data.Chronicle.SavePackageSnapshot", b =>
                 {
+                    b.Navigation("Defects");
+
                     b.Navigation("Deltas");
                 });
 #pragma warning restore 612, 618

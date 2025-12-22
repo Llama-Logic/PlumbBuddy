@@ -46,6 +46,7 @@ public interface ISettings :
     bool ScanForWrongGameVersionSC { get; set; }
     bool ScanForWrongGameVersionTS2 { get; set; }
     bool ScanForWrongGameVersionTS3 { get; set; }
+    bool ShowDlcRetailUsd { get; set; }
     bool ShowSystemTrayIcon { get; set; }
     bool ShowThemeManager { get; set; }
     Version? SkipUpdateVersion { get; set; }

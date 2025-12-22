@@ -7,9 +7,11 @@ public interface IUserInterfaceMessaging :
 
     event EventHandler<BeginManifestingModRequestedEventArgs>? BeginManifestingModRequested;
     event EventHandler<FilesDroppedEventArgs>? FilesDropped;
+    event EventHandler? ShowArchivistRequested;
 
     void BeginManifestingMod(string modFilePath);
     void DropFiles(IReadOnlyList<string> paths);
     Task<IReadOnlyList<string>> GetFilesFromDragAndDropAsync();
     Task<bool> IsModScaffoldedAsync(string modFilePath);
+    void ShowArchivist();
 }

@@ -1,4 +1,3 @@
-using System.Threading;
 using Serializer = ProtoBuf.Serializer;
 
 namespace PlumbBuddy.Services.Archival;
@@ -21,7 +20,7 @@ public partial class Archivist :
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
     public static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IProxyHost proxyHost, ISuperSnacks superSnacks)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IProxyHost proxyHost, ISuperSnacks superSnacks, IUserInterfaceMessaging userInterfaceMessaging)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
@@ -32,6 +31,7 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(modsDirectoryCataloger);
         ArgumentNullException.ThrowIfNull(proxyHost);
         ArgumentNullException.ThrowIfNull(superSnacks);
+        ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
         this.loggerFactory = loggerFactory;
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
@@ -41,6 +41,7 @@ public partial class Archivist :
         this.modsDirectoryCataloger = modsDirectoryCataloger;
         this.proxyHost = proxyHost;
         this.superSnacks = superSnacks;
+        this.userInterfaceMessaging = userInterfaceMessaging;
         chronicleByNucleusIdAndCreated = [];
         chronicles = [];
         Chronicles = new(chronicles);
@@ -49,6 +50,7 @@ public partial class Archivist :
         this.settings.PropertyChanged += HandleSettingsPropertyChanged;
         if (this.settings.ArchivistEnabled)
             ConnectToFolders();
+        WarnIfDisabled();
     }
 
     ~Archivist() =>
@@ -78,6 +80,7 @@ public partial class Archivist :
     string snapshotsSearchText = string.Empty;
     ArchivistState state;
     readonly ISuperSnacks superSnacks;
+    readonly IUserInterfaceMessaging userInterfaceMessaging;
 
     public ReadOnlyObservableCollection<Chronicle> Chronicles { get; }
 
@@ -312,6 +315,8 @@ public partial class Archivist :
             else
                 DisconnectFromFolders();
         }
+        else if (e.PropertyName is nameof(ISettings.Onboarded))
+            WarnIfDisabled();
         else if (e.PropertyName is nameof(ISettings.UserDataFolderPath))
         {
             if (settings.ArchivistEnabled)
@@ -383,7 +388,7 @@ public partial class Archivist :
                 throw new FormatException("save package contains invalid number of save game data resources");
             var saveGameDataKey = saveGameDataKeys[0];
             DiagnosticStatus = $"{fileInfo.Name} / Deserialize SGD";
-            var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+            var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
             if (saveGameData.SaveSlot is not { } saveSlot
                 || saveGameData.Account is not { } account)
                 return;
@@ -422,9 +427,9 @@ public partial class Archivist :
                 .ConfigureAwait(false);
             var activeHousehold = saveGameData.Households.FirstOrDefault(h => h.HouseholdId == saveSlot.ActiveHouseholdId);
             var zoneId = saveSlot.GameplayData?.CameraData?.ZoneId ?? default;
-            var lastZone = saveGameData.Zones?.FirstOrDefault(z => z.ZoneId == zoneId);
+            var lastZone = saveGameData.Zones.FirstOrDefault(z => z.ZoneId == zoneId);
             var neighborhoodId = lastZone?.NeighborhoodId ?? default;
-            var lastNeighborhood = saveGameData.Neighborhoods?.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
+            var lastNeighborhood = saveGameData.Neighborhoods.FirstOrDefault(n => n.NeighborhoodId == neighborhoodId);
             await chronicleDbContext.Database.ExecuteSqlRawAsync("INSERT INTO KnownSavePackageHashes (Sha256) VALUES ({0}) ON CONFLICT DO NOTHING", fileHashArray).ConfigureAwait(false);
             newSnapshot = new SavePackageSnapshot
             {
@@ -435,6 +440,77 @@ public partial class Archivist :
                 Label = $"Snapshot {(lastSnapshot is null ? 0 : lastSnapshot.Id) + 1:n0}",
                 OriginalSavePackageHash = await chronicleDbContext.KnownSavePackageHashes.FirstAsync(mfh => mfh.Sha256 == fileHashArray).ConfigureAwait(false)
             };
+            DiagnosticStatus = $"{fileInfo.Name} / Indexing Relationships";
+            var indexedRelationships = saveSlot.GameplayData is { } gameplayData
+                && gameplayData.RelationshipService is { } relationshipService
+                && relationshipService.Relationships is { Count: > 0 } relationships
+                ? relationships.ToImmutableDictionary(r => new RelationshipKey(r.SimIdA, r.SimIdB))
+                : ImmutableDictionary<RelationshipKey, PersistableServiceRelationship>.Empty;
+            DiagnosticStatus = $"{fileInfo.Name} / Checking for Siblings With Romantic Relationships";
+            var sims = saveGameData.Sims.ToImmutableDictionary(sd => sd.SimId);
+            var households = saveGameData.Households.ToImmutableDictionary(hd => hd.HouseholdId);
+            var zones = saveGameData.Zones.ToImmutableDictionary(zd => zd.ZoneId);
+            var neighborhoods = saveGameData.Neighborhoods.ToImmutableDictionary(nd => nd.NeighborhoodId);
+            foreach (var (mom, children) in saveGameData.Sims
+                .SelectMany
+                (
+                    sd => sd.Attributes
+                        ?.GenealogyTracker
+                        ?.FamilyRelations
+                        .Where(fr => fr.RelationType is RelationshipIndex.RelationshipMother)
+                        .Select(fr => (mother: fr.SimId, child: sd.SimId))
+                        ?? Enumerable.Empty<(ulong mother, ulong child)>()
+                )
+                .GroupBy(motherhood => motherhood.mother)
+                .Where(g => g.Count() > 1)
+                .Select(g => (mom: g.Key, children: g.Select(motherhood => motherhood.child).ToImmutableArray())))
+            {
+                for (var siblingAIndex = 0; siblingAIndex < children.Length - 1; ++siblingAIndex)
+                    for (var siblingBIndex = siblingAIndex + 1; siblingBIndex < children.Length; ++siblingBIndex)
+                    {
+                        var siblingAId = children[siblingAIndex];
+                        var siblingBId = children[siblingBIndex];
+                        if (indexedRelationships.TryGetValue(new RelationshipKey(siblingAId, siblingBId), out var relationship)
+                            && relationship.BidirectionalRelationshipData is { } bidirectional
+                            && bidirectional.Tracks.Any(t => t.TrackId is 0x410B))
+                        {
+                            var siblingA = sims.TryGetValue(siblingAId, out var siblingAValue) ? siblingAValue : null;
+                            var siblingAHousehold = households.TryGetValue(siblingA?.HouseholdId ?? 0, out var siblingAHouseholdValue) ? siblingAHouseholdValue : null;
+                            var siblingAHomeZone = zones.TryGetValue(siblingAHousehold?.HomeZone ?? 0, out var siblingAHomeZoneValue) ? siblingAHomeZoneValue : null;
+                            var siblingAHomeNeighborhood = neighborhoods.TryGetValue(siblingAHomeZone?.NeighborhoodId ?? 0, out var siblingAHomeNeighborhoodValue) ? siblingAHomeNeighborhoodValue : null;
+                            var siblingB = sims.TryGetValue(siblingBId, out var siblingBValue) ? siblingBValue : null;
+                            var siblingBHousehold = households.TryGetValue(siblingB?.HouseholdId ?? 0, out var siblingBHouseholdValue) ? siblingBHouseholdValue : null;
+                            var siblingBHomeZone = zones.TryGetValue(siblingBHousehold?.HomeZone ?? 0, out var siblingBHomeZoneValue) ? siblingBHomeZoneValue : null;
+                            var siblingBHomeNeighborhood = neighborhoods.TryGetValue(siblingBHomeZone?.NeighborhoodId ?? 0, out var siblingBHomeNeighborhoodValue) ? siblingBHomeNeighborhoodValue : null;
+                            newSnapshot.Defects.Add
+                            (
+                                new
+                                (
+                                    newSnapshot,
+                                    string.Format
+                                    (
+                                        AppText.Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description,
+                                        siblingA?.FirstName ?? "?",
+                                        siblingA?.LastName ?? "?",
+                                        siblingAId,
+                                        siblingAHousehold?.Name ?? "?",
+                                        siblingAHomeZone?.Name ?? "?",
+                                        siblingAHomeNeighborhood?.Name ?? "?",
+                                        siblingB?.FirstName ?? "?",
+                                        siblingB?.LastName ?? "?",
+                                        siblingBId,
+                                        siblingBHousehold?.Name ?? "?",
+                                        siblingBHomeZone?.Name ?? "?",
+                                        siblingBHomeNeighborhood?.Name ?? "?"
+                                    )
+                                )
+                                {
+                                    SavePackageSnapshotDefectType = SavePackageSnapshotDefectType.SiblingsWithRomanticRelationship
+                                }
+                            );
+                        }
+                    }
+            }
             var contextLock = new AsyncLock();
             using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
                 await Task.WhenAll(packageKeys.Select(async key =>
@@ -454,7 +530,7 @@ public partial class Archivist :
                         var content =
                               explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
                             ? await package.GetRawAsync(key).ConfigureAwait(false)
-                            : await package.GetAsync(key).ConfigureAwait(false);
+                            : await package.GetAsync(key, true).ConfigureAwait(false);
                         var compressedContent = (await DataBasePackedFile.ZLibCompressAsync(content).ConfigureAwait(false)).ToArray();
                         var compressionType = explicitCompressionMode switch
                         {
@@ -469,7 +545,7 @@ public partial class Archivist :
                         {
                             try
                             {
-                                var png = await package.GetTranslucentJpegAsPngAsync(key).ConfigureAwait(false);
+                                var png = await package.GetTranslucentJpegAsPngAsync(key, true).ConfigureAwait(false);
                                 newSnapshot.Thumbnail = MemoryMarshal.TryGetArray(png, out var segment) && segment.Array is { } array
                                     ? array
                                     : png.ToArray();
@@ -611,6 +687,7 @@ public partial class Archivist :
                 await enhancedPackageMemoryStream.DisposeAsync().ConfigureAwait(false);
             }
             using var chroniclesLockHeld = await chroniclesLock.LockAsync().ConfigureAwait(false);
+            Snapshot? viewSnapshot = null;
             if (!chronicleByNucleusIdAndCreated.TryGetValue((account.NucleusId, account.Created), out var chronicle))
             {
                 chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
@@ -621,7 +698,26 @@ public partial class Archivist :
             else if (newSnapshot is not null)
             {
                 await chronicle.ReloadScalarsAsync().ConfigureAwait(false);
-                await chronicle.LoadSnapshotAsync(newSnapshot).ConfigureAwait(false);
+                viewSnapshot = await chronicle.LoadSnapshotAsync(newSnapshot).ConfigureAwait(false);
+            }
+            var disabledSavePackageSnapshotDefectTypes = (await chronicleDbContext.DisabledSavePackageSnapshotDefectTypes.Select(dspsdt => dspsdt.SavePackageSnapshotDefectType).ToListAsync().ConfigureAwait(false)).ToImmutableHashSet();
+            if (newSnapshot is not null
+                && newSnapshot.Defects.Any(d => !disabledSavePackageSnapshotDefectTypes.Contains(d.SavePackageSnapshotDefectType)))
+            {
+                superSnacks.OfferRefreshments(new MarkupString(AppText.Archivist_SnapshotDefect_Snack), Severity.Warning, options =>
+                {
+                    options.Icon = MaterialDesignIcons.Normal.ContentSaveAlert;
+                    options.OnClick = async _ =>
+                    {
+                        if (chronicles.Contains(chronicle))
+                            SelectedChronicle = chronicle;
+                        if (viewSnapshot is not null)
+                            viewSnapshot.ShowDetails = true;
+                        userInterfaceMessaging.ShowArchivist();
+                    };
+                    options.RequireInteraction = true;
+                });
+                await proxyHost.ForegroundPlumbBuddyAsync(pauseGame: true).ConfigureAwait(false);
             }
         }
         catch (DirectoryNotFoundException)
@@ -814,7 +910,7 @@ public partial class Archivist :
                     continue;
                 if (!string.IsNullOrWhiteSpace(chronicle.GameNameOverride))
                 {
-                    var saveGameData = Serializer.Deserialize<ArchivistSaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
+                    var saveGameData = Serializer.Deserialize<SaveGameData>(await package.GetAsync(saveGameDataKey).ConfigureAwait(false));
                     if (chronicle.GameNameOverride?.Trim() is { Length: > 0 } gameNameOverride
                         && saveGameData.SaveSlot is { } saveSlot
                         && saveSlot.SlotName != gameNameOverride)
@@ -868,5 +964,21 @@ public partial class Archivist :
         );
         if (!appLifecycleManager.IsVisible)
             await platformFunctions.SendLocalNotificationAsync(AppText.Archivist_Notification_CannotConnectToArchivesFolder_Caption, AppText.Archivist_Notification_CannotConnectToArchivesFolder_Test).ConfigureAwait(false);
+    }
+
+    void WarnIfDisabled() =>
+        _ = Task.Run(WarnIfDisabledAsync);
+
+    async Task WarnIfDisabledAsync()
+    {
+        if (!settings.Onboarded || settings.ArchivistEnabled && settings.ArchivistAutoIngestSaves)
+            return;
+        await Task.Delay(500).ConfigureAwait(false);
+        await modsDirectoryCataloger.WaitForIdleAsync().ConfigureAwait(false);
+        superSnacks.OfferRefreshments(new MarkupString(AppText.Archivist_Disabled_Snack), Severity.Info, options =>
+        {
+            options.Icon = MaterialDesignIcons.Normal.ContentSaveCheck;
+            options.OnClick = async _ => userInterfaceMessaging.ShowArchivist();
+        });
     }
 }

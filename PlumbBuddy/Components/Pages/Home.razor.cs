@@ -2,6 +2,7 @@ namespace PlumbBuddy.Components.Pages;
 
 partial class Home
 {
+    const int archivistTabIndex = 4;
     const int manfiestEditorTabIndex = 6;
 
     int activePanelIndex;
@@ -30,6 +31,7 @@ partial class Home
         {
             Settings.PropertyChanged -= HandleSettingsPropertyChanged;
             UserInterfaceMessaging.BeginManifestingModRequested -= HandleUserInterfaceMessagingBeginManifestingModRequested;
+            UserInterfaceMessaging.ShowArchivistRequested -= HandleUserInterfaceMessagingShowArchivistRequested;
             javaScriptThis?.Dispose();
         }
     }
@@ -51,12 +53,19 @@ partial class Home
         }
     }
 
+    void HandleUserInterfaceMessagingShowArchivistRequested(object? sender, EventArgs e)
+    {
+        activePanelIndex = archivistTabIndex;
+        StateHasChanged();
+    }
+
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
+        UserInterfaceMessaging.ShowArchivistRequested += HandleUserInterfaceMessagingShowArchivistRequested;
     }
 
     protected override async Task OnInitializedAsync()

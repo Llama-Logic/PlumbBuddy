@@ -63,7 +63,12 @@
 						@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
 					</MudSwitchM3>
 				</MudTooltip>
-				@if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip)]">
+                    <MudSwitchM3 @bind-Value="@ShowDlcRetailUsd" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CurrencyUsd" ThumbOffIcon="@MaterialDesignIcons.Normal.CurrencyUsdOff">
+                        @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label)]
+                    </MudSwitchM3>
+                </MudTooltip>
+                @if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
 				{
 					<MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Tip)]">
 						<MudSwitchM3 @bind-Value="@ShowSystemTrayIcon" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.ChevronUp">

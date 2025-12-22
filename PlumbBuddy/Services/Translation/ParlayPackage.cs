@@ -1,4 +1,4 @@
-namespace PlumbBuddy.Services;
+namespace PlumbBuddy.Services.Translation;
 
 public record ParlayPackage(string ModFilePath, string? ManifestedName, string? ManifestedCreators, string? ManifestedVersion, string? ManifestedMessageFromCreators, Uri? ManifestedTranslationSubmissionUrl, IReadOnlyList<ParlayStringTable> StringTables)
 {

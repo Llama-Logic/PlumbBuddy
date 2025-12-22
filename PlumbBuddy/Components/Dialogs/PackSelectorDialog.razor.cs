@@ -1,7 +1,6 @@
-using Microsoft.Maui.Controls;
-
 namespace PlumbBuddy.Components.Dialogs;
 
+[SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 partial class PackSelectorDialog
 {
     static readonly Dictionary<string, string> cachedBase64PackIcons = [];
@@ -22,6 +21,12 @@ partial class PackSelectorDialog
             return isCheckedValues[0];
         }
     }
+
+    decimal DisabledDlcTotalRetailUsd =>
+        PackGroups.SelectMany(packGroup => packGroup.Packs.Where(pack => !pack.IsChecked).Select(pack => pack.RetailUsd ?? 0)).Sum();
+
+    decimal EnabledDlcTotalRetailUsd =>
+        PackGroups.SelectMany(packGroup => packGroup.Packs.Where(pack => pack.IsChecked).Select(pack => pack.RetailUsd ?? 0)).Sum();
 
     [CascadingParameter]
     IMudDialogInstance? MudDialog { get; set; }
@@ -99,7 +104,7 @@ partial class PackSelectorDialog
     {
         isApplying = true;
         StateHasChanged();
-        if (await SmartSimObserver.CheckIfGameIsRunningAsync().ConfigureAwait(false))
+        if (await SmartSimObserver.CheckIfGameIsRunningAsync())
         {
             isApplying = false;
             StateHasChanged();
@@ -186,6 +191,7 @@ partial class PackSelectorDialog
     void ReloadPackGroups() =>
         _ = StaticDispatcher.DispatchAsync(ReloadPackGroupsAsync);
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ReloadPackGroupsAsync()
     {
         PackGroups.Clear();
@@ -207,7 +213,7 @@ partial class PackSelectorDialog
                 if (!packCatalog.TryGetValue(packCode, out var packCatalogEntry))
                     continue;
                 IList<Pack> packs;
-                var packGroupKey = $"{packCatalogEntry.Type}{packCatalogEntry.SubType}{packCatalogEntry.KitType}{(string.IsNullOrWhiteSpace(packCatalogEntry.EaPromoCode) ? string.Empty : "Creator")}";
+                var packGroupKey = $"{packCatalogEntry.Type}{packCatalogEntry.SubType}{packCatalogEntry.KitType}{(packCatalogEntry.IsCreatorContent ? "Creator" : string.Empty)}";
                 if (packGroups.TryGetValue(packGroupKey, out var packGroup))
                     packs = packGroup.packs;
                 else
@@ -239,7 +245,8 @@ partial class PackSelectorDialog
                     Code = packCode,
                     Icon = $"data:image/png;base64,{await GetPackIconAsync(packCode)}",
                     IsChecked = !currentlyDisabledPacks.Contains(packCode),
-                    Name = packCatalogEntry.EnglishName
+                    Name = packCatalogEntry.EnglishName,
+                    RetailUsd = packCatalogEntry.RetailUsd
                 });
             }
         }
@@ -305,6 +312,9 @@ partial class PackSelectorDialog
             }
         }
 
+        public decimal TotalRetailUsd =>
+            Packs.Sum(pack => pack.RetailUsd ?? 0);
+
         public required string Name { get; init; }
         public required IReadOnlyList<Pack> Packs { get; init; }
     }
@@ -315,5 +325,6 @@ partial class PackSelectorDialog
         public required string Icon { get; init; }
         public bool IsChecked { get; set; }
         public required string Name { get; init; }
+        public decimal? RetailUsd { get; init; }
     }
 }

@@ -109,6 +109,8 @@ partial class SettingsDialog
 
     bool ScanForWrongGameVersionTS3 { get; set; }
 
+    bool ShowDlcRetailUsd { get; set; }
+
     bool ShowSystemTrayIcon { get; set; }
 
     [Inject]
@@ -234,6 +236,7 @@ partial class SettingsDialog
         ScanForWrongGameVersionSC = Settings.ScanForWrongGameVersionSC;
         ScanForWrongGameVersionTS2 = Settings.ScanForWrongGameVersionTS2;
         ScanForWrongGameVersionTS3 = Settings.ScanForWrongGameVersionTS3;
+        ShowDlcRetailUsd = Settings.ShowDlcRetailUsd;
         ShowSystemTrayIcon = Settings.ShowSystemTrayIcon;
         Type = Settings.Type;
     }
@@ -294,6 +297,7 @@ partial class SettingsDialog
         Settings.ScanForWrongGameVersionSC = ScanForWrongGameVersionSC;
         Settings.ScanForWrongGameVersionTS2 = ScanForWrongGameVersionTS2;
         Settings.ScanForWrongGameVersionTS3 = ScanForWrongGameVersionTS3;
+        Settings.ShowDlcRetailUsd = ShowDlcRetailUsd;
         Settings.ShowSystemTrayIcon = ShowSystemTrayIcon;
         Settings.Type = Type;
         Settings.UserDataFolderPath = UserDataFolderPath;

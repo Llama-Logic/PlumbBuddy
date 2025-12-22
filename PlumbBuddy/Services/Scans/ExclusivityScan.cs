@@ -30,6 +30,8 @@ public class ExclusivityScan :
         return Task.CompletedTask;
     }
 
+    [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+    [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public override async IAsyncEnumerable<ScanIssue> ScanAsync()
     {
         using var pbDbContext = await pbDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);

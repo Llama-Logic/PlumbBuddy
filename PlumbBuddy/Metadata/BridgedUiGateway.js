@@ -765,7 +765,8 @@
     const globalRelationalDataStores = [];
     const promisedBridgedUis = {};
     const promisedBridgedUiLookUps = {};
-    let promisedScreenshotList = null;
+    let promisedScreenshotNamesList = null;
+    const promisedScreenshotDetails = {};
     const promisedStringTableEntriesLookUps = {};
     const saveSpecificRelationalDataStores = [];
     let dispatchDataReceived = null;
@@ -894,6 +895,25 @@
         }
 
         /**
+         * Requests the details for the specified screenshot
+         * @param {String} the name of the screenshot
+         * @returns {Promise} a promise that will resolve with the details for the specified screenshot
+         */
+        getScreenshotDetails(screenshotName) {
+            const alreadyPromised = promisedScreenshotDetails[screenshotName];
+            if (alreadyPromised) {
+                return alreadyPromised.promise;
+            }
+            const madePromise = makePromise();
+            promisedScreenshotDetails[screenshotName] = madePromise;
+            sendMessageToPlumbBuddy({
+                type: 'getScreenshotDetails',
+                name: screenshotName,
+            });
+            return madePromise.promise;
+        }
+
+        /**
          * Attempts to look up a loaded bridged UI
          * @param {String} uniqueId the UUID for the tab of the bridged UI
          * @returns {Promise} a promise that will resolve with the bridged UI or a fault that it is not currently loaded
@@ -921,19 +941,45 @@
         }
 
         /**
-         * Requests a list of the screenshots currently in the player's Screenshots folder
+         * Requests a list of the names of screenshots currently in the player's Screenshots folder
          * @returns {Promise} a promise that will resolve with the list of screenshots currently in the player's Screenshots folder
          */
-        listScreenshots() {
-            if (promisedScreenshotList) {
-                return promisedScreenshotList.promise;
+        listScreenshotNames() {
+            if (promisedScreenshotNamesList) {
+                return promisedScreenshotNamesList.promise;
             }
             const madePromise = makePromise();
-            promisedScreenshotList = madePromise;
+            promisedScreenshotNamesList = madePromise;
             sendMessageToPlumbBuddy({
-                type: 'listScreenshots'
+                type: 'listScreenshotNames'
             });
-            return promisedScreenshotList.promise;
+            return promisedScreenshotNamesList.promise;
+        }
+
+        /**
+         * Requests a list of the screenshots, including their details, currently in the player's Screenshots folder
+         * @param {Function} progressCallback (optional) a callback function which will be invoked with three parameters: (1) the total number of screenshots being listed; (2) the current number of screenshots which have been loaded; (3) the screenshot that was just loaded, if there is one
+         * @returns {Promise} a promise that will resolve with the list of screenshots currently in the player's Screenshots folder
+         */
+        async listScreenshots(progressCallback = null) {
+            const callerWantsProgress = typeof progressCallback === 'function' || progressCallback instanceof Function;
+            const screenshotNames = await this.listScreenshotNames();
+            if (!Array.isArray(screenshotNames)) {
+                return;
+            }
+            const totalScreenshots = screenshotNames.length;
+            if (callerWantsProgress) {
+                progressCallback(screenshotNames.length, 0);
+            }
+            const result = [];
+            for (let i = 0; i < totalScreenshots; ++i) {
+                const screenshotDetails = await this.getScreenshotDetails(screenshotNames[i]);
+                result.push(screenshotDetails);
+                if (callerWantsProgress) {
+                    progressCallback(screenshotNames.length, i + 1, screenshotDetails);
+                }
+            }
+            return result;
         }
 
         /**
@@ -1081,12 +1127,21 @@
                     gamepads.push(gamepad);
                     dispatchGamepadConnected(gamepad);
                 });
-            } else if (message.type === 'listScreenshotsResponse') {
-                if (!promisedScreenshotList) {
+            } else if (message.type === 'getScreenshotDetailsResponse') {
+                const screenshotName = message.name;
+                const promised = promisedScreenshotDetails[screenshotName];
+                if (!promised) {
                     return;
                 }
-                promisedScreenshotList.resolve(message.screenshots);
-                promisedScreenshotList = null;
+                delete message.type;
+                promised.resolve(message);
+                delete promisedScreenshotDetails[screenshotName];
+            } else if (message.type === 'listScreenshotNamesResponse') {
+                if (!promisedScreenshotNamesList) {
+                    return;
+                }
+                promisedScreenshotNamesList.resolve(message.names);
+                promisedScreenshotNamesList = null;
             } else if (message.type === 'lookUpLocalizedStringsResponse') {
                 const lookUpId = sanitizeUuid(message.lookUpId);
                 const promisedLookUp = promisedStringTableEntriesLookUps[lookUpId];

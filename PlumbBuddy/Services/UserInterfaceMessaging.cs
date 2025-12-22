@@ -28,6 +28,7 @@ public sealed class UserInterfaceMessaging :
     public event EventHandler<BeginManifestingModRequestedEventArgs>? BeginManifestingModRequested;
     public event EventHandler<FilesDroppedEventArgs>? FilesDropped;
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler? ShowArchivistRequested;
 
     public void BeginManifestingMod(string modFilePath) =>
         _ = StaticDispatcher.DispatchAsync(async () =>
@@ -81,4 +82,7 @@ public sealed class UserInterfaceMessaging :
 
     void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+
+    public void ShowArchivist() =>
+        ShowArchivistRequested?.Invoke(this, EventArgs.Empty);
 }

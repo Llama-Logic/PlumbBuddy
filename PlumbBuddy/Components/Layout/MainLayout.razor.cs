@@ -231,6 +231,7 @@ public partial class MainLayout
             await JSRuntime.InvokeVoidAsync("subscribeToPreferredColorSchemeChanges", javaScriptThis);
             await mainPage.ShowWebViewAsync();
         }
+        
     }
 
     void OpenThemeManager(bool value) =>

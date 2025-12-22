@@ -19,7 +19,7 @@ namespace PlumbBuddy.Localization {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class AppText {
@@ -286,6 +286,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can toggle watching for certain defects on or off specifically for this chronicle. This can be useful if you&apos;ve triggered any of them purposefully..
+        /// </summary>
+        internal static string Archivist_Chronicle_WatchedSnapshotDefects_HelperText {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_WatchedSnapshotDefects_HelperText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Watch for Save Defects.
+        /// </summary>
+        internal static string Archivist_Chronicle_WatchedSnapshotDefects_Label {
+            get {
+                return ResourceManager.GetString("Archivist_Chronicle_WatchedSnapshotDefects_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to do this?.
         /// </summary>
         internal static string Archivist_DeletePriorSnapshot_Caution_Caption {
@@ -318,6 +336,15 @@ namespace PlumbBuddy.Localization {
         internal static string Archivist_DeletePriorSnapshot_Caution2_Text {
             get {
                 return ResourceManager.GetString("Archivist_DeletePriorSnapshot_Caution2_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Archivist could be checking your saves for known defects and helping with them, but it&apos;s currently disabled or not automatically taking snapshots. Click here to open Archivist..
+        /// </summary>
+        internal static string Archivist_Disabled_Snack {
+            get {
+                return ResourceManager.GetString("Archivist_Disabled_Snack", resourceCulture);
             }
         }
         
@@ -517,6 +544,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I&apos;ve found some problems with this snapshot. Click here to learn more..
+        /// </summary>
+        internal static string Archivist_Snapshot_DefectsPresent_Tip {
+            get {
+                return ResourceManager.GetString("Archivist_Snapshot_DefectsPresent_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Permanently Delete all Snapshots preceding this one and Reclaim Space.
         /// </summary>
         internal static string Archivist_Snapshot_DeletePrior_Tip {
@@ -648,6 +684,39 @@ namespace PlumbBuddy.Localization {
         internal static string Archivist_Snapshot_ViewDetails_Tip {
             get {
                 return ResourceManager.GetString("Archivist_Snapshot_ViewDetails_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following sims in this snapshot are considered siblings *and* have a romantic relationship track.
+        ///
+        ///&gt; {0} {1} ({2})&lt;br /&gt; {3}&lt;br /&gt; {4}, {5}
+        ///
+        ///&gt; {6} {7} ({8})&lt;br /&gt; {9}&lt;br /&gt; {10}, {11}
+        ///
+        ///EA has publicly asked for help in fixing a game bug in which this can happen accidentally. If you didn&apos;t cause this intentionally, please consider [contacting us on Discord](http://discord.gg/XKbMEEfRde). We can help you verify that you experienced the bug for which EA is looking and coordinate getting your save to  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description {
+            get {
+                return ResourceManager.GetString("Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Siblings with Romantic Relationship.
+        /// </summary>
+        internal static string Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Label {
+            get {
+                return ResourceManager.GetString("Archivist_SnapshotDefect_SiblingsWithRomanticRelationship_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sorry to interrupt, but while archiving the save which just appeared, I found something wrong with it.  I&apos;d like to show it to you right now. This could be important. Please click this warning..
+        /// </summary>
+        internal static string Archivist_SnapshotDefect_Snack {
+            get {
+                return ResourceManager.GetString("Archivist_SnapshotDefect_Snack", resourceCulture);
             }
         }
         
@@ -5506,6 +5575,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show the retail cost of DLC in USD.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whenever DLC is being listed in some way, I&apos;ll show you the combined retail cost of it in US dollars, as if you had purchased it at full price..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show an icon in the system tray.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_ShowSystemTrayIcon_Label {
@@ -5762,6 +5849,24 @@ namespace PlumbBuddy.Localization {
         internal static string PackSelectorDialog_Status_Examining {
             get {
                 return ResourceManager.GetString("PackSelectorDialog_Status_Examining", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total Retail Value of Disabled Content: {0:c}.
+        /// </summary>
+        internal static string PackSelectorDialog_TotalDisabledContent_Label {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_TotalDisabledContent_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total Retail Value of Enabled Content: {0:c}.
+        /// </summary>
+        internal static string PackSelectorDialog_TotalEnabledContent_Label {
+            get {
+                return ResourceManager.GetString("PackSelectorDialog_TotalEnabledContent_Label", resourceCulture);
             }
         }
         
@@ -8916,6 +9021,33 @@ namespace PlumbBuddy.Localization {
         internal static string SmartSimObserver_HelpWithPackPurchase_Thanks_Text {
             get {
                 return ResourceManager.GetString("SmartSimObserver_HelpWithPackPurchase_Thanks_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing to Report.
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_Caption {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I found nothing wrong with your game or mods, but that might have to do with you having disabled almost every scan. You can turn them back on in **Settings**..
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_Description {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Mod Health Settings.
+        /// </summary>
+        internal static string SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label {
+            get {
+                return ResourceManager.GetString("SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label", resourceCulture);
             }
         }
         

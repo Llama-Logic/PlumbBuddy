@@ -408,9 +408,6 @@ public partial class SmartSimObserver :
                 );
                 return false;
             }
-            var saveScratchDirectory = new DirectoryInfo(Path.Combine(settings.UserDataFolderPath, "saves", "scratch"));
-            if (saveScratchDirectory.Exists)
-                saveScratchDirectory.Delete(true);
             foreach (var cacheComponent in cacheComponents)
             {
                 var retries = 20;
@@ -1284,7 +1281,22 @@ public partial class SmartSimObserver :
                     }
                 })).ConfigureAwait(false);
             }
-            ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption)];
+            ScanIssues = [..scanIssues.OrderByDescending(scanIssue => scanIssue.Type).ThenBy(scanIssue => scanIssue.Caption), ..scanIssues.IsEmpty ? [new ScanIssue()
+            {
+                Caption = AppText.SmartSimObserver_NoScanIssues_Caption,
+                Data = "no-scan-issues",
+                Description = AppText.SmartSimObserver_NoScanIssues_Description,
+                Icon = MaterialDesignIcons.Normal.FlaskEmptyOff,
+                Resolutions =
+                [
+                    new()
+                    {
+                        Data = "open-mod-health-settings",
+                        Icon = MaterialDesignIcons.Normal.Cog,
+                        Label = AppText.SmartSimObserver_NoScanIssues_OpenModHealthSettings_Label
+                    }
+                ]
+            }] : Enumerable.Empty<ScanIssue>()];
             var attentionWorthyScanIssues = scanIssues.Where(si => si.Type is not ScanIssueType.Healthy).ToImmutableArray();
             if (attentionWorthyScanIssues.Length is > 0)
             {
