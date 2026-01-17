@@ -3,6 +3,7 @@ namespace PlumbBuddy.Services;
 public interface ISettings :
     INotifyPropertyChanged
 {
+    bool AllowModsToInterceptKeyStrokes { get; set; }
     string ArchiveFolderPath { get; set; }
     bool ArchivistEnabled { get; set; }
     bool ArchivistAutoIngestSaves { get; set; }
@@ -20,6 +21,7 @@ public interface ISettings :
     ModHoundExcludePackagesMode ModHoundExcludePackagesMode { get; set; }
     ImmutableArray<string> ModHoundPackagesExclusions { get; set; }
     TimeSpan? ModHoundReportRetentionPeriod { get; set; }
+    bool NotifyOnModKeyStrokeInterceptionChanges { get; set; }
     bool OfferPatchDayModUpdatesHelp { get; set; }
     bool Onboarded { get; set; }
     string ParlayName { get; set; }

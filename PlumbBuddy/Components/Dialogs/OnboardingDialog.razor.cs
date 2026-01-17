@@ -10,6 +10,12 @@ partial class OnboardingDialog
     bool isModHealthGuideVisible;
     string? loadingText;
 
+    bool AllowModsToInterceptKeyStrokes
+    {
+        get => Settings.AllowModsToInterceptKeyStrokes;
+        set => Settings.AllowModsToInterceptKeyStrokes = value;
+    }
+
     string ArchiveFolderPath
     {
         get => Settings.ArchiveFolderPath;
@@ -44,6 +50,12 @@ partial class OnboardingDialog
     {
         get => Settings.InstallationFolderPath;
         set => Settings.InstallationFolderPath = value;
+    }
+
+    bool NotifyOnModKeyStrokeInterceptionChanges
+    {
+        get => Settings.NotifyOnModKeyStrokeInterceptionChanges;
+        set => Settings.NotifyOnModKeyStrokeInterceptionChanges = value;
     }
 
     bool OfferPatchDayModUpdatesHelp

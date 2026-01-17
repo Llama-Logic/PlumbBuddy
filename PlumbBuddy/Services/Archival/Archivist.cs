@@ -340,6 +340,7 @@ public partial class Archivist :
         OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
+    [SuppressMessage("Maintainability", "CA1505: Avoid unmaintainable code")]
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     async Task ProcessDequeuedFileAsync(FileInfo fileInfo, bool isInSavesDirectory, DateTime? gameStarted)
     {

@@ -11,6 +11,18 @@ class Settings :
 
     readonly IPreferences preferences;
 
+    public bool AllowModsToInterceptKeyStrokes
+    {
+        get => preferences.Get(nameof(AllowModsToInterceptKeyStrokes), false);
+        set
+        {
+            if (AllowModsToInterceptKeyStrokes == value)
+                return;
+            preferences.Set(nameof(AllowModsToInterceptKeyStrokes), value);
+            OnPropertyChanged();
+        }
+    }
+
     public string ArchiveFolderPath
     {
         get => preferences.Get(nameof(ArchiveFolderPath), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PlumbBuddy", "Archive"));
@@ -221,6 +233,18 @@ class Settings :
             if (ModHoundReportRetentionPeriod == value)
                 return;
             preferences.Set(nameof(ModHoundReportRetentionPeriod), (value == null ? TimeSpan.FromSeconds(-1) : value < minimumModHoundReportRetentionPeriod ? minimumModHoundReportRetentionPeriod : value).ToString());
+            OnPropertyChanged();
+        }
+    }
+
+    public bool NotifyOnModKeyStrokeInterceptionChanges
+    {
+        get => preferences.Get(nameof(NotifyOnModKeyStrokeInterceptionChanges), true);
+        set
+        {
+            if (NotifyOnModKeyStrokeInterceptionChanges == value)
+                return;
+            preferences.Set(nameof(NotifyOnModKeyStrokeInterceptionChanges), value);
             OnPropertyChanged();
         }
     }

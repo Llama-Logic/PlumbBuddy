@@ -22,5 +22,6 @@ public interface IProxyHost :
     Task ForegroundPlumbBuddyAsync(bool pauseGame = false);
     Task NotifyScreenshotsChangedAsync();
     Task ProcessMessageFromBridgedUiAsync(Guid uniqueId, string messageJson);
+    Task ShowNotificationAsync(string text, string? title = null, ulong? iconInstance = null);
     Task WaitForSavesAccessAsync(CancellationToken cancellationToken = default);
 }

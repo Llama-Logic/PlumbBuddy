@@ -1,15 +1,18 @@
 import base64
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from clock import ClockSpeedMode, ServerClock
+from datetime import timedelta
+from distributor.shared_messages import IconInfoData
+import os
+from plumbbuddy_proxy import logger
 from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
 from plumbbuddy_proxy.utilities import inject_to
 from plumbbuddy_proxy.ipc_client import ipc
-from plumbbuddy_proxy import logger
-import os
-from clock import ClockSpeedMode, ServerClock
-from datetime import timedelta
 import services
+from sims4.localization import LocalizationHelperTuning
+from sims4.resources import Types, get_resource_key
 import subprocess
 import sys
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from ui.ui_dialog_notification import UiDialogNotification
 from uuid import uuid4, UUID
 import webbrowser
@@ -52,6 +55,15 @@ def _attach_save_characteristics(ipc_message: dict) -> dict:
     except Exception as ex:
         logger.exception(ex)
         return ipc_message
+
+def _show_notification(text: str, title: str = None, icon_instance: int = None):
+    if title is None:
+        title = 'PlumbBuddy Script API'
+    localized_text = lambda **_: LocalizationHelperTuning.get_raw_text(text)
+    localized_title = lambda **_: LocalizationHelperTuning.get_raw_text(title)
+    client = services.client_manager().get_first_client()
+    notification = UiDialogNotification.TunableFactory().default(client.active_sim, text = localized_text, title = localized_title)
+    notification.show_dialog(icon_override = IconInfoData(icon_resource = get_resource_key(icon_instance, Types.PNG)) if icon_instance else IconInfoData(obj_instance = client.active_sim))
 
 def _try_to_foreground_plumbbuddy():
     if os.name == 'nt':
@@ -703,14 +715,26 @@ class Gateway:
     def __init__(self):
         self._gamepads: List[Gamepad] = []
         self._global_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
+        self._intercepting_keys = set()
         self._save_specific_relational_data_stores: Dict[UUID, Tuple[RelationalDataStorage, dict]] = {}
         self._reset_bridged_ui_cache()
+        self._reset_intercept_keys_cache()
         self._reset_look_up_string_table_entries_cache()
 
         self._dispatch_is_connected_changed: Callable[[bool], None] = lambda _: None
         def set_dispatch_is_connected_changed(dispatch: Callable[[bool], None]):
             self._dispatch_is_connected_changed = dispatch
         self._is_connected_changed: Event[bool] = Event(set_dispatch_is_connected_changed)
+
+        self._dispatch_key_down_intercepted: Callable[[str], None] = lambda _: None
+        def set_dispatch_key_down_intercepted(dispatch: Callable[[str], None]):
+            self._dispatch_key_down_intercepted = dispatch
+        self._key_down_intercepted: Event[str] = Event(set_dispatch_key_down_intercepted)
+
+        self._dispatch_key_up_intercepted: Callable[[str], None] = lambda _: None
+        def set_dispatch_key_up_intercepted(dispatch: Callable[[str], None]):
+            self._dispatch_key_up_intercepted = dispatch
+        self._key_up_intercepted: Event[str] = Event(set_dispatch_key_up_intercepted)
 
         self._dispatch_gamepad_connected: Callable[[Gamepad], None] = lambda _: None
         def set_dispatch_gamepad_disconnected(dispatch: Callable[[Gamepad], None]):
@@ -720,6 +744,7 @@ class Gateway:
         @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
             if connection_state == 0:
+                self._intercepting_keys.clear()
                 requested_bridged_uis = getattr(self, '_requested_bridged_uis', None)
                 if requested_bridged_uis is not None:
                     for eventuals_list in requested_bridged_uis.values():
@@ -735,6 +760,7 @@ class Gateway:
                     for bridged_ui_tuple in bridged_uis.values():
                         bridged_ui_tuple[1]['destroyed'](None)
                 self._reset_bridged_ui_cache()
+                self._reset_intercept_keys_cache()
                 self._reset_look_up_string_table_entries_cache()
                 self._dispatch_is_connected_changed(False)
             elif connection_state == 2:
@@ -889,6 +915,12 @@ class Gateway:
                 self._gamepads.append(gamepad)
                 self._dispatch_gamepad_connected(gamepad)
             return
+        if message_type == 'key_intercepted':
+            if message['is_down']:
+                self._dispatch_key_down_intercepted(message['key'])
+            else:
+                self._dispatch_key_up_intercepted(message['key'])
+            return
         if message_type == 'look_up_localized_strings_response':
             eventual: Eventual[Sequence[StringTableEntry]] = None
             try:
@@ -915,12 +947,48 @@ class Gateway:
                 'type': 'send_loaded_save_identifiers_response'
             }))
             return
+        if message_type == 'show_notification':
+            show_notification_kwargs = {}
+            if message['title']:
+                show_notification_kwargs['title'] = message['title'].strip()
+            if message['icon_instance']:
+                show_notification_kwargs['icon_instance'] = int(message['icon_instance'], 16)
+            _show_notification(message['text'].strip(), **show_notification_kwargs)
+            return
+        if message_type == 'start_intercepting_keys_response':
+            for key, result in message['key_results'].items():
+                if result == 0:
+                    self._intercepting_keys.add(key.casefold())
+            if message['request_id']:
+                eventual: Eventual[Dict[str, int]] = None
+                try:
+                    eventual = self._start_desktop_input_interception_requests.pop(UUID(message['request_id']))
+                except KeyError:
+                    return
+                eventual._set_result(message['key_results'])
+            return
+        if message_type == 'stop_intercepting_keys_response':
+            for key, result in message['key_results'].items():
+                if result == 0:
+                    self._intercepting_keys.remove(key.casefold())
+            if message['request_id']:
+                eventual: Eventual[Dict[str, int]] = None
+                try:
+                    eventual = self._stop_desktop_input_interception_requests.pop(UUID(message['request_id']))
+                except KeyError:
+                    return
+                eventual._set_result(message['key_results'])
+            return
 
     def _reset_bridged_ui_cache(self):
         self._requested_bridged_uis: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_ui_look_ups: Dict[UUID, List[Eventual[BridgedUi]]] = {}
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
-    
+
+    def _reset_intercept_keys_cache(self):
+        self._start_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[str, int]]] = {}
+        self._stop_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[str, int]]] = {}
+
     def _reset_look_up_string_table_entries_cache(self):
         self._look_up_string_table_entries_requests: Dict[UUID, Eventual[Sequence[StringTableEntry]]]
 
@@ -939,6 +1007,14 @@ class Gateway:
         """
 
         return len(self._gamepads)
+
+    @property
+    def intercepting_keys(self) -> Sequence[str]:
+        """
+        Gets the keys currently being intercepted
+        """
+
+        return tuple(self._intercepting_keys)
 
     @property
     def is_connected() -> bool:
@@ -960,6 +1036,22 @@ class Gateway:
 
         return self._is_connected_changed
     
+    @property
+    def key_down_intercepted(self) -> Event[str]:
+        """
+        Gets the event dispatched when a monitored key is pressed by the player while the game is foregrounded
+        """
+
+        return self._key_down_intercepted
+    
+    @property
+    def key_up_intercepted(self) -> Event[str]:
+        """
+        Gets the event dispatched when a monitored key is released by the player while the game is foregrounded
+        """
+
+        return self._key_up_intercepted
+
     def get_gamepad(self, index: int) -> Gamepad:
         """
         Gets the gamepad with the specified index
@@ -1114,6 +1206,44 @@ class Gateway:
             'layers': layers
         })
         _try_to_foreground_plumbbuddy()
+        return eventual
+
+    def start_intercepting_keys(self, keys: Sequence[str]):
+        """
+        Requests that PlumbBuddy start monitoring for key strokes sent to the game
+        
+        :param keys: a sequence of names of keys the mod wants monitored
+        :returns: an Eventual that will resolve with a dict specifying the return codes of eaching start monitoring attempt (`0` is success)
+        """
+
+        request_id = uuid4()
+        message = {
+            'keys': keys,
+            'request_id': str(request_id),
+            'type': 'start_intercepting_keys'
+        }
+        eventual = Eventual[Dict[str, int]]()
+        self._start_desktop_input_interception_requests[request_id] = eventual
+        ipc.send(message)
+        return eventual
+    
+    def stop_intercepting_keys(self, keys: Sequence[str]):
+        """
+        Requests that PlumbBuddy stop monitoring for key strokes sent to the game
+        
+        :param keys: a sequence of names of keys the mod no longer wants monitored
+        :returns: an Eventual that will resolve with a dict specifying the return codes of eaching stop monitoring attempt (`0` is success, `1` means success but another mod was also monitoring that key)
+        """
+
+        request_id = uuid4()
+        message = {
+            'keys': keys,
+            'request_id': str(request_id),
+            'type': 'stop_intercepting_keys'
+        }
+        eventual = Eventual[Dict[str, int]]()
+        self._stop_desktop_input_interception_requests[request_id] = eventual
+        ipc.send(message)
         return eventual
 
 gateway = Gateway()

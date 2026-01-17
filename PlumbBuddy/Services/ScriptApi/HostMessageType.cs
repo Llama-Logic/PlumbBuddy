@@ -17,9 +17,13 @@ public enum HostMessageType
     GamepadThumbstickChanged,
     GamepadTriggerChanged,
     GetScreenshotDetailsResponse,
+    KeyIntercepted,
     ListScreenshotNamesResponse,
     LookUpLocalizedStringsResponse,
     RelationalDataStorageQueryResults,
     ScreenshotsChanged,
-    SendLoadedSaveIdentifiers
+    SendLoadedSaveIdentifiers,
+    ShowNotification,
+    StartInterceptingKeysResponse,
+    StopInterceptingKeysResponse
 }

@@ -61,7 +61,7 @@ public partial class GameResourceCataloger :
             key = new(ResourceType.DSTImage, key.Group, key.FullInstance);
         try
         {
-            return await DirectDrawSurface.GetPngDataFromDiffuseSurfaceTextureDataAsync(await GetRawResourceAsync(key).ConfigureAwait(false)).ConfigureAwait(false);
+            return await DirectDrawSurface.GetPngDataFromDdsDataAsync(await GetRawResourceAsync(key).ConfigureAwait(false)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

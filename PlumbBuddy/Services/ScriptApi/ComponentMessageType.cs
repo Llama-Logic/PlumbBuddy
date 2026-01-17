@@ -17,5 +17,7 @@ public enum ComponentMessageType
     QueryRelationalDataStorage,
     SendDataToBridgedUi,
     SendLoadedSaveIdentifiersResponse,
+    StartInterceptingKeys,
+    StopInterceptingKeys,
     VibrateGamepad
 }

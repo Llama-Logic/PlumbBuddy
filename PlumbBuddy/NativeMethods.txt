@@ -1,5 +1,9 @@
 AllowSetForegroundWindow
+CallNextHookEx
+GetForegroundWindow
+GetModuleHandle
 GetSystemCpuSetInformation
+GetWindowThreadProcessId
 GetWindowPlacement
 IsIconic
 PostThreadMessage
@@ -7,7 +11,16 @@ SetForegroundWindow
 IsIconic
 MessageBoxW
 SetForegroundWindow
+SetWindowsHookEx
 SetWindowPlacement
 ShowWindow
 
+WM_KEYDOWN
+WM_KEYUP
 WM_QUIT
+WM_SYSKEYDOWN
+WM_SYSKEYUP
+
+VIRTUAL_KEY
+
+KBDLLHOOKSTRUCT

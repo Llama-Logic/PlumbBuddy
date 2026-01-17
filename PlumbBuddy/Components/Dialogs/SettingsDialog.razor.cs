@@ -17,6 +17,8 @@ partial class SettingsDialog
     ThemeSelector? themeSelector;
     UserType type;
 
+    bool AllowModsToInterceptKeyStrokes { get; set; }
+
     [Parameter]
     public int ActivePanelIndex { get; set; }
 
@@ -60,6 +62,8 @@ partial class SettingsDialog
 
     [CascadingParameter]
     IMudDialogInstance? MudDialog { get; set; }
+
+    bool NotifyOnModKeyStrokeInterceptionChanges { get; set; }
 
     bool OfferPatchDayModUpdatesHelp { get; set; }
 
@@ -210,6 +214,8 @@ partial class SettingsDialog
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
         GenerateGlobalManifestPackage = Settings.GenerateGlobalManifestPackage;
+        AllowModsToInterceptKeyStrokes = Settings.AllowModsToInterceptKeyStrokes;
+        NotifyOnModKeyStrokeInterceptionChanges = Settings.NotifyOnModKeyStrokeInterceptionChanges;
         modHoundExcludePackagesMode = Settings.ModHoundExcludePackagesMode;
         ModHoundReportRetentionPeriodTicks = Settings.ModHoundReportRetentionPeriod?.Ticks;
         OfferPatchDayModUpdatesHelp = Settings.OfferPatchDayModUpdatesHelp;
@@ -269,6 +275,8 @@ partial class SettingsDialog
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;
+        Settings.AllowModsToInterceptKeyStrokes = AllowModsToInterceptKeyStrokes;
+        Settings.NotifyOnModKeyStrokeInterceptionChanges = NotifyOnModKeyStrokeInterceptionChanges;
         Settings.InstallationFolderPath = InstallationFolderPath;
         Settings.ModHoundExcludePackagesMode = ModHoundExcludePackagesMode;
         Settings.ModHoundPackagesExclusions = ModHoundPackagesExclusions.ToImmutableArray();

@@ -19,8 +19,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.7.29</ApplicationDisplayVersion>
-        <ApplicationVersion>1.7.29</ApplicationVersion>
+        <ApplicationDisplayVersion>1.7.30</ApplicationDisplayVersion>
+        <ApplicationVersion>1.7.30</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -89,14 +89,14 @@
         <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="CsvHelper" Version="33.1.0" />
-        <PackageReference Include="Epiforge.Extensions.Collections" Version="2.0.0" />
-        <PackageReference Include="Epiforge.Extensions.Expressions" Version="2.0.1" />
+        <PackageReference Include="Epiforge.Extensions.Collections" Version="2.0.1" />
+        <PackageReference Include="Epiforge.Extensions.Expressions" Version="2.0.2" />
         <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
         <PackageReference Include="H.NotifyIcon.Maui" Version="2.1.4" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="ini-parser" Version="2.5.2" />
         <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="9.0.8" />
-        <PackageReference Include="LlamaLogic.Packages" Version="3.6.3" />
+        <PackageReference Include="LlamaLogic.Packages" Version="3.7.0" />
         <PackageReference Include="LlamaLogic.Protobuf" Version="1.117.227" />
         <PackageReference Include="LlamaLogic.ValveDataFormat" Version="1.0.3" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.10" />
@@ -172,6 +172,7 @@
         <MauiXaml Remove="AppxPackages\**" />
         <None Remove="AppxPackages\**" />
         <PRIResource Remove="AppxPackages\**" />
+        <None Remove="Integration\**" />
         <None Remove="Metadata\**" />
         <None Remove="Proxy\**\*.pyc" />
         <None Remove="PlumbBuddy_Proxy.zip" />
@@ -191,6 +192,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Integration\**" />
         <EmbeddedResource Include="Metadata\**" />
         <EmbeddedResource Include="PlumbBuddy_Proxy.ts4script" />
     </ItemGroup>

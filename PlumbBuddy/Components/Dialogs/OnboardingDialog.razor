@@ -239,8 +239,18 @@
 												@MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_GenerateGlobalManifestPackage_Label)]
 											</MudSwitchM3>
                                         </MudTooltip>
+                                        <MudTooltip Arrow Color="Color.Primary" Text="When this is on, I will let your mods ask to monitor when you press and release keys which are not already reserved by the operating system or the game for critical functions. You can toggle this setting at any time, even while the game is running.">
+                                            <MudSwitchM3 @bind-Value="@AllowModsToInterceptKeyStrokes" Color="Color.Primary" Disabled="@(!GenerateGlobalManifestPackage)" ThumbIcon="@MaterialDesignIcons.Normal.Keyboard">
+                                                Allow mods to monitor keystrokes
+                                            </MudSwitchM3>
+                                        </MudTooltip>
+                                        <MudTooltip Arrow Color="Color.Primary" Text="When this is on, I will let you know in game when mods ask to start or stop monitoring when you press and release keys. You can toggle this setting at any time, even while the game is running.">
+                                            <MudSwitchM3 @bind-Value="@NotifyOnModKeyStrokeInterceptionChanges" Color="Color.Primary" Disabled="@(!GenerateGlobalManifestPackage || !AllowModsToInterceptKeyStrokes)" ThumbIcon="@MaterialDesignIcons.Normal.KeyboardSettings">
+                                                Notify in-game when mods make keystroke monitoring requests
+                                            </MudSwitchM3>
+                                        </MudTooltip>
                                         <MudTooltip Arrow Color="Color.Primary" Text="@StringLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Tip)]">
-                                            <MudSwitchM3 @bind-Value="@ShowDlcRetailUsd" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CurrencyUsd" ThumbOffIcon="@MaterialDesignIcons.Normal.CurrencyUsdOff">
+                                            <MudSwitchM3 @bind-Value="@ShowDlcRetailUsd" Color="Color.Primary" ThumbIcon="@MaterialDesignIcons.Normal.CurrencyUsd">
                                                 @MarkupLocalizer[nameof(AppText.OnboardingDialog_PlumbBuddy_ShowDlcRetailUsd_Label)]
                                             </MudSwitchM3>
                                         </MudTooltip>

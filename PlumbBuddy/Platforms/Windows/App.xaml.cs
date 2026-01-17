@@ -147,6 +147,7 @@ public partial class App :
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
         builder.Services.AddSingleton<IElectronicArtsApp, Platforms.Windows.ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
+        builder.Services.AddSingleton<IDesktopInputInterceptor, DesktopInputInterceptor>();
         builder.Services.AddSingleton<IGamepadInterop, GamepadInterop>();
     }
 

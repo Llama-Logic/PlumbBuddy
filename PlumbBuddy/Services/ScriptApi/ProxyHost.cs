@@ -1,5 +1,4 @@
-using Microsoft.Maui.Media;
-using PlumbBuddy.Services.Protobuf;
+using AngleSharp.Common;
 using PlumbBuddy.Services.ScriptApi;
 using SQLitePCL;
 using Serializer = ProtoBuf.Serializer;
@@ -112,27 +111,30 @@ public partial class ProxyHost :
         }
     }
 
-    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IAppLifecycleManager appLifecycleManager, IGameResourceCataloger gameResourceCataloger, IGamepadInterop gamepadInterop)
+    public ProxyHost(IPlatformFunctions platformFunctions, ILogger<ProxyHost> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory, IGameResourceCataloger gameResourceCataloger, IGamepadInterop gamepadInterop, IDesktopInputInterceptor desktopInputInterceptor)
     {
         ArgumentNullException.ThrowIfNull(platformFunctions);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(pbDbContextFactory);
-        ArgumentNullException.ThrowIfNull(appLifecycleManager);
         ArgumentNullException.ThrowIfNull(gameResourceCataloger);
         ArgumentNullException.ThrowIfNull(gamepadInterop);
+        ArgumentNullException.ThrowIfNull(desktopInputInterceptor);
         this.platformFunctions = platformFunctions;
         this.logger = logger;
         this.settings = settings;
         this.pbDbContextFactory = pbDbContextFactory;
-        this.appLifecycleManager = appLifecycleManager;
         this.gameResourceCataloger = gameResourceCataloger;
         this.gamepadInterop = gamepadInterop;
+        this.desktopInputInterceptor = desktopInputInterceptor;
         cancellationTokenSource = new();
         cancellationToken = cancellationTokenSource.Token;
         connectedClients = new();
         bridgedUiLoadingLocks = new();
         loadedBridgedUis = new();
+        desktopInputInterceptorLock = new();
+        desktopInputInterceptorReferenceCounts = [];
+        desktopInputMessagingQueue = new();
         gameIsSavingManualResetEvent = new(true);
         gamepadMessagingEnrolledBridgedUis = new();
         gamepadMessagingEnrolledClients = new();
@@ -150,7 +152,10 @@ public partial class ProxyHost :
         foreach (var gamepad in this.gamepadInterop.Gamepads)
             WireGamepad(gamepad);
         ((INotifyCollectionChanged)this.gamepadInterop.Gamepads).CollectionChanged += HandleGamepadInteropGamepadsCollectionChanged;
+        desktopInputInterceptor.KeyDown += HandleDesktopInputInterceptorKeyDown;
+        desktopInputInterceptor.KeyUp += HandleDesktopInputInterceptorKeyUp;
         gamepadMessagingQueue = new();
+        _ = Task.Run(ProcessDesktopInputMessagesAsync);
         _ = Task.Run(ProcessGamepadMessagesAsync);
         listener = new(IPAddress.Loopback, port);
         listener.Start();
@@ -160,11 +165,14 @@ public partial class ProxyHost :
     ~ProxyHost() =>
         Dispose(false);
 
-    readonly IAppLifecycleManager appLifecycleManager;
     readonly ConcurrentDictionary<Guid, AsyncLock> bridgedUiLoadingLocks;
     readonly CancellationTokenSource cancellationTokenSource;
     readonly CancellationToken cancellationToken;
     readonly ConcurrentDictionary<TcpClient, AsyncLock> connectedClients;
+    readonly IDesktopInputInterceptor desktopInputInterceptor;
+    readonly AsyncLock desktopInputInterceptorLock;
+    readonly Dictionary<DesktopInputKey, int> desktopInputInterceptorReferenceCounts;
+    readonly AsyncProducerConsumerQueue<(DesktopInputKey key, bool isDown)> desktopInputMessagingQueue;
     [SuppressMessage("Usage", "CA2213: Disposable fields should be disposed", Justification = "CA can't tell that this is actually happening")]
     FileSystemWatcher? fileSystemWatcher;
     readonly IGamepadInterop gamepadInterop;
@@ -385,6 +393,9 @@ public partial class ProxyHost :
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
+            desktopInputInterceptor.KeyDown -= HandleDesktopInputInterceptorKeyDown;
+            desktopInputInterceptor.KeyUp -= HandleDesktopInputInterceptorKeyUp;
+            desktopInputMessagingQueue.CompleteAdding();
             ((INotifyCollectionChanged)gamepadInterop.Gamepads).CollectionChanged -= HandleGamepadInteropGamepadsCollectionChanged;
             gamepadMessagingQueue.CompleteAdding();
             settings.PropertyChanged -= HandleSettingsPropertyChanged;
@@ -480,6 +491,12 @@ public partial class ProxyHost :
             PauseGame = pauseGame,
             Type = nameof(HostMessageType.ForegroundPlumbbuddy).Underscore().ToLowerInvariant()
         });
+
+    async void HandleDesktopInputInterceptorKeyDown(object? sender, DesktopInputEventArgs e) =>
+        desktopInputMessagingQueue.Enqueue((e.Key, true));
+
+    async void HandleDesktopInputInterceptorKeyUp(object? sender, DesktopInputEventArgs e) =>
+        desktopInputMessagingQueue.Enqueue((e.Key, false));
 
     void HandleFileSystemWatcherChanged(object sender, FileSystemEventArgs e) =>
         pathsProcessingQueue?.Enqueue(e.FullPath);
@@ -683,7 +700,12 @@ public partial class ProxyHost :
 
     void HandleSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(ISettings.Type))
+        if (e.PropertyName is nameof(ISettings.AllowModsToInterceptKeyStrokes))
+        {
+            if (!settings.AllowModsToInterceptKeyStrokes)
+                ShutdownKeyInterception();
+        }
+        else if (e.PropertyName is nameof(ISettings.Type))
             IsBridgedUiDevelopmentModeEnabled = false;
     }
 
@@ -889,6 +911,13 @@ public partial class ProxyHost :
                 {
                     Type = nameof(HostMessageType.SendLoadedSaveIdentifiers).Underscore().ToLowerInvariant()
                 }).ConfigureAwait(false);
+                using (var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false))
+                    if (desktopInputInterceptorReferenceCounts.Count is > 0)
+                        await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
+                        {
+                            Type = nameof(HostMessageType.StartInterceptingKeysResponse).Underscore().ToLowerInvariant(),
+                            KeyResults = desktopInputInterceptorReferenceCounts.Keys.ToImmutableDictionary(key => key.ToString(), key => 0)
+                        }).ConfigureAwait(false);
                 gamepadMessagingQueue.Enqueue(async () =>
                 {
                     gamepadMessagingEnrolledClients.TryAdd(client, null);
@@ -974,6 +1003,21 @@ public partial class ProxyHost :
             return;
         }
         PromptPlayerForBridgedUiAuthorization(requestMessage, archive, layers.AsReadOnly());
+    }
+
+    async Task ProcessDesktopInputMessagesAsync()
+    {
+        var type = nameof(HostMessageType.KeyIntercepted).Underscore().ToLowerInvariant();
+        while (await desktopInputMessagingQueue.OutputAvailableAsync().ConfigureAwait(false))
+        {
+            var (key, isDown) = await desktopInputMessagingQueue.DequeueAsync().ConfigureAwait(false);
+            await SendMessageToProxyAsync(new KeyInterceptedMessage
+            {
+                Type = type,
+                Key = key.ToString(),
+                IsDown = isDown
+            }).ConfigureAwait(false);
+        }
     }
 
     async Task ProcessGamepadMessagesAsync()
@@ -1283,6 +1327,90 @@ public partial class ProxyHost :
                     saveSimNow = requestedSimNow;
                     saveSlotId = requestedSlotId;
                     gameServicesRunningManualResetEvent.Set();
+                }
+                break;
+            case ComponentMessageType.StartInterceptingKeys when fromBridgedUiUniqueId is null:
+                {
+                    if (TryParseMessage<KeyInterceptionMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "start intercepting keys", out var keyInterceptionMessage))
+                    {
+                        using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
+                        var results = new Dictionary<string, int>();
+                        var keyInterceptionsStarted = new List<DesktopInputKey>();
+                        foreach (var keyStr in keyInterceptionMessage.Keys)
+                        {
+                            if (!Enum.TryParse<DesktopInputKey>(keyStr, true, out var key)
+                                || key is DesktopInputKey.None)
+                            {
+                                results.Add(keyStr, 1);
+                                continue;
+                            }
+                            if (!settings.AllowModsToInterceptKeyStrokes)
+                            {
+                                results.Add(keyStr, 2);
+                                continue;
+                            }
+                            if (desktopInputInterceptorReferenceCounts.TryGetValue(key, out var existingCount))
+                            {
+                                desktopInputInterceptorReferenceCounts[key] = existingCount + 1;
+                                results.Add(keyStr, 0);
+                                continue;
+                            }
+                            await desktopInputInterceptor.StartMonitoringKeyAsync(key).ConfigureAwait(false);
+                            desktopInputInterceptorReferenceCounts.Add(key, 1);
+                            keyInterceptionsStarted.Add(key);
+                            results.Add(keyStr, 0);
+                        }
+                        await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
+                        {
+                            Type = nameof(HostMessageType.StartInterceptingKeysResponse).Underscore().ToLowerInvariant(),
+                            RequestId = keyInterceptionMessage.RequestId,
+                            KeyResults = results
+                        }).ConfigureAwait(false);
+                        if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStarted.Count is > 0)
+                            await ShowNotificationAsync($"Your mods are now listening for when you press the {keyInterceptionsStarted.Humanize("or")} {(keyInterceptionsStarted.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                    }
+                }
+                break;
+            case ComponentMessageType.StopInterceptingKeys when fromBridgedUiUniqueId is null:
+                {
+                    if (TryParseMessage<KeyInterceptionMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "stop intercepting keys", out var keyInterceptionMessage))
+                    {
+                        using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
+                        var results = new Dictionary<string, int>();
+                        var keyInterceptionsStopped = new List<DesktopInputKey>();
+                        foreach (var keyStr in keyInterceptionMessage.Keys)
+                        {
+                            if (!Enum.TryParse<DesktopInputKey>(keyStr, out var key)
+                                || key is DesktopInputKey.None)
+                            {
+                                results.Add(keyStr, 2);
+                                continue;
+                            }
+                            if (!desktopInputInterceptorReferenceCounts.TryGetValue(key, out var existingCount))
+                            {
+                                results.Add(keyStr, 3);
+                                continue;
+                            }
+                            if (existingCount is > 1)
+                            {
+                                desktopInputInterceptorReferenceCounts[key] = existingCount - 1;
+                                results.Add(keyStr, 1);
+                                continue;
+                            }
+                            await desktopInputInterceptor.StopMonitoringKeyAsync(key).ConfigureAwait(false);
+                            desktopInputInterceptorReferenceCounts.Remove(key);
+                            keyInterceptionsStopped.Add(key);
+                            results.Add(keyStr, 0);
+                        }
+                        await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
+                        {
+                            Type = nameof(HostMessageType.StopInterceptingKeysResponse).Underscore().ToLowerInvariant(),
+                            RequestId = keyInterceptionMessage.RequestId,
+                            KeyResults = results
+                        }).ConfigureAwait(false);
+                        if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStopped.Count is > 0)
+                            await ShowNotificationAsync($"Your mods are no longer listening for when you press the {keyInterceptionsStopped.Humanize("or")} {(keyInterceptionsStopped.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                    }
                 }
                 break;
             case ComponentMessageType.VibrateGamepad:
@@ -1709,6 +1837,40 @@ public partial class ProxyHost :
                 client.Dispose();
             }
         }
+    }
+
+    public Task ShowNotificationAsync(string text, string? title = null, ulong? iconInstance = null) =>
+        SendMessageToProxyAsync(new ShowNotificationMessage
+        {
+            Type = nameof(HostMessageType.ShowNotification).Underscore().ToLowerInvariant(),
+            Text = text,
+            Title = title,
+            IconInstance = iconInstance?.ToString("x16")
+        });
+
+    void ShutdownKeyInterception() =>
+        _ = Task.Run(ShutdownKeyInterceptionAsync);
+
+    async Task ShutdownKeyInterceptionAsync()
+    {
+        using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
+        if (desktopInputInterceptorReferenceCounts.Count is <= 0)
+            return;
+        var results = new Dictionary<string, int>();
+        var keyInterceptionsStopped = new List<DesktopInputKey>();
+        foreach (var key in desktopInputInterceptorReferenceCounts.Keys.ToImmutableArray())
+        {
+            await desktopInputInterceptor.StopMonitoringKeyAsync(key).ConfigureAwait(false);
+            desktopInputInterceptorReferenceCounts.Remove(key);
+            keyInterceptionsStopped.Add(key);
+        }
+        await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
+        {
+            Type = nameof(HostMessageType.StopInterceptingKeysResponse).Underscore().ToLowerInvariant(),
+            KeyResults = results
+        }).ConfigureAwait(false);
+        if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStopped.Count is > 0)
+            await ShowNotificationAsync($"Your mods are no longer listening for when you press the {keyInterceptionsStopped.Humanize("or")} {(keyInterceptionsStopped.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
     }
 
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities")]

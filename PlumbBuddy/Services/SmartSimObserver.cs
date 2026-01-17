@@ -804,6 +804,7 @@ public partial class SmartSimObserver :
             return;
         await Task.Delay(500).ConfigureAwait(false);
         var integrationPackageFileInfo = new FileInfo(Path.Combine(modsDirectory.FullName, IntegrationPackageName));
+        var assembly = Assembly.GetExecutingAssembly();
         if (force
             || !integrationPackageFileInfo.Exists
             || !integrationPackageLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false)))
@@ -855,6 +856,27 @@ public partial class SmartSimObserver :
                 model.ManifestedModFiles.Add(manifestedModFile);
             using var integrationPackage = new DataBasePackedFile();
             await integrationPackage.SetAsync(GlobalModsManifestModel.ResourceKey, model).ConfigureAwait(false);
+            foreach (var resourceName in assembly.GetManifestResourceNames().Where(n => n.StartsWith("PlumbBuddy.Integration.", StringComparison.Ordinal)))
+            {
+                using var resourceStream = assembly.GetManifestResourceStream(resourceName);
+                if (resourceStream is null)
+                    continue;
+                if (resourceName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    var pngDataLength = (int)resourceStream.Length;
+                    var array = ArrayPool<byte>.Shared.Rent(pngDataLength);
+                    try
+                    {
+                        Memory<byte> pngData = array;
+                        await resourceStream.ReadExactlyAsync(pngData[..pngDataLength]).ConfigureAwait(false);
+                        await integrationPackage.SetPngAsDdsAsync(new ResourceKey(ResourceType.DSTImage, 0, Fnv64.SetHighBit(Fnv64.GetHash(resourceName))), pngData).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(array);
+                    }
+                }
+            }
             await integrationPackage.SaveAsAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false);
             integrationPackageLastSha256 = await ModFileManifestModel.GetFileSha256HashAsync(integrationPackageFileInfo.FullName).ConfigureAwait(false);
         }
@@ -863,7 +885,7 @@ public partial class SmartSimObserver :
             || !integrationScriptModFileInfo.Exists
             || !integrationScriptModLastSha256.SequenceEqual(await ModFileManifestModel.GetFileSha256HashAsync(integrationScriptModFileInfo.FullName).ConfigureAwait(false)))
         {
-            using var integrationScriptModResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("PlumbBuddy.PlumbBuddy_Proxy.ts4script");
+            using var integrationScriptModResourceStream = assembly.GetManifestResourceStream("PlumbBuddy.PlumbBuddy_Proxy.ts4script");
             if (integrationScriptModResourceStream is not null)
             {
                 using (var integrationScriptModFileStream = integrationScriptModFileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.None))
