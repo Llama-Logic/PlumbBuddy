@@ -221,6 +221,14 @@
       <Folder Include="wwwroot\img\custom-themes\vampishly\" />
     </ItemGroup>
 
+    <Target Name="BuildMacOSAgent" BeforeTargets="Build" Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <Exec Command="xcodebuild -project &quot;$(ProjectDir)../macOS Agent/PlumbBuddy macOS Agent.xcodeproj&quot; -scheme &quot;PlumbBuddy macOS Agent&quot; -configuration Release -sdk macosx ARCHS=&quot;arm64 x86_64&quot; ONLY_ACTIVE_ARCH=NO OTHER_CODE_SIGN_FLAGS=&quot;--timestamp&quot; BUILD_DIR=&quot;$(ProjectDir)../macOS Agent/build&quot;" />
+    </Target>
+
+    <Target Name="BundleMacOSAgent" BeforeTargets="_CodesignAppBundle" Condition="$([MSBuild]::IsOSPlatform('osx'))">
+        <Copy SourceFiles="$(ProjectDir)../macOS Agent/build/Release/PlumbBuddy macOS Agent" DestinationFiles="$(ProjectDir)bin/Release/net8.0-maccatalyst/PlumbBuddy.app/Contents/MacOS/Agent" />
+    </Target>
+
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">
         <ReadLinesFromFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py">
             <Output TaskParameter="Lines" ItemName="OriginalProxyScriptLines" />

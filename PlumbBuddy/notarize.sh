@@ -8,7 +8,7 @@ else
   exit 1
 fi
 
-# Variables (taken from .env)
+# Variables
 APP_BUNDLE="bin/Release/net8.0-maccatalyst/PlumbBuddy.app"
 ZIP_FILE="PlumbBuddy.zip"
 

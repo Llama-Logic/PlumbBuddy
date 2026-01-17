@@ -407,3 +407,7 @@ PlumbBuddy.zip
 
 # Compiled TS4 script mods
 *.ts4script
+
+# Xcode
+project.xcworkspace
+xcuserdata
