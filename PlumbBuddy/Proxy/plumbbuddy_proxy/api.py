@@ -1175,6 +1175,8 @@ class Gateway:
             raise Exception('request_reason is not optional')
         if tab_name is None or len(tab_name) == 0:
             raise Exception('tab_name is not optional')
+        if layers is None:
+            layers = []
         eventual = Eventual[BridgedUi]()
         already_loaded = self._get_bridged_ui(unique_id)
         if already_loaded is not None:
