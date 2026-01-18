@@ -1348,6 +1348,11 @@ public partial class ProxyHost :
                                 results.Add(keyStr, 2);
                                 continue;
                             }
+                            if (desktopInputInterceptorReferenceCounts.Count >= 9)
+                            {
+                                results.Add(keyStr, 3);
+                                continue;
+                            }
                             if (desktopInputInterceptorReferenceCounts.TryGetValue(key, out var existingCount))
                             {
                                 desktopInputInterceptorReferenceCounts[key] = existingCount + 1;
