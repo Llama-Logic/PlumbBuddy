@@ -473,7 +473,7 @@ public partial class Archivist :
                         var siblingBId = children[siblingBIndex];
                         if (indexedRelationships.TryGetValue(new RelationshipKey(siblingAId, siblingBId), out var relationship)
                             && relationship.BidirectionalRelationshipData is { } bidirectional
-                            && bidirectional.Tracks.Any(t => t.TrackId is 0x410B))
+                            && bidirectional.Tracks.Any(track => track.TrackId is 0x410B && track.Value != 0))
                         {
                             var siblingA = sims.TryGetValue(siblingAId, out var siblingAValue) ? siblingAValue : null;
                             var siblingAHousehold = households.TryGetValue(siblingA?.HouseholdId ?? 0, out var siblingAHouseholdValue) ? siblingAHouseholdValue : null;
