@@ -285,7 +285,7 @@ public partial class DesktopInputInterceptor :
             return;
         try
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if (await agentOutput.ReadLineAsync(cancellationToken).ConfigureAwait(false) is not { } line)
                     break;
@@ -322,9 +322,12 @@ public partial class DesktopInputInterceptor :
         catch (OperationCanceledException)
         {
         }
-        agentProcess?.Kill(true);
-        agentProcess?.Dispose();
-        agentProcess = null;
+        finally
+        {
+            agentProcess?.Kill(true);
+            agentProcess?.Dispose();
+            agentProcess = null;
+        }
     }
 
     public async Task<bool> StartMonitoringKeyAsync(DesktopInputKey key)
