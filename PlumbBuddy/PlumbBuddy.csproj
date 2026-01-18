@@ -6,6 +6,7 @@
         <AssemblyName>PlumbBuddy</AssemblyName>
         <DefaultLanguage>en-US</DefaultLanguage>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
+        <EnableNETSdkEolCheck>false</EnableNETSdkEolCheck>
         <NoWarn>CA1014;CA1063;NU1701</NoWarn>
         <OutputType>Exe</OutputType>
         <RootNamespace>PlumbBuddy</RootNamespace>
@@ -227,7 +228,8 @@
     </Target>
 
     <Target Name="BundleMacOSAgent" BeforeTargets="_CodesignAppBundle" Condition="$([MSBuild]::IsOSPlatform('osx'))">
-        <Copy SourceFiles="$(ProjectDir)../macOS Agent/build/Release/PlumbBuddy macOS Agent" DestinationFiles="$(ProjectDir)bin/Release/net8.0-maccatalyst/PlumbBuddy.app/Contents/MacOS/Agent" />
+        <Copy Condition="'$(Configuration)' == 'Debug'" SourceFiles="$(ProjectDir)../macOS Agent/build/Release/PlumbBuddy macOS Agent" DestinationFiles="$(ProjectDir)bin/Debug/net8.0-maccatalyst/maccatalyst-arm64/PlumbBuddy.app/Contents/MacOS/Agent" />
+        <Copy Condition="'$(Configuration)' == 'Release'" SourceFiles="$(ProjectDir)../macOS Agent/build/Release/PlumbBuddy macOS Agent" DestinationFiles="$(ProjectDir)bin/Release/net8.0-maccatalyst/PlumbBuddy.app/Contents/MacOS/Agent" />
     </Target>
 
     <Target Name="CompileProxy" BeforeTargets="BeforeResGen" Inputs="$(ProjectDir)Proxy\**\*.py" Outputs="$(IntermediateOutputPath)">

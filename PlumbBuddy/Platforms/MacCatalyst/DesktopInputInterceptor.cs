@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
 public partial class DesktopInputInterceptor :
@@ -113,17 +115,25 @@ public partial class DesktopInputInterceptor :
 
     static async Task<string?> GetForegroundBundleAsync()
     {
-        using var process = Process.Start(new ProcessStartInfo("/usr/bin/osascript", "-e 'tell application \"System Events\" to get bundle identifier of first application process whose frontmost is true'")
+        using var process = Process.Start(new ProcessStartInfo
         {
+            FileName = "/usr/bin/osascript",
+            ArgumentList =
+            {
+                "-e",
+                "tell application \"System Events\" to get bundle identifier of first application process whose frontmost is true"
+            },
             CreateNoWindow = true,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             UseShellExecute = false
         });
         if (process is null)
             return null;
-        var bundle = (await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false)).Trim();
+        var output = await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
+        var error = await process.StandardError.ReadToEndAsync().ConfigureAwait(false);
         await process.WaitForExitAsync().ConfigureAwait(false);
-        return bundle;
+        return string.IsNullOrWhiteSpace(output) ? null : output.Trim();
     }
 
     public DesktopInputInterceptor(IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger)
@@ -245,10 +255,10 @@ public partial class DesktopInputInterceptor :
 
     async Task ManageAgentProcessAsync()
     {
-        using var agentProcessLockHeld = agentProcessLock.Lock();
+        using var agentProcessLockHeld = await agentProcessLock.LockAsync().ConfigureAwait(false);
         if (agentProcess is null && !keys.IsEmpty)
         {
-            var agentPath = Path.Combine(AppContext.BaseDirectory, "Agent");
+            var agentPath = Path.Combine(Foundation.NSBundle.MainBundle.BundlePath, "Contents", "MacOS", "Agent");
             if (!File.Exists(agentPath))
                 return;
             agentProcessCancellationTokenSource = new();

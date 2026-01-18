@@ -1,11 +1,18 @@
 import Cocoa
 
+// MARK: - Stdout must be unbuffered when piped
+setbuf(stdout, nil)
+
+// MARK: - Accessibility
+
 func ensureAccessibility(prompt: Bool) -> Bool {
-    let options = [
-        kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: prompt
+    let options: NSDictionary = [
+        kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString: prompt
     ]
-    return AXIsProcessTrustedWithOptions(options as CFDictionary)
+    return AXIsProcessTrustedWithOptions(options)
 }
+
+// MARK: - Event Tap
 
 func createEventTap() -> CFMachPort? {
     let mask =
@@ -17,43 +24,55 @@ func createEventTap() -> CFMachPort? {
         place: .headInsertEventTap,
         options: .defaultTap,
         eventsOfInterest: CGEventMask(mask),
-        callback: { _, type, event, _ in
-            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-            let isDown = type == .keyDown
-            let prefix = isDown ? "D" : "U"
-            print("\(prefix) \(keyCode)")
-            fflush(stdout)
-            return Unmanaged.passRetained(event)
-        },
+        callback: eventTapCallback,
         userInfo: nil
     )
 }
 
-// Step 1: Prompt if needed
+func eventTapCallback(
+    proxy: CGEventTapProxy,
+    type: CGEventType,
+    event: CGEvent,
+    userInfo: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+
+    guard type == .keyDown || type == .keyUp else {
+        return Unmanaged.passUnretained(event)
+    }
+
+    let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
+    let prefix = (type == .keyDown) ? "D" : "U"
+
+    print("\(prefix) \(keyCode)")
+
+    // IMPORTANT: never retain the event
+    return Unmanaged.passUnretained(event)
+}
+
+// MARK: - Main
+
+// Step 1: Request accessibility if needed
 if !ensureAccessibility(prompt: true) {
     print("WAITING_FOR_ACCESSIBILITY")
-    fflush(stdout)
 
-    // Stay alive until the user grants permission
     while !ensureAccessibility(prompt: false) {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
     }
 }
 
-// Step 2: Now we are trusted — create the tap
+// Step 2: Create the event tap
 guard let tap = createEventTap() else {
     print("FAILED_TO_CREATE_EVENT_TAP")
-    fflush(stdout)
-    CFRunLoopRun()
-    fatalError("Unreachable")
+    exit(1)
 }
 
+// Step 3: Install run loop source
 let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
 CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
 CGEvent.tapEnable(tap: tap, enable: true)
 
-// Step 3: Normal operation
+// Step 4: Signal readiness
 print("EVENT_TAP_ACTIVE")
-fflush(stdout)
 
+// Step 5: Run forever
 CFRunLoopRun()

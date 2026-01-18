@@ -10,5 +10,7 @@
 	<string>PlumbBuddy needs accessibility access to monitor keyboard input.</string>
 	<key>NSInputMonitoringUsageDescription</key>
 	<string>PlumbBuddy needs to monitor keyboard input to share it with mods.</string>
+	<key>LSUIElement</key>
+	<true/>
 </dict>
 </plist>
