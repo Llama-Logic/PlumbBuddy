@@ -1,5 +1,6 @@
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace PlumbBuddy.Platforms.Windows;
@@ -7,6 +8,99 @@ namespace PlumbBuddy.Platforms.Windows;
 partial class DesktopInputInterceptor :
     IDesktopInputInterceptor
 {
+    static DesktopInputKey GetDesktopInputKey(KBDLLHOOKSTRUCT kbDllHookStruct) =>
+        (VIRTUAL_KEY)kbDllHookStruct.vkCode switch
+        {
+            VIRTUAL_KEY.VK_BACK => DesktopInputKey.Backspace,
+            VIRTUAL_KEY.VK_RETURN => DesktopInputKey.Enter,
+            VIRTUAL_KEY.VK_SPACE => DesktopInputKey.Space,
+            VIRTUAL_KEY.VK_PRIOR => DesktopInputKey.PageUp,
+            VIRTUAL_KEY.VK_NEXT => DesktopInputKey.PageDown,
+            VIRTUAL_KEY.VK_END => DesktopInputKey.End,
+            VIRTUAL_KEY.VK_HOME => DesktopInputKey.Home,
+            VIRTUAL_KEY.VK_LEFT => DesktopInputKey.Left,
+            VIRTUAL_KEY.VK_UP => DesktopInputKey.Up,
+            VIRTUAL_KEY.VK_RIGHT => DesktopInputKey.Right,
+            VIRTUAL_KEY.VK_DOWN => DesktopInputKey.Down,
+            VIRTUAL_KEY.VK_INSERT => DesktopInputKey.Insert,
+            VIRTUAL_KEY.VK_DELETE => DesktopInputKey.Delete,
+            VIRTUAL_KEY.VK_OEM_3 => DesktopInputKey.Grave,
+            VIRTUAL_KEY.VK_OEM_MINUS => DesktopInputKey.Minus,
+            VIRTUAL_KEY.VK_OEM_PLUS => DesktopInputKey.Equals,
+            VIRTUAL_KEY.VK_OEM_4 => DesktopInputKey.LeftBracket,
+            VIRTUAL_KEY.VK_OEM_6 => DesktopInputKey.RightBracket,
+            VIRTUAL_KEY.VK_OEM_5 => DesktopInputKey.Backslash,
+            VIRTUAL_KEY.VK_OEM_1 => DesktopInputKey.Semicolon,
+            VIRTUAL_KEY.VK_OEM_7 => DesktopInputKey.Apostrophe,
+            VIRTUAL_KEY.VK_OEM_COMMA => DesktopInputKey.Comma,
+            VIRTUAL_KEY.VK_OEM_PERIOD => DesktopInputKey.Period,
+            VIRTUAL_KEY.VK_OEM_2 => DesktopInputKey.ForwardSlash,
+            VIRTUAL_KEY.VK_0 => DesktopInputKey.Number0,
+            VIRTUAL_KEY.VK_1 => DesktopInputKey.Number1,
+            VIRTUAL_KEY.VK_2 => DesktopInputKey.Number2,
+            VIRTUAL_KEY.VK_3 => DesktopInputKey.Number3,
+            VIRTUAL_KEY.VK_4 => DesktopInputKey.Number4,
+            VIRTUAL_KEY.VK_5 => DesktopInputKey.Number5,
+            VIRTUAL_KEY.VK_6 => DesktopInputKey.Number6,
+            VIRTUAL_KEY.VK_7 => DesktopInputKey.Number7,
+            VIRTUAL_KEY.VK_8 => DesktopInputKey.Number8,
+            VIRTUAL_KEY.VK_9 => DesktopInputKey.Number9,
+            VIRTUAL_KEY.VK_A => DesktopInputKey.A,
+            VIRTUAL_KEY.VK_B => DesktopInputKey.B,
+            VIRTUAL_KEY.VK_C => DesktopInputKey.C,
+            VIRTUAL_KEY.VK_D => DesktopInputKey.D,
+            VIRTUAL_KEY.VK_E => DesktopInputKey.E,
+            VIRTUAL_KEY.VK_F => DesktopInputKey.F,
+            VIRTUAL_KEY.VK_G => DesktopInputKey.G,
+            VIRTUAL_KEY.VK_H => DesktopInputKey.H,
+            VIRTUAL_KEY.VK_I => DesktopInputKey.I,
+            VIRTUAL_KEY.VK_J => DesktopInputKey.J,
+            VIRTUAL_KEY.VK_K => DesktopInputKey.K,
+            VIRTUAL_KEY.VK_L => DesktopInputKey.L,
+            VIRTUAL_KEY.VK_M => DesktopInputKey.M,
+            VIRTUAL_KEY.VK_N => DesktopInputKey.N,
+            VIRTUAL_KEY.VK_O => DesktopInputKey.O,
+            VIRTUAL_KEY.VK_P => DesktopInputKey.P,
+            VIRTUAL_KEY.VK_Q => DesktopInputKey.Q,
+            VIRTUAL_KEY.VK_R => DesktopInputKey.R,
+            VIRTUAL_KEY.VK_S => DesktopInputKey.S,
+            VIRTUAL_KEY.VK_T => DesktopInputKey.T,
+            VIRTUAL_KEY.VK_U => DesktopInputKey.U,
+            VIRTUAL_KEY.VK_V => DesktopInputKey.V,
+            VIRTUAL_KEY.VK_W => DesktopInputKey.W,
+            VIRTUAL_KEY.VK_X => DesktopInputKey.X,
+            VIRTUAL_KEY.VK_Y => DesktopInputKey.Y,
+            VIRTUAL_KEY.VK_Z => DesktopInputKey.Z,
+            VIRTUAL_KEY.VK_NUMPAD0 => DesktopInputKey.NumberPad0,
+            VIRTUAL_KEY.VK_NUMPAD1 => DesktopInputKey.NumberPad1,
+            VIRTUAL_KEY.VK_NUMPAD2 => DesktopInputKey.NumberPad2,
+            VIRTUAL_KEY.VK_NUMPAD3 => DesktopInputKey.NumberPad3,
+            VIRTUAL_KEY.VK_NUMPAD4 => DesktopInputKey.NumberPad4,
+            VIRTUAL_KEY.VK_NUMPAD5 => DesktopInputKey.NumberPad5,
+            VIRTUAL_KEY.VK_NUMPAD6 => DesktopInputKey.NumberPad6,
+            VIRTUAL_KEY.VK_NUMPAD7 => DesktopInputKey.NumberPad7,
+            VIRTUAL_KEY.VK_NUMPAD8 => DesktopInputKey.NumberPad8,
+            VIRTUAL_KEY.VK_NUMPAD9 => DesktopInputKey.NumberPad9,
+            VIRTUAL_KEY.VK_MULTIPLY => DesktopInputKey.Multiply,
+            VIRTUAL_KEY.VK_ADD => DesktopInputKey.Add,
+            VIRTUAL_KEY.VK_SUBTRACT => DesktopInputKey.Subtract,
+            VIRTUAL_KEY.VK_DECIMAL => DesktopInputKey.Decimal,
+            VIRTUAL_KEY.VK_DIVIDE => DesktopInputKey.Divide,
+            VIRTUAL_KEY.VK_F1 => DesktopInputKey.F1,
+            VIRTUAL_KEY.VK_F2 => DesktopInputKey.F2,
+            VIRTUAL_KEY.VK_F3 => DesktopInputKey.F3,
+            VIRTUAL_KEY.VK_F4 => DesktopInputKey.F4,
+            VIRTUAL_KEY.VK_F5 => DesktopInputKey.F5,
+            VIRTUAL_KEY.VK_F6 => DesktopInputKey.F6,
+            VIRTUAL_KEY.VK_F7 => DesktopInputKey.F7,
+            VIRTUAL_KEY.VK_F8 => DesktopInputKey.F8,
+            VIRTUAL_KEY.VK_F9 => DesktopInputKey.F9,
+            VIRTUAL_KEY.VK_F10 => DesktopInputKey.F10,
+            VIRTUAL_KEY.VK_F11 => DesktopInputKey.F11,
+            VIRTUAL_KEY.VK_F12 => DesktopInputKey.F12,
+            _ => DesktopInputKey.None
+        };
+
     public DesktopInputInterceptor(IPlatformFunctions platformFunctions, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger)
     {
         ArgumentNullException.ThrowIfNull(platformFunctions);
@@ -173,7 +267,9 @@ partial class DesktopInputInterceptor :
         while (await hookMessageQueue.OutputAvailableAsync().ConfigureAwait(false))
         {
             var (isDown, info) = await hookMessageQueue.DequeueAsync().ConfigureAwait(false);
-            var key = info.GetDesktopInputKey();
+            var key = GetDesktopInputKey(info);
+            if (key is DesktopInputKey.None)
+                continue;
             using (var keysCurrentlyDownLockHeld = await keysCurrentlyDownLock.LockAsync().ConfigureAwait(false))
             {
                 if (isDown == keysCurrentlyDown.Contains(key))
@@ -183,16 +279,14 @@ partial class DesktopInputInterceptor :
                 else
                     keysCurrentlyDown.Remove(key);
             }
-            if (await GetIsGameForegroundedAsync().ConfigureAwait(false))
+            if (await GetIsGameForegroundedAsync().ConfigureAwait(false)
+                && keys.ContainsKey(key))
             {
-                if (key is not DesktopInputKey.None && keys.ContainsKey(key))
-                {
-                    var eventArgs = new DesktopInputEventArgs { Key = key };
-                    if (isDown)
-                        KeyDown?.Invoke(this, eventArgs);
-                    else
-                        KeyUp?.Invoke(this, eventArgs);
-                }
+                var eventArgs = new DesktopInputEventArgs { Key = key };
+                if (isDown)
+                    KeyDown?.Invoke(this, eventArgs);
+                else
+                    KeyUp?.Invoke(this, eventArgs);
             }
         }
     }

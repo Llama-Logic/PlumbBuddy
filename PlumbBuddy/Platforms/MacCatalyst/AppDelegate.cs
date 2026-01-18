@@ -17,6 +17,7 @@ public class AppDelegate :
         builder.Services.AddSingleton<IPlatformFunctions, PlatformFunctions>();
         builder.Services.AddSingleton<IElectronicArtsApp, ElectronicArtsApp>();
         builder.Services.AddSingleton<ISteam, Steam>();
+        builder.Services.AddSingleton<IDesktopInputInterceptor, DesktopInputInterceptor>();
         builder.Services.AddSingleton<IGamepadInterop, GamepadInterop>();
     }
 }

@@ -1311,6 +1311,15 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to or.
+        /// </summary>
+        internal static string Conjunction_Or {
+            get {
+                return ResourceManager.GetString("Conjunction_Or", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Branch.
         /// </summary>
         internal static string CreateBranchDialog_Caption {
@@ -5458,6 +5467,24 @@ namespace PlumbBuddy.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow mods to monitor keystrokes.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When this is on, I will let your mods ask to monitor when you press and release keys which are not already reserved by the operating system or the game for critical functions. You can toggle this setting at any time, even while the game is running..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Tip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically check for updates.
         /// </summary>
         internal static string OnboardingDialog_PlumbBuddy_AutomaticallyCheckForUpdates_Label {
@@ -5553,6 +5580,24 @@ namespace PlumbBuddy.Localization {
         internal static string OnboardingDialog_PlumbBuddy_Label {
             get {
                 return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notify in-game when mods make keystroke monitoring requests.
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Label {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When this is on, I will let you know in game when mods ask to start or stop monitoring when you press and release keys. You can toggle this setting at any time, even while the game is running..
+        /// </summary>
+        internal static string OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Tip {
+            get {
+                return ResourceManager.GetString("OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Tip", resourceCulture);
             }
         }
         
@@ -6286,6 +6331,51 @@ namespace PlumbBuddy.Localization {
         internal static string PersonalNotes_ToPersonalDate_Label {
             get {
                 return ResourceManager.GetString("PersonalNotes_ToPersonalDate_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to key.
+        /// </summary>
+        internal static string ProxyHost_IGN_KeyInterception_Key {
+            get {
+                return ResourceManager.GetString("ProxyHost_IGN_KeyInterception_Key", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your mods are now listening for when you press the {0} {1}..
+        /// </summary>
+        internal static string ProxyHost_IGN_StartInterceptingKeys_Text {
+            get {
+                return ResourceManager.GetString("ProxyHost_IGN_StartInterceptingKeys_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PlumbBuddy.
+        /// </summary>
+        internal static string ProxyHost_IGN_StartInterceptingKeys_Title {
+            get {
+                return ResourceManager.GetString("ProxyHost_IGN_StartInterceptingKeys_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your mods are no longer listening for when you press the {0} {1}..
+        /// </summary>
+        internal static string ProxyHost_IGN_StopInterceptingKeys_Text {
+            get {
+                return ResourceManager.GetString("ProxyHost_IGN_StopInterceptingKeys_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PlumbBuddy.
+        /// </summary>
+        internal static string ProxyHost_IGN_StopInterceptingKeys_Title {
+            get {
+                return ResourceManager.GetString("ProxyHost_IGN_StopInterceptingKeys_Title", resourceCulture);
             }
         }
         

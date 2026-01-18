@@ -3699,4 +3699,38 @@ EA has publicly asked for help in fixing a game bug in which this can happen acc
   <data name="PackSelectorDialog_TotalEnabledContent_Label" xml:space="preserve">
     <value>Total Retail Value of Enabled Content: {0:c}</value>
   </data>
+  <data name="OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Label" xml:space="preserve">
+    <value>Allow mods to monitor keystrokes</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_AllowModsToInterceptKeyStrokes_Tip" xml:space="preserve">
+    <value>When this is on, I will let your mods ask to monitor when you press and release keys which are not already reserved by the operating system or the game for critical functions. You can toggle this setting at any time, even while the game is running.</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Label" xml:space="preserve">
+    <value>Notify in-game when mods make keystroke monitoring requests</value>
+  </data>
+  <data name="OnboardingDialog_PlumbBuddy_NotifyOnModKeyStrokeInterceptionChanges_Tip" xml:space="preserve">
+    <value>When this is on, I will let you know in game when mods ask to start or stop monitoring when you press and release keys. You can toggle this setting at any time, even while the game is running.</value>
+  </data>
+  <data name="ProxyHost_IGN_StartInterceptingKeys_Title" xml:space="preserve">
+    <value>PlumbBuddy</value>
+  </data>
+  <data name="ProxyHost_IGN_StartInterceptingKeys_Text" xml:space="preserve">
+    <value>Your mods are now listening for when you press the {0} {1}.</value>
+    <comment>{0} = List of Keys
+{1} = Key or Keys</comment>
+  </data>
+  <data name="ProxyHost_IGN_StopInterceptingKeys_Title" xml:space="preserve">
+    <value>PlumbBuddy</value>
+  </data>
+  <data name="ProxyHost_IGN_StopInterceptingKeys_Text" xml:space="preserve">
+    <value>Your mods are no longer listening for when you press the {0} {1}.</value>
+    <comment>{0} = List of Keys
+{1} = Key or Keys</comment>
+  </data>
+  <data name="Conjunction_Or" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="ProxyHost_IGN_KeyInterception_Key" xml:space="preserve">
+    <value>key</value>
+  </data>
 </root>

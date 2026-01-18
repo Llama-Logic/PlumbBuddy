@@ -1,5 +1,4 @@
 using AngleSharp.Common;
-using PlumbBuddy.Services.ScriptApi;
 using SQLitePCL;
 using Serializer = ProtoBuf.Serializer;
 
@@ -1367,7 +1366,7 @@ public partial class ProxyHost :
                             KeyResults = results
                         }).ConfigureAwait(false);
                         if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStarted.Count is > 0)
-                            await ShowNotificationAsync($"Your mods are now listening for when you press the {keyInterceptionsStarted.Humanize("or")} {(keyInterceptionsStarted.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StartInterceptingKeys_Text, keyInterceptionsStarted.Humanize(AppText.Conjunction_Or), keyInterceptionsStarted.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StartInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
                     }
                 }
                 break;
@@ -1409,7 +1408,7 @@ public partial class ProxyHost :
                             KeyResults = results
                         }).ConfigureAwait(false);
                         if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStopped.Count is > 0)
-                            await ShowNotificationAsync($"Your mods are no longer listening for when you press the {keyInterceptionsStopped.Humanize("or")} {(keyInterceptionsStopped.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StopInterceptingKeys_Text, keyInterceptionsStopped.Humanize(AppText.Conjunction_Or), keyInterceptionsStopped.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StopInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
                     }
                 }
                 break;
