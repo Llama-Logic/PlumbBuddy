@@ -1876,7 +1876,7 @@ public partial class ProxyHost :
             KeyResults = results
         }).ConfigureAwait(false);
         if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStopped.Count is > 0)
-            await ShowNotificationAsync($"Your mods are no longer listening for when you press the {keyInterceptionsStopped.Humanize("or")} {(keyInterceptionsStopped.Count is > 1 ? "key".Pluralize() : "key")}.", "PlumbBuddy", Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StopInterceptingKeys_Text, keyInterceptionsStopped.OrderBy(key => key.ToString()).Humanize(AppText.Conjunction_Or), keyInterceptionsStopped.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StopInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
     }
 
     [SuppressMessage("Security", "CA2100: Review SQL queries for security vulnerabilities")]
