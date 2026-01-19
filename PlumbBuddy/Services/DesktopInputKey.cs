@@ -1,8 +1,9 @@
 namespace PlumbBuddy.Services;
 
-public enum DesktopInputKey
+public enum DesktopInputKey :
+    int
 {
-    None,
+    None = 0,
     Backspace,
     Enter,
     Space,

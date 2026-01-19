@@ -2,6 +2,7 @@ import base64
 from clock import ClockSpeedMode, ServerClock
 from datetime import timedelta
 from distributor.shared_messages import IconInfoData
+from enum import IntEnum
 import os
 from plumbbuddy_proxy import logger
 from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
@@ -16,6 +17,96 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from ui.ui_dialog_notification import UiDialogNotification
 from uuid import uuid4, UUID
 import webbrowser
+
+class DesktopInputKey(IntEnum):
+    Unknown = 0
+    Backspace = 1
+    Enter = 2
+    Space = 3
+    PageUp = 4
+    PageDown = 5
+    End = 6
+    Home = 7
+    Left = 8
+    Up = 9
+    Right = 10
+    Down = 11
+    Insert = 12
+    Delete = 13
+    Grave = 14
+    Minus = 15
+    Equals = 16
+    LeftBracket = 17
+    RightBracket = 18
+    Backslash = 19
+    Semicolon = 20
+    Apostrophe = 21
+    Comma = 22
+    Period = 23
+    ForwardSlash = 24
+    Number0 = 25
+    Number1 = 26
+    Number2 = 27
+    Number3 = 28
+    Number4 = 29
+    Number5 = 30
+    Number6 = 31
+    Number7 = 32
+    Number8 = 33
+    Number9 = 34
+    A = 35
+    B = 36
+    C = 37
+    D = 38
+    E = 39
+    F = 40
+    G = 41
+    H = 42
+    I = 43
+    J = 44
+    K = 45
+    L = 46
+    M = 47
+    N = 48
+    O = 49
+    P = 50
+    Q = 51
+    R = 52
+    S = 53
+    T = 54
+    U = 55
+    V = 56
+    W = 57
+    X = 58
+    Y = 59
+    Z = 60
+    NumberPad0 = 61
+    NumberPad1 = 62
+    NumberPad2 = 63
+    NumberPad3 = 64
+    NumberPad4 = 65
+    NumberPad5 = 66
+    NumberPad6 = 67
+    NumberPad7 = 68
+    NumberPad8 = 69
+    NumberPad9 = 70
+    Multiply = 71
+    Add = 72
+    Subtract = 73
+    Decimal = 74
+    Divide = 75
+    F1 = 76
+    F2 = 77
+    F3 = 78
+    F4 = 79
+    F5 = 80
+    F6 = 81
+    F7 = 82
+    F8 = 83
+    F9 = 84
+    F10 = 85
+    F11 = 86
+    F12 = 87
 
 def _attach_save_characteristics(ipc_message: dict) -> dict:
     try:
@@ -721,20 +812,25 @@ class Gateway:
         self._reset_intercept_keys_cache()
         self._reset_look_up_string_table_entries_cache()
 
+        self._dispatch_intercepting_keys_changed: Callable[[Sequence[DesktopInputKey]], None] = lambda _: None
+        def set_dispatch_intercepting_keys_changed(dispatch: Callable[[Sequence[DesktopInputKey]], None]):
+            self._dispatch_intercepting_keys_changed = dispatch
+        self._intercepting_keys_changed: Event[Sequence[DesktopInputKey]] = Event(set_dispatch_intercepting_keys_changed)
+
         self._dispatch_is_connected_changed: Callable[[bool], None] = lambda _: None
         def set_dispatch_is_connected_changed(dispatch: Callable[[bool], None]):
             self._dispatch_is_connected_changed = dispatch
         self._is_connected_changed: Event[bool] = Event(set_dispatch_is_connected_changed)
 
-        self._dispatch_key_down_intercepted: Callable[[str], None] = lambda _: None
-        def set_dispatch_key_down_intercepted(dispatch: Callable[[str], None]):
+        self._dispatch_key_down_intercepted: Callable[[DesktopInputKey], None] = lambda _: None
+        def set_dispatch_key_down_intercepted(dispatch: Callable[[DesktopInputKey], None]):
             self._dispatch_key_down_intercepted = dispatch
-        self._key_down_intercepted: Event[str] = Event(set_dispatch_key_down_intercepted)
+        self._key_down_intercepted: Event[DesktopInputKey] = Event(set_dispatch_key_down_intercepted)
 
-        self._dispatch_key_up_intercepted: Callable[[str], None] = lambda _: None
-        def set_dispatch_key_up_intercepted(dispatch: Callable[[str], None]):
+        self._dispatch_key_up_intercepted: Callable[[DesktopInputKey], None] = lambda _: None
+        def set_dispatch_key_up_intercepted(dispatch: Callable[[DesktopInputKey], None]):
             self._dispatch_key_up_intercepted = dispatch
-        self._key_up_intercepted: Event[str] = Event(set_dispatch_key_up_intercepted)
+        self._key_up_intercepted: Event[DesktopInputKey] = Event(set_dispatch_key_up_intercepted)
 
         self._dispatch_gamepad_connected: Callable[[Gamepad], None] = lambda _: None
         def set_dispatch_gamepad_disconnected(dispatch: Callable[[Gamepad], None]):
@@ -744,7 +840,10 @@ class Gateway:
         @listen_for(ipc.connection_state_changed)
         def handle_ipc_connection_state_changed(connection_state):
             if connection_state == 0:
+                number_of_intercepting_keys = len(self._intercepting_keys)
                 self._intercepting_keys.clear()
+                if len(self._intercepting_keys) != number_of_intercepting_keys:
+                    self._dispatch_intercepting_keys_changed(self._intercepting_keys)
                 requested_bridged_uis = getattr(self, '_requested_bridged_uis', None)
                 if requested_bridged_uis is not None:
                     for eventuals_list in requested_bridged_uis.values():
@@ -917,9 +1016,9 @@ class Gateway:
             return
         if message_type == 'key_intercepted':
             if message['is_down']:
-                self._dispatch_key_down_intercepted(message['key'])
+                self._dispatch_key_down_intercepted(DesktopInputKey(message['key']))
             else:
-                self._dispatch_key_up_intercepted(message['key'])
+                self._dispatch_key_up_intercepted(DesktopInputKey(message['key']))
             return
         if message_type == 'look_up_localized_strings_response':
             eventual: Eventual[Sequence[StringTableEntry]] = None
@@ -956,28 +1055,40 @@ class Gateway:
             _show_notification(message['text'].strip(), **show_notification_kwargs)
             return
         if message_type == 'start_intercepting_keys_response':
+            number_of_intercepting_keys = len(self._intercepting_keys)
             for key, result in message['key_results'].items():
                 if result == 0:
-                    self._intercepting_keys.add(key.casefold())
+                    self._intercepting_keys.add(DesktopInputKey(key))
+            if len(self._intercepting_keys) != number_of_intercepting_keys:
+                self._dispatch_intercepting_keys_changed(self._intercepting_keys)
             if message['request_id']:
                 eventual: Eventual[Dict[str, int]] = None
                 try:
                     eventual = self._start_desktop_input_interception_requests.pop(UUID(message['request_id']))
                 except KeyError:
                     return
-                eventual._set_result(message['key_results'])
+                results = {}
+                for key, result in message['key_results'].items():
+                    results[DesktopInputKey(key)] = result
+                eventual._set_result(results)
             return
         if message_type == 'stop_intercepting_keys_response':
+            number_of_intercepting_keys = len(self._intercepting_keys)
             for key, result in message['key_results'].items():
                 if result == 0:
-                    self._intercepting_keys.remove(key.casefold())
+                    self._intercepting_keys.remove(DesktopInputKey(key))
+            if len(self._intercepting_keys) != number_of_intercepting_keys:
+                self._dispatch_intercepting_keys_changed(self._intercepting_keys)
             if message['request_id']:
                 eventual: Eventual[Dict[str, int]] = None
                 try:
                     eventual = self._stop_desktop_input_interception_requests.pop(UUID(message['request_id']))
                 except KeyError:
                     return
-                eventual._set_result(message['key_results'])
+                results = {}
+                for key, result in message['key_results'].items():
+                    results[DesktopInputKey(key)] = result
+                eventual._set_result(results)
             return
 
     def _reset_bridged_ui_cache(self):
@@ -986,8 +1097,8 @@ class Gateway:
         self._bridged_uis: Dict[UUID, Tuple[BridgedUi, dict]] = {}
 
     def _reset_intercept_keys_cache(self):
-        self._start_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[str, int]]] = {}
-        self._stop_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[str, int]]] = {}
+        self._start_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[DesktopInputKey, int]]] = {}
+        self._stop_desktop_input_interception_requests: Dict[UUID, Eventual[Dict[DesktopInputKey, int]]] = {}
 
     def _reset_look_up_string_table_entries_cache(self):
         self._look_up_string_table_entries_requests: Dict[UUID, Eventual[Sequence[StringTableEntry]]]
@@ -1009,13 +1120,21 @@ class Gateway:
         return len(self._gamepads)
 
     @property
-    def intercepting_keys(self) -> Sequence[str]:
+    def intercepting_keys(self) -> Sequence[DesktopInputKey]:
         """
         Gets the keys currently being intercepted
         """
 
         return tuple(self._intercepting_keys)
 
+    @property
+    def intercepting_keys_changed(self) -> Event[Sequence[DesktopInputKey]]:
+        """
+        Gets the event dispatched when intercepting_keys is changed
+        """
+
+        return self._intercepting_keys_changed
+    
     @property
     def is_connected() -> bool:
         """
@@ -1210,40 +1329,46 @@ class Gateway:
         _try_to_foreground_plumbbuddy()
         return eventual
 
-    def start_intercepting_keys(self, keys: Sequence[str]):
+    def start_intercepting_keys(self, keys: Sequence[DesktopInputKey]):
         """
         Requests that PlumbBuddy start monitoring for key strokes sent to the game
         
-        :param keys: a sequence of names of keys the mod wants monitored
+        :param keys: a sequence of names of DesktopInputKeys the mod wants monitored
         :returns: an Eventual that will resolve with a dict specifying the return codes of eaching start monitoring attempt (`0` is success)
         """
 
         request_id = uuid4()
+        message_keys = []
+        for key in keys:
+            message_keys.append(int(key))
         message = {
-            'keys': keys,
+            'keys': message_keys,
             'request_id': str(request_id),
             'type': 'start_intercepting_keys'
         }
-        eventual = Eventual[Dict[str, int]]()
+        eventual = Eventual[Dict[DesktopInputKey, int]]()
         self._start_desktop_input_interception_requests[request_id] = eventual
         ipc.send(message)
         return eventual
     
-    def stop_intercepting_keys(self, keys: Sequence[str]):
+    def stop_intercepting_keys(self, keys: Sequence[DesktopInputKey]):
         """
         Requests that PlumbBuddy stop monitoring for key strokes sent to the game
         
-        :param keys: a sequence of names of keys the mod no longer wants monitored
+        :param keys: a sequence of names of DesktopInputKeys the mod no longer wants monitored
         :returns: an Eventual that will resolve with a dict specifying the return codes of eaching stop monitoring attempt (`0` is success, `1` means success but another mod was also monitoring that key)
         """
 
         request_id = uuid4()
+        message_keys = []
+        for key in keys:
+            message_keys.append(int(key))
         message = {
-            'keys': keys,
+            'keys': message_keys,
             'request_id': str(request_id),
             'type': 'stop_intercepting_keys'
         }
-        eventual = Eventual[Dict[str, int]]()
+        eventual = Eventual[Dict[DesktopInputKey, int]]()
         self._stop_desktop_input_interception_requests[request_id] = eventual
         ipc.send(message)
         return eventual

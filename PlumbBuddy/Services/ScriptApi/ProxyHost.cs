@@ -915,7 +915,7 @@ public partial class ProxyHost :
                         await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
                         {
                             Type = nameof(HostMessageType.StartInterceptingKeysResponse).Underscore().ToLowerInvariant(),
-                            KeyResults = desktopInputInterceptorReferenceCounts.Keys.ToImmutableDictionary(key => key.ToString(), key => 0)
+                            KeyResults = desktopInputInterceptorReferenceCounts.Keys.ToImmutableDictionary(key => (int)key, key => 0)
                         }).ConfigureAwait(false);
                 gamepadMessagingQueue.Enqueue(async () =>
                 {
@@ -1013,7 +1013,7 @@ public partial class ProxyHost :
             await SendMessageToProxyAsync(new KeyInterceptedMessage
             {
                 Type = type,
-                Key = key.ToString(),
+                Key = (int)key,
                 IsDown = isDown
             }).ConfigureAwait(false);
         }
@@ -1333,37 +1333,37 @@ public partial class ProxyHost :
                     if (TryParseMessage<KeyInterceptionMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "start intercepting keys", out var keyInterceptionMessage))
                     {
                         using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
-                        var results = new Dictionary<string, int>();
+                        var results = new Dictionary<int, int>();
                         var keyInterceptionsStarted = new List<DesktopInputKey>();
-                        foreach (var keyStr in keyInterceptionMessage.Keys)
+                        foreach (var key in keyInterceptionMessage.Keys.Cast<DesktopInputKey>())
                         {
-                            if (!Enum.TryParse<DesktopInputKey>(keyStr, true, out var key)
+                            if (!Enum.IsDefined(typeof(DesktopInputKey), key)
                                 || key is DesktopInputKey.None)
                             {
-                                results.Add(keyStr, 1);
+                                results.Add((int)key, 1);
                                 continue;
                             }
                             if (!settings.AllowModsToInterceptKeyStrokes)
                             {
-                                results.Add(keyStr, 2);
+                                results.Add((int)key, 2);
                                 continue;
                             }
                             if (desktopInputInterceptorReferenceCounts.Count >= 9
                                 && !desktopInputInterceptorReferenceCounts.ContainsKey(key))
                             {
-                                results.Add(keyStr, 3);
+                                results.Add((int)key, 3);
                                 continue;
                             }
                             if (desktopInputInterceptorReferenceCounts.TryGetValue(key, out var existingCount))
                             {
                                 desktopInputInterceptorReferenceCounts[key] = existingCount + 1;
-                                results.Add(keyStr, 0);
+                                results.Add((int)key, 0);
                                 continue;
                             }
                             await desktopInputInterceptor.StartMonitoringKeyAsync(key).ConfigureAwait(false);
                             desktopInputInterceptorReferenceCounts.Add(key, 1);
                             keyInterceptionsStarted.Add(key);
-                            results.Add(keyStr, 0);
+                            results.Add((int)key, 0);
                         }
                         await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
                         {
@@ -1372,7 +1372,7 @@ public partial class ProxyHost :
                             KeyResults = results
                         }).ConfigureAwait(false);
                         if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStarted.Count is > 0)
-                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StartInterceptingKeys_Text, keyInterceptionsStarted.Humanize(AppText.Conjunction_Or), keyInterceptionsStarted.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StartInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StartInterceptingKeys_Text, keyInterceptionsStarted.OrderBy(key => key.ToString()).Humanize(AppText.Conjunction_Or), keyInterceptionsStarted.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StartInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
                     }
                 }
                 break;
@@ -1381,31 +1381,31 @@ public partial class ProxyHost :
                     if (TryParseMessage<KeyInterceptionMessage>(messageRoot, messageJson, jsonSerializerOptions, logger, "stop intercepting keys", out var keyInterceptionMessage))
                     {
                         using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
-                        var results = new Dictionary<string, int>();
+                        var results = new Dictionary<int, int>();
                         var keyInterceptionsStopped = new List<DesktopInputKey>();
-                        foreach (var keyStr in keyInterceptionMessage.Keys)
+                        foreach (var key in keyInterceptionMessage.Keys.Cast<DesktopInputKey>())
                         {
-                            if (!Enum.TryParse<DesktopInputKey>(keyStr, out var key)
+                            if (!Enum.IsDefined(typeof(DesktopInputKey), key)
                                 || key is DesktopInputKey.None)
                             {
-                                results.Add(keyStr, 2);
+                                results.Add((int)key, 2);
                                 continue;
                             }
                             if (!desktopInputInterceptorReferenceCounts.TryGetValue(key, out var existingCount))
                             {
-                                results.Add(keyStr, 3);
+                                results.Add((int)key, 3);
                                 continue;
                             }
                             if (existingCount is > 1)
                             {
                                 desktopInputInterceptorReferenceCounts[key] = existingCount - 1;
-                                results.Add(keyStr, 1);
+                                results.Add((int)key, 1);
                                 continue;
                             }
                             await desktopInputInterceptor.StopMonitoringKeyAsync(key).ConfigureAwait(false);
                             desktopInputInterceptorReferenceCounts.Remove(key);
                             keyInterceptionsStopped.Add(key);
-                            results.Add(keyStr, 0);
+                            results.Add((int)key, 0);
                         }
                         await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
                         {
@@ -1414,7 +1414,7 @@ public partial class ProxyHost :
                             KeyResults = results
                         }).ConfigureAwait(false);
                         if (settings.NotifyOnModKeyStrokeInterceptionChanges && keyInterceptionsStopped.Count is > 0)
-                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StopInterceptingKeys_Text, keyInterceptionsStopped.Humanize(AppText.Conjunction_Or), keyInterceptionsStopped.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StopInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
+                            await ShowNotificationAsync(string.Format(AppText.ProxyHost_IGN_StopInterceptingKeys_Text, keyInterceptionsStopped.OrderBy(key => key.ToString()).Humanize(AppText.Conjunction_Or), keyInterceptionsStopped.Count is > 1 ? AppText.ProxyHost_IGN_KeyInterception_Key.Pluralize() : AppText.ProxyHost_IGN_KeyInterception_Key), AppText.ProxyHost_IGN_StopInterceptingKeys_Title, Fnv64.SetHighBit(Fnv64.GetHash("PlumbBuddy.Integration.DesktopInputInterceptorIcon.png")));
                     }
                 }
                 break;
@@ -1861,12 +1861,13 @@ public partial class ProxyHost :
         using var desktopInputInterceptorLockHeld = await desktopInputInterceptorLock.LockAsync().ConfigureAwait(false);
         if (desktopInputInterceptorReferenceCounts.Count is <= 0)
             return;
-        var results = new Dictionary<string, int>();
+        var results = new Dictionary<int, int>();
         var keyInterceptionsStopped = new List<DesktopInputKey>();
         foreach (var key in desktopInputInterceptorReferenceCounts.Keys.ToImmutableArray())
         {
             await desktopInputInterceptor.StopMonitoringKeyAsync(key).ConfigureAwait(false);
             desktopInputInterceptorReferenceCounts.Remove(key);
+            results.Add((int)key, 0);
             keyInterceptionsStopped.Add(key);
         }
         await SendMessageToProxyAsync(new KeyInterceptionResponseMessage
