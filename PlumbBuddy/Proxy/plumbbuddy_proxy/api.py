@@ -1156,7 +1156,7 @@ class Gateway:
         return self._is_connected_changed
     
     @property
-    def key_down_intercepted(self) -> Event[str]:
+    def key_down_intercepted(self) -> Event[DesktopInputKey]:
         """
         Gets the event dispatched when a monitored key is pressed by the player while the game is foregrounded
         """
@@ -1164,7 +1164,7 @@ class Gateway:
         return self._key_down_intercepted
     
     @property
-    def key_up_intercepted(self) -> Event[str]:
+    def key_up_intercepted(self) -> Event[DesktopInputKey]:
         """
         Gets the event dispatched when a monitored key is released by the player while the game is foregrounded
         """
