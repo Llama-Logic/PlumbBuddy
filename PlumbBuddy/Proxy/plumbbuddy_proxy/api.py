@@ -1136,7 +1136,7 @@ class Gateway:
         return self._intercepting_keys_changed
     
     @property
-    def is_connected() -> bool:
+    def is_connected(self) -> bool:
         """
         Gets whether PlumbBuddy is currently connected
 
