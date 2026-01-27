@@ -40,6 +40,12 @@ partial class OnboardingDialog
         set => Settings.ForceGameProcessPerformanceProcessorAffinity = value;
     }
 
+    string DefaultFundingUrl
+    {
+        get => Settings.DefaultFundingUrl;
+        set => Settings.DefaultFundingUrl = value;
+    }
+
     bool GenerateGlobalManifestPackage
     {
         get => Settings.GenerateGlobalManifestPackage;
@@ -248,6 +254,17 @@ partial class OnboardingDialog
     /// <inheritdoc />
     public void Dispose() =>
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
+
+    async Task HandleOpenFundingUrlInBrowserAsync()
+    {
+        try
+        {
+            await Browser.OpenAsync(DefaultFundingUrl, BrowserLaunchMode.External);
+        }
+        catch
+        {
+        }
+    }
 
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {

@@ -893,7 +893,7 @@ partial class ManifestEditor
                     creators = selectStepFileAddManifests.SelectMany(manifest => manifest.Creators).Distinct().ToList().AsReadOnly();
                     creatorsChipSetField?.Refresh();
                     url = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.Url is not null)?.Url?.ToString() ?? string.Empty;
-                    fundingUrl = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.FundingUrl is not null)?.FundingUrl?.ToString() ?? string.Empty;
+                    fundingUrl = selectStepFileAddManifests.FirstOrDefault(manifest => manifest.FundingUrl is not null)?.FundingUrl?.ToString() ?? Settings.DefaultFundingUrl;
                     requiredPacks = selectStepFileAddManifests.SelectMany(manifest => manifest.RequiredPacks).Select(packCode => packCode.ToUpperInvariant()).Distinct().ToList().AsReadOnly();
                     requiredPacksChipSetField?.Refresh();
                     recommendedPacks.AddRange(selectStepFileAddManifests.SelectMany(manifest => manifest.RecommendedPacks).DistinctBy(recommendedPack => recommendedPack.PackCode).Select(recommendedPack => new RecommendedPack(PublicCatalogs, recommendedPack.PackCode, recommendedPack.Reason)));
@@ -1288,6 +1288,7 @@ partial class ManifestEditor
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        fundingUrl = Settings.DefaultFundingUrl;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         PublicCatalogs.PropertyChanged += HandlePublicCatalogsPropertyChanged;
         UserInterfaceMessaging.BeginManifestingModRequested += HandleUserInterfaceMessagingBeginManifestingModRequested;
@@ -1415,7 +1416,7 @@ partial class ManifestEditor
         recommendedPacks.Clear();
         await (requiredPacksChipSetField?.ClearAsync() ?? Task.CompletedTask);
         await (requirementsStepForm?.ResetAsync() ?? Task.CompletedTask);
-        fundingUrl = string.Empty;
+        fundingUrl = Settings.DefaultFundingUrl;
         url = string.Empty;
         await (creatorsChipSetField?.ClearAsync() ?? Task.CompletedTask);
         description = string.Empty;

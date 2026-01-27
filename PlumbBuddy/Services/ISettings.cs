@@ -11,6 +11,8 @@ public interface ISettings :
     SmartSimCacheStatus CacheStatus { get; set; }
     bool ConnectToGamePads { get; set; }
     string DefaultCreatorsList { get; set; }
+    [SuppressMessage("Design", "CA1056: URI-like properties should not be strings")]
+    string DefaultFundingUrl { get; set; }
     bool DevToolsUnlocked { get; set; }
     string DownloadsFolderPath { get; set; }
     bool ForceGameProcessPerformanceProcessorAffinity { get; set; }
