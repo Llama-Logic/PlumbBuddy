@@ -8,9 +8,6 @@ public sealed class AccountData :
 {
     IExtension? extensionData;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(4, Name = "created")]
     public ulong Created { get; set; }
 
@@ -19,4 +16,7 @@ public sealed class AccountData :
 
     [ProtoMember(2, Name = "persona_name", IsRequired = true)]
     public string PersonaName { get; set; } = "";
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 }

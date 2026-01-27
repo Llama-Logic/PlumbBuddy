@@ -10,21 +10,12 @@ public sealed class PersistableServiceRelationship :
     ulong? simIdA;
     ulong? simIdB;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(1, Name = @"sim_id_a")]
     public ulong SimIdA
     {
         get => simIdA.GetValueOrDefault();
         set => simIdA = value;
     }
-
-    public bool ShouldSerializeSimIdA() =>
-        simIdA != null;
-
-    public void ResetSimIdA() =>
-        simIdA = null;
 
     [ProtoMember(2, Name = @"sim_id_b")]
     public ulong SimIdB
@@ -33,12 +24,21 @@ public sealed class PersistableServiceRelationship :
         set => simIdB = value;
     }
 
-    public bool ShouldSerializeSimIdB() =>
-        simIdB != null;
+    [ProtoMember(3, Name = @"bidirectional_relationship_data")]
+    public PersistableBidirectionalRelationshipData? BidirectionalRelationshipData { get; set; }
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
+
+    public void ResetSimIdA() =>
+        simIdA = null;
+
+    public bool ShouldSerializeSimIdA() =>
+        simIdA != null;
 
     public void ResetSimIdB() =>
         simIdB = null;
 
-    [ProtoMember(3, Name = @"bidirectional_relationship_data")]
-    public PersistableBidirectionalRelationshipData? BidirectionalRelationshipData { get; set; }
+    public bool ShouldSerializeSimIdB() =>
+        simIdB != null;
 }

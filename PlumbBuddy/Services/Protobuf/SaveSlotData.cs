@@ -8,9 +8,6 @@ public sealed class SaveSlotData :
 {
     IExtension? extensionData;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(11, Name = @"active_household_id")]
     public ulong ActiveHouseholdId { get; set; }
 
@@ -23,4 +20,7 @@ public sealed class SaveSlotData :
     [ProtoMember(9, Name = "slot_name")]
     [DefaultValue("")]
     public string SlotName { get; set; } = "";
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 }

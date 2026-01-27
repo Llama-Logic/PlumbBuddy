@@ -8,9 +8,6 @@ public sealed class SaveGameData :
 {
     IExtension? extensionData;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(2, Name = "save_slot")]
     public SaveSlotData? SaveSlot { get; set; }
 
@@ -32,4 +29,10 @@ public sealed class SaveGameData :
     [ProtoMember(7, Name = "zones")]
     [SuppressMessage("Design", "CA1002: Do not expose generic lists", Justification = "Take it up with protobuf.net")]
     public List<ZoneData> Zones { get; } = [];
+
+    [ProtoMember(30, Name = @"attributes")]
+    public PersistableSimInfoAttributes? Attributes { get; set; }
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 }

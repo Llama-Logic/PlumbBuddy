@@ -9,9 +9,6 @@ public sealed class GameplaySaveSlotData :
     IExtension? extensionData;
     ulong? worldGameTime;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(3, Name = "camera_data")]
     public GameplayCameraData? CameraData { get; set; }
 
@@ -22,12 +19,15 @@ public sealed class GameplaySaveSlotData :
         set => worldGameTime = value;
     }
 
-    public bool ShouldSerializeWorldGameTime() =>
-        worldGameTime is not null;
+    [ProtoMember(13, Name = @"relationship_service")]
+    public PersistableRelationshipService? RelationshipService { get; set; }
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 
     public void ResetWorldGameTime() =>
         worldGameTime = null;
 
-    [ProtoMember(13, Name = @"relationship_service")]
-    public PersistableRelationshipService? RelationshipService { get; set; }
+    public bool ShouldSerializeWorldGameTime() =>
+        worldGameTime is not null;
 }

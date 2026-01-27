@@ -460,7 +460,7 @@ public partial class Archivist :
                         ?.FamilyRelations
                         .Where(fr => fr.RelationType is RelationshipIndex.RelationshipMother)
                         .Select(fr => (mother: fr.SimId, child: sd.SimId))
-                        ?? Enumerable.Empty<(ulong mother, ulong child)>()
+                        ?? []
                 )
                 .GroupBy(motherhood => motherhood.mother)
                 .Where(g => g.Count() > 1)

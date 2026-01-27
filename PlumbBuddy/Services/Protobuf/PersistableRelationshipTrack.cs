@@ -10,9 +10,6 @@ public sealed class PersistableRelationshipTrack :
     ulong? trackId;
     float? value;
 
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
-        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
-
     [ProtoMember(1, Name = @"track_id")]
     public ulong TrackId
     {
@@ -26,6 +23,9 @@ public sealed class PersistableRelationshipTrack :
         get => value.GetValueOrDefault();
         set => this.value = value;
     }
+
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing) =>
+        Extensible.GetExtensionObject(ref extensionData, createIfMissing);
 
     public void ResetTrackId() =>
         trackId = null;
