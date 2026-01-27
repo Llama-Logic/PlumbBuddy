@@ -10,6 +10,7 @@ partial class PackSelectorDialog
 
     bool isApplying = false;
     bool isLoading = true;
+    readonly AsyncLock reloadingPackGroundsLock = new();
 
     bool? AllPacks
     {
@@ -194,6 +195,7 @@ partial class PackSelectorDialog
     [SuppressMessage("Maintainability", "CA1502: Avoid excessive complexity")]
     async Task ReloadPackGroupsAsync()
     {
+        using var reloadingPackGroundsLockHeld = await reloadingPackGroundsLock.LockAsync();
         PackGroups.Clear();
         isLoading = true;
         StateHasChanged();
