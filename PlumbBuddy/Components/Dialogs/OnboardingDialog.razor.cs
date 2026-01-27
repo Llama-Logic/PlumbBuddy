@@ -324,6 +324,7 @@ partial class OnboardingDialog
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        Settings.UiZoom = 1M;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SetDefaultScansForUserType(Settings.Type);
     }
