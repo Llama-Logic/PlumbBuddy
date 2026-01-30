@@ -20,18 +20,18 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.7.33</ApplicationDisplayVersion>
-        <ApplicationVersion>1.7.33</ApplicationVersion>
+        <ApplicationDisplayVersion>1.7.34</ApplicationDisplayVersion>
+        <ApplicationVersion>1.7.34</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-        <InformationalVersion>$(ApplicationVersion)+debug</InformationalVersion>
-        <ProxyScriptModLoggingMode>debug</ProxyScriptModLoggingMode>
+        <InformationalVersion>$(ApplicationVersion)</InformationalVersion>
+        <ProxyScriptModBuildMode>debug</ProxyScriptModBuildMode>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <InformationalVersion>$(ApplicationVersion)+release</InformationalVersion>
-        <ProxyScriptModLoggingMode>release</ProxyScriptModLoggingMode>
+        <InformationalVersion>$(ApplicationVersion)</InformationalVersion>
+        <ProxyScriptModBuildMode>release</ProxyScriptModBuildMode>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
@@ -236,7 +236,7 @@
         <ReadLinesFromFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py">
             <Output TaskParameter="Lines" ItemName="OriginalProxyScriptLines" />
         </ReadLinesFromFile>
-        <WriteLinesToFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py" Lines="@(OriginalProxyScriptLines-&gt;Replace('__VERSION__', '$(InformationalVersion)')-&gt;Replace('__LOGGING_MODE__', '$(ProxyScriptModLoggingMode)'))" Overwrite="true" />
+        <WriteLinesToFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py" Lines="@(OriginalProxyScriptLines-&gt;Replace('__VERSION__', '$(InformationalVersion)')-&gt;Replace('__BUILD_MODE__', '$(ProxyScriptModBuildMode)'))" Overwrite="true" />
         <Exec Command="$(PythonBinary) -m compileall -b -q -j0 &quot;$(ProjectDir)Proxy&quot;" />
         <WriteLinesToFile File="$(ProjectDir)Proxy/plumbbuddy_proxy/__init__.py" Lines="@(OriginalProxyScriptLines)" Overwrite="true" />
         <Exec Condition="$([MSBuild]::IsOSPlatform('windows'))" Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)PackScriptMod.ps1&quot; -ProjectDir $(ProjectDir)" />

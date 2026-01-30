@@ -7,6 +7,7 @@ import logging
 import os
 import time
 from sims4.utils import blueprintmethod, blueprintproperty
+from plumbbuddy_proxy.deployment import BuildMode, SemVer
 
 def get_mod_root(file, depth=2):
     """
@@ -115,10 +116,12 @@ class UTCFormatter(logging.Formatter):
         else:
             return time.strftime("%Y-%m-%d %H:%M:%S", ct)
 
-def Logger(name, root, filename, prefix='', version='N/A', mode='debug', **kwargs):
+def Logger(name, root, filename, prefix = '', version: SemVer = None, build_mode: BuildMode = BuildMode.Debug, **kwargs):
     path = os.path.join(root, filename)
     handler = logging.FileHandler(path, mode='w')
-    log_mode = logging.DEBUG if mode == 'debug' else logging.INFO
+    log_mode = logging.DEBUG if build_mode == BuildMode.Debug else logging.INFO
+    if not version:
+        version = SemVer('0.0.0')
 
     formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', datefmt = '%Y-%m-%d %H:%M:%S')
 
@@ -128,11 +131,11 @@ def Logger(name, root, filename, prefix='', version='N/A', mode='debug', **kwarg
     handler.setFormatter(formatter)
 
     logger.info(
-        '{prefix}[{name}] Version: {version}'.format(
-            prefix=prefix,
-            name=name,
-            version=version,
-            mode=mode
+        '{prefix}[{name}] Version: {version}; Build Mode: {build_mode}'.format(
+            prefix = prefix,
+            name = name,
+            version = version,
+            build_mode = build_mode
         )
     )
     return logger

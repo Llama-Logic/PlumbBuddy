@@ -1,5 +1,3 @@
-using PlumbBuddy.Services;
-
 namespace PlumbBuddy.Components.Dialogs;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
@@ -8,6 +6,7 @@ partial class SettingsDialog
     IReadOnlyList<string> defaultCreators = [];
     ChipSetField? defaultCreatorsChipSetField;
     FoldersSelector? foldersSelector;
+    string fundingUrl = string.Empty;
     ModHoundExcludePackagesMode modHoundExcludePackagesMode;
     IReadOnlyList<string> modHoundPackagesExclusions = [];
     ChipSetField? modHoundPackagesExclusionsChipSetField;
@@ -210,6 +209,7 @@ partial class SettingsDialog
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        fundingUrl = Settings.DefaultFundingUrl;
         originalUiZoom = Settings.UiZoom;
         AutomaticallyCheckForUpdates = Settings.AutomaticallyCheckForUpdates;
         ForceGameProcessPerformanceProcessorAffinity = Settings.ForceGameProcessPerformanceProcessorAffinity;
@@ -254,6 +254,17 @@ partial class SettingsDialog
         MudDialog?.Close(DialogResult.Cancel());
     }
 
+    async Task HandleOpenFundingUrlInBrowserAsync()
+    {
+        try
+        {
+            await Browser.OpenAsync(fundingUrl, BrowserLaunchMode.External);
+        }
+        catch
+        {
+        }
+    }
+
     async Task OkOnClickHandlerAsync()
     {
         if (foldersSelector is not null && tabs is not null)
@@ -272,6 +283,7 @@ partial class SettingsDialog
         Settings.ArchiveFolderPath = ArchiveFolderPath;
         Settings.AutomaticallyCheckForUpdates = AutomaticallyCheckForUpdates;
         Settings.DefaultCreatorsList = string.Join(Environment.NewLine, defaultCreators);
+        Settings.DefaultFundingUrl = fundingUrl;
         Settings.DownloadsFolderPath = DownloadsFolderPath;
         Settings.ForceGameProcessPerformanceProcessorAffinity = ForceGameProcessPerformanceProcessorAffinity;
         Settings.GenerateGlobalManifestPackage = GenerateGlobalManifestPackage;

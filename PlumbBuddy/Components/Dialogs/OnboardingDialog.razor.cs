@@ -40,6 +40,12 @@ partial class OnboardingDialog
         set => Settings.ForceGameProcessPerformanceProcessorAffinity = value;
     }
 
+    string DefaultFundingUrl
+    {
+        get => Settings.DefaultFundingUrl;
+        set => Settings.DefaultFundingUrl = value;
+    }
+
     bool GenerateGlobalManifestPackage
     {
         get => Settings.GenerateGlobalManifestPackage;
@@ -249,6 +255,17 @@ partial class OnboardingDialog
     public void Dispose() =>
         Settings.PropertyChanged -= HandleSettingsPropertyChanged;
 
+    async Task HandleOpenFundingUrlInBrowserAsync()
+    {
+        try
+        {
+            await Browser.OpenAsync(DefaultFundingUrl, BrowserLaunchMode.External);
+        }
+        catch
+        {
+        }
+    }
+
     async Task<bool> HandlePreventStepChangeAsync(StepChangeDirection direction, int targetIndex)
     {
         isFoldersGuideVisible = false;
@@ -307,6 +324,7 @@ partial class OnboardingDialog
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        Settings.UiZoom = 1M;
         Settings.PropertyChanged += HandleSettingsPropertyChanged;
         SetDefaultScansForUserType(Settings.Type);
     }

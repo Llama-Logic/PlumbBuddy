@@ -4,10 +4,11 @@ from datetime import timedelta
 from distributor.shared_messages import IconInfoData
 from enum import IntEnum
 import os
-from plumbbuddy_proxy import logger
+from plumbbuddy_proxy import logger, plumbbuddy_build_mode, plumbbuddy_version
 from plumbbuddy_proxy.asynchronous import listen_for, Event, Eventual
-from plumbbuddy_proxy.utilities import inject_to
+from plumbbuddy_proxy.deployment import BuildMode, SemVer
 from plumbbuddy_proxy.ipc_client import ipc
+from plumbbuddy_proxy.utilities import inject_to
 import services
 from sims4.localization import LocalizationHelperTuning
 from sims4.resources import Types, get_resource_key
@@ -1104,6 +1105,14 @@ class Gateway:
         self._look_up_string_table_entries_requests: Dict[UUID, Eventual[Sequence[StringTableEntry]]]
 
     @property
+    def build_mode(self) -> BuildMode:
+        """
+        Gets the build mode for this release of PlumbBuddy
+        """
+
+        return plumbbuddy_build_mode
+
+    @property
     def gamepad_connected(self) -> Event[Gamepad]:
         """
         Gets the event which is dispatched when the player has connected a gamepad
@@ -1170,6 +1179,14 @@ class Gateway:
         """
 
         return self._key_up_intercepted
+    
+    @property
+    def version(self) -> SemVer:
+        """
+        Gets the version of this release of PlumbBuddy
+        """
+
+        return plumbbuddy_version
 
     def get_gamepad(self, index: int) -> Gamepad:
         """

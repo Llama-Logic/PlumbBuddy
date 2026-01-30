@@ -107,6 +107,18 @@ class Settings :
         }
     }
 
+    public string DefaultFundingUrl
+    {
+        get => preferences.Get(nameof(DefaultFundingUrl), string.Empty);
+        set
+        {
+            if (DefaultFundingUrl == value)
+                return;
+            preferences.Set(nameof(DefaultFundingUrl), value);
+            OnPropertyChanged();
+        }
+    }
+
     public bool DevToolsUnlocked
     {
         get => preferences.Get(nameof(DevToolsUnlocked), false);
