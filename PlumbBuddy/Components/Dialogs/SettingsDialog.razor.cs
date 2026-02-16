@@ -272,7 +272,7 @@ partial class SettingsDialog
             await foldersSelector.ValidateAsync();
             if (!foldersSelector.IsValid)
             {
-                tabs.ActivatePanel(2);
+                await tabs.ActivatePanelAsync(2);
                 return;
             }
         }

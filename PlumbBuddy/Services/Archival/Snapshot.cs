@@ -5,7 +5,7 @@ using Serializer = ProtoBuf.Serializer;
 namespace PlumbBuddy.Services.Archival;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
-public class Snapshot :
+public sealed partial class Snapshot :
     INotifyPropertyChanged
 {
     static async Task<MemoryStream> ConvertPackageToExcludedStreamAsync(ChronicleDbContext dbContext, DataBasePackedFile package)
@@ -116,27 +116,33 @@ public class Snapshot :
         return package;
     }
 
-    public Snapshot(ILogger<Snapshot> logger, IDbContextFactory<ChronicleDbContext> dbContextFactory, SavePackageSnapshot savePackageSnapshot, Chronicle chronicle)
+    public Snapshot(ILogger<Snapshot> logger, IDbContextFactory<ChronicleDbContext> dbContextFactory, SavePackageSnapshot savePackageSnapshot, Chronicle chronicle, ICollectionObserver collectionObserver, IMainThreadDetails mainThreadDetails)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(dbContextFactory);
         ArgumentNullException.ThrowIfNull(savePackageSnapshot);
         ArgumentNullException.ThrowIfNull(chronicle);
+        ArgumentNullException.ThrowIfNull(collectionObserver);
+        ArgumentNullException.ThrowIfNull(mainThreadDetails);
         this.logger = logger;
         this.dbContextFactory = dbContextFactory;
         SavePackageSnapshotId = savePackageSnapshot.Id;
         this.chronicle = chronicle;
+        this.collectionObserver = collectionObserver;
+        this.mainThreadDetails = mainThreadDetails;
         firstLoadComplete = new();
         _ = Task.Run(() => LoadAllAsync(savePackageSnapshot));
     }
 
     readonly Chronicle chronicle;
+    readonly ICollectionObserver collectionObserver;
     readonly IDbContextFactory<ChronicleDbContext> dbContextFactory;
     ImmutableArray<byte> enhancedPackageSha256 = [];
     readonly TaskCompletionSource firstLoadComplete;
     bool isEditing;
     string label = string.Empty;
     readonly ILogger<Snapshot> logger;
+    readonly IMainThreadDetails mainThreadDetails;
     string? notes;
     ImmutableArray<byte> originalPackageSha256 = [];
     bool showDetails;
@@ -314,7 +320,7 @@ public class Snapshot :
                 }).ConfigureAwait(false);
                 await newChronicleDbContext.SaveChangesAsync().ConfigureAwait(false);
                 var archivist = Chronicle.Archivist;
-                var newChronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), newChronicleDbContextFactory, archivist);
+                var newChronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), newChronicleDbContextFactory, mainThreadDetails, archivist);
                 await newChronicle.FirstLoadComplete.ConfigureAwait(false);
                 await archivist.LoadChronicleAsync(newChronicle).ConfigureAwait(false);
                 archivist.SelectedChronicle = newChronicle;

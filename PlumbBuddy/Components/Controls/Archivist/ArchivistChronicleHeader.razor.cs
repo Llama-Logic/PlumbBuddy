@@ -79,4 +79,11 @@ partial class ArchivistChronicleHeader
             return;
         PlatformFunctions.ViewFile(new FileInfo(Path.Combine(Settings.ArchiveFolderPath, $"N-{chronicle.NucleusId:x16}-C-{chronicle.Created:x16}.chronicle.sqlite")));
     }
+
+    Task ShowScrapbookAsync()
+    {
+        if (Chronicle is { } chronicle)
+            return DialogService.ShowScrapbookDialogAsync(chronicle);
+        return Task.CompletedTask;
+    }
 }

@@ -4,7 +4,7 @@ namespace PlumbBuddy.Services.Archival;
 
 [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
 [SuppressMessage("Naming", "CA1724: Type names should not match namespaces")]
-public partial class Archivist :
+public sealed partial class Archivist :
     IArchivist
 {
     static readonly ImmutableHashSet<string> extensions = Enumerable.Range(0, 5)
@@ -20,7 +20,7 @@ public partial class Archivist :
     [GeneratedRegex(@"^Slot_(?<slot>[\da-f]{8})\.save(?<ver>\.ver[0-4])?$")]
     public static partial Regex GetSavesDirectoryLegalFilenamePattern();
 
-    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IProxyHost proxyHost, ISuperSnacks superSnacks, IUserInterfaceMessaging userInterfaceMessaging)
+    public Archivist(ILoggerFactory loggerFactory, ILogger<Archivist> logger, IDbContextFactory<PbDbContext> pbDbContextFactory, IPlatformFunctions platformFunctions, IAppLifecycleManager appLifecycleManager, ISettings settings, IModsDirectoryCataloger modsDirectoryCataloger, IProxyHost proxyHost, ISuperSnacks superSnacks, IUserInterfaceMessaging userInterfaceMessaging, IMainThreadDetails mainThreadDetails)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(logger);
@@ -32,6 +32,7 @@ public partial class Archivist :
         ArgumentNullException.ThrowIfNull(proxyHost);
         ArgumentNullException.ThrowIfNull(superSnacks);
         ArgumentNullException.ThrowIfNull(userInterfaceMessaging);
+        ArgumentNullException.ThrowIfNull(mainThreadDetails);
         this.loggerFactory = loggerFactory;
         this.logger = logger;
         this.pbDbContextFactory = pbDbContextFactory;
@@ -42,6 +43,7 @@ public partial class Archivist :
         this.proxyHost = proxyHost;
         this.superSnacks = superSnacks;
         this.userInterfaceMessaging = userInterfaceMessaging;
+        this.mainThreadDetails = mainThreadDetails;
         chronicleByNucleusIdAndCreated = [];
         chronicles = [];
         Chronicles = new(chronicles);
@@ -68,6 +70,7 @@ public partial class Archivist :
     readonly ILoggerFactory loggerFactory;
     bool isDisposed;
     readonly ILogger<Archivist> logger;
+    readonly IMainThreadDetails mainThreadDetails;
     readonly IModsDirectoryCataloger modsDirectoryCataloger;
     AsyncProducerConsumerQueue<(string path, bool manuallyAdded)>? pathsProcessingQueue;
     readonly IDbContextFactory<PbDbContext> pbDbContextFactory;
@@ -219,7 +222,7 @@ public partial class Archivist :
                 using var chronicleDbContext = await chronicleDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
                 if ((await chronicleDbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                     await chronicleDbContext.Database.MigrateAsync().ConfigureAwait(false);
-                var chronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
+                var chronicle = new Chronicle(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, mainThreadDetails, this);
                 chronicleByNucleusIdAndCreated.Add((ulong.Parse(fileInfoAndMatch.Match.Groups["nucleusIdHex"].Value, NumberStyles.HexNumber), ulong.Parse(fileInfoAndMatch.Match.Groups["createdHex"].Value, NumberStyles.HexNumber)), chronicle);
                 await chronicle.FirstLoadComplete.ConfigureAwait(false);
                 chronicles.Add(chronicle);
@@ -519,14 +522,7 @@ public partial class Archivist :
                     await semaphore.WaitAsync().ConfigureAwait(false);
                     try
                     {
-                        var keyBytes = new byte[16];
-                        Memory<byte> keyBytesMemory = keyBytes;
-                        var type = key.Type;
-                        MemoryMarshal.Write(keyBytesMemory.Span[0..4], in type);
-                        var group = key.Group;
-                        MemoryMarshal.Write(keyBytesMemory.Span[4..8], in group);
-                        var fullInstance = key.FullInstance;
-                        MemoryMarshal.Write(keyBytesMemory.Span[8..16], in fullInstance);
+                        var keyBytes = key.ToByteArray();
                         var explicitCompressionMode = package.GetExplicitCompressionMode(key);
                         var content =
                               explicitCompressionMode is LlamaLogic.Packages.CompressionMode.CallerSuppliedStreamable
@@ -542,7 +538,7 @@ public partial class Archivist :
                             LlamaLogic.Packages.CompressionMode.ForceZLib => SavePackageResourceCompressionType.ZLIB,
                             _ => throw new NotSupportedException("unsupported DBPF resource compression")
                         };
-                        if (type is ResourceType.SaveGameHouseholdThumbnail)
+                        if (key.Type is ResourceType.SaveGameHouseholdThumbnail)
                         {
                             try
                             {
@@ -691,7 +687,7 @@ public partial class Archivist :
             Snapshot? viewSnapshot = null;
             if (!chronicleByNucleusIdAndCreated.TryGetValue((account.NucleusId, account.Created), out var chronicle))
             {
-                chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, this);
+                chronicle = new(loggerFactory, loggerFactory.CreateLogger<Chronicle>(), chronicleDbContextFactory, mainThreadDetails, this);
                 chronicleByNucleusIdAndCreated.Add((account.NucleusId, account.Created), chronicle);
                 await chronicle.FirstLoadComplete.ConfigureAwait(false);
                 chronicles.Add(chronicle);

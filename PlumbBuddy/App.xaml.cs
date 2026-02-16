@@ -6,6 +6,8 @@ public partial class App :
     [SuppressMessage("Maintainability", "CA1506: Avoid excessive class coupling")]
     public App(ILifetimeScope lifetimeScope, ILogger<App> logger, ISettings settings, IDbContextFactory<PbDbContext> pbDbContextFactory)
     {
+        MauiProgram.AppDataDirectory.ToString();
+        MauiProgram.CacheDirectory.ToString();
         ArgumentNullException.ThrowIfNull(lifetimeScope);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(settings);

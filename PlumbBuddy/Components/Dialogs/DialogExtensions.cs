@@ -190,6 +190,20 @@ static class DialogExtensions
             return null;
         });
 
+    public static Task ShowScrapbookDialogAsync(this IDialogService dialogService, Chronicle chronicle) =>
+        StaticDispatcher.DispatchAsync(async () =>
+        {
+            var dialog = await dialogService.ShowAsync<ScrapbookDialog>($"{chronicle.Name} Scrapbook", new DialogParameters<ScrapbookDialog>()
+            {
+                { x => x.Chronicle, chronicle },
+            }, new DialogOptions
+            {
+                FullWidth = true,
+                MaxWidth = MaxWidth.Large
+            });
+            await dialog.Result;
+        });
+
     public static Task<string?> ShowSelectCatalogedModFileDialogAsync(this IDialogService dialogService) =>
         StaticDispatcher.DispatchAsync(async () =>
         {

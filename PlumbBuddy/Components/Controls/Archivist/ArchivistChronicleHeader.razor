@@ -68,7 +68,7 @@
 				<MudTextM3 Typo="TypoM3.Headline" Align="Align.Center">
 					@(Observed(() => chronicle.Name))
 				</MudTextM3>
-				<MudGrid Justify="Justify.Center" Spacing="0">
+				<MudGrid Justify="Justify.Center" Spacing="0" Class="align-center">
 					<MudItem>
 						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_DatabaseSize_Tip)">
 							<MudChip Icon="@MaterialDesignIcons.Normal.Harddisk" Value="@(ByteSize.FromBytes(Observed(() => chronicle.DatabaseSize)).Humanize())" />
@@ -89,7 +89,14 @@
                             <MudChip Icon="@MaterialDesignIcons.Normal.Timeline" Value="@(AppText.Archivist_Chronicle_Snapshot.ToQuantity(snapshots is null ? 0 : ObservedCollection(() => snapshots).Count))" />
 						</MudTooltip>
 					</MudItem>
-				</MudGrid>
+                    <MudItem>
+                        <MudTooltip Arrow Text="Show Chronicle Scrapbook">
+                            <MudButton Color="Color.Secondary" OnClick="ShowScrapbookAsync" StartIcon="@MaterialDesignIcons.Normal.ImageAlbum" Variant="Variant.Filled">
+                                Scrapbook
+                            </MudButton>
+                        </MudTooltip>
+                    </MudItem>
+                </MudGrid>
 				@if (Observed(() => chronicle.Notes) is { } notes && !string.IsNullOrWhiteSpace(notes))
 				{
 					<MudDivider />
