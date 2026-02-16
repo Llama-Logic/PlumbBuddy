@@ -26,9 +26,10 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
 
     async Task<string?> FindAppByBundleIdAsync(string bundleId)
     {
+        string? bundlePath = null;
         try
         {
-            using var process = new Process
+            using var mdfindProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -39,16 +40,51 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
                     CreateNoWindow = true,
                 }
             };
-            process.Start();
-            var output = await process.StandardOutput.ReadLineAsync().ConfigureAwait(false);
-            await process.WaitForExitAsync().ConfigureAwait(false);
-            if (process.ExitCode is not 0)
-                return null;
-            return output;
+            mdfindProcess.Start();
+            var mdfindOutput = (await mdfindProcess.StandardOutput.ReadLineAsync().ConfigureAwait(false))?.Trim();
+            await mdfindProcess.WaitForExitAsync().ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(mdfindOutput)
+                && mdfindProcess.ExitCode is 0
+                && bundleId.Equals(await ReadBundleIdAsync(new(mdfindOutput)).ConfigureAwait(false), StringComparison.OrdinalIgnoreCase))
+                bundlePath = mdfindOutput;
         }
         catch
         {
-            return null;
+            // whoops, mdfind didn't work
+        }
+        if (bundlePath is null)
+            foreach (DirectoryInfo root in GetCandidateRoots())
+                foreach (var bundle in root.GetDirectories("*.app", SearchOption.AllDirectories))
+                    if (await ReadBundleIdAsync(bundle).ConfigureAwait(false) is { } appBundleId
+                        && bundleId.Equals(appBundleId, StringComparison.OrdinalIgnoreCase))
+                        return bundle.FullName;
+        return bundlePath;
+    }
+
+    static IEnumerable<DirectoryInfo> GetCandidateRoots()
+    {
+        var apps = new DirectoryInfo("/Applications");
+        if (apps.Exists)
+            yield return apps;
+        var userApps = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Applications"));
+        if (userApps.Exists)
+            yield return userApps;
+        var volumes = new DirectoryInfo("/Volumes");
+        if (volumes.Exists)
+        {
+            try
+            {
+                foreach (var volume in volumes.GetDirectories())
+                {
+                    var volumeApps = new DirectoryInfo(Path.Combine(volume.FullName, "Applications"));
+                    if (volumeApps.Exists)
+                        yield return volumeApps;
+                }
+            }
+            catch
+            {
+                // permission denied or otherwise inaccessible to a user process, don't cry over it
+            }
         }
     }
 
@@ -159,5 +195,29 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
         while (await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false) && --patience > 0)
             await Task.Delay(TimeSpan.FromSeconds(0.1)).ConfigureAwait(false);
         return !await GetIsElectronicArtsAppRunningAsync().ConfigureAwait(false);
+    }
+
+    static async Task<string?> ReadBundleIdAsync(DirectoryInfo appDir)
+    {
+        if (!appDir.Exists)
+            return null;
+        var infoPlistFile = new FileInfo(Path.Combine(appDir.FullName, "Contents", "Info.plist"));
+        if (!infoPlistFile.Exists)
+            return null;
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "/usr/libexec/PlistBuddy",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        startInfo.ArgumentList.Add("-c");
+        startInfo.ArgumentList.Add("Print :CFBundleIdentifier");
+        startInfo.ArgumentList.Add(infoPlistFile.FullName);
+        using var process = new Process { StartInfo = startInfo };
+        process.Start();
+        var output = await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
+        await process.WaitForExitAsync().ConfigureAwait(false);
+        return process.ExitCode == 0 ? output.Trim() : null;
     }
 }
