@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace PlumbBuddy.Platforms.MacCatalyst;
 
 public partial class DesktopInputInterceptor :

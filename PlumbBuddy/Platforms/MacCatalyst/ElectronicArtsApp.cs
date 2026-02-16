@@ -53,8 +53,8 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
             // whoops, mdfind didn't work
         }
         if (bundlePath is null)
-            foreach (DirectoryInfo root in GetCandidateRoots())
-                foreach (var bundle in root.GetDirectories("*.app", SearchOption.AllDirectories))
+            foreach (var root in GetCandidateRoots())
+                foreach (var bundle in root.GetDirectories("*.app"))
                     if (await ReadBundleIdAsync(bundle).ConfigureAwait(false) is { } appBundleId
                         && bundleId.Equals(appBundleId, StringComparison.OrdinalIgnoreCase))
                         return bundle.FullName;
@@ -65,26 +65,44 @@ class ElectronicArtsApp(ILogger<IElectronicArtsApp> logger) :
     {
         var apps = new DirectoryInfo("/Applications");
         if (apps.Exists)
+        {
             yield return apps;
+            var appsEaGames = new DirectoryInfo(Path.Combine(apps.FullName, "EA Games"));
+            if (appsEaGames.Exists)
+                yield return appsEaGames;
+        }
         var userApps = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Applications"));
         if (userApps.Exists)
+        {
             yield return userApps;
+            var userAppsEaGames = new DirectoryInfo(Path.Combine(userApps.FullName, "EA Games"));
+            if (userAppsEaGames.Exists)
+                yield return userAppsEaGames;
+        }
         var volumes = new DirectoryInfo("/Volumes");
         if (volumes.Exists)
         {
+            DirectoryInfo[]? volumeDirectories = null;
             try
             {
-                foreach (var volume in volumes.GetDirectories())
-                {
-                    var volumeApps = new DirectoryInfo(Path.Combine(volume.FullName, "Applications"));
-                    if (volumeApps.Exists)
-                        yield return volumeApps;
-                }
+                volumeDirectories = volumes.GetDirectories();
             }
             catch
             {
                 // permission denied or otherwise inaccessible to a user process, don't cry over it
             }
+            if (volumeDirectories is not null)
+                foreach (var volume in volumeDirectories)
+                {
+                    var volumeApps = new DirectoryInfo(Path.Combine(volume.FullName, "Applications"));
+                    if (volumeApps.Exists)
+                    {
+                        yield return volumeApps;
+                        var volumeAppsEaGames = new DirectoryInfo(Path.Combine(volumeApps.FullName, "EA Games"));
+                        if (volumeAppsEaGames.Exists)
+                            yield return volumeAppsEaGames;
+                    }
+                }
         }
     }
 
