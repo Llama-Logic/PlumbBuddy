@@ -50,7 +50,7 @@ codebleu:
   description: |
     Visit on [itch.io](https://codebleu.itch.io/)!
   default_border_radius: 2px
-  font: Ubuntu
+  font: Inter
   palette_dark:
     Background: '#101018ff'
     Surface: '#20203080'

@@ -84,33 +84,22 @@ public partial class MainLayout
             if (!string.IsNullOrWhiteSpace(customTheme.DefaultBorderRadius))
                 theme.LayoutProperties.DefaultBorderRadius = customTheme.DefaultBorderRadius;
             if (!string.IsNullOrWhiteSpace(customTheme.Font))
-            {
-                string[] fontFamily =
-                [
-                    customTheme.Font,
-                    "system-ui",
-                    "-apple-system",
-                    "Helvetica Neue",
-                    "Helvetica",
-                    "Arial",
-                    "sans-serif"
-                ];
-                var typography = theme.Typography;
-                typography.Body1.FontFamily = fontFamily;
-                typography.Body2.FontFamily = fontFamily;
-                typography.Button.FontFamily = fontFamily;
-                typography.Caption.FontFamily = fontFamily;
-                typography.Default.FontFamily = fontFamily;
-                typography.H1.FontFamily = fontFamily;
-                typography.H2.FontFamily = fontFamily;
-                typography.H3.FontFamily = fontFamily;
-                typography.H4.FontFamily = fontFamily;
-                typography.H5.FontFamily = fontFamily;
-                typography.H6.FontFamily = fontFamily;
-                typography.Overline.FontFamily = fontFamily;
-                typography.Subtitle1.FontFamily = fontFamily;
-                typography.Subtitle2.FontFamily = fontFamily;
-            }
+                theme.Typography = new Typography
+                {
+                    Default = new DefaultTypography
+                    {
+                        FontFamily =
+                        [
+                            customTheme.Font,
+                            "system-ui",
+                            "-apple-system",
+                            "Helvetica Neue",
+                            "Helvetica",
+                            "Arial",
+                            "sans-serif"
+                        ]
+                    }
+                };
             if (customTheme.PaletteLight is { } customThemeLightPaletteChanges)
                 foreach (var (key, value) in customThemeLightPaletteChanges)
                     if (value is not null)
