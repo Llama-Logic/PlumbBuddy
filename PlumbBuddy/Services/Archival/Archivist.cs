@@ -653,6 +653,7 @@ public partial class Archivist :
             MemoryStream? enhancedPackageMemoryStream = null;
             ReadOnlyMemory<byte> customThumbnail = chroniclePropertySet.Thumbnail;
             if (isInSavesDirectory
+                && !fileInfo.Name.StartsWith("Slot_ffffffff.save", StringComparison.OrdinalIgnoreCase) // DO NOT CUSTOMIZE THE AUTO SAVE
                 && (!string.IsNullOrWhiteSpace(chroniclePropertySet.GameNameOverride)
                 || !customThumbnail.IsEmpty))
             {
@@ -885,7 +886,7 @@ public partial class Archivist :
         if (!savesDirectory.Exists)
             return;
         foreach (var saveFile in savesDirectory.GetFiles("*.*", SearchOption.TopDirectoryOnly)
-            .Where(file => GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name))
+            .Where(file => GetSavesDirectoryLegalFilenamePattern().IsMatch(file.Name) && !file.Name.StartsWith("Slot_ffffffff.save", StringComparison.OrdinalIgnoreCase) /* DO NOT CUSTOMIZE THE AUTO SAVE */)
             .OrderBy(file => file.LastWriteTime)
             .ToImmutableArray())
         {

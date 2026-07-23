@@ -4,10 +4,9 @@ sealed class ReadOnlyMemoryOfByteStream :
     Stream
 {
     public ReadOnlyMemoryOfByteStream(ReadOnlyMemory<byte> readOnlyMemoryOfBytes) =>
-        this.readOnlyMemoryOfBytes = readOnlyMemoryOfBytes;
+        Memory = readOnlyMemoryOfBytes;
 
     long position;
-    readonly ReadOnlyMemory<byte> readOnlyMemoryOfBytes;
 
     public override bool CanRead =>
         true;
@@ -19,7 +18,9 @@ sealed class ReadOnlyMemoryOfByteStream :
         false;
 
     public override long Length =>
-        readOnlyMemoryOfBytes.Length;
+        Memory.Length;
+
+    public ReadOnlyMemory<byte> Memory { get; }
 
     public override long Position
     {
@@ -27,7 +28,7 @@ sealed class ReadOnlyMemoryOfByteStream :
         set
         {
             ArgumentOutOfRangeException.ThrowIfNegative(value, nameof(value));
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, readOnlyMemoryOfBytes.Length, nameof(value));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, Memory.Length, nameof(value));
             position = value;
         }
     }
@@ -44,11 +45,11 @@ sealed class ReadOnlyMemoryOfByteStream :
         ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
         if (buffer.Length - offset < count)
             throw new ArgumentException("invalid offset and length");
-        if (position >= readOnlyMemoryOfBytes.Length)
+        if (position >= Memory.Length)
             return 0;
         var positionAsInt = (int)position;
-        var result = Math.Min(readOnlyMemoryOfBytes.Length - positionAsInt, count);
-        readOnlyMemoryOfBytes.Span.Slice(positionAsInt, result).CopyTo(buffer.AsSpan(offset, result));
+        var result = Math.Min(Memory.Length - positionAsInt, count);
+        Memory.Span.Slice(positionAsInt, result).CopyTo(buffer.AsSpan(offset, result));
         position += result;
         return result;
     }
@@ -59,11 +60,11 @@ sealed class ReadOnlyMemoryOfByteStream :
         {
             SeekOrigin.Begin => offset,
             SeekOrigin.Current => position + offset,
-            SeekOrigin.End => readOnlyMemoryOfBytes.Length + offset,
+            SeekOrigin.End => Memory.Length + offset,
             _ => throw new ArgumentOutOfRangeException(nameof(origin))
         };
         ArgumentOutOfRangeException.ThrowIfNegative(newPosition, nameof(offset));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(newPosition, readOnlyMemoryOfBytes.Length, nameof(offset));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(newPosition, Memory.Length, nameof(offset));
         position = newPosition;
         return position;
     }

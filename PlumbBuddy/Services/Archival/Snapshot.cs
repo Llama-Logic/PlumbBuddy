@@ -37,11 +37,19 @@ public class Snapshot :
 
     static async Task<DataBasePackedFile> RegeneratePackageAsync(ChronicleDbContext dbContext, long savePackageSnapshotId)
     {
-        static MemoryStream fromReadOnlyMemory(ReadOnlyMemory<byte> data) =>
-            MemoryMarshal.TryGetArray(data, out var segment) && segment.Array is { } array
-            ? new MemoryStream(array, segment.Offset, segment.Count, writable: false)
-            : new MemoryStream(data.ToArray());
-        var package = new DataBasePackedFile();
+        var package = new DataBasePackedFile
+        {
+            // enable Memory Boost
+            Unused5 = new byte[]
+            {
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0xFF, 0xFF, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00
+            }
+        };
         using (var semaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount / 4)))
             await Task.WhenAll((await dbContext.SavePackageResources
                 .Where(spr => spr.Snapshots!.Any(s => s.Id == savePackageSnapshotId))
@@ -68,7 +76,8 @@ public class Snapshot :
                     await semaphore.WaitAsync().ConfigureAwait(false);
                     try
                     {
-                        var contentStream = fromReadOnlyMemory(await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false));
+                        var currentContent = await DataBasePackedFile.ZLibDecompressAsync(resource.ContentZLib, resource.ContentSize).ConfigureAwait(false);
+                        var contentStream = new ReadOnlyMemoryOfByteStream(currentContent);
                         var compressionType = resource.CompressionType;
                         try
                         {
@@ -79,19 +88,24 @@ public class Snapshot :
                                 MemoryMarshal.Read<uint>(keyBytes.Span[4..8]),
                                 MemoryMarshal.Read<ulong>(keyBytes.Span[8..16])
                             );
+                            if (key.Type is ResourceType.ZoneObjectData && compressionType is SavePackageResourceCompressionType.None)
+                                Debugger.Break();
                             foreach (var delta in resource.Deltas)
                             {
-                                using var oldContentStream = contentStream;
-                                contentStream = new MemoryStream();
                                 var patch = await DataBasePackedFile.ZLibDecompressAsync(delta.PatchZLib, delta.PatchSize).ConfigureAwait(false);
-                                BinaryPatch.Apply(oldContentStream, () => fromReadOnlyMemory(patch), contentStream);
+                                using var newContextStream = new ArrayBufferWriterOfByteStream();
+                                BinaryPatch.Apply(contentStream, () => new ReadOnlyMemoryOfByteStream(patch), newContextStream);
+                                contentStream.Dispose();
+                                contentStream = new(newContextStream.WrittenMemory);
                                 if (delta.CompressionType is { } deltaCompressionType)
                                     compressionType = deltaCompressionType;
+                                if (key.Type is ResourceType.ZoneObjectData && compressionType is SavePackageResourceCompressionType.None)
+                                    Debugger.Break();
                             }
                             await package.SetAsync
                             (
                                 key,
-                                contentStream.ToArray().AsMemory(),
+                                contentStream.Memory,
                                 compressionType switch
                                 {
                                     SavePackageResourceCompressionType.None => CompressionMode.ForceOff,
