@@ -2,7 +2,7 @@
 @inject IMarkupLocalizer<AppText> MarkupLocalizer
 @inject IParlay Parlay
 
-<MudTable Dense Hover Items="@StringTableEntries" Filter="@(ste => ParlayStringTable.IncludeEntry(Parlay, ste))" FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 308px)">
+<MudTable Dense Hover Items="@StringTableEntries" Filter="@(ste => ParlayStringTable.IncludeEntry(Parlay, ste))" FixedHeader Height="calc(var(--plumbbuddy-zoomed-vh) - 356px)">
 	<ToolBarContent>
 		<MudTextM3 Typo="TypoM3.Title" Style="width: 80%;">
 			@MarkupLocalizer[nameof(AppText.Parlay_StringTable_Title)]
@@ -33,5 +33,8 @@
 				@(ParlayStringTable.HighlightForDisplay(context.Original))
 			</div>
 		</MudTd>
-	</RowTemplate>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
 </MudTable>
