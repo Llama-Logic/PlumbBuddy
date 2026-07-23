@@ -1275,7 +1275,7 @@ partial class ManifestEditor
         if (stepper is null || stepper.GetActiveIndex() is not 0)
             return;
         selectStepFile = new FileInfo(Path.Combine(Settings.UserDataFolderPath, "Mods", e.ModFilePath));
-        await stepper.SetActiveIndex(6);
+        await stepper.GoToStepAsync(6);
         StateHasChanged();
     }
 

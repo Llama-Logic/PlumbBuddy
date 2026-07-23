@@ -1,5 +1,7 @@
 AllowSetForegroundWindow
 CallNextHookEx
+EnumDisplayMonitors
+GetDpiForMonitor
 GetForegroundWindow
 GetModuleHandle
 GetSystemCpuSetInformation

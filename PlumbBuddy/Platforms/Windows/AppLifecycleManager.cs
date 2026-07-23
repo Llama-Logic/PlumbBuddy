@@ -1,18 +1,59 @@
+using Epiforge.Extensions.Collections.Specialized;
+using MessagePack;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.Windows.AppLifecycle;
 using Windows.Storage;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT.Interop;
 
 namespace PlumbBuddy.Platforms.Windows;
 
-class AppLifecycleManager :
+partial class AppLifecycleManager :
     IAppLifecycleManager,
     IDisposable
 {
+    static unsafe byte[] CurrentDisplayConfigurationHash
+    {
+        get
+        {
+            using var sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            var byteArray = ArrayPool<byte>.Shared.Rent(24);
+            Span<byte> byteSpan = byteArray;
+            try
+            {
+                var displayAreas = new List<(int left, int top, int right, int bottom, uint dpiX, uint dpiY)>();
+                BOOL enumerator(HMONITOR monitor, HDC hdc, RECT* rect, LPARAM lParam)
+                {
+                    if (PInvoke.GetDpiForMonitor(monitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, out var dpiX, out var dpiY).Succeeded)
+                        displayAreas.Add((rect->left, rect->top, rect->right, rect->bottom, dpiX, dpiY));
+                    return true;
+                }
+                PInvoke.EnumDisplayMonitors(default, default, enumerator, default);
+                foreach (var displayArea in displayAreas.OrderBy(da => da.left).ThenBy(da => da.top))
+                {
+                    var (left, top, right, bottom, dpiX, dpiY) = displayArea;
+                    MemoryMarshal.Write(byteSpan[0..4], in left);
+                    MemoryMarshal.Write(byteSpan[4..8], in top);
+                    MemoryMarshal.Write(byteSpan[8..12], in right);
+                    MemoryMarshal.Write(byteSpan[12..16], in bottom);
+                    MemoryMarshal.Write(byteSpan[16..20], in dpiX);
+                    MemoryMarshal.Write(byteSpan[20..24], in dpiY);
+                    sha256.AppendData(byteArray[0..24]);
+                }
+                return sha256.GetCurrentHash();
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(byteArray);
+            }
+        }
+    }
+
     public AppLifecycleManager(MauiWinUIApplication app, ExtendedActivationKind extendedActivationKind)
     {
         if (extendedActivationKind is ExtendedActivationKind.StartupTask && new Services.Settings(Preferences.Default).Onboarded)
@@ -29,6 +70,7 @@ class AppLifecycleManager :
     AppWindow? appWindow;
     bool isWindowActive;
     bool preventCasualClosing = true;
+    readonly Dictionary<EquatableList<byte>, SavedWindowPlacement> savedWindowPlacements = [];
     readonly AsyncManualResetEvent? startupTaskTrap;
     Microsoft.UI.Xaml.Window? xamlWindow;
 
@@ -73,12 +115,29 @@ class AppLifecycleManager :
         }
     }
 
+    static byte[]? GetLocalByteArraySetting(string key) =>
+        ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var valueObj)
+        && valueObj is byte[] value
+        ? value
+        : default;
+
     T GetLocalSetting<T>(string key, T defaultValue, IFormatProvider? provider = null)
         where T : IFormattable, IParsable<T> =>
         ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var valueStr)
         && T.TryParse(valueStr?.ToString(), provider, out var value)
         ? value
         : defaultValue;
+
+    static void SetLocalSetting(string key, byte[]? value)
+    {
+        var values = ApplicationData.Current.LocalSettings.Values;
+        if (value == default)
+            values.Remove(key);
+        else if (values.ContainsKey(key))
+            values[key] = value;
+        else
+            values.Add(key, value);
+    }
 
     void HandleAppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
@@ -108,17 +167,11 @@ class AppLifecycleManager :
         WINDOWPLACEMENT windowPlacement = default;
         if (PInvoke.GetWindowPlacement(new HWND(WindowNative.GetWindowHandle(xamlWindow)), ref windowPlacement).Value is not 0)
         {
-            SetLocalSetting("WindowFlags", (uint)windowPlacement.flags);
-            SetLocalSetting("WindowMaxX", windowPlacement.ptMaxPosition.X);
-            SetLocalSetting("WindowMaxY", windowPlacement.ptMaxPosition.Y);
-            SetLocalSetting("WindowMinX", windowPlacement.ptMinPosition.X);
-            SetLocalSetting("WindowMinY", windowPlacement.ptMinPosition.Y);
-            SetLocalSetting("WindowNormalL", windowPlacement.rcNormalPosition.left);
-            SetLocalSetting("WindowNormalT", windowPlacement.rcNormalPosition.top);
-            SetLocalSetting("WindowNormalR", windowPlacement.rcNormalPosition.right);
-            SetLocalSetting("WindowNormalB", windowPlacement.rcNormalPosition.bottom);
-            SetLocalSetting("WindowShowCmd", (int)windowPlacement.showCmd);
-            SetLocalSetting("WindowPlacementSaved", 1);
+            var displayConfigurationHash = CurrentDisplayConfigurationHash;
+            var equatableDisplayConfigurationHash = new EquatableList<byte>(displayConfigurationHash);
+            ref var savedWindowPlacementEntry = ref CollectionsMarshal.GetValueRefOrAddDefault(savedWindowPlacements, equatableDisplayConfigurationHash, out _);
+            savedWindowPlacementEntry = SavedWindowPlacement.FromWin32WindowPlacement(string.Join(string.Empty, displayConfigurationHash.Select(b => b.ToString("x2"))), windowPlacement);
+            SetLocalSetting("SavedWindowPlacements", MessagePackSerializer.Serialize(savedWindowPlacements.Values.ToList()));
         }
     }
 
@@ -160,32 +213,23 @@ class AppLifecycleManager :
                 this.xamlWindow.Activate();
             appWindow = xamlWindow.AppWindow;
             appWindow.Closing += HandleAppWindowClosing;
-            if (GetLocalSetting("WindowPlacementSaved", 0) is not 0)
+            if (GetLocalByteArraySetting("SavedWindowPlacements") is { } savedWindowPlacementsByteArray)
             {
-                var windowPlacement = new WINDOWPLACEMENT
+                try
                 {
-                    flags = (WINDOWPLACEMENT_FLAGS)GetLocalSetting("WindowFlags", 0),
-                    length = (uint)Marshal.SizeOf<WINDOWPLACEMENT>(),
-                    ptMaxPosition = new System.Drawing.Point
-                    (
-                        GetLocalSetting("WindowMaxX", 0),
-                        GetLocalSetting("WindowMaxY", 0)
-                    ),
-                    ptMinPosition = new System.Drawing.Point
-                    (
-                        GetLocalSetting("WindowMinX", 0),
-                        GetLocalSetting("WindowMinY", 0)
-                    ),
-                    rcNormalPosition = new RECT
-                    (
-                        GetLocalSetting("WindowNormalL", 0),
-                        GetLocalSetting("WindowNormalT", 0),
-                        GetLocalSetting("WindowNormalR", 0),
-                        GetLocalSetting("WindowNormalB", 0)
-                    ),
-                    showCmd = (SHOW_WINDOW_CMD)GetLocalSetting("WindowShowCmd", 0)
-                };
-                PInvoke.SetWindowPlacement(new HWND(WindowNative.GetWindowHandle(this.xamlWindow)), in windowPlacement);
+                    var savedWindowPlacements = MessagePackSerializer.Deserialize<List<SavedWindowPlacement>>(savedWindowPlacementsByteArray);
+                    foreach (var savedWindowPlacement in savedWindowPlacements)
+                        this.savedWindowPlacements.Add(new(Convert.FromHexString(savedWindowPlacement.DisplayConfigurationHashHex)), savedWindowPlacement);
+                    if (this.savedWindowPlacements.TryGetValue(new(CurrentDisplayConfigurationHash), out var currentSavedWindowPlacement))
+                    {
+                        var currentWin32WindowPlacement = currentSavedWindowPlacement.ToWin32WindowPlacement();
+                        PInvoke.SetWindowPlacement(new(WindowNative.GetWindowHandle(this.xamlWindow)), in currentWin32WindowPlacement);
+                    }
+                }
+                catch
+                {
+                    // meh
+                }
             }
         }
     }
