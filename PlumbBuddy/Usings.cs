@@ -14,6 +14,7 @@ global using Epiforge.Extensions.Collections.ObjectModel;
 global using Epiforge.Extensions.Expressions.Observable.Query;
 global using H.NotifyIcon;
 global using Humanizer;
+global using Humanizer.Bytes;
 global using ICSharpCode.SharpZipLib.Zip;
 global using IniParser.Exceptions;
 global using IniParser.Parser;
