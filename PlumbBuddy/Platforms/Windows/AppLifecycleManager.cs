@@ -108,10 +108,8 @@ partial class AppLifecycleManager :
     {
         if (disposing)
         {
-            if (xamlWindow is not null)
-                xamlWindow.Activated -= HandleWindowActivated;
-            if (appWindow is not null)
-                appWindow.Closing -= HandleAppWindowClosing;
+            xamlWindow?.Activated -= HandleWindowActivated;
+            appWindow?.Closing -= HandleAppWindowClosing;
         }
     }
 
