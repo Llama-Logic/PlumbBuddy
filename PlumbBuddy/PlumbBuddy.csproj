@@ -20,8 +20,8 @@
         <ApplicationId>com.llamalogic.plumbbuddy</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.7.37</ApplicationDisplayVersion>
-        <ApplicationVersion>1.7.37</ApplicationVersion>
+        <ApplicationDisplayVersion>1.7.38</ApplicationDisplayVersion>
+        <ApplicationVersion>1.7.38</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -49,7 +49,7 @@
         <AppxSymbolPackageEnabled>true</AppxSymbolPackageEnabled>
         <GenerateAppInstallerFile>true</GenerateAppInstallerFile>
         <GenerateTestArtifacts>false</GenerateTestArtifacts>
-        <PackageCertificateThumbprint>0c3a6be3d44b381a2185f90423fcc567a6cb4338</PackageCertificateThumbprint>
+        <PackageCertificateThumbprint>094122F38A3B4268F6A3C11E07E18B00046C9E04</PackageCertificateThumbprint>
         <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 

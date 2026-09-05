@@ -28,9 +28,9 @@ Write-Progress -Activity "Build for Windows" -Status "Removing $version Workspac
 Remove-Item -Path ${outputDir}PlumbBuddy_${version}.0_Test -Recurse
 
 Write-Progress -Activity "Build for Windows" -Status "Timestamping x64" -PercentComplete 87
-signtool sign /fd SHA256 /tr http://timestamp.sectigo.com /td SHA256 /sha1 0c3a6be3d44b381a2185f90423fcc567a6cb4338 "${outputDir}PlumbBuddy_${version}_x64.msix"
+signtool sign /fd SHA256 /tr http://timestamp.sectigo.com /td SHA256 /sha1 094122F38A3B4268F6A3C11E07E18B00046C9E04 "${outputDir}PlumbBuddy_${version}_x64.msix"
 
 Write-Progress -Activity "Build for Windows" -Status "Timestamping amd64" -PercentComplete 94
-signtool sign /fd SHA256 /tr http://timestamp.sectigo.com /td SHA256 /sha1 0c3a6be3d44b381a2185f90423fcc567a6cb4338 "${outputDir}PlumbBuddy_${version}_arm64.msix"
+signtool sign /fd SHA256 /tr http://timestamp.sectigo.com /td SHA256 /sha1 094122F38A3B4268F6A3C11E07E18B00046C9E04 "${outputDir}PlumbBuddy_${version}_arm64.msix"
 
 Write-Progress -Activity "Build for Windows" -Completed -Status "Built $version for x64 and arm64"
