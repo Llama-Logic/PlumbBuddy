@@ -57,10 +57,16 @@ public static class MauiProgram
 
         builder.Services.AddSingleton(FolderPicker.Default);
 
+#if DEBUG
+        builder.Logging.SetMinimumLevel(LogLevel.Debug);
+#endif
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog
         (
             new LoggerConfiguration()
+#if DEBUG
+                .MinimumLevel.Is(LogEventLevel.Debug)
+#endif
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #if DEBUG
                 .WriteTo.File(Path.Combine(AppDataDirectory.FullName, "DebugLog.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Properties}{NewLine}{Exception}")

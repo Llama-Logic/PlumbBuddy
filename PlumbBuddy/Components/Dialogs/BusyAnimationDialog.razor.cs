@@ -36,7 +36,7 @@ partial class BusyAnimationDialog
         await base.OnAfterRenderAsync(firstRender);
         if (ProcessComplete is { } processComplete)
         {
-            await JSRuntime.InvokeVoidAsync("loadLottie", AnimationPath, animationClassName);
+            var runningAnimation = await JSRuntime.InvokeAsync<IJSObjectReference>("loadLottie", AnimationPath, animationClassName);
             try
             {
                 await processComplete;
@@ -45,6 +45,8 @@ partial class BusyAnimationDialog
             {
                 // all we care about is completion, not faults
             }
+            await JSRuntime.InvokeVoidAsync("destroyLottie", runningAnimation);
+            await runningAnimation.DisposeAsync();
             MudDialog?.Close(DialogResult.Ok(true));
         }
     }

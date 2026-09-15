@@ -5,6 +5,9 @@ window.blurElement = selector =>
 window.delay = ms =>
     new Promise(resolve => setTimeout(resolve, ms));
 
+window.destroyLottie = animation =>
+    animation?.destroy();
+
 window.focusElement = selector =>
     document.querySelector(selector).focus();
 
