@@ -89,7 +89,7 @@ public sealed class DependencyScan :
         {
             yield return new ScanIssue
             {
-                Caption = string.Format(AppText.Scan_Dependency_RequiredPack_Caption, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithMissingPacks.MissingPackCodes.Count)),
+                Caption = string.Format(AppText.Scan_Dependency_RequiredPack_Caption, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, AppText.Scan_Dependency_PackNoun.ToLocalizedQuantity(modWithMissingPacks.MissingPackCodes.Count)),
                 Description = string.Format(AppText.Scan_Dependency_RequiredPack_Description, string.IsNullOrWhiteSpace(modWithMissingPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithMissingPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithMissingPacks.MissingPackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithMissingPacks.MissingPackCodes).Humanize(), smartSimObserver.IsSteamInstallation ? AppText.Common_Steam : AppText.Common_TheEAApp),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
@@ -137,7 +137,7 @@ public sealed class DependencyScan :
         {
             yield return new ScanIssue
             {
-                Caption = string.Format(AppText.Scan_Dependency_DisabledPack_Caption, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithDisabledPacks.MissingPackCodes.Count)),
+                Caption = string.Format(AppText.Scan_Dependency_DisabledPack_Caption, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, AppText.Scan_Dependency_PackNoun.ToLocalizedQuantity(modWithDisabledPacks.MissingPackCodes.Count)),
                 Description = string.Format(AppText.Scan_Dependency_DisabledPack_Description, string.IsNullOrWhiteSpace(modWithDisabledPacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithDisabledPacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithDisabledPacks.MissingPackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithDisabledPacks.MissingPackCodes).Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonalOff,
                 Type = ScanIssueType.Sick,
@@ -182,7 +182,7 @@ public sealed class DependencyScan :
             .AsAsyncEnumerable())
             yield return new ScanIssue
             {
-                Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
+                Caption = string.Format(AppText.Scan_Dependency_IncompatiblePack_Caption, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, AppText.Scan_Dependency_PackNoun.ToLocalizedQuantity(modWithIncompatiblePacks.IncompatiblePackCodes.Count)),
                 Description = string.Format(AppText.Scan_Dependency_IncompatiblePack_Description, string.IsNullOrWhiteSpace(modWithIncompatiblePacks.Name) ? AppText.Scan_Dependency_ModNameFallback : modWithIncompatiblePacks.Name, (publicCatalogs.PackCatalog is { } packCatalog ? modWithIncompatiblePacks.IncompatiblePackCodes.Select(packCode => packCatalog.TryGetValue(packCode, out var pack) ? pack.EnglishName : packCode) : modWithIncompatiblePacks.IncompatiblePackCodes).Humanize()),
                 Icon = MaterialDesignIcons.Normal.BagPersonal,
                 Type = ScanIssueType.Sick,
@@ -304,14 +304,14 @@ public sealed class DependencyScan :
                 return
                 (
                     AppText.Scan_Dependency_BrokenFile_Caption,
-                    string.Format(AppText.Scan_Dependency_BrokenFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
+                    string.Format(AppText.Scan_Dependency_BrokenFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToLocalizedQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     null
                 );
             if (resolutionType.HasFlag(MissingDependencyModResolutionType.ReinstallFile))
                 return
                 (
                     AppText.Scan_Dependency_ReinstallFile_Caption,
-                    string.Format(AppText.Scan_Dependency_ReinstallFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
+                    string.Format(AppText.Scan_Dependency_ReinstallFile_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToLocalizedQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
                         Label = string.Format(AppText.Scan_Dependency_ReinstallFile_Download_Label, modWithMissingDependencyMod.Name),
@@ -339,7 +339,7 @@ public sealed class DependencyScan :
                 return
                 (
                     AppText.Scan_Dependency_FileNeedsDownload_Caption,
-                    string.Format(AppText.Scan_Dependency_FileNeedsDownload_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
+                    string.Format(AppText.Scan_Dependency_FileNeedsDownload_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToLocalizedQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize()),
                     new()
                     {
                         Label = AppText.Scan_Dependency_FileNeedsDownload_Download_Label,
@@ -367,7 +367,7 @@ public sealed class DependencyScan :
                 return
                 (
                     string.Format(AppText.Scan_Dependency_FileNeedsDependency_Caption, modWithMissingDependencyMod.DependencyName),
-                    string.Format(AppText.Scan_Dependency_FileNeedsDependency_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
+                    string.Format(AppText.Scan_Dependency_FileNeedsDependency_Description, AppText.Scan_Dependency_FileNoun_LowerCase.ToLocalizedQuantity(modWithMissingDependencyMod.FilePaths.Count), modWithMissingDependencyMod.FilePaths.Select(filePath => $"`{filePath}`").Humanize(), modWithMissingDependencyMod.DependencyName, getByLine(modWithMissingDependencyMod.DependencyCreators)),
                     new()
                     {
                         Label = string.Format(AppText.Scan_Dependency_FileNeedsDependency_Download_Label, modWithMissingDependencyMod.DependencyName),

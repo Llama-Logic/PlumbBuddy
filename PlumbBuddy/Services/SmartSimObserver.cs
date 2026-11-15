@@ -1327,7 +1327,7 @@ public partial class SmartSimObserver :
                 if (distinctAttentionWorthyScanIssueCaptions.Length is <= 3)
                     modHealthStatusSummary = distinctAttentionWorthyScanIssueCaptions.Humanize();
                 else
-                    modHealthStatusSummary = distinctAttentionWorthyScanIssueCaptions.Take(2).Append(AppText.SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue.ToQuantity(distinctAttentionWorthyScanIssueCaptions.Length - 2, ShowQuantityAs.Words)).Humanize();
+                    modHealthStatusSummary = distinctAttentionWorthyScanIssueCaptions.Take(2).Append(AppText.SmartSimObserver_Notification_UnhealthyMods_Text_OtherIssue.ToLocalizedQuantity(distinctAttentionWorthyScanIssueCaptions.Length - 2, ShowQuantityAs.Words)).Humanize();
                 if (modHealthStatusSummary != lastModHealthStatusSummary)
                 {
                     if (!appLifecycleManager.IsVisible)
