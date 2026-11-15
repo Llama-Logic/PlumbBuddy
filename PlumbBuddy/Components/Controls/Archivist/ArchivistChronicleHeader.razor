@@ -86,7 +86,7 @@
 					</MudItem>
 					<MudItem>
 						<MudTooltip Arrow Text="@(AppText.Archivist_Chronicle_Snapshots_Tip)">
-                            <MudChip Icon="@MaterialDesignIcons.Normal.Timeline" Value="@(AppText.Archivist_Chronicle_Snapshot.ToQuantity(snapshots is null ? 0 : ObservedCollection(() => snapshots).Count))" />
+                            <MudChip Icon="@MaterialDesignIcons.Normal.Timeline" Value="@(AppText.Archivist_Chronicle_Snapshot.ToLocalizedQuantity(snapshots is null ? 0 : ObservedCollection(() => snapshots).Count))" />
 						</MudTooltip>
 					</MudItem>
 				</MudGrid>

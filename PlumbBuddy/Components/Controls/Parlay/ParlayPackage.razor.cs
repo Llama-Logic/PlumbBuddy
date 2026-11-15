@@ -17,7 +17,7 @@ partial class ParlayPackage
             await DialogService.ShowInfoDialogAsync(AppText.Parlay_MergeStringTable_NoStringsImported_Caption, AppText.Parlay_MergeStringTable_NoStringsImported_Text);
             return;
         }
-        await DialogService.ShowInfoDialogAsync(AppText.Parlay_MergeStringTable_MergeComplete_Caption, string.Format(AppText.Parlay_MergeStringTable_MergeComplete_Text, AppText.Parlay_MergeStringTable_MergeComplete_Text_String.ToQuantity(stringsImported)));
+        await DialogService.ShowInfoDialogAsync(AppText.Parlay_MergeStringTable_MergeComplete_Caption, string.Format(AppText.Parlay_MergeStringTable_MergeComplete_Text, AppText.Parlay_MergeStringTable_MergeComplete_Text_String.ToLocalizedQuantity(stringsImported)));
     }
 
     async Task ShowCreatorMessageAsync()
